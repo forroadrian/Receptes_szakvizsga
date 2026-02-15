@@ -1,12 +1,8 @@
+import type Ingredient from "~/models/Ingredient";
+
 export interface SearchOptions {
-    visual? : Visual
-    data: Data
+    placeholder? :string,
+    haystack: possibleHaystack
 }
 
-interface Visual {
-    placeholder?: string
-}
-
-interface Data {
-    data: Array<any>
-}
+export type possibleHaystack = Array<Ingredient> 
