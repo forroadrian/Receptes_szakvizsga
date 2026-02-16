@@ -28,16 +28,35 @@
                         </NuxtLink>
                     </li>
                 </ul>
-                <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
+                <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0 ">
                     <NuxtLink class="btn btn-dark" to="/login">Belépés</NuxtLink>
-                    <NuxtLink class="btn btn-outline-dark" to="/signup">Regisztráció</NuxtLink>
+                    <NuxtLink class="btn btn-outline-dark me-3" to="/signup">Regisztráció</NuxtLink>
                 </div>
             </div>
         </nav>
     </header>
+
+
+    <div class="asd d-flex flex-column ">
+        <button class="rbtn rbtn--orange m-3">Mentés</button>
+        <button class="rbtn rbtn--green m-3">Szűrés</button>
+        <button class="rbtn rbtn--light  m-3">Bevásárlólista</button>
+        <button class="rbtn rbtn--purple  m-3">Kedvencek</button>
+    </div>
+
 </template>
 
 <style scoped>
+.asd {
+    width: 30%;
+
+}
+
+.rbtn {
+    font-size: 22px;
+
+}
+
 .nav-link,
 .btn {
     font-size: var(--nav-font-size);
