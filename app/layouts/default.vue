@@ -1,9 +1,23 @@
 <template>
-    <div class="d-flex flex-column min-vh-100">
+    <div class="appLayouts">
         <Header />
-        <main class="container py-4 flex-grow-1">
+
+        <main class="appLayoutsMain container py-4">
             <slot />
         </main>
+
         <Footer />
     </div>
 </template>
+
+<style scoped>
+.appLayouts {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.appLayoutsMain {
+    flex: 1;
+}
+</style>

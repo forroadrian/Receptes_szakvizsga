@@ -12,9 +12,9 @@
             </button>
 
             <div id="mainNav" class="collapse navbar-collapse text-center text-lg-start">
-                <ul class="navbar-nav me-auto ">
-                    <li class="nav-item">
-                        <NuxtLink class="nav-link" to="/"><i class="bi bi-house"></i> Kezdőlap</NuxtLink>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item ">
+                        <NuxtLink class="nav-link " to="/"><i class="bi bi-house"></i> Kezdőlap</NuxtLink>
                     </li>
                     <li class="nav-item">
                         <NuxtLink class="nav-link" to="/recipes"><i class="bi bi-fork-knife"></i>Receptek</NuxtLink>
@@ -38,7 +38,6 @@
 </template>
 
 <style scoped>
-
 .nav-link,
 .btn {
     font-size: var(--nav-font-size);
@@ -62,24 +61,21 @@
 }
 
 .navbar-toggler,
-.navbar-brand img {
-    margin: 0px 10px;
+.navbar-brand img,
+.nav-link {
+    margin: 0px 20px;
 }
 
-.nav-item {
-    margin: var(--nav-item-gap-y) var(--nav-item-gap-x);
-}
 
 @media (max-width: 991px) {
 
     .nav-link,
     .btn {
         font-size: var(--nav-font-size-lg);
-
     }
 
     .btn {
-        margin: var(--nav-item-gap-y);
+        margin: 0px 20px;
     }
 }
 </style>
