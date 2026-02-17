@@ -4,6 +4,7 @@
 
         <main class="appLayoutsMain container py-4">
             <slot />
+           <Button/>
         </main>
 
         <Footer />

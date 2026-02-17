@@ -1,6 +1,6 @@
 <script setup></script>
 <template>
-    <header class="border-bottom bg-white">
+    <header>
         <nav class="navbar navbar-expand-lg container py-2">
             <div>
                 <NuxtLink class="navbar-brand" to="/"><img src="../assets/images/logo.png" alt="Brand logo"
@@ -37,25 +37,9 @@
     </header>
 
 
-    <div class="asd d-flex flex-column ">
-        <button class="rbtn rbtn--orange m-3">Mentés</button>
-        <button class="rbtn rbtn--green m-3">Szűrés</button>
-        <button class="rbtn rbtn--light  m-3">Bevásárlólista</button>
-        <button class="rbtn rbtn--purple  m-3">Kedvencek</button>
-    </div>
-
 </template>
 
 <style scoped>
-.asd {
-    width: 30%;
-
-}
-
-.rbtn {
-    font-size: 22px;
-
-}
 
 .nav-link,
 .btn {
