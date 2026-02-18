@@ -29,8 +29,9 @@
                     </li>
                 </ul>
                 <div class="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0 ">
-                    <NuxtLink class="btn btn-dark" to="/login">Belépés</NuxtLink>
-                    <NuxtLink class="btn btn-outline-dark me-3" to="/signup">Regisztráció</NuxtLink>
+                    <NuxtLink class="grad orange" to="/login">Belépés</NuxtLink>
+                    <NuxtLink class="grad orange outline" to="/signup">Regisztráció
+                    </NuxtLink>
                 </div>
             </div>
         </nav>
@@ -40,7 +41,6 @@
 </template>
 
 <style scoped>
-
 .nav-link,
 .btn {
     font-size: var(--nav-font-size);
