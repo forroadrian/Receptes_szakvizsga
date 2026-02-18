@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import type { possibleHaystack, SearchOptions } from '@/types/SearchBarOptions'
-import type Ingredient from '~/models/Ingredient';
+import type SearchBarOptions from '~/interfaces/SearchBarOptions';
 
-const props = defineProps<SearchOptions>();
-const emit = defineEmits([''])
-const searchText = ref<string>("");
+const filter = defineModel<string>()
+const props = defineProps<SearchBarOptions>()
 
-const filteredData = computed<possibleHaystack>(() =>{
-    // TODO: create data structures
-    return props.haystack.filter((value) => {
-        let title: string = value.name
-        return title.includes(searchText.value)
-    })
-});
+const input = ref("")
+
+watch(input,() => {
+    filter.value = input.value
+})
 
 </script>
 
 <template>
-    <input type="text" name="" id="" :placeholder="placeholder" v-model="searchText">
+    <input type="text" :placeholder="placeholder" v-model="input">
 </template>
