@@ -1,11 +1,10 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { ref, computed } from 'vue';
+
+const model = defineModel();
+const showPassword = ref(false);
 
 const props = defineProps({
-    modelValue: {
-        type: String,
-        default: ''
-    },
     type: {
         type: String,
         default: 'text'
@@ -24,19 +23,40 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['update:modelValue']);
+const inputType = computed(() => {
+    if (props.type === 'password') {
+        return showPassword.value ? 'text' : 'password';
+    }
+    return props.type;
+});
 
-const updateValue = (inputEvent) => {
-    const newValue = inputEvent.target.value;
-    emit('update:modelValue', newValue);
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
 }
-
 </script>
 
 <template>
     <div class="mb-3">
         <label v-if="label" class="form-label">{{ label }}</label>
-        <input class="form-control" :type="type" :placeholder="placeholder" :required="required" :value="modelValue"
-            @input="updateValue">
+
+        <div class="position-relative d-flex align-items-center">
+            <input class="form-control pe-5" v-model="model" :type="inputType" :placeholder="placeholder" :required="required"/>
+
+            <i v-if="type === 'password'"
+                :class="showPassword ? 'bi bi-eye-slash password-icon' : 'bi bi-eye password-icon'" @click="togglePassword"></i>
+        </div>
     </div>
 </template>
+
+<style scoped>
+.password-icon {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.password-icon:hover {
+    color: #000;
+}
+</style>
