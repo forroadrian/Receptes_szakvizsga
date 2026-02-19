@@ -33,13 +33,13 @@ const onSubmit = () => {
 
 
 <template>
-    <div class="d-flex align-items-center justify-content-center px-3 py-5">
-        <div class="card shadow">
+    <div class="d-flex align-items-center justify-content-center px-3 py">
+        <div class="card shadow-lg">
             <div class="row g-0">
                 <div class="col-12 col-lg-6">
-                    <div class="p-4 p-md-5 d-flex flex-column justify-content-center">
+                    <div class="p-4 form-side p-md-5 d-flex flex-column justify-content-center">
                         <div class="text-center mb-4">
-                            <h1 class="fs-2">Regisztráció</h1>
+                            <h1 class="fs-1">Regisztráció</h1>
                         </div>
 
                         <form @submit.prevent="onSubmit">
@@ -79,8 +79,8 @@ const onSubmit = () => {
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-6">
-                    <img src="../assets/images/background.jpg" alt="recipe image" title="recipe image"/>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="../assets/images/background.png" alt="recipe image" title="recipe image"/>
                 </div>
             </div>
         </div>
@@ -97,7 +97,8 @@ img {
 }
 
 .card {
-    max-width: 980px;
+    max-width: 1200px;
+    width: 100%;
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.6);
 }
@@ -106,5 +107,9 @@ a {
     text-decoration: none;
     color: #6f42c1;
     font-size: 15px;
+}
+
+.py{
+    padding-top: 8rem;
 }
 </style>
