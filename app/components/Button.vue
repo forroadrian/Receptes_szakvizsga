@@ -22,6 +22,10 @@ const props = defineProps({
     icon: {
         type: String
     },
+     iconPosition: {
+        type: String,
+        default: "left",
+    },
     iconOnly: {
         type: Boolean,
         default: false,
@@ -34,6 +38,11 @@ const classes = computed(() => {
     return ["grad", props.color, props.outline ? "outline" : "",];
 });
 
+const iconPosition = computed(() => {
+    return props.iconPosition === "right" ? "right" : "left";
+});
+
+
 function handleClick(event) {
     if (!props.disabled) {
         emit("click", event);
@@ -42,11 +51,17 @@ function handleClick(event) {
 </script>
 <template>
     <button :type="type" :class="classes" :disabled="disabled" @click="handleClick">
-        <i v-if="icon" :class="icon"></i>
+       <i  v-if="icon && iconPosition === 'left'" :class="icon"> </i>
+
         <span v-if="!iconOnly">
             <slot />
         </span>
-    </button>
+        </button>
 </template>
 
-<style scoped></style>
+<style scoped>
+i {
+    font-size: 20px;
+    padding: 0px 10px;
+}
+</style>
