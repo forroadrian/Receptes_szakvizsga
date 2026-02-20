@@ -22,9 +22,6 @@ const results = useSearch(params);
 </script>
 <template>
   <div>
-    <h1 class="text-center">welcome</h1>
-  </div>
-  <div>
     <h2>Test</h2>
     <p>{{ params.query }}</p>
     <p>{{ results }}</p>
