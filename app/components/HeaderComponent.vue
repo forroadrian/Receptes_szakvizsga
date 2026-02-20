@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const isLoggedIn = ref(true);
 const selectedLanguage = ref("hu");
-const isDark = ref(true);
+const isLight = ref(true);
 
 const languageOptions = [
     { value: "hu", label: "Magyar" },
     { value: "en", label: "English" }
 ]
 
-const theme = computed(() => (isDark.value ? "dark" : "light"));
-const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód"));
+const theme = computed(() => (isLight.value ? "dark" : "light"));
+const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mód"));
 
 </script>
 <template>
@@ -27,7 +27,7 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div id="mainNav" class="collapse navbar-collapse">
+                <div id="mainNav" class="collapse navbar-collapse p-0">
                     <ul class="navbar-nav mx-lg-auto text-center nav-links">
                         <li class="nav-item ">
                             <NuxtLink class="nav-link" to="/">Kezdőlap</NuxtLink>
@@ -44,62 +44,58 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
                     </ul>
 
                     <div v-if="!isLoggedIn" class="auth-area">
-                        <NuxtLink class="grad orange outline w-100 w-lg-auto" to="/signup"> Regisztráció</NuxtLink>
-                        <NuxtLink class="grad orange w-100 w-lg-auto" to="/login">Belépés</NuxtLink>
+                        <NuxtLink class="grad orange outline w-lg-auto" to="/signup"> Regisztráció</NuxtLink>
+                        <NuxtLink class="grad orange w-lg-auto" to="/login">Belépés</NuxtLink>
                     </div>
 
-                    <div v-else class="auth-area">
-                        <select class="form-select lang-select grad light w-sm-25  m-auto" v-model="selectedLanguage"
+                    <form v-else class="auth-area">
+                        <select class="form-select lang-select m-auto" v-model="selectedLanguage"
                             aria-label="Nyelv választása">
                             <option v-for="lang in languageOptions" :value="lang.value">
                                 {{ lang.label }}
                             </option>
                         </select>
 
-                        <div class="dropdown w-100 w-lg-auto">
+                        <div class="dropdown w-lg-auto">
                             <button
-                                class="grad-text text-orange w-100 d-flex align-items-center justify-content-center justify-content-lg-start"
+                                class="w-100 d-flex align-items-center justify-content-center justify-content-lg-start"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img class="nav-avatar me-2" src="../assets/images/logo.png" alt="Profilkép" />
                                 <p class="text-truncate my-auto">HosszúFelhasználónév </p>
                             </button>
 
-                            <ul class="dropdown-menu account-menu dropdown-menu-end">
-                                <li class="account-head px-3 pt-3 pb-2">
+                            <ul class="dropdown-menu account-menu">
+                                <li class="account-head p-3 ">
                                     <div class="account-avatar-wrap">
                                         <img class="account-avatar" src="../assets/images/logo.png" alt="Profilkép" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="mt-2 text-center">
-                                        <div class="account-name text-truncate">felhasznalonev</div>
-                                        <div class="account-email text-truncate">felhasznalo.gmail.com
+                                        <div class="account-name ">felhasznalonev</div>
+                                        <div class="account-email">felhasznalo.gmail.com
                                         </div>
                                     </div>
                                 </li>
-
                                 <li>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input me-2 " type="checkbox" role="switch"
-                                            v-model="isDark" />
-                                        <label class="form-check-label ">
-                                            {{ isDark ? "Sötét téma" : "Világos téma" }}
-                                        </label>
+                                    <div class="form-check form-switch m-2" @click.stop>
+                                        <input class="form-check-input bg-danger" type="checkbox" role="switch"
+                                            v-model="isLight" />
+                                        <span>{{ isLight ? "Világos téma" : "Sötét téma" }}</span>
                                     </div>
-
+                                </li>
+                                <li>
+                                    <NuxtLink to="about" class="dropdown-item account-item" href="#">
+                                        <span><i class="bi bi-gear pe-3"></i>Profil beállítások</span>
+                                    </NuxtLink>
                                 </li>
                                 <li>
                                     <a class="dropdown-item account-item" href="#">
-                                        <span class="flex-grow-1">Profil beállítások</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item account-item account-danger" href="#">
-                                        <span class="flex-grow-1">Kijelentkezés</span>
+                                        <span><i class="bi bi-box-arrow-right pe-3"></i>Kijelentkezés</span>
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </nav>
@@ -110,18 +106,25 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
 <style scoped>
 .dropdown button {
     border: none !important;
+    background-color: transparent !important;
 }
 
 .site-header,
 .nav-link:hover::after,
 .lang-select,
-.auth-area {
+.auth-area,
+.dropdown,
+.grad {
     width: 100%;
 }
 
 .nav-link,
 .account-avatar-wrap {
     position: relative;
+}
+
+.dropdown button p {
+    color: var(--orange);
 }
 
 .nav-link {
@@ -153,8 +156,8 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
 .auth-area {
     display: flex;
     flex-direction: column;
-    gap: .5rem;
-    margin-top: .75rem;
+    gap: 30px;
+    margin-top: 30px;
 }
 
 .nav-avatar {
@@ -180,9 +183,7 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
 }
 
 .account-menu {
-    padding: .5rem 0;
     border: 0;
-    border-radius: 14px;
     color: #1b1b1b;
 }
 
@@ -206,9 +207,6 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
 
 
 .account-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     padding: 10px;
 }
 
@@ -230,14 +228,11 @@ const themeText = computed(() => (isDark.value ? "Sötét mód" : "Világos mód
         width: 140px;
     }
 
-    .nav-links {
-        gap: .15rem;
-    }
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 992px) {
     .lang-select {
-        width: 25%;
+        width: 30%;
         text-align: center;
     }
 

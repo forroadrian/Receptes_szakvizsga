@@ -106,3 +106,17 @@
         transform: translateX(100%)
     }
 }
+
+.dropdown-menu {
+    display: block;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transition: opacity 160ms ease, transform 160ms ease;
+   
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}

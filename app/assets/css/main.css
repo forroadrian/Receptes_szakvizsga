@@ -19,6 +19,11 @@
     --grad-gray-dark: linear-gradient(135deg, #212121, #363636, #636363);
 }
 
+select:focus {
+    border-color: rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+}
+
 h1 {
     font-family: "Caveat Brush", cursive;
     text-transform: uppercase;
