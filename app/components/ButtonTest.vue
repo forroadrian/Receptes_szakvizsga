@@ -8,7 +8,7 @@
             <Button color="yellow" disabled>Yellow disabled</Button>
             <Button color="dark">Lorem ipsum </Button>
             <Button color="green" icon="bi bi-arrow-right-circle" icon-only></Button>
-            <Button color="green" icon="bi bi-arrow-right-circle" icon-position="right"> Green </Button>
+            <Button color="green"  icon="bi bi-arrow-right-circle" icon-position="right"> Green </Button>
             <Button color="green" outline>Lorem ipsum </Button>
             <Button color="yellow" outline>Lorem ipsum </Button>
             <Button color="orange" outline>Lorem ipsum </Button>

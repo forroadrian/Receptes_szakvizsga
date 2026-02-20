@@ -1,15 +1,14 @@
 <template>
     <div class="appLayouts">
-        <Header />
+        <HeaderComponent />
 
         <main class="appLayoutsMain container py-4">
-            <slot />
-           
+            <slot> </slot>
             <ButtonTest />
 
         </main>
 
-        <Footer />
+        <FooterComponent />
     </div>
 </template>
 
