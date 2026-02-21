@@ -28,8 +28,8 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
                 </button>
 
                 <div id="mainNav" class="collapse navbar-collapse p-0">
-                    <ul class="navbar-nav mx-lg-auto text-center nav-links">
-                        <li class="nav-item ">
+                    <ul class="navbar-nav mx-lg-auto nav-links">
+                        <li class="nav-item">
                             <NuxtLink class="nav-link" to="/">Kezdőlap</NuxtLink>
                         </li>
                         <li class="nav-item">
@@ -58,22 +58,21 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 
                         <div class="dropdown w-lg-auto">
                             <button
-                                class="w-100 d-flex align-items-center justify-content-center justify-content-lg-start"
+                                class="dropdown-toggle d-flex align-items-center justify-content-center justify-content-lg-start"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img class="nav-avatar me-2" src="../assets/images/logo.png" alt="Profilkép" />
+                                <img class="nav-avatar me-3" src="../assets/images/logo.png" alt="Profilkép" />
                                 <p class="text-truncate my-auto">HosszúFelhasználónév </p>
                             </button>
 
                             <ul class="dropdown-menu account-menu">
-                                <li class="account-head p-3 ">
+                                <li class="account-head p-3">
                                     <div class="account-avatar-wrap">
                                         <img class="account-avatar" src="../assets/images/logo.png" alt="Profilkép" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="mt-2 text-center">
-                                        <div class="account-name ">felhasznalonev</div>
-                                        <div class="account-email">felhasznalo.gmail.com
-                                        </div>
+                                        <div class="account-name "><strong>felhasznalonev</strong></div>
+                                        <p class="account-email">felhasznalo.gmail.com</p>
                                     </div>
                                 </li>
                                 <li>
@@ -113,7 +112,7 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 .nav-link:hover::after,
 .lang-select,
 .auth-area,
-.dropdown,
+.dropdown, 
 .grad {
     width: 100%;
 }
@@ -163,7 +162,7 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 .nav-avatar {
     width: 28px;
     height: 28px;
-    border-radius: 999px;
+    border-radius: 50%;
     flex: 0 0 auto;
 }
 
@@ -202,6 +201,10 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     border-radius: 50%;
     font-size: 20px;
     color: #000000;
+}
+
+.account-edit,
+.nav-links {
     text-align: center;
 }
 
@@ -246,7 +249,7 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     }
 
     .nav-link {
-        width: 100%;
+        width: 40%;
         max-width: 520px;
         margin: 10px 0px;
     }
