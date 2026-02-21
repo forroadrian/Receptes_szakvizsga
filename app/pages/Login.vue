@@ -29,15 +29,15 @@ const onSubmit = () => {
                             </div>
 
                             <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate @submit.prevent="onSubmit">
-                                <FormInput v-model="username" label="Felhasználónév" type="text" placeholder="Add meg a felhasználóneved" required />
+                                <FormInput class="pt-3" v-model="username" label="Felhasználónév" type="text" placeholder="Add meg a felhasználóneved" required />
 
-                                <FormInput v-model="password" label="Jelszó" type="password" placeholder="Add meg a jelszavad" required />
-
-                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                <FormInput class="pt-3" v-model="password" label="Jelszó" type="password" placeholder="Add meg a jelszavad" required />
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
                                     Bejelentkezés
                                 </button>
 
-                                <div class="mt-3 d-flex justify-content-center">
+                                <div class="mt-3 d-flex justify-content-center pt-3">
                                     <p class="pe-3">Nincs még fiókod?</p>
                                     <NuxtLink to="register">Regisztráció</NuxtLink>
                                 </div>
@@ -63,6 +63,7 @@ const onSubmit = () => {
 img {
     width: 100%;
     height: 100%;
+    min-height: 500px;
     object-fit: cover;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -72,6 +73,7 @@ img {
     max-width: 1200px;
     width: 100%;
     border-radius: 12px;
+    min-height: 500px;
     border: 2px solid rgba(211, 209, 209, 0.6);
 }
 

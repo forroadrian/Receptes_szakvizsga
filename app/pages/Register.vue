@@ -45,15 +45,15 @@ const onSubmit = () => {
     if (!formRef.value || !formRef.value.checkValidity()) {
     return;
 }
-
     console.log("ok");
+
 };
 </script>
 
 <template>
     <section class="register-page">
-        <div class="register-shell d-flex align-items-center justify-content-center px-3 py">
-            <div class="card shadow-lg">
+        <div class="register-shell d-flex align-items-center justify-content-center px-3">
+            <div class="card shadow-lg align-self-center">
                 <div class="row g-0">
                     <div class="col-12 col-lg-6">
                         <div class="p-4 form-side p-md-5 d-flex flex-column justify-content-center">
@@ -115,9 +115,16 @@ const onSubmit = () => {
 </template>
 
 <style scoped>
+
 .register-page {
     min-height: 100vh;
     background: linear-gradient(160deg, #faf8f5 0%, #f5f4f4 55%, #fff9f4 100%);
+}
+
+.register-shell {
+    min-height: 100vh;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 img {
@@ -132,7 +139,7 @@ img {
     max-width: 1200px;
     width: 100%;
     border-radius: 12px;
-    border: 2px solid rgba(211, 209, 209, 0.6);
+    border: 2px solid rgba(173, 173, 173, 0.6);
 }
 
 a {
@@ -142,15 +149,14 @@ a {
     text-decoration: none;
 }
 
-.py {
-    padding-top: 8rem;
-}
+
 
 @media (max-width: 944.98px) {
     .register-shell {
         padding-left: 0 !important;
         padding-right: 0 !important;
         padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
     .card {
