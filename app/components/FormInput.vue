@@ -43,7 +43,7 @@ const togglePassword = () => {
             <input class="form-control pe-5" v-model="model" :type="inputType" :placeholder="placeholder" :required="required"/>
 
             <i v-if="type === 'password'"
-                :class="showPassword ? 'bi bi-eye-slash password-icon' : 'bi bi-eye password-icon'" @click="togglePassword"></i>
+                :class="showPassword ? 'bi bi-eye password-icon' : 'bi bi-eye-slash password-icon'" @click="togglePassword"></i>
         </div>
     </div>
 </template>
@@ -54,9 +54,5 @@ const togglePassword = () => {
     right: 15px;
     cursor: pointer;
     font-size: 16px;
-}
-
-.password-icon:hover {
-    color: #000;
 }
 </style>
