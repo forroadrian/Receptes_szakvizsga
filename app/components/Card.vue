@@ -37,30 +37,74 @@ const divider = computed(() => {
 
 <template>
     <div class="card--base d-flex" :class="[cardDirection, variantStyle]">
-        <div class="d-flex">
-            <div v-if="$slots.media">
-                <slot name="media"></slot>
+        <template v-if="mediaPosition=='top'">
+            <div class="d-flex">
+                <div v-if="$slots.media">
+                    <slot name="media"></slot>
+                </div>
             </div>
-        </div>
 
-        <div v-if="$slots.badge">
-            <slot name="badge"></slot>
-        </div>
-        <div v-if="$slots.header">
-            <slot name="header"></slot>
-        </div>
-        <div v-if="$slots.body">
-            <slot name="body"></slot>
-        </div>
-        <div v-if="$slots.metadata">
-            <slot name="metadata"></slot>
-        </div>
-        <div v-if="$slots.tags">
-            <slot name="tags"></slot>
-        </div>
-        <div v-if="$slots.footer" :class="divider">
-            <slot name="footer"></slot>
-        </div>
+            <div v-if="$slots.badge">
+                <slot name="badge"></slot>
+            </div>
+            <div v-if="$slots.header">
+                <slot name="header"></slot>
+            </div>
+            <div v-if="$slots.body">
+                <slot name="body"></slot>
+            </div>
+            <div v-if="$slots.metadata">
+                <slot name="metadata"></slot>
+            </div>
+            <div v-if="$slots.tags">
+                <slot name="tags"></slot>
+            </div>
+            <div v-if="$slots.footer" :class="divider">
+                <slot name="footer"></slot>
+            </div>
+        </template>
+
+        <template v-else-if="mediaPosition == 'topLeft'">
+<div class="d-flex">
+                <div v-if="$slots.media">
+                    <slot name="media"></slot>
+                </div>
+            </div>
+
+            <div v-if="$slots.badge">
+                <slot name="badge"></slot>
+            </div>
+            <div v-if="$slots.header">
+                <slot name="header"></slot>
+            </div>
+            <div v-if="$slots.body">
+                <slot name="body"></slot>
+            </div>
+            <div v-if="$slots.metadata">
+                <slot name="metadata"></slot>
+            </div>
+            <div v-if="$slots.tags">
+                <slot name="tags"></slot>
+            </div>
+            <div v-if="$slots.footer" :class="divider">
+                <slot name="footer"></slot>
+            </div>
+        </template>
+
+        <template v-else>
+<div class="d-flex">
+            </div>
+            <div v-if="$slots.header">
+                <slot name="header"></slot>
+            </div>
+            <div v-if="$slots.body">
+                <slot name="body"></slot>
+            </div>
+            <div v-if="$slots.footer" :class="divider">
+                <slot name="footer"></slot>
+            </div>
+        </template>
+
     </div>
 </template>
 
