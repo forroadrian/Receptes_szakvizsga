@@ -9,7 +9,13 @@ const props = withDefaults(
 const headingTag = computed<`h${HeadingRank}`>(() => `h${props.rank}` as const)
 </script>
 <template>
-  <component :is="headingTag" class="c-card--title">
-    <slot />
+  <component :is="headingTag" class="card--title text-center">
+    <slot></slot>
   </component>
 </template>
+
+<style scoped>
+
+
+
+</style>
