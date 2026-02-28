@@ -17,7 +17,7 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 <template>
     <header class="site-header">
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
-            <div class="container px-0 d-flex align-items-center">
+            <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
                     <img src="../assets/images/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
                 </NuxtLink>
@@ -48,53 +48,85 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
                         <NuxtLink class="grad orange w-lg-auto" to="/login">Belépés</NuxtLink>
                     </div>
 
-                    <form v-else class="auth-area">
-                        <select class="form-select lang-select m-auto" v-model="selectedLanguage"
-                            aria-label="Nyelv választása">
-                            <option v-for="lang in languageOptions" :value="lang.value">
-                                {{ lang.label }}
-                            </option>
-                        </select>
+                    <div v-else class="auth-area">
+                        <div class="dropdown lang-dropdown mx-auto">
+                            <button class="btn lang-btn dropdown-toggle d-flex align-items-center gap-2" type="button"
+                                data-bs-toggle="dropdown">
+                                <img :src="selectedLanguage === 'hu' ? '/icons/hu.svg' : '/icons/us.svg'"
+                                    class="flag-icon" alt="flag" />
 
-                        <div class="dropdown w-lg-auto">
-                            <button
-                                class="dropdown-toggle d-flex align-items-center justify-content-center justify-content-lg-start"
-                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img class="nav-avatar me-3" src="../assets/images/logo.png" alt="Profilkép" />
-                                <p class="text-truncate my-auto">HosszúFelhasználónév </p>
+                                <span class="fw-semibold">
+                                    {{ selectedLanguage === 'hu' ? 'Magyar' : 'English' }}
+                                </span>
                             </button>
 
-                            <ul class="dropdown-menu account-menu">
-                                <li class="account-head p-3">
-                                    <div class="account-avatar-wrap">
-                                        <img class="account-avatar" src="../assets/images/logo.png" alt="Profilkép" />
-                                        <span class="account-edit" aria-hidden="true">✎</span>
-                                    </div>
-                                    <div class="mt-2 text-center">
-                                        <div class="account-name "><strong>felhasznalonev</strong></div>
-                                        <p class="account-email">felhasznalo.gmail.com</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="form-check form-switch m-2" @click.stop>
-                                        <input class="form-check-input bg-danger" type="checkbox" role="switch"
-                                            v-model="isLight" />
-                                        <span>{{ isLight ? "Világos téma" : "Sötét téma" }}</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <NuxtLink to="about" class="dropdown-item account-item" href="#">
-                                        <span><i class="bi bi-gear pe-3"></i>Profil beállítások</span>
-                                    </NuxtLink>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item account-item" href="#">
-                                        <span><i class="bi bi-box-arrow-right pe-3"></i>Kijelentkezés</span>
-                                    </a>
+                            <ul class="dropdown-menu rounded-4 mx-auto">
+                                <li v-for="lang in languageOptions">
+                                    <button class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
+                                        @click="selectedLanguage = lang.value">
+                                        <img :src="lang.value === 'hu'
+                                            ? '/icons/hu.svg' : '/icons/us.svg'" class=" flag-icon" alt="flag" />
+                                        <span>{{ lang.label }}</span>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
-                    </form>
+
+                        <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
+                            <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
+                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div> <img src="../assets/images/logo.png" alt="Profilkép" /></div>
+
+                                <div class="d-flex flex-column align-items-start">
+                                    <p class="text-truncate usernameToggle">HosszúFelhasználónév</p>
+                                </div>
+                            </button>
+
+                            <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
+                                <li class="p-2 text-center">
+                                    <div class="account-avatar-wrap mb-3">
+                                        <img class="account-avatar" src="../assets/images/logo.png" alt="Profilkép" />
+                                        <span class="account-edit" aria-hidden="true">✎</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="flex-grow-1">
+                                            <p class="fw-bold text-truncate m-0">felhasznalonev</p>
+                                            <p class="text-muted small text-break">hosszufelhasznalonev<br>@bankitatabanya.hu </p>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="px-2">
+                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"@click.stop>
+                                        <div class="d-flex align-items-center">
+                                            <p>
+                                                <span class="badge">{{ isLight ? "☀️" : "🌙" }}</span>
+                                                {{ isLight ? "Világos téma" : "Sötét téma" }}
+                                            </p>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input bg-warning border-0 ms-auto" type="checkbox"
+                                                role="switch" v-model="isLight" />
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="mt-2">
+                                    <NuxtLink to="/profile" class="dropdown-item d-flex align-items-center gap-2 py-2 ">
+                                        <p><span class="badge">👤</span>Profil beállítások</p>
+                                    </NuxtLink>
+                                </li>
+
+                                <li class="p-2">
+                                    <button class="dropdown-item rounded-3d-flex align-items-center gap-2 py-2 "
+                                        type="button">
+                                        <span class="fw-semibold text-orange"><i class="bi bi-box-arrow-right"></i>
+                                            Kijelentkezés</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -103,17 +135,12 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 </template>
 
 <style scoped>
-.dropdown button {
+.dropdown button,
+.dropdown-menu {
     border: none !important;
-    background-color: transparent !important;
 }
 
-.site-header,
-.nav-link:hover::after,
-.lang-select,
-.auth-area,
-.dropdown, 
-.grad {
+.nav-link:hover::after {
     width: 100%;
 }
 
@@ -124,10 +151,11 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 
 .dropdown button p {
     color: var(--orange);
+    margin: 0px auto;
 }
 
 .nav-link {
-    font-size: var(--nav-font-size);
+    font-size: 18px;
     color: #7a7a7a;
     transition: .18s;
 }
@@ -150,13 +178,12 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 
 .navbar-brand img {
     width: var(--brand-logo-width);
+    height: auto;
 }
 
 .auth-area {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-top: 30px;
 }
 
 .nav-avatar {
@@ -166,29 +193,41 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     flex: 0 0 auto;
 }
 
-.dropdown-menu {
-    min-width: 100%;
+.usernameToggle {
+    max-width: 190px;
 }
 
-.navbar,
-.container-fluid,
-.navbar-collapse {
-    max-width: 100%;
+#userDropdown img {
+    width: 30px;
+    height: 30px;
 }
 
 .account-menu,
-.account-edit {
+.account-edit,
+.lang-item:hover {
     background: #fafafa;
 }
 
+.account-menu.show,
+.dropdown-menu.show {
+    display: block;
+    pointer-events: auto;
+}
+
 .account-menu {
-    border: 0;
     color: #1b1b1b;
+    min-width: 250px;
+    margin-left: 10px;
+}
+
+.dropdown-menu,
+.account-menu {
+    display: none;
 }
 
 .account-avatar-wrap {
-    width: 56px;
-    height: 56px;
+    width: 55px;
+    height: 55px;
     margin: 0 auto;
 }
 
@@ -208,9 +247,20 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     text-align: center;
 }
 
+.flag-icon {
+    width: 22px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
 
-.account-item {
-    padding: 10px;
+.lang-btn {
+    border-radius: 14px;
+}
+
+.lang-btn:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
 @media (min-width: 992px) {
@@ -230,7 +280,6 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     .lang-select {
         width: 140px;
     }
-
 }
 
 @media (max-width: 992px) {
@@ -249,10 +298,14 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     }
 
     .nav-link {
-        width: 40%;
         max-width: 520px;
         margin: 10px 0px;
     }
 
+    .auth-area {
+        margin-top: 20px;
+        padding-top: 20px;
+        gap: 20px;
+    }
 }
 </style>
