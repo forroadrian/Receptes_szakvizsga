@@ -115,7 +115,6 @@ const onSubmit = () => {
 </template>
 
 <style scoped>
-
 .register-page {
     min-height: 100vh;
     background: linear-gradient(160deg, #faf8f5 0%, #f5f4f4 55%, #fff9f4 100%);
