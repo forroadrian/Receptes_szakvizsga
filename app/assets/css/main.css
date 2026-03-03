@@ -67,4 +67,6 @@ h4 {
 
 .text-gray-dark {
     --text-gradient: var(--grad-gray-dark);
+.form-control.is-invalid, .was-validated .form-control:invalid, .form-control.is-valid, .was-validated .form-control:valid{
+    background-image: none;
 }
