@@ -71,9 +71,23 @@ h4 {
 
 .account-edit {
     background: var(--bs-body-bg);
-    color: var(--bs-emphasis-color);
+    color: var(--bs-body-color);
 }
 
-.form-control.is-invalid, .was-validated .form-control:invalid, .form-control.is-valid, .was-validated .form-control:valid {
+.form-control.is-invalid,
+.was-validated .form-control:invalid,
+.form-control.is-valid,
+.was-validated .form-control:valid {
     background-image: none;
+}
+
+.footer,
+.footer-link,
+.social-btn {
+    color: var(--bs-secondary-color);
+}
+
+.footer-link:hover,
+.footer-title {
+    color: var(--bs-emphasis-color);
 }

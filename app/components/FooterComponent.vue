@@ -87,22 +87,24 @@ const scrollTop = () => {
 </template>
 
 <style scoped>
-.footer {
-    color: rgba(255, 255, 255, .86);
-    /* background:
-        radial-gradient(800px 500px at 5% 0%, rgba(245, 147, 1, 0.5), rgba(253, 102, 32, .4), transparent 70%),
-        radial-gradient(1000px 500px at 100% 90%, rgba(245, 147, 1, 0.5), rgba(253, 102, 32, .4), transparent 70%),
-        linear-gradient(180deg, #141414, #201f1e, #312d2b);*/
-
-    background: radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
+html[data-bs-theme="dark"] .footer {
+    background:
+        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
         radial-gradient(1000px 700px at 100% 100%, rgba(245, 164, 71, 0.3), transparent 70%),
         linear-gradient(180deg, #222226, #19191c);
+}
+
+html[data-bs-theme="light"] .footer {
+    background:
+        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
+        radial-gradient(1000px 700px at 100% 100%, rgba(255, 175, 3, 0.3), transparent 70%),
+        linear-gradient(180deg, #fcf9f6, #fff5ed);
 }
 
 .footer-logo {
     width: var(--brand-logo-width);
     height: auto;
-    filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 10px 5px rgba(41, 41, 41, 0.4));
 }
 
 .footer-desc {
@@ -110,19 +112,10 @@ const scrollTop = () => {
     font-size: 14px;
 }
 
-.footer-desc,
-.footer-link,
-.footer-contact-item,
-.social-btn,
-.mini-badge {
-    color: rgba(255, 255, 255, 0.72);
-}
-
 .footer-title {
     font-family: "Caveat", cursive;
     font-weight: 700;
     font-size: 28px;
-    color: rgba(255, 255, 255, 0.95);
     letter-spacing: 0.9px;
 }
 
@@ -149,40 +142,42 @@ const scrollTop = () => {
 }
 
 .footer-link:hover {
-    color: #fff;
     transform: translateX(10px);
+    font-weight: 700;
 }
 
 .footer-contact {
     display: grid;
 }
 
-.footer-contact-item i {
-    color: rgba(255, 255, 255, 0.75);
-    transform: translateY(2px);
-}
-
 .contact-panel {
     padding: 18px 16px;
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+.contact-panel,
+.mini-badge {
+    border-radius: 20px;
 }
 
 .mini-badge {
     display: inline-flex;
     align-items: center;
     padding: 10px 12px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .footer-social,
 .footer-link,
 .mini-badge {
     gap: 10px;
+}
+
+.mini-badge,
+.social-btn,
+.scroll-top,
+.contact-panel {
+    background: linear-gradient(180deg, rgba(255, 147, 6, 0.082), rgba(243, 243, 243, 0.03));
+    border: 1px solid var(--bs-border-color);
+    box-shadow: var(--bs-box-shadow-sm);
 }
 
 .social-btn {
@@ -192,10 +187,6 @@ const scrollTop = () => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(10px);
     margin: 0px 8px
 }
 
@@ -204,21 +195,23 @@ const scrollTop = () => {
     background: rgba(255, 255, 255, 0.10);
 }
 
-.footer .border-top {
-    border-top-color: rgba(235, 235, 235, 0.2) !important;
+.scroll-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px var(--orange);
 }
 
 .scroll-top {
+    font-size: 30px !important;
     position: absolute;
-    left: 18px;
-    bottom: 18px;
-    width: 46px;
-    height: 46px;
+    left: 50px;
+    bottom: 60px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: none;
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.92);
     cursor: pointer;
+    background: var(--grad-orange);
+    color: var(--text-light);
 }
 
 @media (max-width: 991px) {
