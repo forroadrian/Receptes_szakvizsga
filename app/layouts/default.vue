@@ -2,7 +2,7 @@
     <div class="appLayouts">
         <HeaderComponent />
 
-        <main class="appLayoutsMain container py-4">
+        <main class="appLayoutsMain container">
             <slot> </slot>
             <ButtonTest />
 

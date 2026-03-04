@@ -7,5 +7,13 @@ export default defineNuxtConfig({
         '~/assets/css/main.css',
         'bootstrap-icons/font/bootstrap-icons.css',
         "@/assets/css/buttons.css"
-    ]
+    ],
+    modules: ['@nuxtjs/color-mode'],
+    colorMode: {
+        preference: 'light',
+        fallback: 'light',
+        dataValue: 'bs-theme',
+        storage: 'cookie',
+        storageKey: 'nuxt-color-mode'
+    }
 })

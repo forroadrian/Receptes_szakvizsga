@@ -41,37 +41,37 @@
 }
 
 .outline {
+    --outline-grad: var(--grad-orange);
+    --outline-color: var(--orange);
+
     border: 4px solid transparent;
+    background:
+        linear-gradient(var(--bs-body-bg), var(--bs-body-bg)) padding-box,
+        var(--outline-grad) border-box;
+
     background-origin: border-box;
     background-clip: padding-box, border-box;
+    color: var(--outline-color);
 }
 
 .outline.orange {
-    background:
-        linear-gradient(#fff, #fff) padding-box,
-        var(--grad-orange) border-box;
-    color: var(--orange);
+    --outline-grad: var(--grad-orange);
+    --outline-color: var(--orange);
 }
 
 .outline.yellow {
-    background:
-        linear-gradient(#fff, #fff) padding-box,
-        var(--grad-yellow) border-box;
-    color: var(--yellow);
+    --outline-grad: var(--grad-yellow);
+    --outline-color: var(--yellow);
 }
 
 .outline.green {
-    background:
-        linear-gradient(#fff, #fff) padding-box,
-        var(--grad-green) border-box;
-    color: var(--green);
+    --outline-grad: var(--grad-green);
+    --outline-color: var(--green);
 }
 
 .outline.dark {
-    background:
-        linear-gradient(#fff, #fff) padding-box,
-        var(--grad-gray-dark) border-box;
-    color: var(--text-dark);
+    --outline-grad: var(--grad-gray-dark);
+    --outline-color: var(--text-dark);
 }
 
 .grad:disabled {
@@ -87,7 +87,6 @@
 .grad:active {
     transform: translateY(2px);
 }
-
 
 .grad::after {
     content: "";
@@ -112,7 +111,6 @@
     opacity: 0;
     transform: translateY(-8px) scale(0.98);
     transition: opacity 160ms ease, transform 160ms ease;
-   
 }
 
 .dropdown-menu.show {

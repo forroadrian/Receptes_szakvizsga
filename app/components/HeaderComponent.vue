@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 
 const isLoggedIn = ref(true);
 const selectedLanguage = ref("hu");
-const isLight = ref(true);
+const colorMode = useColorMode()
 
 const languageOptions = [
     { value: "hu", label: "Magyar" },
     { value: "en", label: "English" }
 ]
 
-const theme = computed(() => (isLight.value ? "dark" : "light"));
-const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mód"));
+const isReady = ref(false)
+onMounted(() => {
+    isReady.value = true
+})
+
+const toggleTheme = () => {
+    colorMode.preference =
+        colorMode.value === "dark" ? "light" : "dark"
+}
 
 </script>
 <template>
@@ -53,7 +60,7 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
                             <button class="btn lang-btn dropdown-toggle d-flex align-items-center gap-2" type="button"
                                 data-bs-toggle="dropdown">
                                 <img :src="selectedLanguage === 'hu' ? '/icons/hu.svg' : '/icons/us.svg'"
-                                    class="flag-icon" alt="flag" />
+                                    class=" flag-icon" width="22" height="16" alt="flag" />
 
                                 <span class="fw-semibold">
                                     {{ selectedLanguage === 'hu' ? 'Magyar' : 'English' }}
@@ -91,22 +98,25 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="flex-grow-1">
                                             <p class="fw-bold text-truncate m-0">felhasznalonev</p>
-                                            <p class="text-muted small text-break">hosszufelhasznalonev<br>@bankitatabanya.hu </p>
+                                            <p class="text-muted small text-break">
+                                                hosszufelhasznalonev<br>@bankitatabanya.hu </p>
                                         </div>
                                     </div>
                                 </li>
 
                                 <li class="px-2">
-                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"@click.stop>
+                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"
+                                        @click.stop>
                                         <div class="d-flex align-items-center">
-                                            <p>
-                                                <span class="badge">{{ isLight ? "☀️" : "🌙" }}</span>
-                                                {{ isLight ? "Világos téma" : "Sötét téma" }}
-                                            </p>
+                                            <span class="badge">
+                                                {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
+                                            </span>
+                                            {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input bg-warning border-0 ms-auto" type="checkbox"
-                                                role="switch" v-model="isLight" />
+                                                role="switch" :checked="isReady && colorMode.value === 'dark'"
+                                                @change="toggleTheme" />
                                         </div>
                                     </div>
                                 </li>
@@ -156,7 +166,6 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 
 .nav-link {
     font-size: 18px;
-    color: #7a7a7a;
     transition: .18s;
 }
 
@@ -172,8 +181,8 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 }
 
 .nav-link.router-link-exact-active {
-    color: var(--text-dark);
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--dark)
 }
 
 .navbar-brand img {
@@ -202,11 +211,6 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     height: 30px;
 }
 
-.account-menu,
-.account-edit,
-.lang-item:hover {
-    background: #fafafa;
-}
 
 .account-menu.show,
 .dropdown-menu.show {
@@ -215,7 +219,6 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
 }
 
 .account-menu {
-    color: #1b1b1b;
     min-width: 250px;
     margin-left: 10px;
 }
@@ -239,7 +242,6 @@ const themeText = computed(() => (isLight.value ? "Sötét mód" : "Világos mó
     height: 30px;
     border-radius: 50%;
     font-size: 20px;
-    color: #000000;
 }
 
 .account-edit,

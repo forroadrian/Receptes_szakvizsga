@@ -93,7 +93,7 @@ const onSubmit = () => {
                                         feltételeket.</div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                <button type="submit" class="grad orange w-100 py-2">
                                     Regisztrálás
                                 </button>
 
@@ -117,7 +117,6 @@ const onSubmit = () => {
 <style scoped>
 .register-page {
     min-height: 100vh;
-    background: linear-gradient(160deg, #faf8f5 0%, #f5f4f4 55%, #fff9f4 100%);
 }
 
 .register-shell {
@@ -142,7 +141,7 @@ img {
 }
 
 a {
-    color: #6f42c1 !important;
+    color: #9c66ff !important;
     cursor: pointer;
     font-size: 15px;
     text-decoration: none;

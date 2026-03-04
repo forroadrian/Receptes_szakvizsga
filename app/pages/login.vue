@@ -28,12 +28,15 @@ const onSubmit = () => {
                                 <h1 class="fs-1">Bejelentkezés</h1>
                             </div>
 
-                            <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate @submit.prevent="onSubmit">
-                                <FormInput class="pt-3" v-model="username" label="Felhasználónév" type="text" placeholder="Add meg a felhasználóneved" required />
+                            <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }"
+                                novalidate @submit.prevent="onSubmit">
+                                <FormInput class="pt-3" v-model="username" label="Felhasználónév" type="text"
+                                    placeholder="Add meg a felhasználóneved" required />
 
-                                <FormInput class="pt-3" v-model="password" label="Jelszó" type="password" placeholder="Add meg a jelszavad" required />
-                                
-                                <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
+                                <FormInput class="pt-3" v-model="password" label="Jelszó" type="password"
+                                    placeholder="Add meg a jelszavad" required />
+
+                                <button type="submit" class="btn grad green w-100 py-2 mt-5">
                                     Bejelentkezés
                                 </button>
 
@@ -57,7 +60,6 @@ const onSubmit = () => {
 <style scoped>
 .register-page {
     min-height: 100vh;
-    background: linear-gradient(160deg, #faf8f5 0%, #f5f4f4 55%, #fff9f4 100%);
 }
 
 .register-shell {
