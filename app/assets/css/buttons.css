@@ -17,7 +17,6 @@
 .orange {
     background: var(--grad-orange);
     color: var(--text-light);
-
 }
 
 .green {
@@ -31,12 +30,12 @@
 }
 
 .soft {
-    background: var(--grad-gray-light);
+    background: var(--grad-light);
     color: var(--text-dark);
 }
 
 .dark {
-    background: var(--grad-gray-dark);
+    background: var(--grad-dark);
     color: var(--text-light);
 }
 
@@ -70,8 +69,13 @@
 }
 
 .outline.dark {
-    --outline-grad: var(--grad-gray-dark);
+    --outline-grad: var(--grad-dark);
     --outline-color: var(--text-dark);
+}
+
+.outline.soft {
+    --outline-grad: var(--grad-light);
+    --outline-color: var(--text-light);
 }
 
 .grad:disabled {

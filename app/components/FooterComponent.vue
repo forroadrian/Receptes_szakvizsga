@@ -7,10 +7,10 @@ const scrollTop = () => {
 
 <template>
     <footer class="footer position-relative">
-        <div class="container py-5">
+        <div class="container pt-5">
             <div class="row g-4 align-items-start text-center text-lg-start">
                 <div class="col-12 col-lg-5">
-                    <img src="../assets/images/logo.png" alt="Logo" class="footer-logo mb-3" />
+                    <img src="/logo.png" alt="Logo" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit!
                     </p>
@@ -90,14 +90,14 @@ const scrollTop = () => {
 html[data-bs-theme="dark"] .footer {
     background:
         radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
-        radial-gradient(1000px 700px at 100% 100%, rgba(245, 164, 71, 0.3), transparent 70%),
+        radial-gradient(1000px 700px at 100% 100%, rgba(245, 164, 70, 0.3), transparent 70%),
         linear-gradient(180deg, #222226, #19191c);
 }
 
 html[data-bs-theme="light"] .footer {
     background:
-        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
-        radial-gradient(1000px 700px at 100% 100%, rgba(255, 175, 3, 0.3), transparent 70%),
+        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.2), transparent 70%),
+        radial-gradient(1000px 700px at 100% 100%, rgba(255, 225, 160, 0.39), transparent 70%),
         linear-gradient(180deg, #fcf9f6, #fff5ed);
 }
 
@@ -175,7 +175,7 @@ html[data-bs-theme="light"] .footer {
 .social-btn,
 .scroll-top,
 .contact-panel {
-    background: linear-gradient(180deg, rgba(255, 147, 6, 0.082), rgba(243, 243, 243, 0.03));
+    background: linear-gradient(0deg, rgba(255, 178, 78, 0.212), rgba(243, 243, 243, 0.03));
     border: 1px solid var(--bs-border-color);
     box-shadow: var(--bs-box-shadow-sm);
 }
@@ -203,8 +203,8 @@ html[data-bs-theme="light"] .footer {
 .scroll-top {
     font-size: 30px !important;
     position: absolute;
-    left: 50px;
-    bottom: 60px;
+    left: 40px;
+    bottom: 20px;
     width: 60px;
     height: 60px;
     border-radius: 50%;

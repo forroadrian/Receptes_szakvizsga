@@ -13,8 +13,8 @@
     --grad-orange: linear-gradient(135deg, #ffc976, #ff0400);
     --grad-green: linear-gradient(135deg, #35a55a, #006e2e);
     --grad-yellow: linear-gradient(135deg, #ffe6ac, #fab464, #ff7231);
-    --grad-gray-light: linear-gradient(135deg, #ffffff, #f5f5f5, #e6e6e6);
-    --grad-gray-dark: linear-gradient(135deg, #212121, #363636, #636363);
+    --grad-light: linear-gradient(135deg, #ffffff, #f5f5f5, #e6e6e6);
+    --grad-dark: linear-gradient(135deg, #212121, #363636, #636363);
 }
 
 select:focus {
@@ -22,7 +22,8 @@ select:focus {
     box-shadow: none !important;
 }
 
-h1 {
+h1,
+h2 {
     font-family: "Caveat Brush", cursive;
     text-transform: uppercase;
 }
@@ -34,6 +35,14 @@ p,
 span,
 label {
     font-family: "Poppins", sans-serif !important;
+}
+
+.heropicture {
+    background-image: url("../images/proba.png");
+    background-repeat: no-repeat;
+
+    box-shadow: inset 0 40px 100px -40px rgba(245, 164, 70, 0.2);
+    background-position: right bottom;
 }
 
 h4 {
@@ -61,12 +70,12 @@ h4 {
     --text-gradient: var(--grad-yellow);
 }
 
-.text-gray-light {
-    --text-gradient: var(--grad-gray-light);
+.text-light {
+    --text-gradient: var(--grad-light);
 }
 
-.text-gray-dark {
-    --text-gradient: var(--grad-gray-dark);
+.text-dark {
+    --text-gradient: var(--grad-dark);
 }
 
 .account-edit {

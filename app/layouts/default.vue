@@ -1,11 +1,9 @@
 <template>
-    <div class="appLayouts">
+    <div class="appLayouts herobg">
         <HeaderComponent />
 
         <main class="appLayoutsMain container">
             <slot> </slot>
-            <ButtonTest />
-
         </main>
 
         <FooterComponent />

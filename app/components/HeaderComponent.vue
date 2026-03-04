@@ -26,7 +26,7 @@ const toggleTheme = () => {
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
-                    <img src="../assets/images/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
+                    <img src="/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
                 </NuxtLink>
 
                 <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -59,7 +59,7 @@ const toggleTheme = () => {
                         <div class="dropdown lang-dropdown mx-auto">
                             <button class="btn lang-btn dropdown-toggle d-flex align-items-center gap-2" type="button"
                                 data-bs-toggle="dropdown">
-                                <img :src="selectedLanguage === 'hu' ? '/icons/hu.svg' : '/icons/us.svg'"
+                                <img :src="selectedLanguage === 'hu' ? '/icons/hu.svg' : '/icons/gb.svg'"
                                     class=" flag-icon" width="22" height="16" alt="flag" />
 
                                 <span class="fw-semibold">
@@ -67,14 +67,14 @@ const toggleTheme = () => {
                                 </span>
                             </button>
 
-                            <ul class="dropdown-menu rounded-4 mx-auto">
+                            <ul class="dropdown-menu rounded-4 shadow-sm">
                                 <li v-for="lang in languageOptions">
-                                    <button class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
+                                    <span class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
                                         @click="selectedLanguage = lang.value">
                                         <img :src="lang.value === 'hu'
-                                            ? '/icons/hu.svg' : '/icons/us.svg'" class=" flag-icon" alt="flag" />
+                                            ? '/icons/hu.svg' : '/icons/gb.svg'" class=" flag-icon" alt="flag" />
                                         <span>{{ lang.label }}</span>
-                                    </button>
+                                    </span>
                                 </li>
                             </ul>
                         </div>
@@ -82,7 +82,7 @@ const toggleTheme = () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div> <img src="../assets/images/logo.png" alt="Profilkép" /></div>
+                                <div> <img src="/logo.png" alt="Profilkép" /></div>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">HosszúFelhasználónév</p>
@@ -92,7 +92,7 @@ const toggleTheme = () => {
                             <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img class="account-avatar" src="../assets/images/logo.png" alt="Profilkép" />
+                                        <img class="account-avatar" src="/logo.png" alt="Profilkép" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -199,7 +199,12 @@ const toggleTheme = () => {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    flex: 0 0 auto;
+    flex: 0 auto;
+}
+
+.lang-dropdown .dropdown-menu {
+    min-width: 100%;
+    width: auto;
 }
 
 .usernameToggle {
@@ -286,7 +291,7 @@ const toggleTheme = () => {
 
 @media (max-width: 992px) {
     .lang-select {
-        width: 30%;
+        width: 50%;
         text-align: center;
     }
 

@@ -19,6 +19,10 @@ const props = defineProps({
         type: String,
         default: "button",
     },
+    to: {
+        type: [String, Object],
+        default: null
+    },
     icon: {
         type: String
     },
@@ -41,6 +45,7 @@ const iconPosition = computed(() => {
     return props.iconPosition === "right" ? "right" : "left";
 });
 
+const isLink = computed(() => props.to !== null);
 
 function handleClick(event) {
     if (!props.disabled) {
@@ -49,7 +54,17 @@ function handleClick(event) {
 }
 </script>
 <template>
-    <button :type="type" :class="classes" :disabled="disabled" @click="handleClick">
+    <NuxtLink v-if="isLink" :to="to" :class="classes" @click="handleClick">
+        <i v-if="icon && iconPosition === 'left'" :class="icon"></i>
+
+        <span v-if="!iconOnly">
+            <slot />
+        </span>
+
+        <i v-if="icon && iconPosition === 'right'" :class="icon"></i>
+    </NuxtLink>
+
+    <button v-else :type="type" :class="classes" :disabled="disabled" @click="handleClick">
         <i v-if="icon && iconPosition === 'left'" :class="icon"> </i>
 
         <span v-if="!iconOnly">
