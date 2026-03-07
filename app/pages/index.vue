@@ -5,12 +5,12 @@
 <template>
     <section class="hero">
         <div class="container">
-            <div class="row align-items-center g-4">
-                <div class="col-12 col-lg-6">
-                    <span class="badge text-bg-light border rounded-pill px-3 py-2 mb-3">✨ Tudatos étkezés,
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-6 my-5">
+                    <span class="badge soft border rounded-pill px-3 py-2 mb-3">✨ Tudatos étkezés,
                         könnyedén</span>
                     <h2>Tervezd meg az étrendedet!</h2>
-                    <p class="text-secondary pb-4">
+                    <p class="py-4">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                         labore et dolore magna aliqua.
                     </p>
@@ -26,32 +26,53 @@
         </div>
     </section>
 
-    <section>
-        <div class="container ourFeatures" >
+    <section class="ourFeatures">
+        <div class="container">
             <h2 class="text-center d-flex row">Miért válassz minket?</h2>
-           <div class=" row flex flex-wrap text-center py-5">
-                <div class="col-lg-4 col-md-6 col-sm-12 p-3">
+            <div class=" row flex flex-wrap text-center py-4">
+                <div class="col-lg-4 col-md-6 col-sm-12 p-4">
                     <div>
                         <img src="../assets/icons/cooking.png" alt="">
                     </div>
-                    <h3>Text title</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias, doloribus.</p>
+                    <h3>Könnyű receptek </h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br> adipisicing elit. Alias, doloribus.</p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
                     <div>
-                        <img src="../assets/icons/peking-duck.png" alt="">
+                        <img src="../assets/icons/clock.png" alt="">
                     </div>
-                    <h3>Text title</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias, doloribus.</p>
+                    <h3>Idő spórolás</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br> adipisicing elit. Alias, doloribus.</p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
                     <div>
                         <img src="../assets/icons/calendar.png" alt="">
                     </div>
-                    <h3>Text title</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Alias, doloribus.</p>
+                    <h3>Menütervezés </h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br>adipisicing elit. Alias, doloribus.</p>
                 </div>
-             </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 p-3">
+                    <div>
+                        <img src="../assets/icons/ingredient.png" alt="">
+                    </div>
+                    <h3>Alapanyagok kezelése</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br> adipisicing elit. Alias, doloribus.</p>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 p-3">
+                    <div>
+                        <img src="../assets/icons/peking-duck.png" alt="">
+                    </div>
+                    <h3>Változatos étkezések</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br> adipisicing elit. Alias, doloribus.</p>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 p-3">
+                    <div>
+                        <img src="../assets/icons/man.png" alt="">
+                    </div>
+                    <h3>Személyre szabhatóság</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur,<br>adipisicing elit. Alias, doloribus.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -64,7 +85,8 @@ h2 {
 }
 
 .hero-image {
-    min-height: 600px;
+    min-height: 500px;
+    width: 570px;
     background-image: url('../assets/images/proba.png');
     background-size: 80%;
     background-repeat: no-repeat;
@@ -85,15 +107,36 @@ h2 {
     pointer-events: none;
 }
 
-.ourFeatures h2:before,.ourFeatures h2:after {
+.ourFeatures h2:before,
+.ourFeatures h2:after {
     content: "";
     flex: 1 1;
-    border-bottom: 2px solid var( --bs-emphasis-color);
+    border-bottom: 2px solid var(--bs-emphasis-color);
     margin: auto 10px;
+
 }
 
-.ourFeatures img{
-    background-size: contain;
-    
+.ourFeatures {
+    margin: 70px 0px;
+}
+
+
+.ourFeatures img {
+    margin-bottom: 10px;
+}
+
+
+@media (min-width: 992px) {}
+
+@media (max-width: 992px) {
+
+    .hero-image {
+        max-width: 600px;
+        margin: 0px auto;
+    }
+
+    .ourFeatures {
+        margin-top: 150px;
+    }
 }
 </style>
