@@ -324,8 +324,17 @@ const handleSave = () => {
     }
 }
 
+.profile-page {
+    min-height: calc(100vh - 120px);
+}
+
 .section-title {
     position: relative;
+}
+
+:deep(.form-control:focus) {
+    border-color: rgba(214, 188, 142, 0.95);
+    box-shadow: 0 0 0 0.2rem rgba(214, 188, 142, 0.25);
 }
 
 .section-title::after,
