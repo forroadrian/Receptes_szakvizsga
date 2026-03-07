@@ -5,8 +5,7 @@ export default defineNuxtConfig({
     css: [
         'bootstrap/dist/css/bootstrap.min.css',
         '~/assets/css/main.css',
-        'bootstrap-icons/font/bootstrap-icons.css',
-        "@/assets/css/buttons.css"
+        'bootstrap-icons/font/bootstrap-icons.css'
     ],
     modules: ['@nuxtjs/color-mode'],
     colorMode: {
