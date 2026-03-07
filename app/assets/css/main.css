@@ -96,7 +96,12 @@ h4 {
     color: var(--bs-secondary-color);
 }
 
+
 .footer-link:hover,
 .footer-title {
     color: var(--bs-emphasis-color);
+}
+
+.hero .badge {
+    background-color: var(--bs-secondary-color);
 }
