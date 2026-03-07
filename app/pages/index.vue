@@ -1,5 +1,11 @@
 <script setup>
-
+const categories = [
+    { name: "Összes", icon: "bi bi-three-dots" },
+    { name: "Reggeli", icon: "bi bi-sun" },
+    { name: "Ebéd", icon: "bi bi-egg-fried" },
+    { name: "Vacsora", icon: "bi bi-moon" },
+    { name: "Snack", icon: "bi bi-cookie" },
+]
 </script>
 
 <template>
@@ -27,6 +33,20 @@
         </div>
     </section>
 
+    <section class="py-4">
+        <div class="container text-center">
+            <h2 class="my-5">Étkezések</h2>
+            <div class="row justify-content-center">
+                <div class="align-items-center col-auto g-5 m-2" v-for="item in categories">
+                    <div class="category-icon">
+                        <i :class="item.icon"></i>
+                    </div>
+                    <p class="mt-2">{{ item.name }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="ourFeatures">
         <div class="container">
             <h2 class="text-center d-flex row">Miért válassz minket?</h2>
@@ -36,7 +56,8 @@
                         <img src="../assets/icons/cooking.png" alt="">
                     </div>
                     <h3>Könnyű receptek </h3>
-                    <p>Pár lépésből elkészíthető ételek, amelyek egyszerűbbé teszik a mindennapokat. Fedezd fel bátran!
+                    <p>Pár lépésből elkészíthető ételek, amelyek egyszerűbbé teszik a
+                        mindennapokat.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -44,8 +65,7 @@
                         <img src="../assets/icons/clock.png" alt="">
                     </div>
                     <h3>Időspórolás</h3>
-                    <p>Nem kell feleslegesen azon aggódnod, hogy mit főzz és mikor, így több időd marad az igazán
-                        fontos dolgokra.
+                    <p>Nem kell azon aggódnod, hogy mit főzz és mikor, így több időd marad az igazán fontos dolgokra.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -53,7 +73,7 @@
                         <img src="../assets/icons/calendar.png" alt="">
                     </div>
                     <h3>Menütervezés </h3>
-                    <p>Tervezd meg az étkezéseidet néhány kattintással, hogy jobban átlásd, mi kerül majd az asztalodra.
+                    <p>Tervezd meg az étkezéseidet néhány kattintással, hogy teljesen átláthatóak legyenek számodra.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -69,7 +89,7 @@
                         <img src="../assets/icons/peking-duck.png" alt="">
                     </div>
                     <h3>Változatos étkezések</h3>
-                    <p>Inspiráló receptek reggelire, ebédre és vacsorára hogy minden nap - új ízek kerülhessenek az
+                    <p>Inspiráló receptek reggelire, ebédre és vacsorára hogy minden nap új ízek kerülhessenek az
                         asztalra.</p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -77,7 +97,7 @@
                         <img src="../assets/icons/man.png" alt="">
                     </div>
                     <h3>Személyre szabhatóság</h3>
-                    <p>Allergia? Ételérzékenység? - Szűrőinkkel kereshetsz olyan recepteket, amelyek
+                    <p>Allergia? Ételérzékenység? - Nálunk megtalálod azokat a recepteket amelyek
                         megfelelnek az
                         igényeidnek. </p>
                 </div>
@@ -95,10 +115,10 @@ h2 {
 
 .hero-image {
     min-height: 500px;
-    background-image: url('../assets/images/proba.png');
+    background-image: url('../assets/images/hero-img.png');
     background-size: 80%;
     background-repeat: no-repeat;
-    background-position: center 50%;
+    background-position: center 40%;
     filter:
         drop-shadow(0 20px 30px rgba(255, 255, 255, 0.137)) drop-shadow(0 20px 50px rgba(255, 120, 0, 0.4)) drop-shadow(0 0 80px rgba(255, 150, 50, 0.35));
 }
@@ -130,10 +150,27 @@ h2 {
 
 .ourFeatures p {
     font-size: 14px;
+    padding: 10px 60px;
 }
 
 .ourFeatures img {
     margin-bottom: 10px;
+}
+
+.category-icon i {
+    font-size: 30px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    color: var(--yellow);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 10px 5px rgba(22, 22, 22, 0.2),
+        inset 2px 5px 5px 2px rgba(179, 95, 0, 0.301);
 }
 
 

@@ -43,8 +43,8 @@ const onSubmit = () => {
     setCustomInputValidity();
 
     if (!formRef.value || !formRef.value.checkValidity()) {
-    return;
-}
+        return;
+    }
     console.log("ok");
 
 };
@@ -93,9 +93,9 @@ const onSubmit = () => {
                                         feltételeket.</div>
                                 </div>
 
-                                <button type="submit" class="grad orange w-100 py-2">
+                                <Button type="submit" class="grad orange w-100 py-2">
                                     Regisztrálás
-                                </button>
+                                </Button>
 
                                 <div class="mt-3 d-flex justify-content-center">
                                     <p class="pe-3">Van már fiókod?</p>

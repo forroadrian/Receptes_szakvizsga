@@ -114,7 +114,7 @@ const toggleTheme = () => {
                                             {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
                                         </div>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input bg-warning border-0 ms-auto" type="checkbox"
+                                            <input class="form-check-input border-0 ms-auto" type="checkbox"
                                                 role="switch" :checked="isReady && colorMode.value === 'dark'"
                                                 @change="toggleTheme" />
                                         </div>
@@ -209,6 +209,18 @@ const toggleTheme = () => {
 
 .usernameToggle {
     max-width: 190px;
+}
+
+.form-switch input {
+    background-color: var(--yellow) !important;
+}
+
+.form-switch input:checked {
+    background-color: var(--orange) !important;
+}
+
+.form-switch input:focus {
+    box-shadow: none !important
 }
 
 #userDropdown img {

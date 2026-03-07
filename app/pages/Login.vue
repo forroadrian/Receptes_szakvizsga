@@ -36,9 +36,9 @@ const onSubmit = () => {
                                 <FormInput class="pt-3" v-model="password" label="Jelszó" type="password"
                                     placeholder="Add meg a jelszavad" required />
 
-                                <button type="submit" class="btn grad green w-100 py-2 mt-5">
+                                <Button type="submit" class="btn grad green w-100 py-2 mt-5">
                                     Bejelentkezés
-                                </button>
+                                </Button>
 
                                 <div class="mt-3 d-flex justify-content-center pt-3">
                                     <p class="pe-3">Nincs még fiókod?</p>

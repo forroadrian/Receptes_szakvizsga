@@ -79,12 +79,14 @@ label {
     font-family: "Poppins", sans-serif !important;
 }
 
-.heropicture {
-    background-image: url("../images/proba.png");
-    background-repeat: no-repeat;
+.grad:hover,
+.category-icon:hover {
+    transform: translateY(-2px);
+}
 
-    box-shadow: inset 0 40px 100px -40px rgba(245, 164, 70, 0.2);
-    background-position: right bottom;
+.grad:active,
+.category-icon:active {
+    transform: translateY(2px);
 }
 
 h4 {
