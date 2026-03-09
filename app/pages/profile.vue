@@ -8,6 +8,8 @@ const emailInput = ref("");
 const passwordInput = ref("");
 const newPasswordInput = ref("");
 
+const activeSection = ref("menu");
+
 const alertShow = ref(false);
 const alertType = ref("success");
 const alertMessage = ref("");
@@ -34,28 +36,47 @@ const showAlert = (type, message) => {
     }, 5000);
 };
 
-const handleSave = () => {
-    const isAllEmpty =
-        !usernameInput.value.trim() &&
-        !emailInput.value.trim() &&
-        !passwordInput.value.trim() &&
-        !newPasswordInput.value.trim();
+const openSection = (section) => {
+    activeSection.value = section;
+};
 
-    if (isAllEmpty) {
-        showAlert("danger", "Nem történt módosítás.");
+const handleSave = () => {
+    if (activeSection.value === "username") {
+        if (!usernameInput.value.trim()) {
+            showAlert("danger", "Add meg az új felhasználónevet.");
+            return;
+        }
+
+        displayedUsername.value = usernameInput.value.trim();
+        usernameInput.value = "";
+        showAlert("success", "Sikeres módosítás.");
+        activeSection.value = "menu";
         return;
     }
 
-    if (usernameInput.value.trim()) {
-        displayedUsername.value = usernameInput.value.trim();
+    if (activeSection.value === "email") {
+        if (!emailInput.value.trim()) {
+            showAlert("danger", "Add meg az új email címet.");
+            return;
+        }
+
+        emailInput.value = "";
+        showAlert("success", "Sikeres módosítás.");
+        activeSection.value = "menu";
+        return;
     }
 
-    usernameInput.value = "";
-    emailInput.value = "";
-    passwordInput.value = "";
-    newPasswordInput.value = "";
+    if (activeSection.value === "password") {
+        if (!passwordInput.value.trim() || !newPasswordInput.value.trim()) {
+            showAlert("danger", "Töltsd ki mindkét jelszó mezőt.");
+            return;
+        }
 
-    showAlert("success", "Sikeres módosítás.");
+        passwordInput.value = "";
+        newPasswordInput.value = "";
+        showAlert("success", "Sikeres módosítás.");
+        activeSection.value = "menu";
+    }
 };
 </script>
 
@@ -165,37 +186,111 @@ const handleSave = () => {
                             </div>
                         </div>
                     </div>
+
                     <div class="col-12 col-lg-8">
                         <div class="card shadow-sm rounded-3">
                             <div class="card-body p-4 p-md-5">
-                                <div class="section-title mb-4 pb-3">
-                                    <h2 class="mb-0">Profil beállítások</h2>
-                                </div>
-                                <form @submit.prevent="handleSave">
-                                    <div class="mb-3">
-                                        <FormInput v-model="usernameInput" label="Felhasználónév" type="text"
-                                            placeholder="Felhasználónév" />
+                                <template v-if="activeSection === 'menu'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Profil beállítások</h2>
                                     </div>
-                                    <div class="mb-3">
-                                        <FormInput v-model="emailInput" label="Email" type="email" required
-                                            placeholder="Email" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <FormInput v-model="passwordInput" label="Jelszó" type="password"
-                                            placeholder="Jelszó" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <FormInput v-model="newPasswordInput" label="Új jelszó" type="password"
-                                            placeholder="Új jelszó" />
-                                    </div>
-                                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
 
-                                        <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
-                                            @click="handleSave">
-                                            Mentés
-                                        </Button>
+                                    <div class="settings-options">
+                                        <button type="button" class="settings-option" @click="openSection('username')">
+                                            <div class="settings-option-left">
+                                                <i class="bi bi-person"></i>
+                                                <div>
+                                                    <h5 class="mb-1">Felhasználónév módosítás</h5>
+                                                </div>
+                                            </div>
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+
+                                        <button type="button" class="settings-option" @click="openSection('password')">
+                                            <div class="settings-option-left">
+                                                <i class="bi bi-lock"></i>
+                                                <div>
+                                                    <h5 class="mb-1">Jelszó módosítás</h5>
+                                                </div>
+                                            </div>
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+
+                                        <button type="button" class="settings-option" @click="openSection('email')">
+                                            <div class="settings-option-left">
+                                                <i class="bi bi-envelope"></i>
+                                                <div>
+                                                    <h5 class="mb-1">Email módosítás</h5>
+                                                </div>
+                                            </div>
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
                                     </div>
-                                </form>
+                                </template>
+
+                                <template v-if="activeSection === 'username'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Felhasználónév módosítása</h2>
+                                    </div>
+
+                                    <form @submit.prevent="handleSave">
+                                        <div class="mb-4">
+                                            <FormInput v-model="usernameInput" label="Felhasználónév" type="text"
+                                                placeholder="Felhasználónév" />
+                                        </div>
+
+                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
+                                                Mentés
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </template>
+
+                                <template v-if="activeSection === 'password'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Jelszó módosítása</h2>
+                                    </div>
+
+                                    <form @submit.prevent="handleSave">
+                                        <div class="mb-3">
+                                            <FormInput v-model="passwordInput" label="Jelszó" type="password"
+                                                placeholder="Jelszó" />
+                                        </div>
+                                        <div class="mb-4">
+                                            <FormInput v-model="newPasswordInput" label="Új jelszó" type="password"
+                                                placeholder="Új jelszó" />
+                                        </div>
+
+                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
+                                                Mentés
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </template>
+
+                                <template v-if="activeSection === 'email'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Email módosítása</h2>
+                                    </div>
+
+                                    <form @submit.prevent="handleSave">
+                                        <div class="mb-4">
+                                            <FormInput v-model="emailInput" label="Email" type="email" required
+                                                placeholder="Email" />
+                                        </div>
+
+                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
+                                                Mentés
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -441,6 +536,49 @@ const handleSave = () => {
     transform: translateY(1px);
 }
 
+.settings-options {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.settings-option {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: transparent;
+    padding: 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    transition: background-color .2s ease;
+    color: var(--bs-emphasis-color);
+}
+
+.settings-option:last-child {
+    border-bottom: none;
+}
+
+.settings-option:hover {
+    background: rgba(214, 188, 142, .12);
+}
+
+.settings-option-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.settings-option-left i {
+    font-size: 1.4rem;
+    opacity: .85;
+}
+
+.settings-option h5 {
+    font-size: 1.1rem;
+}
+
 [data-bs-theme="dark"] .profile-shell {
     background: rgba(15, 18, 22, 0.65);
 }
@@ -520,21 +658,15 @@ const handleSave = () => {
     background: rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-bs-theme="dark"] :deep(.btn-dark) {
-    background: rgba(255, 255, 255, 0.14) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+[data-bs-theme="dark"] .settings-options {
+    border-color: rgba(255, 255, 255, 0.10);
 }
 
-[data-bs-theme="dark"] :deep(.btn-dark:hover) {
-    background: rgba(255, 255, 255, 0.20) !important;
+[data-bs-theme="dark"] .settings-option {
+    border-bottom-color: rgba(255, 255, 255, 0.10);
 }
 
-[data-bs-theme="dark"] .badge.text-bg-dark {
-    background: rgba(255, 255, 255, 0.10) !important;
-    color: rgba(255, 255, 255, 0.90) !important;
-}
-
-[data-bs-theme="dark"] .chip-btn {
-    color: rgba(255, 255, 255, 0.85) !important;
+[data-bs-theme="dark"] .settings-option:hover {
+    background: rgba(214, 188, 142, .12);
 }
 </style>
