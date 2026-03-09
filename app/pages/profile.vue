@@ -3,10 +3,12 @@ import { ref } from "vue";
 
 const displayedUsername = ref("Felhasználónév");
 
-const usernameInput = ref("");
-const emailInput = ref("");
-const passwordInput = ref("");
+const usernameInput = ref(displayedUsername.value);
+const currentPasswordInput = ref("");
 const newPasswordInput = ref("");
+const confirmPasswordInput = ref("");
+const emailInput = ref("pelda@email.com");
+const newEmailInput = ref("");
 
 const activeSection = ref("menu");
 
@@ -36,46 +38,80 @@ const showAlert = (type, message) => {
     }, 5000);
 };
 
+const resetToMenu = () => {
+    activeSection.value = "menu";
+    usernameInput.value = displayedUsername.value;
+    currentPasswordInput.value = "";
+    newPasswordInput.value = "";
+    confirmPasswordInput.value = "";
+    newEmailInput.value = "";
+};
+
 const openSection = (section) => {
     activeSection.value = section;
+
+    if (section === "username") {
+        usernameInput.value = displayedUsername.value;
+    }
+
+    if (section === "email") {
+        newEmailInput.value = "";
+    }
+
+    if (section === "password") {
+        currentPasswordInput.value = "";
+        newPasswordInput.value = "";
+        confirmPasswordInput.value = "";
+    }
 };
 
 const handleSave = () => {
     if (activeSection.value === "username") {
         if (!usernameInput.value.trim()) {
-            showAlert("danger", "Add meg az új felhasználónevet.");
+            showAlert("danger", "Add meg a felhasználónevet.");
             return;
         }
 
         displayedUsername.value = usernameInput.value.trim();
-        usernameInput.value = "";
+        usernameInput.value = displayedUsername.value;
         showAlert("success", "Sikeres módosítás.");
-        activeSection.value = "menu";
+        resetToMenu();
         return;
     }
 
     if (activeSection.value === "email") {
-        if (!emailInput.value.trim()) {
-            showAlert("danger", "Add meg az új email címet.");
+        if (!emailInput.value.trim() || !newEmailInput.value.trim()) {
+            showAlert("danger", "Töltsd ki mindkét email mezőt.");
             return;
         }
 
-        emailInput.value = "";
+        emailInput.value = newEmailInput.value.trim();
+        newEmailInput.value = "";
         showAlert("success", "Sikeres módosítás.");
-        activeSection.value = "menu";
+        resetToMenu();
         return;
     }
 
     if (activeSection.value === "password") {
-        if (!passwordInput.value.trim() || !newPasswordInput.value.trim()) {
-            showAlert("danger", "Töltsd ki mindkét jelszó mezőt.");
+        if (
+            !currentPasswordInput.value.trim() ||
+            !newPasswordInput.value.trim() ||
+            !confirmPasswordInput.value.trim()
+        ) {
+            showAlert("danger", "Töltsd ki az összes jelszó mezőt.");
             return;
         }
 
-        passwordInput.value = "";
+        if (newPasswordInput.value !== confirmPasswordInput.value) {
+            showAlert("danger", "Az új jelszavak nem egyeznek.");
+            return;
+        }
+
+        currentPasswordInput.value = "";
         newPasswordInput.value = "";
+        confirmPasswordInput.value = "";
         showAlert("success", "Sikeres módosítás.");
-        activeSection.value = "menu";
+        resetToMenu();
     }
 };
 </script>
@@ -105,91 +141,96 @@ const handleSave = () => {
 
         <div class="container">
             <div class="profile-shell p-3 p-md-4 rounded-3 shadow">
-                <div class="row g-4">
+                <div class="row g-4 align-items-stretch">
                     <div class="col-12 col-lg-4">
-                        <div class="card shadow-sm rounded-3">
-                            <div class="card-body p-4">
-                                <div class="text-center mb-4">
-                                    <div class="avatar-wrap mx-auto mb-3 position-relative">
-                                        <div
-                                            class="avatar-circle d-flex align-items-center justify-content-center bg-light border">
-                                            <i class="bi bi-image"></i>
+                        <div class="w-100">
+                            <div class="card shadow-sm rounded-3">
+                                <div class="card-body p-4">
+                                    <div class="text-center mb-4">
+                                        <div class="avatar-wrap mx-auto mb-3 position-relative">
+                                            <div
+                                                class="avatar-circle d-flex align-items-center justify-content-center bg-light border">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                            <button class="avatar-camera" type="button"
+                                                aria-label="Profilkép módosítása">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </button>
                                         </div>
-                                        <button class="avatar-camera" type="button" aria-label="Profilkép módosítása">
-                                            <i class="bi bi-camera-fill"></i>
-                                        </button>
+                                        <h5 class="mb-0">{{ displayedUsername }}</h5>
                                     </div>
-                                    <h5 class="mb-0">{{ displayedUsername }}</h5>
-                                </div>
 
-                                <div class="mb-4">
-                                    <h6 class="mb-2">Nem kedvelt alapanyagok</h6>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <span
-                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Nyúlhús
-                                            <button type="button" class="chip-btn" aria-label="Nyúlhús törlése">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
-                                        <span
-                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Brokkoli
-                                            <button type="button" class="chip-btn" aria-label="Brokkoli törlése">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
-                                        <span
-                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Máj
-                                            <button type="button" class="chip-btn" aria-label="Máj törlése">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
+                                    <div class="mb-4">
+                                        <h6 class="mb-2">Nem kedvelt alapanyagok</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span
+                                                class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                                Nyúlhús
+                                                <button type="button" class="chip-btn" aria-label="Nyúlhús törlése">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </span>
+                                            <span
+                                                class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                                Brokkoli
+                                                <button type="button" class="chip-btn" aria-label="Brokkoli törlése">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </span>
+                                            <span
+                                                class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                                Máj
+                                                <button type="button" class="chip-btn" aria-label="Máj törlése">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-4">
-                                    <h6 class="mb-2">Allergének</h6>
 
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <span
-                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Laktóz
-                                            <button type="button" class="chip-btn" aria-label="Laktóz törlése">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
+                                    <div class="mb-4">
+                                        <h6 class="mb-2">Allergének</h6>
+
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span
+                                                class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                                Laktóz
+                                                <button type="button" class="chip-btn" aria-label="Laktóz törlése">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mt-4">
-                            <div class="list-group menu">
-                                <button type="button"
-                                    class="list-group-item list-group-item-action active d-flex align-items-center gap-2">
-                                    <i class="bi bi-person-lines-fill "></i>
-                                    <span>Profil beállítások</span>
-                                </button>
+                            <div class="mt-4">
+                                <div class="list-group menu">
+                                    <button type="button"
+                                        class="list-group-item list-group-item-action active d-flex align-items-center gap-2"
+                                        @click="resetToMenu">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        <span>Profil beállítások</span>
+                                    </button>
 
-                                <button type="button"
-                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-                                    <i class="bi bi-shield-plus"></i>
-                                    <span>Allergén hozzáadása</span>
-                                </button>
+                                    <button type="button"
+                                        class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                                        <i class="bi bi-shield-plus"></i>
+                                        <span>Allergén hozzáadása</span>
+                                    </button>
 
-                                <button type="button"
-                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-                                    <i class="bi bi-slash-circle"></i>
-                                    <span>Nem kedvelt alapanyagok hozzáadása</span>
-                                </button>
+                                    <button type="button"
+                                        class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                                        <i class="bi bi-slash-circle"></i>
+                                        <span>Nem kedvelt alapanyagok hozzáadása</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-12 col-lg-8">
-                        <div class="card shadow-sm rounded-3">
-                            <div class="card-body p-4 p-md-5">
+                    <div class="col-12 col-lg-8 d-flex">
+                        <div class="card shadow-sm rounded-3 w-100 right-card">
+                            <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
                                 <template v-if="activeSection === 'menu'">
                                     <div class="section-title mb-4 pb-3">
                                         <h2 class="mb-0">Profil beállítások</h2>
@@ -233,13 +274,18 @@ const handleSave = () => {
                                         <h2 class="mb-0">Felhasználónév módosítása</h2>
                                     </div>
 
-                                    <form @submit.prevent="handleSave">
+                                    <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
                                             <FormInput v-model="usernameInput" label="Felhasználónév" type="text"
                                                 placeholder="Felhasználónév" />
                                         </div>
 
-                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                        <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
+                                                Mégsem
+                                            </Button>
+
                                             <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
                                                 @click="handleSave">
                                                 Mentés
@@ -253,17 +299,28 @@ const handleSave = () => {
                                         <h2 class="mb-0">Jelszó módosítása</h2>
                                     </div>
 
-                                    <form @submit.prevent="handleSave">
+                                    <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-3">
-                                            <FormInput v-model="passwordInput" label="Jelszó" type="password"
-                                                placeholder="Jelszó" />
+                                            <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                type="password" placeholder="Aktuális jelszó" />
                                         </div>
-                                        <div class="mb-4">
+
+                                        <div class="mb-3">
                                             <FormInput v-model="newPasswordInput" label="Új jelszó" type="password"
                                                 placeholder="Új jelszó" />
                                         </div>
 
-                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                        <div class="mb-4">
+                                            <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad"
+                                                type="password" placeholder="Add meg újra a jelszavad" />
+                                        </div>
+
+                                        <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
+                                                Mégsem
+                                            </Button>
+
                                             <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
                                                 @click="handleSave">
                                                 Mentés
@@ -277,13 +334,23 @@ const handleSave = () => {
                                         <h2 class="mb-0">Email módosítása</h2>
                                     </div>
 
-                                    <form @submit.prevent="handleSave">
-                                        <div class="mb-4">
-                                            <FormInput v-model="emailInput" label="Email" type="email" required
+                                    <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                        <div class="mb-3">
+                                            <FormInput v-model="emailInput" label="Email" type="email"
                                                 placeholder="Email" />
                                         </div>
 
-                                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                        <div class="mb-4">
+                                            <FormInput v-model="newEmailInput" label="Új email" type="email"
+                                                placeholder="Új email" />
+                                        </div>
+
+                                        <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
+                                                Mégsem
+                                            </Button>
+
                                             <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
                                                 @click="handleSave">
                                                 Mentés
@@ -297,6 +364,7 @@ const handleSave = () => {
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -491,6 +559,10 @@ const handleSave = () => {
     right: 0;
     height: 70px;
     background: linear-gradient(180deg, rgba(214, 188, 142, .25), rgba(255, 255, 255, 0));
+}
+
+.right-card {
+    min-height: 100%;
 }
 
 .menu .list-group-item {
