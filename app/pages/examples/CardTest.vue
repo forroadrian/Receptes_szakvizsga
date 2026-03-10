@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CardTagItem } from '~/components/CardTags.vue';
+import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
 
 const tagsFirstCard: CardTagItem[] = [
@@ -13,7 +13,7 @@ const tagsFirstCard: CardTagItem[] = [
     <div class="container py-4">
         <h1 class="mb-4">Kartyak :D</h1>
         <section class="mb-5">
-            <Card variant="outline" media-position="topLeft" tags-position="below" show-divider class="mb-3">
+            <CardBase variant="outline" media-position="topLeft" tags-position="below" show-divider class="mb-3">
                 <template #media>
                     <div class="d-flex align-items-center justify-content-center w-100 h-100 text-secondary">
                         <span>📷</span>
@@ -47,11 +47,11 @@ const tagsFirstCard: CardTagItem[] = [
                 <template #footer>
                     <p class="small text-body-secondary mb-0">(!) Allergént tartalmaz: Búzafélék</p>
                 </template>
-            </Card>
+            </CardBase>
         </section>
 
         <section class="mb-5">
-            <Card variant="outline" media-position="top" tags-position="above" show-divider class="mb-3">
+            <CardBase variant="outline" media-position="top" tags-position="above" show-divider class="mb-3">
                 <template #media>
                     <div class="d-flex align-items-center justify-content-center w-100 h-100 text-secondary">
                         <span>📷</span>
@@ -76,7 +76,7 @@ const tagsFirstCard: CardTagItem[] = [
                 <template #footer>
                     <p class="small text-body-secondary mb-0">(!!!) Allergént tartalmaz: Búzafélék</p>
                 </template>
-            </Card>
+            </CardBase>
         </section>
     </div>
 </template>

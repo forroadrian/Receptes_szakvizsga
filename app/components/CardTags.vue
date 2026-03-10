@@ -1,10 +1,5 @@
 <script setup lang="ts">
-export type TagVariant = 'active'|'outline'|'greyed'
-
-export interface CardTagItem {
-    label: string,
-    variant?: TagVariant 
-}
+import type CardTagItem from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
 const props = defineProps<{
     items: CardTagItem[]
