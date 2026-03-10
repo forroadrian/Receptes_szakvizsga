@@ -7,7 +7,7 @@ export default defineNuxtConfig({
         '~/assets/css/main.css',
         'bootstrap-icons/font/bootstrap-icons.css'
     ],
-    modules: ['@nuxtjs/color-mode'],
+    modules: ['@nuxtjs/color-mode', '@nuxt/image'],
     colorMode: {
         preference: 'light',
         fallback: 'light',

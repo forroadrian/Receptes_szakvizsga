@@ -6,7 +6,17 @@ const props = withDefaults(defineProps<CardBaseProps>(),
     variant: "outline",
     showDivider: false,
     mediaPosition: "top",
-    tagPosition: "below"
+    tagPosition: "below",
+    mediaClass: '',
+    bodyClass: '',
+    contentClass: '',
+    mediaLeftClass: '',
+    mediaTopClass: '',
+    tagsClass: '',
+    headerClass: '',
+    metadataClass: '',
+    dividerClass: '',
+    footerClass: ''
 })
 
 const cardDirection = computed(() => {
@@ -37,32 +47,32 @@ const divider = computed(() => {
 </script>
 
 <template>
-    <div class="card--base d-flex" :class="[cardDirection, variantStyle]">
+    <div class="card--base d-flex" :class="[cardDirection, variantStyle, $attrs.class]">
         <template v-if="mediaPosition == 'top' && $slots.media">
-            <div class="card--media-wrapper card--media-top position-relative">
+            <div class="card--media-wrapper card--media-top position-relative" :class="[mediaClass, mediaTopClass]">
                 <slot name="media"></slot>
                 <div v-if="$slots.badge" class="card--badge position-absolute top-0 end-0 m-2">
                     <slot name="badge"></slot>
                 </div>
             </div>
-            <div class="card--content d-flex flex-column flex-grow-1 p-3">  
-                <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2">
+            <div :class="contentClass" class="card--content d-flex flex-column flex-grow-1 p-3" >  
+                <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2" :class="tagsClass">
                     <slot name="tags"></slot>
                 </div>
-                <div v-if="$slots.header" class="card--header">
+                <div v-if="$slots.header" class="card--header" :class="headerClass">
                     <slot name="header"></slot>
                 </div>
-                <div v-if="$slots.body" class="card--body">
+                <div v-if="$slots.body" class="card--body" :class="bodyClass">
                     <slot name="body"></slot>
                 </div>
-                <div v-if="$slots.metadata" class="card--metadata">
+                <div v-if="$slots.metadata" class="card--metadata" :class="metadataClass">
                     <slot name="metadata"></slot>
                 </div>
-                <div v-if="tagPosition == 'below' && $slots.tags" class="card--tags mt-2">
+                <div v-if="tagPosition == 'below' && $slots.tags" class="card--tags mt-2" :class="tagsClass">
                     <slot name="tags"></slot>
                 </div>
-                <hr class="card--divider my-2" :class="divider">
-                <div v-if="$slots.footer" class="card--footer">
+                <hr class="card--divider my-2" :class="[divider, dividerClass]">
+                <div v-if="$slots.footer" class="card--footer" :class="footerClass">
                     <slot name="footer"></slot>
                 </div>
             </div>
@@ -70,30 +80,30 @@ const divider = computed(() => {
 
         <template v-else-if="mediaPosition == 'topLeft' && $slots.media">
             <div class="card--row d-flex flex-row flex-grow-1">
-                <div class="card--media-wrapper card--media-left position-relative">
+                <div class="card--media-wrapper card--media-left position-relative" :class="[mediaClass, mediaLeftClass]">
                     <slot name="media"></slot>
                     <div v-if="$slots.badge" class="card--badge position-absolute top-0 end-0 m-2">
                         <slot name="badge"></slot>
                     </div>
                 </div>
-                <div class="card--content d-flex flex-column flex-grow-1 p-3">
-                    <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2">
+                <div class="card--content d-flex flex-column flex-grow-1 p-3" :class="contentClass">
+                    <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2" :class="tagsClass">
                         <slot name="tags"></slot>
                     </div>
-                    <div v-if="$slots.header" class="card--header">
+                    <div v-if="$slots.header" class="card--header" :class="headerClass">
                         <slot name="header"></slot>
                     </div>
-                    <div v-if="$slots.body" class="card--body">
+                    <div v-if="$slots.body" class="card--body" :class="bodyClass">
                         <slot name="body"></slot>
                     </div>
-                    <div v-if="$slots.metadata" class="card--metadata">
+                    <div v-if="$slots.metadata" class="card--metadata" :class="metadataClass">
                         <slot name="metadata"></slot>
                     </div>
-                    <div v-if="tagPosition == 'below' && $slots.tags" class="card--tags mt-2">
+                    <div v-if="tagPosition == 'below' && $slots.tags" class="card--tags mt-2" :class="tagsClass">
                         <slot name="tags"></slot>
                     </div>
-                    <hr class="card--divider my-2" :class="divider">
-                    <div v-if="$slots.footer" class="card--footer">
+                    <hr v-if="divider" class="card--divider my-2" :class="[divider, dividerClass]">
+                    <div v-if="$slots.footer" class="card--footer" :class="footerClass">
                         <slot name="footer"></slot>
                     </div>
                 </div>
@@ -140,5 +150,15 @@ const divider = computed(() => {
     border: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     margin-inline: 0;
+}
+
+.content-settings {
+    padding: 0 !important;
+    max-height: 80px;
+    justify-content: space-evenly;
+}
+
+.to-bottom {
+    align-self: center;
 }
 </style>
