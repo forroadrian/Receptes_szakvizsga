@@ -55,8 +55,8 @@ const divider = computed(() => {
                     <slot name="badge"></slot>
                 </div>
             </div>
-            <div :class="contentClass" class="card--content d-flex flex-column flex-grow-1 p-3" >  
-                <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2" :class="tagsClass">
+            <div class="card--content d-flex flex-column flex-grow-1 p-3 justify-content-center align-items-center" :class="tagsClass">
+                <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2">
                     <slot name="tags"></slot>
                 </div>
                 <div v-if="$slots.header" class="card--header" :class="headerClass">
@@ -129,8 +129,11 @@ const divider = computed(() => {
 
 <style scoped>
 .card--base {
+    border: none!important;
     max-width: 100%;
-    overflow: hidden;
+    background:
+        radial-gradient(circle at 90% 10%, rgba(255,120,0,0.4), transparent 50%),
+        radial-gradient(circle at 10% 90%, rgba(255,80,0,0.15), transparent 60%)
 }
 
 .card--media-top {
