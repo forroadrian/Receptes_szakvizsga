@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
-
 const tagsFirstCard: CardTagItem[] = [
     { label: 'Ebéd', variant: 'active' },
     { label: 'Sós', variant: 'outline' },
@@ -12,6 +11,7 @@ const tagsFirstCard: CardTagItem[] = [
 <template>
     <div class="container py-4">
         <h1 class="mb-4">Kartyak :D</h1>
+        <IngredientCardAmount :amount="0" description="hamarosan lejar" image="/images/background.png"/>
         <section class="mb-5">
             <CardBase variant="outline" media-position="topLeft" tags-position="below" show-divider class="mb-3">
                 <template #media>
@@ -82,8 +82,7 @@ const tagsFirstCard: CardTagItem[] = [
 </template>
 
 
-<style>
-    .card--base {
-        max-width: 400px!important;
-    }
+<style scoped>
+
+
 </style>

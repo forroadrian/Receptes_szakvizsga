@@ -161,4 +161,9 @@ const divider = computed(() => {
 .to-bottom {
     align-self: center;
 }
+
+.small-picture {
+    max-width: 60px;
+    min-width: 0 !important;
+}
 </style>
