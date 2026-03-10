@@ -1,13 +1,18 @@
-export default class Ingredient {
+import type { IngredientTag, IngredientTagOptions } from "~/interfaces/ModelInterfaces/Tags";
+
+export default class Ingredient implements IngredientTag{
+    private _tag: IngredientTagOptions;
     private _name: string;
     private _amount: number;
     private _unit: string;
 
-    constructor(name: string, amount: number, unit: string) {
+    constructor(name: string, amount: number, unit: string, tag?: IngredientTagOptions) {
         this._name = name;
         this._amount = amount;
         this._unit = unit;
+        this._tag = tag ?? "friss";
     }
+
 
 
     public get name(): string {
@@ -26,21 +31,25 @@ export default class Ingredient {
 
     
     public set name(v : string) {
-        this.name = v;
+        this._name = v;
     }
 
     
     public set amount(v : number) {
-        this.amount = v;
+        this._amount = v;
     }
 
     
     public set unit(v : string) {
-        this.unit = v;
+        this._unit = v;
     }
     
     
+    public set tag(v : IngredientTagOptions) {
+        this._tag = v;
+    }
     
-
-
+    public get tag() {
+        return this._tag;
+    }
 }
