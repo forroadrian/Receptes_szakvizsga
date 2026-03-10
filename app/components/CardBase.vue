@@ -1,11 +1,6 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-    orientation?: "horizontal" | "vertical",
-    variant?: "outline" | "subtle",
-    showDivider?: boolean,
-    mediaPosition?: "top" | "topLeft",
-    tagPosition?: "above" | "below"
-}>(),
+import { type CardBaseProps } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
+const props = withDefaults(defineProps<CardBaseProps>(),
 {
     orientation: "vertical",
     variant: "outline",
@@ -18,8 +13,7 @@ const cardDirection = computed(() => {
     if (props.orientation == "vertical") {
         return "flex-column c-card--vertical"
     }
-    return "flex-row c-card--horizontal"
-
+    return "flex-row c-card--horizontal"    
 })
 
 const variantStyle = computed(() => {
