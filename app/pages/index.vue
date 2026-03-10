@@ -1,4 +1,9 @@
-<script setup>
+<script setup lang="ts">
+import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
+
+
+import { ref } from 'vue'
+
 const categories = [
     { name: "Összes", icon: "bi bi-three-dots" },
     { name: "Reggeli", icon: "bi bi-sun" },
@@ -6,6 +11,36 @@ const categories = [
     { name: "Vacsora", icon: "bi bi-moon" },
     { name: "Snack", icon: "bi bi-cookie" },
 ]
+
+const tagsFirstCard: CardTagItem[] = [
+    { label: 'Ebéd', variant: 'active' },
+    { label: 'Sós', variant: 'outline' },
+    { label: 'Tovább...', variant: 'greyed' },
+]
+
+const cards = ref([
+    {
+        id: 1,
+        title: 'Lorem ipsum dolor sit',
+        description: 'Accusantium doloremque laudantium, totam rem aperiam eaque.',
+        badge: 'Kipróbált',
+        allergen: 'Búzafélék',
+    },
+    {
+        id: 2,
+        title: 'Lorem ipsum dolor sit amet',
+        description: 'Ez egy másik leírás, teljesen eltérő tartalommal.',
+        badge: 'Kipróbált',
+        allergen: 'Tej',
+    },
+    {
+        id: 3,
+        title: 'Lorem ipsum dolor sit',
+        description: 'Itt is egyedi szöveg jelenik meg a kártyán.',
+        badge: 'Tervezett',
+        allergen: 'Tojás',
+    }
+])
 </script>
 
 <template>
@@ -14,7 +49,7 @@ const categories = [
             <div class="row align-items-center">
                 <div class="col-12 col-lg-7 my-5">
                     <span class="badge dark border rounded-pill px-3 py-2 mb-3">✨ Tudatos étkezés,
-                        könnyedén</span>
+                        könnyedén</span>          
                     <h2>Tervezd meg az étrendedet!</h2>
                     <p class="py-4">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -105,6 +140,47 @@ const categories = [
         </div>
     </section>
 
+    <section class="topRecipe">
+        <h4 class="text-center grad-text text-orange">Ajánlatunk</h4>
+        <h2 class="text-center mb-5">Legfelkapottabb receptek</h2>
+        <div class="row mb-5">
+            <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-3 mx-auto" v-for="(card, index) in cards">
+                <CardBase variant="outline" media-position="top" tags-position="above"  :class="{ 'mt-lg-5': index != 1 }"
+                    show-divider class="mb-3 h-100">
+                    <template #media>
+                        <div class="d-flex align-items-center justify-content-center w-100 h-100">
+                            <span>📷</span>
+                        </div>
+                    </template>
+
+                    <template #badge>
+                        <span class="badge dark rounded-pill">
+                            {{ card.badge }}
+                        </span>
+                    </template>
+                    
+                    <template #header>
+                        <CardHeader>
+                            <CardTitle :rank="3">{{ card.title }}</CardTitle>
+                        </CardHeader>
+                    </template>
+
+                    <template #body>
+                        <p class="small text-body-secondary mb-0 text-center">
+                            {{ card.description }}
+                        </p>
+                    </template>
+
+                    <template #footer>
+                        <p class="small text-center mb-0">
+                            (!!!) Allergént tartalmaz: {{ card.allergen }}
+                        </p>
+                    </template>
+                </CardBase>
+            </div>
+        </div>
+    </section>
+
 </template>
 
 <style scoped>
@@ -157,7 +233,7 @@ h2 {
     margin-bottom: 10px;
 }
 
-.category-icon i {
+.category-icon i{
     font-size: 30px;
     width: 70px;
     height: 70px;
