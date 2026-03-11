@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const displayedUsername = ref("Felhasználónév");
 
@@ -9,12 +9,21 @@ const newPasswordInput = ref("");
 const confirmPasswordInput = ref("");
 const emailInput = ref("");
 const newEmailInput = ref("");
+const allergenInput = ref("");
+const dislikedIngredientInput = ref("");
+
+const allergens = ref(["Laktóz"]);
+const dislikedIngredients = ref(["Nyúlhús", "Brokkoli", "Máj"]);
 
 const activeSection = ref("menu");
 
 const alertShow = ref(false);
 const alertType = ref("success");
 const alertMessage = ref("");
+
+const isProfileSettingsActive = computed(() =>
+    ["menu", "username", "password", "email"].includes(activeSection.value)
+);
 
 let alertTimer;
 
@@ -45,6 +54,8 @@ const resetToMenu = () => {
     newPasswordInput.value = "";
     confirmPasswordInput.value = "";
     newEmailInput.value = "";
+    allergenInput.value = "";
+    dislikedIngredientInput.value = "";
 };
 
 const openSection = (section) => {
@@ -63,6 +74,24 @@ const openSection = (section) => {
         newPasswordInput.value = "";
         confirmPasswordInput.value = "";
     }
+
+    if (section === "allergen") {
+        allergenInput.value = "";
+    }
+
+    if (section === "dislikedIngredient") {
+        dislikedIngredientInput.value = "";
+    }
+};
+
+const removeAllergen = (index) => {
+    allergens.value.splice(index, 1);
+    showAlert("success", "Allergén sikeresen törölve.");
+};
+
+const removeDislikedIngredient = (index) => {
+    dislikedIngredients.value.splice(index, 1);
+    showAlert("success", "A nem kedvelt alapanyag sikeresen törölve.");
 };
 
 const handleSave = () => {
@@ -112,6 +141,44 @@ const handleSave = () => {
         confirmPasswordInput.value = "";
         showAlert("success", "Sikeres módosítás.");
         resetToMenu();
+        return;
+    }
+
+    if (activeSection.value === "allergen") {
+        const trimmedAllergen = allergenInput.value.trim();
+
+        if (!trimmedAllergen) {
+            showAlert("danger", "Add meg az allergén nevét.");
+            return;
+        }
+
+        if (allergens.value.some((item) => item.toLowerCase() === trimmedAllergen.toLowerCase())) {
+            showAlert("danger", "Ez az allergén már szerepel a listában.");
+            return;
+        }
+
+        allergens.value.push(trimmedAllergen);
+        showAlert("success", "Allergén sikeresen hozzáadva.");
+        resetToMenu();
+        return;
+    }
+
+    if (activeSection.value === "dislikedIngredient") {
+        const trimmedIngredient = dislikedIngredientInput.value.trim();
+
+        if (!trimmedIngredient) {
+            showAlert("danger", "Add meg a nem kedvelt alapanyag nevét.");
+            return;
+        }
+
+        if (dislikedIngredients.value.some((item) => item.toLowerCase() === trimmedIngredient.toLowerCase())) {
+            showAlert("danger", "Ez az alapanyag már szerepel a listában.");
+            return;
+        }
+
+        dislikedIngredients.value.push(trimmedIngredient);
+        showAlert("success", "A nem kedvelt alapanyag sikeresen hozzáadva.");
+        resetToMenu();
     }
 };
 </script>
@@ -142,21 +209,13 @@ const handleSave = () => {
                                 <div class="mb-4">
                                     <h6 class="mb-2">Nem kedvelt alapanyagok</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Nyúlhús
-                                            <button type="button" class="chip-btn">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
-                                        <span class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Brokkoli
-                                            <button type="button" class="chip-btn">
-                                                <i class="bi bi-x"></i>
-                                            </button>
-                                        </span>
-                                        <span class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Máj
-                                            <button type="button" class="chip-btn">
+                                        <span
+                                            v-for="(ingredient, index) in dislikedIngredients"
+                                            :key="`${ingredient}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2"
+                                        >
+                                            {{ ingredient }}
+                                            <button type="button" class="chip-btn" @click="removeDislikedIngredient(index)">
                                                 <i class="bi bi-x"></i>
                                             </button>
                                         </span>
@@ -167,9 +226,13 @@ const handleSave = () => {
                                     <h6 class="mb-2">Allergének</h6>
 
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            Laktóz
-                                            <button type="button" class="chip-btn">
+                                        <span
+                                            v-for="(allergen, index) in allergens"
+                                            :key="`${allergen}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2"
+                                        >
+                                            {{ allergen }}
+                                            <button type="button" class="chip-btn" @click="removeAllergen(index)">
                                                 <i class="bi bi-x"></i>
                                             </button>
                                         </span>
@@ -180,17 +243,32 @@ const handleSave = () => {
 
                         <div class="mt-4">
                             <div class="list-group menu">
-                                <button type="button" class="list-group-item list-group-item-action active d-flex align-items-center gap-2" @click="resetToMenu">
+                                <button
+                                    type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                    :class="{ active: isProfileSettingsActive }"
+                                    @click="resetToMenu"
+                                >
                                     <i class="bi bi-person-lines-fill"></i>
                                     <span>Profil beállítások</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                                <button
+                                    type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                    :class="{ active: activeSection === 'allergen' }"
+                                    @click="openSection('allergen')"
+                                >
                                     <i class="bi bi-shield-plus"></i>
                                     <span>Allergén hozzáadása</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+                                <button
+                                    type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                    :class="{ active: activeSection === 'dislikedIngredient' }"
+                                    @click="openSection('dislikedIngredient')"
+                                >
                                     <i class="bi bi-slash-circle"></i>
                                     <span>Nem kedvelt alapanyagok hozzáadása</span>
                                 </button>
@@ -312,6 +390,50 @@ const handleSave = () => {
 
                                             <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
                                                 Mentés
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </section>
+
+                                <section v-if="activeSection === 'allergen'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Allergén hozzáadása</h2>
+                                    </div>
+
+                                    <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                        <div class="mb-4">
+                                            <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
+                                        </div>
+
+                                        <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                                Mégsem
+                                            </Button>
+
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                                Hozzáadás
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </section>
+
+                                <section v-if="activeSection === 'dislikedIngredient'">
+                                    <div class="section-title mb-4 pb-3">
+                                        <h2 class="mb-0">Nem kedvelt alapanyagok hozzáadása</h2>
+                                    </div>
+
+                                    <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                        <div class="mb-4">
+                                            <FormInput v-model="dislikedIngredientInput" label="Nem kedvelt alapanyag neve" type="text" />
+                                        </div>
+
+                                        <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                                Mégsem
+                                            </Button>
+
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                                Hozzáadás
                                             </Button>
                                         </div>
                                     </form>
