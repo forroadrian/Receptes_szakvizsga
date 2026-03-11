@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import { type CardBaseProps } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 const props = withDefaults(defineProps<CardBaseProps>(),
-{
-    orientation: "vertical",
-    variant: "outline",
-    showDivider: false,
-    mediaPosition: "top",
-    tagPosition: "below",
-    mediaClass: '',
-    bodyClass: '',
-    contentClass: '',
-    mediaLeftClass: '',
-    mediaTopClass: '',
-    tagsClass: '',
-    headerClass: '',
-    metadataClass: '',
-    dividerClass: '',
-    footerClass: ''
-})
+    {
+        orientation: "vertical",
+        variant: "outline",
+        showDivider: false,
+        mediaPosition: "top",
+        tagPosition: "below",
+        mediaClass: '',
+        bodyClass: '',
+        contentClass: '',
+        mediaLeftClass: '',
+        mediaTopClass: '',
+        tagsClass: '',
+        headerClass: '',
+        metadataClass: '',
+        dividerClass: '',
+        footerClass: ''
+    })
 
 const cardDirection = computed(() => {
     if (props.orientation == "vertical") {
         return "flex-column c-card--vertical"
     }
-    return "flex-row c-card--horizontal"    
+    return "flex-row c-card--horizontal"
 })
 
 const variantStyle = computed(() => {
@@ -49,13 +49,12 @@ const divider = computed(() => {
 <template>
     <div class="card--base d-flex" :class="[cardDirection, variantStyle, $attrs.class]">
         <template v-if="mediaPosition == 'top' && $slots.media">
-            <div class="card--media-wrapper card--media-top position-relative" :class="[mediaClass, mediaTopClass]">
+            <div class="card--media-wrapper card--media-top position-relative rounded-3"
+                :class="[mediaClass, mediaTopClass]">
                 <slot name="media"></slot>
-                <div v-if="$slots.badge" class="card--badge position-absolute top-0 end-0 m-2">
-                    <slot name="badge"></slot>
-                </div>
             </div>
-            <div class="card--content d-flex flex-column flex-grow-1 p-3 justify-content-center align-items-center" :class="tagsClass">
+            <div class="card--content d-flex flex-column flex-grow-1 p-3 justify-content-center align-items-center"
+                :class="tagsClass">
                 <div v-if="tagPosition == 'above' && $slots.tags" class="card--tags mb-2">
                     <slot name="tags"></slot>
                 </div>
@@ -80,7 +79,8 @@ const divider = computed(() => {
 
         <template v-else-if="mediaPosition == 'topLeft' && $slots.media">
             <div class="card--row d-flex flex-row flex-grow-1">
-                <div class="card--media-wrapper card--media-left position-relative" :class="[mediaClass, mediaLeftClass]">
+                <div class="card--media-wrapper card--media-left position-relative"
+                    :class="[mediaClass, mediaLeftClass]">
                     <slot name="media"></slot>
                     <div v-if="$slots.badge" class="card--badge position-absolute top-0 end-0 m-2">
                         <slot name="badge"></slot>
@@ -128,12 +128,9 @@ const divider = computed(() => {
 </template>
 
 <style scoped>
-.card--base {
-    border: none!important;
-    max-width: 100%;
-    background:
-        radial-gradient(circle at 90% 10%, rgba(255,120,0,0.4), transparent 50%),
-        radial-gradient(circle at 10% 90%, rgba(255,80,0,0.15), transparent 60%)
+.card--base:hover {
+    opacity: 1;
+    transform: translateY(-10px);
 }
 
 .card--media-top {
@@ -151,7 +148,7 @@ const divider = computed(() => {
 
 .card--divider {
     border: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.2) !important;
     margin-inline: 0;
 }
 
