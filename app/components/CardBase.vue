@@ -128,10 +128,6 @@ const divider = computed(() => {
 </template>
 
 <style scoped>
-.card--base:hover {
-    opacity: 1;
-    transform: translateY(-10px);
-}
 
 .card--media-top {
     width: 100%;
