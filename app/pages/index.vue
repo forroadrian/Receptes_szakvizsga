@@ -35,7 +35,7 @@ const cards = ref([
     },
     {
         id: 3,
-        title: 'Lorem ipsum dolor sit',
+        title: 'Lorem ipsum dolor sit amet',
         description: 'Itt is egyedi szöveg jelenik meg a kártyán.',
         badge: 'Tervezett',
         allergen: 'Tojás',
@@ -49,7 +49,7 @@ const cards = ref([
             <div class="row align-items-center">
                 <div class="col-12 col-lg-7 my-5">
                     <span class="badge dark border rounded-pill px-3 py-2 mb-3">✨ Tudatos étkezés,
-                        könnyedén</span>          
+                        könnyedén</span>
                     <h2>Tervezd meg az étrendedet!</h2>
                     <p class="py-4">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -84,14 +84,14 @@ const cards = ref([
 
     <section class="ourFeatures">
         <div class="container">
-            <h2 class="text-center d-flex row">Miért válassz minket?</h2>
+            <h2 class="text-center d-flex">Miért válassz minket?</h2>
             <div class=" row flex flex-wrap text-center py-4">
                 <div class="col-lg-4 col-md-6 col-sm-12 p-4">
                     <div>
                         <img src="../assets/icons/cooking.png" alt="">
                     </div>
                     <h3>Könnyű receptek </h3>
-                    <p>Pár lépésből elkészíthető ételek, amelyek egyszerűbbé teszik a
+                    <p><strong>Pár lépésből elkészíthető ételek</strong>, amelyek egyszerűbbé teszik a
                         mindennapokat.
                     </p>
                 </div>
@@ -100,7 +100,8 @@ const cards = ref([
                         <img src="../assets/icons/clock.png" alt="">
                     </div>
                     <h3>Időspórolás</h3>
-                    <p>Nem kell azon aggódnod, hogy mit főzz és mikor, így több időd marad az igazán fontos dolgokra.
+                    <p>Nem kell azon aggódnod, hogy mit főzz és mikor, így <strong>több időd marad</strong> az igazán
+                        fontos dolgokra.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -108,7 +109,8 @@ const cards = ref([
                         <img src="../assets/icons/calendar.png" alt="">
                     </div>
                     <h3>Menütervezés </h3>
-                    <p>Tervezd meg az étkezéseidet néhány kattintással, hogy teljesen átláthatóak legyenek számodra.
+                    <p><strong>Tervezd meg az étkezéseidet</strong> néhány kattintással, hogy teljesen átláthatóak
+                        legyenek számodra.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -116,7 +118,8 @@ const cards = ref([
                         <img src="../assets/icons/ingredient.png" alt="">
                     </div>
                     <h3>Alapanyagok kezelése</h3>
-                    <p>A meglévő alapanyagok megadásával fedezz fel recepteket, amelyeket már most elkészíthetsz.
+                    <p>A <strong>meglévő alapanyagok</strong> megadásával fedezz fel recepteket, amelyeket már most
+                        elkészíthetsz.
                     </p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -124,7 +127,8 @@ const cards = ref([
                         <img src="../assets/icons/peking-duck.png" alt="">
                     </div>
                     <h3>Változatos étkezések</h3>
-                    <p>Inspiráló receptek reggelire, ebédre és vacsorára hogy minden nap új ízek kerülhessenek az
+                    <p>Inspiráló receptek <strong>reggelire, ebédre és vacsorára</strong>, hogy minden nap új ízek
+                        kerülhessenek az
                         asztalra.</p>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12 p-3">
@@ -132,7 +136,7 @@ const cards = ref([
                         <img src="../assets/icons/man.png" alt="">
                     </div>
                     <h3>Személyre szabhatóság</h3>
-                    <p>Allergia? Ételérzékenység? - Nálunk megtalálod azokat a recepteket amelyek
+                    <p><strong>Allergia? Ételérzékenység?</strong> - Nálunk megtalálod azokat a recepteket amelyek
                         megfelelnek az
                         igényeidnek. </p>
                 </div>
@@ -142,11 +146,11 @@ const cards = ref([
 
     <section class="topRecipe">
         <h4 class="text-center grad-text text-orange">Ajánlatunk</h4>
-        <h2 class="text-center mb-5">Legfelkapottabb receptek</h2>
-        <div class="row mb-5">
-            <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-3 mx-auto" v-for="(card, index) in cards">
-                <CardBase variant="outline" media-position="top" tags-position="above"  :class="{ 'mt-lg-5': index != 1 }"
-                    show-divider class="mb-3 h-100">
+        <h2 class="text-center">Legfelkapottabb receptek</h2>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto" v-for="(card, index) in cards">
+                <CardBase variant="subtle" media-position="top" tags-position="above" :class="{ 'mt-lg-5': index != 1 }"
+                    show-divider class="h-100">
                     <template #media>
                         <div class="d-flex align-items-center justify-content-center w-100 h-100">
                             <span>📷</span>
@@ -154,11 +158,11 @@ const cards = ref([
                     </template>
 
                     <template #badge>
-                        <span class="badge dark rounded-pill">
+                        <span class="badge dark rounded-pill px-4 py-2">
                             {{ card.badge }}
                         </span>
                     </template>
-                    
+
                     <template #header>
                         <CardHeader>
                             <CardTitle :rank="3">{{ card.title }}</CardTitle>
@@ -166,17 +170,22 @@ const cards = ref([
                     </template>
 
                     <template #body>
-                        <p class="small text-body-secondary mb-0 text-center">
+                        <p class="text-center">
                             {{ card.description }}
                         </p>
                     </template>
 
                     <template #footer>
-                        <p class="small text-center mb-0">
-                            (!!!) Allergént tartalmaz: {{ card.allergen }}
+                        <p class="text-center mb-0">
+                            <strong><i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i> Allergént tartalmaz:
+                                {{ card.allergen }}</strong>
                         </p>
                     </template>
                 </CardBase>
+            </div>
+            <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
+                <Button to="/recipes" :color="$colorMode?.value === 'dark' ? 'soft' : 'dark'" icon="bi bi-arrow-right"
+                    iconPosition="right" class="my-5">Keress további recepteket</Button>
             </div>
         </div>
     </section>
@@ -187,6 +196,10 @@ const cards = ref([
 h2 {
     font-weight: 700;
     font-size: 42px;
+}
+
+.ourFeatures .col-lg-4 img {
+    filter: drop-shadow(0 20px 60px var(--orange));
 }
 
 .hero-image {
@@ -233,7 +246,7 @@ h2 {
     margin-bottom: 10px;
 }
 
-.category-icon i{
+.category-icon i {
     font-size: 30px;
     width: 70px;
     height: 70px;
@@ -249,6 +262,13 @@ h2 {
         inset 2px 5px 5px 2px rgba(179, 95, 0, 0.301);
 }
 
+.card--base {
+    color: var(--text-dark);
+    background: var(--grad-yellow) border-box;
+    opacity: 0.9;
+    transition: all .25s ease;
+}
+
 
 @media (max-width: 992px) {
     .hero::before {
@@ -257,6 +277,10 @@ h2 {
 
     .hero-image {
         max-width: 600px;
+        background-size: 70%;
+    }
+
+    .hero-image, .card--base {
         margin: 0px auto;
     }
 
@@ -264,8 +288,8 @@ h2 {
         margin-top: 100px;
     }
 
-    .hero-image {
-        background-size: 70%;
+    .card--base {
+        width: 80%;
     }
 }
 
