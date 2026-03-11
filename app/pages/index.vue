@@ -269,6 +269,10 @@ h2 {
     transition: all .25s ease;
 }
 
+.card--base:hover {
+    opacity: 1;
+    transform: translateY(-10px);
+}
 
 @media (max-width: 992px) {
     .hero::before {

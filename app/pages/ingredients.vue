@@ -80,13 +80,6 @@ const newIngredient = ref({
 
 </template>
 
-<style>
-.card--base {
-    padding: 0;
-}
-</style>
+<style scoped>
 
-  max-width: 25vw;
-}
 </style>
-<style scoped></style>
