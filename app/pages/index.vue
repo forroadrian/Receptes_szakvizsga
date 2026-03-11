@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
+import { ref } from 'vue';
+import { computed } from 'vue';
 
+const colorMode = useColorMode()
 
-import { ref } from 'vue'
-
+const buttonColor = computed(() => {
+    if (colorMode.value === "dark") return "soft"
+    return "dark"
+})
 const categories = [
     { name: "Összes", icon: "bi bi-three-dots" },
     { name: "Reggeli", icon: "bi bi-sun" },
@@ -184,8 +189,12 @@ const cards = ref([
                 </CardBase>
             </div>
             <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
-                <Button to="/recipes" :color="$colorMode?.value === 'dark' ? 'soft' : 'dark'" icon="bi bi-arrow-right"
-                    iconPosition="right" class="my-5">Keress további recepteket</Button>
+                <ClientOnly>
+                    <Button to="/recipes" :color="buttonColor" icon="bi bi-arrow-right" iconPosition="right"
+                        class="my-5">Keress
+                        további
+                        recepteket</Button>
+                </ClientOnly>
             </div>
         </div>
     </section>
@@ -250,7 +259,7 @@ h2 {
     font-size: 30px;
     width: 70px;
     height: 70px;
-    border-radius: 50%;
+    border-radius: 30%;
     margin-bottom: 20px;
     color: var(--yellow);
     display: flex;
@@ -259,7 +268,8 @@ h2 {
     justify-content: center;
     box-shadow:
         0 10px 5px rgba(22, 22, 22, 0.2),
-        inset 2px 5px 5px 2px rgba(179, 95, 0, 0.301);
+        inset 2px 2px 5px 2px rgba(179, 95, 0, 0.301);
+
 }
 
 .card--base {
@@ -269,10 +279,6 @@ h2 {
     transition: all .25s ease;
 }
 
-.card--base:hover {
-    opacity: 1;
-    transform: translateY(-10px);
-}
 
 @media (max-width: 992px) {
     .hero::before {
@@ -284,7 +290,8 @@ h2 {
         background-size: 70%;
     }
 
-    .hero-image, .card--base {
+    .hero-image,
+    .card--base {
         margin: 0px auto;
     }
 

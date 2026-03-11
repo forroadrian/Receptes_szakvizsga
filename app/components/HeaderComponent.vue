@@ -229,10 +229,14 @@ const toggleTheme = () => {
 }
 
 
-.account-menu.show,
-.dropdown-menu.show {
+.dropdown-menu,
+.account-menu {
     display: block;
-    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(-8px);
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
 }
 
 .account-menu {
@@ -240,9 +244,12 @@ const toggleTheme = () => {
     margin-left: 10px;
 }
 
-.dropdown-menu,
-.account-menu {
-    display: none;
+.dropdown-menu.show,
+.account-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .account-avatar-wrap {
