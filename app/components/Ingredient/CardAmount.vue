@@ -16,8 +16,8 @@ const props = withDefaults(defineProps<{
 <template>
     <CardBase media-position="topLeft" :show-divider="false" class="small-card" content-class="content-settings" body-class="to-bottom" media-class="small-picture">
         <template #media>
-            <div class="w-100 text-secondary asd">
-                <NuxtImg :src="props.image" fit="cover" :alt="alt" class="img-fluid mx-auto h-100" />
+            <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
+                <NuxtImg :src="props.image" placeholder :alt="alt" class="w-100 h-100 object-fit-cover d-block" />
             </div>
         </template>
         <template #header>
@@ -36,6 +36,4 @@ const props = withDefaults(defineProps<{
     max-width: 250px;
     max-height: 80px;
 }
-
-
 </style>
