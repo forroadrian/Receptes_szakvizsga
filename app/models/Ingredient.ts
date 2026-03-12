@@ -1,12 +1,15 @@
+import type Identifiable from "~/interfaces/Identifiable";
 import type { IngredientTag, IngredientTagOptions } from "~/interfaces/ModelInterfaces/Tags";
 
-export default class Ingredient implements IngredientTag{
+export default class Ingredient implements IngredientTag, Identifiable{
+    private _id: number;
     private _tag: IngredientTagOptions;
     private _name: string;
     private _amount: number;
     private _unit: string;
 
-    constructor(name: string, amount: number, unit: string, tag?: IngredientTagOptions) {
+    constructor(id: number, name: string, amount: number, unit: string, tag?: IngredientTagOptions) {
+        this._id = id
         this._name = name;
         this._amount = amount;
         this._unit = unit;
@@ -51,5 +54,13 @@ export default class Ingredient implements IngredientTag{
     
     public get tag() {
         return this._tag;
+    }
+
+    public get id(): number {
+        return this._id;
+    }
+ 
+    public set id(v : number) {
+        this._id = v;
     }
 }
