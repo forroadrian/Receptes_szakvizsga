@@ -49,7 +49,7 @@ const onSubmit = () => {
                     </div>
 
                     <div class="col-lg-6 d-none d-lg-block">
-                        <img src="../assets/images/background.png" alt="recipe image" title="recipe image" />
+                        <NuxtImg src="images/background.webp" alt="recipe image" title="recipe image" loading="lazy" />
                     </div>
                 </div>
             </div>

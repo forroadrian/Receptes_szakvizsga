@@ -10,7 +10,7 @@ const scrollTop = () => {
         <div class="container pt-5">
             <div class="row g-4 align-items-start text-center text-lg-start">
                 <div class="col-12 col-lg-5">
-                    <img src="/logo.png" alt="Logo" class="footer-logo mb-3" />
+                    <img src="/logo.webp" alt="Logo" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit!
                     </p>

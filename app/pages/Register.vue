@@ -106,7 +106,7 @@ const onSubmit = () => {
                     </div>
 
                     <div class="col-lg-6 d-none d-lg-block">
-                        <img src="../assets/images/background.png" alt="recipe image" title="recipe image" />
+                        <img src="/images/background.webp" alt="recipe image" title="recipe image" />
                     </div>
                 </div>
             </div>

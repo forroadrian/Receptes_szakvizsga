@@ -26,7 +26,7 @@ const toggleTheme = () => {
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
-                    <img src="/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
+                    <img src="/logo.webp" alt="Brand logo" title="Brand logo" class="brand-logo" />
                 </NuxtLink>
 
                 <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -82,7 +82,7 @@ const toggleTheme = () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div> <img src="/logo.png" alt="Profilkép" /></div>
+                                <div> <img src="/logo.webp" alt="Profilkép" /></div>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">HosszúFelhasználónév</p>
@@ -92,7 +92,7 @@ const toggleTheme = () => {
                             <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img class="account-avatar" src="/logo.png" alt="Profilkép" />
+                                        <img class="account-avatar" src="/logo.webp" alt="Profilkép" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
