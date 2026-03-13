@@ -7,7 +7,7 @@ export default defineNuxtConfig({
         '~/assets/css/main.css',
         'bootstrap-icons/font/bootstrap-icons.css'
     ],
-    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@pinia/nuxt'],
+    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase'],
     colorMode: {
         preference: 'light',
         fallback: 'light',
@@ -15,10 +15,14 @@ export default defineNuxtConfig({
         storage: 'cookie',
         storageKey: 'nuxt-color-mode'
     },
-    runtimeConfig: {
-        public: {
-            supabaseUrl: process.env.SUPABASE_URL,
-            supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
-        }
-    }
+    supabase: {
+        url: process.env.NUXT_SUPABASE_URL,
+        key: process.env.NUXT_SUPABASE_KEY,
+        redirectOptions: {
+            login: '/login',
+            callback: '/confirm',
+            exclude: ['/', '/login', '/register'],
+            saveRedirectToCookie: true,
+        },
+    },
 })
