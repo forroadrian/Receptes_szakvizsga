@@ -1,37 +1,37 @@
 <script setup>
-defineProps({
-    show: {
-        type: Boolean,
-        default: false
-    },
-    type: {
-        type: String,
-        default: "success"
-    },
-    message: {
-        type: String,
-        default: ""
-    }
-});
+const { show, type, message, duration, alertKey, hideAlert } = useAlert()
 
-defineEmits(["close"]);
+const alertVariantClass = computed(() => {
+    return type.value === "success"
+        ? "alert-success-custom"
+        : "alert-danger-custom"
+})
+
+const alertIconClass = computed(() => {
+    return type.value === "success"
+        ? "bi-check-circle-fill"
+        : "bi-exclamation-circle-fill"
+})
 </script>
 
 <template>
     <div class="alert-container position-fixed top-0 start-50 translate-middle-x mt-3">
         <transition name="alert-slide">
-            <div v-if="show" class="custom-alert" :class="type === 'success' ? 'alert-success-custom' : 'alert-danger-custom'">
+            <div v-if="show" :key="alertKey" class="custom-alert" :class="alertVariantClass">
                 <div class="custom-alert-content">
                     <div class="custom-alert-left">
-                        <i class="bi" :class="type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'"></i>
+                        <i class="bi" :class="alertIconClass"></i>
                         <span>{{ message }}</span>
                     </div>
-                    
-                    <button type="button" class="custom-alert-close" @click="$emit('close')" aria-label="Bezárás">
+
+                    <button type="button" class="custom-alert-close" @click="hideAlert" aria-label="Bezárás">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
-                <div class="custom-alert-timer"></div>
+
+                <div class="custom-alert-timer"
+                    :style="{ animationDuration: `${duration}ms` }">
+                </div>
             </div>
         </transition>
     </div>
@@ -78,6 +78,7 @@ defineEmits(["close"]);
     background: transparent;
     color: inherit;
     padding: 0;
+    display: inline-flex;
     align-items: center;
 }
 
@@ -90,7 +91,9 @@ defineEmits(["close"]);
     height: 4px;
     width: 100%;
     transform-origin: left;
-    animation: alertTimerBar 5s linear forwards;
+    animation-name: alertTimerBar;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
 }
 
 .alert-success-custom,
