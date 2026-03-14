@@ -171,7 +171,11 @@ const handleSave = () => {
             return;
         }
 
-        if (dislikedIngredients.value.some((item) => item.toLowerCase() === trimmedIngredient.toLowerCase())) {
+        if (
+            dislikedIngredients.value.some(
+                (item) => item.toLowerCase() === trimmedIngredient.toLowerCase()
+            )
+        ) {
             showAlert("danger", "Ez az alapanyag már szerepel a listában.");
             return;
         }
@@ -185,7 +189,7 @@ const handleSave = () => {
 
 <template>
     <div class="profile-page py-4">
-        <Alert :show="alertShow" :type="alertType" :message="alertMessage" @close="closeAlert"/>
+        <Alert :show="alertShow" :type="alertType" :message="alertMessage" @close="closeAlert" />
 
         <div class="container">
             <div class="profile-shell p-3 p-md-4 rounded-3 shadow w-100">
@@ -195,7 +199,8 @@ const handleSave = () => {
                             <div class="card-body p-4">
                                 <div class="text-center mb-4">
                                     <div class="avatar-wrap mx-auto mb-3 position-relative">
-                                        <div class="avatar-circle d-flex align-items-center justify-content-center border">
+                                        <div
+                                            class="avatar-circle d-flex align-items-center justify-content-center border">
                                             <i class="bi bi-image"></i>
                                         </div>
                                         <button class="avatar-camera" type="button">
@@ -208,9 +213,12 @@ const handleSave = () => {
                                 <div class="mb-4">
                                     <h6 class="mb-2">Nem kedvelt alapanyagok</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span v-for="(ingredient, index) in dislikedIngredients" :key="`${ingredient}-${index}`" class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                        <span v-for="(ingredient, index) in dislikedIngredients"
+                                            :key="`${ingredient}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
                                             {{ ingredient }}
-                                            <button type="button" class="chip-btn" @click="removeDislikedIngredient(index)">
+                                            <button type="button" class="chip-btn"
+                                                @click="removeDislikedIngredient(index)">
                                                 <i class="bi bi-x"></i>
                                             </button>
                                         </span>
@@ -220,7 +228,8 @@ const handleSave = () => {
                                 <div class="mb-4">
                                     <h6 class="mb-2">Allergének</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span v-for="(allergen, index) in allergens" :key="`${allergen}-${index}`" class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                        <span v-for="(allergen, index) in allergens" :key="`${allergen}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
                                             {{ allergen }}
                                             <button type="button" class="chip-btn" @click="removeAllergen(index)">
                                                 <i class="bi bi-x"></i>
@@ -233,19 +242,22 @@ const handleSave = () => {
 
                         <div class="mt-4">
                             <div class="list-group menu">
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: isProfileSettingsActive }" @click="resetToMenu">
                                     <i class="bi bi-person-lines-fill"></i>
                                     <span>Profil beállítások</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: activeSection === 'allergen' }" @click="openSection('allergen')">
                                     <i class="bi bi-shield-plus"></i>
                                     <span>Allergén hozzáadása</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: activeSection === 'dislikedIngredient' }"
                                     @click="openSection('dislikedIngredient')">
                                     <i class="bi bi-slash-circle"></i>
@@ -258,11 +270,7 @@ const handleSave = () => {
                     <div class="col-12 col-lg-8 d-flex">
                         <div class="card custshadow rounded-3 w-100 right-card">
                             <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
-                                <section v-if="activeSection === 'menu'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Profil beállítások</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">
                                     <div class="settings-options">
                                         <button type="button" class="settings-option" @click="openSection('username')">
                                             <div class="settings-option-left">
@@ -294,38 +302,34 @@ const handleSave = () => {
                                             <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
-                                </section>
+                                </ProfileSectionCard>
 
-                                <section v-if="activeSection === 'username'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Felhasználónév módosítása</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'username'"
+                                    title="Felhasználónév módosítása">
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
                                             <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
                                     </form>
-                                </section>
+                                </ProfileSectionCard>
 
-                                <section v-if="activeSection === 'password'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Jelszó módosítása</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'password'" title="Jelszó módosítása">
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-3">
-                                            <FormInput v-model="currentPasswordInput" label="Aktuális jelszó" type="password" />
+                                            <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                type="password" />
                                         </div>
 
                                         <div class="mb-3">
@@ -333,90 +337,89 @@ const handleSave = () => {
                                         </div>
 
                                         <div class="mb-4">
-                                            <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad" type="password" />
+                                            <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad"
+                                                type="password" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
                                     </form>
-                                </section>
+                                </ProfileSectionCard>
 
-                                <section v-if="activeSection === 'email'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Email módosítása</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'email'" title="Email módosítása">
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-3">
-                                            <FormInput v-model="emailInput" label="Email" type="email"/>
+                                            <FormInput v-model="emailInput" label="Email" type="email" />
                                         </div>
 
                                         <div class="mb-4">
-                                            <FormInput v-model="newEmailInput" label="Új email" type="email"/>
+                                            <FormInput v-model="newEmailInput" label="Új email" type="email" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
                                     </form>
-                                </section>
+                                </ProfileSectionCard>
 
-                                <section v-if="activeSection === 'allergen'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Allergén hozzáadása</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'allergen'" title="Allergén hozzáadása">
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
                                             <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Hozzáadás
                                             </Button>
                                         </div>
                                     </form>
-                                </section>
+                                </ProfileSectionCard>
 
-                                <section v-if="activeSection === 'dislikedIngredient'">
-                                    <div class="section-title mb-4 pb-3">
-                                        <h2 class="mb-0">Nem kedvelt alapanyagok hozzáadása</h2>
-                                    </div>
-
+                                <ProfileSectionCard v-if="activeSection === 'dislikedIngredient'"
+                                    title="Nem kedvelt alapanyagok hozzáadása">
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
-                                            <FormInput v-model="dislikedIngredientInput" label="Nem kedvelt alapanyag neve" type="text" />
+                                            <FormInput v-model="dislikedIngredientInput"
+                                                label="Nem kedvelt alapanyag neve" type="text" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Hozzáadás
                                             </Button>
                                         </div>
                                     </form>
-                                </section>
+                                </ProfileSectionCard>
                             </div>
                         </div>
                     </div>
