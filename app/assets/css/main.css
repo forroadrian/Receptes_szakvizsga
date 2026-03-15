@@ -70,6 +70,10 @@ h2 {
     text-transform: uppercase;
 }
 
+h2 {
+    font-weight: 700;
+    font-size: 42px;
+}
 
 h3,
 .nav-link,

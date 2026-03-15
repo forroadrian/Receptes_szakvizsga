@@ -199,13 +199,52 @@ const cards = ref([
         </div>
     </section>
 
+    <section class="aboutProject my-5 py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-6">
+                    <div class="about-image-wrapper d-flex justify-content-center">
+                        <img src="/images/clock-plate.png" alt="Alapanyagok tányéron" title="ingredients-in-plate"
+                            class="about-image" />
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 about-content">
+                    <h4 class="grad-text text-orange">
+                        ,, Mit főzzek a hétvégére? "
+                    </h4>
+                    <h2 class="about-title mb-3">A projekt célja</h2>
+                    <div class="ms-2">
+                        <p class="about-text">
+                            Fontos számunkra, hogy felhasználóink akár már az otthon megtalálható alapanyagokból is
+                            <strong>gondolkodás nélkül, gyorsan és egyszerűen</strong>
+                            tudjanak ételeket készíteni.
+                        </p>
+                        <p class="about-text">
+                            Számtalan receptből válogathatnak, saját ízlésüknek megfelelően:
+                            <strong>kereshetnek, tervezhetnek</strong> szabadon. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </template>
 
 <style scoped>
-h2 {
-    font-weight: 700;
-    font-size: 42px;
+.about-image-wrapper img {
+    width: 70%;
 }
+
+.about-text {
+    line-height: 1.8;
+}
+
+.about-content>div {
+    border-left: 3px solid var(--yellow);
+    padding-left: 30px;
+}
+
+
 
 .ourFeatures .col-lg-4 img {
     filter: drop-shadow(0 20px 60px var(--orange));
@@ -291,7 +330,8 @@ h2 {
     }
 
     .hero-image,
-    .card--base {
+    .card--base,
+    .about-content {
         margin: 0px auto;
     }
 
@@ -301,6 +341,14 @@ h2 {
 
     .card--base {
         width: 80%;
+    }
+
+    .about-content {
+        text-align: center;
+    }
+
+    .about-content>div {
+        border: none;
     }
 }
 
