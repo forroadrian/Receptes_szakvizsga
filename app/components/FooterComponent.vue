@@ -89,22 +89,19 @@ const scrollTop = () => {
 <style scoped>
 html[data-bs-theme="dark"] .footer {
     background:
-        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.3), transparent 70%),
-        radial-gradient(1000px 700px at 100% 100%, rgba(245, 164, 70, 0.3), transparent 70%),
-        linear-gradient(180deg, #222226, #19191c);
+        var(--radial-orange-top-left-strong),
+        var(--radial-yellow-bottom-right-soft)
 }
 
 html[data-bs-theme="light"] .footer {
     background:
-        radial-gradient(1200px 700px at 0% 0%, rgba(255, 102, 0, 0.2), transparent 70%),
-        radial-gradient(1000px 700px at 100% 100%, rgba(255, 225, 160, 0.39), transparent 70%),
-        linear-gradient(180deg, #fcf9f6, #fff5ed);
+        var(--radial-orange-top-left-soft),
+        var(--radial-yellow-bottom-right-strong),
+        var(--grad-light);
 }
 
 .footer-logo {
     width: var(--brand-logo-width);
-    height: auto;
-    filter: drop-shadow(0 10px 5px rgba(41, 41, 41, 0.4));
 }
 
 .footer-desc {
@@ -144,10 +141,6 @@ html[data-bs-theme="light"] .footer {
 .footer-link:hover {
     transform: translateX(10px);
     font-weight: 700;
-}
-
-.footer-contact {
-    display: grid;
 }
 
 .contact-panel {

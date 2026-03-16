@@ -128,7 +128,7 @@ const toggleTheme = () => {
                                 </li>
 
                                 <li class="p-2">
-                                    <button class="dropdown-item rounded-3d-flex align-items-center gap-2 py-2 "
+                                    <button class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 "
                                         type="button">
                                         <span class="fw-semibold text-orange"><i class="bi bi-box-arrow-right"></i>
                                             Kijelentkezés</span>
