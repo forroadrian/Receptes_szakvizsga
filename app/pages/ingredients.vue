@@ -6,9 +6,9 @@ const showAlert = ref<boolean>()
 
 
 const ingredients: Ingredient[] = [
-    new Ingredient("alma", 10, "kg"),
-    new Ingredient("körte", 10, "dkg"),
-    new Ingredient("Tej", 2, "l"),
+    new Ingredient(1,"alma", 10, "kg"),
+    new Ingredient(2,"körte", 10, "dkg"),
+    new Ingredient(3,"Tej", 2, "l"),
 ];
 
 const params = ref<SearchParams<Ingredient>>({
@@ -44,7 +44,7 @@ function saveIngredient() {
         showAlert.value = true
         return;
     }
-    const ing = new Ingredient(currentNew.name, currentNew.amount, currentNew.unit)
+    const ing = new Ingredient(-1,currentNew.name, currentNew.amount, currentNew.unit)
     ingredients.push(ing)
 
     closeIngredientModal();
@@ -55,7 +55,7 @@ function saveIngredient() {
 <template>
     <div class="container mt-3">
         <div class="row mb-3">
-            <h1 class="col-12">Alapanyagok</h1>
+            <h1 class="col-12">Itt mar ennek kell megjelennie</h1>
             <p class="col-lg-8 col-sm-12 pe-4 text-wrap">
                 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis officia
                 voluptatibus similique inventore assumenda quia accusantium minima
