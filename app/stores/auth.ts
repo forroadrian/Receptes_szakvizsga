@@ -42,12 +42,69 @@ export const useAuthStore = defineStore('auth', () => {
             }
 
             return true
-        } catch (error) {
-            errorMessage.value = 'Váratlan hiba történt a regisztráció során.'
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Váratlan hiba történt a regisztráció során.'
             return false
         } finally {
             loading.value = false
         }
+    }
+
+    const signIn = async (loginValue: string, password: string) => {
+        clearMessages()
+        loading.value = true
+
+        try {
+            let emailToLogin = loginValue.trim()
+
+            if (!emailToLogin.includes('@')) {
+                const { data: userRow, error: userError } = await supabase
+                    .from('user')
+                    .select('email')
+                    .eq('username', emailToLogin)
+                    .maybeSingle()
+
+                if (userError || !userRow) {
+                    errorMessage.value = 'Nem létezik ilyen felhasználónév.'
+                    return false
+                }
+
+                emailToLogin = userRow.email
+            }
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: emailToLogin,
+                password
+            })
+
+            if (error) {
+                if (error.code === 'email_not_confirmed') {
+                    errorMessage.value = 'Még nem erősítetted meg az email címedet.'
+                    return false
+                }
+
+                errorMessage.value = 'Hibás adatok.'
+                return false
+            }
+
+            if (!data.user) {
+                errorMessage.value = 'A bejelentkezés nem sikerült.'
+                return false
+            }
+
+            successMessage.value = 'Sikeres bejelentkezés!'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Váratlan hiba történt a bejelentkezés során.'
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const signOut = async () => {
+        clearMessages()
+        await supabase.auth.signOut()
     }
 
     return {
@@ -56,6 +113,8 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage,
         successMessage,
         clearMessages,
-        signUp
+        signUp,
+        signIn,
+        signOut
     }
 })
