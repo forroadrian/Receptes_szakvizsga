@@ -1,53 +1,77 @@
 ﻿<script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+const authStore = useAuthStore()
 
-const email = ref("");
-const username = ref("");
-const password = ref("");
-const repassword = ref("");
-const acceptTerms = ref(false);
-const submitAttempted = ref(false);
-const formRef = ref(null);
+const email = ref('')
+const username = ref('')
+const password = ref('')
+const repassword = ref('')
+const acceptTerms = ref(false)
+const submitAttempted = ref(false)
+const formRef = ref(null)
 
-const usernameOk = computed(() => username.value.trim().length >= 4);
-const passwordOk = computed(() => password.value.trim().length >= 6);
-const passwordsMatch = computed(() => password.value === repassword.value);
+const usernameOk = computed(() => username.value.trim().length >= 4)
+const passwordOk = computed(() => password.value.trim().length >= 6)
+const passwordsMatch = computed(() => password.value === repassword.value)
 
 const setCustomInputValidity = () => {
     if (!formRef.value) {
-        return;
+        return
     }
 
-    const inputs = formRef.value.querySelectorAll("input.form-control");
-    const usernameInput = inputs[1];
-    const passwordInput = inputs[2];
-    const repasswordInput = inputs[3];
+    const inputs = formRef.value.querySelectorAll('input.form-control')
+    const usernameInput = inputs[1]
+    const passwordInput = inputs[2]
+    const repasswordInput = inputs[3]
 
     if (usernameInput) {
-        usernameInput.setCustomValidity(usernameOk.value ? "" : "A felhasználónév legalább 4 karakter legyen.");
+        usernameInput.setCustomValidity(
+            usernameOk.value ? '' : 'A felhasználónév legalább 4 karakter legyen.'
+        )
     }
 
     if (passwordInput) {
-        passwordInput.setCustomValidity(passwordOk.value ? "" : "A jelszó legalább 6 karakter legyen.");
+        passwordInput.setCustomValidity(
+            passwordOk.value ? '' : 'A jelszó legalább 6 karakter legyen.'
+        )
     }
 
     if (repasswordInput) {
-        repasswordInput.setCustomValidity(passwordsMatch.value ? "" : "A két jelszó nem egyezik.");
+        repasswordInput.setCustomValidity(
+            passwordsMatch.value ? '' : 'A két jelszó nem egyezik.'
+        )
     }
-};
+}
 
-watch([username, password, repassword], setCustomInputValidity);
+watch([username, password, repassword], setCustomInputValidity)
 
-const onSubmit = () => {
-    submitAttempted.value = true;
-    setCustomInputValidity();
+const onSubmit = async () => {
+    submitAttempted.value = true
+    authStore.clearMessages()
+    setCustomInputValidity()
 
     if (!formRef.value || !formRef.value.checkValidity()) {
-        return;
+        return
     }
-    console.log("ok");
 
-};
+    const success = await authStore.signUp(
+        email.value,
+        password.value,
+        username.value
+    )
+
+    if (success) {
+        email.value = ''
+        username.value = ''
+        password.value = ''
+        repassword.value = ''
+        acceptTerms.value = false
+        submitAttempted.value = false
+
+        await navigateTo('/login')
+    }
+}
 </script>
 
 <template>
@@ -61,45 +85,88 @@ const onSubmit = () => {
                                 <h1 class="fs-1">Regisztráció</h1>
                             </div>
 
-                            <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }"
-                                novalidate @submit.prevent="onSubmit">
-                                <FormInput v-model="email" label="Email cím" type="email"
-                                    placeholder="Add meg az email címed" required />
+                            <form
+                                ref="formRef"
+                                class="needs-validation"
+                                :class="{ 'was-validated': submitAttempted }"
+                                novalidate
+                                @submit.prevent="onSubmit"
+                            >
+                                <FormInput
+                                    v-model="email"
+                                    label="Email cím"
+                                    type="email"
+                                    placeholder="Add meg az email címed"
+                                    required
+                                />
 
-                                <FormInput v-model="username" label="Felhasználónév" type="text"
-                                    placeholder="Add meg a felhasználóneved" required />
+                                <FormInput
+                                    v-model="username"
+                                    label="Felhasználónév"
+                                    type="text"
+                                    placeholder="Add meg a felhasználóneved"
+                                    required
+                                />
                                 <div v-if="submitAttempted && !usernameOk" class="invalid-feedback d-block mb-2">
                                     A felhasználónév legalább 4 karakter legyen.
                                 </div>
 
-                                <FormInput v-model="password" label="Jelszó" type="password"
-                                    placeholder="Add meg a jelszavad" required />
+                                <FormInput
+                                    v-model="password"
+                                    label="Jelszó"
+                                    type="password"
+                                    placeholder="Add meg a jelszavad"
+                                    required
+                                />
                                 <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
                                     A jelszó legalább 6 karakter legyen.
                                 </div>
 
-                                <FormInput v-model="repassword" label="Jelszó újra" type="password"
-                                    placeholder="Add meg újra a jelszavad" required />
+                                <FormInput
+                                    v-model="repassword"
+                                    label="Jelszó újra"
+                                    type="password"
+                                    placeholder="Add meg újra a jelszavad"
+                                    required
+                                />
                                 <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
                                     A két jelszó nem egyezik.
                                 </div>
 
                                 <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" v-model="acceptTerms" required />
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        v-model="acceptTerms"
+                                        required
+                                    />
                                     <label class="form-check-label">
                                         Elfogadom a felhasználói feltételeket
                                     </label>
-                                    <div class="invalid-feedback">A továbblépéshez el kell fogadnod a felhasználói
-                                        feltételeket.</div>
+                                    <div class="invalid-feedback">
+                                        A továbblépéshez el kell fogadnod a felhasználói feltételeket.
+                                    </div>
                                 </div>
 
-                                <Button type="submit" class="grad orange w-100 py-2">
-                                    Regisztrálás
+                                <div v-if="authStore.errorMessage" class="alert alert-danger">
+                                    {{ authStore.errorMessage }}
+                                </div>
+
+                                <div v-if="authStore.successMessage" class="alert alert-success">
+                                    {{ authStore.successMessage }}
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    class="grad orange w-100 py-2"
+                                    :disabled="authStore.loading"
+                                >
+                                    {{ authStore.loading ? 'Regisztráció...' : 'Regisztrálás' }}
                                 </Button>
 
                                 <div class="mt-3 d-flex justify-content-center">
                                     <p class="pe-3">Van már fiókod?</p>
-                                    <NuxtLink to="login">Bejelentkezés</NuxtLink>
+                                    <NuxtLink to="/login">Bejelentkezés</NuxtLink>
                                 </div>
                             </form>
                         </div>
