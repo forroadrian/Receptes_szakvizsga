@@ -4,8 +4,11 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     css: [
         'bootstrap/dist/css/bootstrap.min.css',
+        'bootstrap-icons/font/bootstrap-icons.css',
+        '~/assets/css/gradients.css',
         '~/assets/css/main.css',
-        'bootstrap-icons/font/bootstrap-icons.css'
+        '~/assets/css/auth.css',
+        '~/assets/css/profile.css'
     ],
     modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase'],
     colorMode: {
