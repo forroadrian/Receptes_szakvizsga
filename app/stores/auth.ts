@@ -104,7 +104,16 @@ export const useAuthStore = defineStore('auth', () => {
 
     const signOut = async () => {
         clearMessages()
-        await supabase.auth.signOut()
+
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+            errorMessage.value = 'A kijelentkezés nem sikerült.'
+            return false
+        }
+
+        successMessage.value = 'Sikeres kijelentkezés!'
+        return true
     }
 
     return {

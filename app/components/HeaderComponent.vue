@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useAuthStore } from "~/stores/auth";
 
-const isLoggedIn = ref(true);
+const authStore = useAuthStore()
+const user = useSupabaseUser()
+
+const isLoggedIn = computed(() => !!user.value);
 const selectedLanguage = ref("hu");
 const colorMode = useColorMode()
 
@@ -15,11 +19,37 @@ onMounted(() => {
     isReady.value = true
 })
 
+const displayUsername = computed(() => {
+    if (!user.value) return ""
+
+    const username = user.value.user_metadata?.username
+    if (username && username.trim() !== "") {
+        return username
+    }
+
+    if (user.value.email) {
+        return user.value.email.split("@")[0]
+    }
+
+    return "Felhasználó"
+})
+
+const displayEmail = computed(() => {
+    return user.value?.email ?? ""
+})
+
 const toggleTheme = () => {
     colorMode.preference =
         colorMode.value === "dark" ? "light" : "dark"
 }
 
+const handleSignOut = async () => {
+    const success = await authStore.signOut()
+
+    if (success) {
+        await navigateTo("/")
+    }
+}
 </script>
 <template>
     <header class="site-header">
@@ -68,7 +98,7 @@ const toggleTheme = () => {
                             </button>
 
                             <ul class="dropdown-menu rounded-4 shadow-sm">
-                                <li v-for="lang in languageOptions">
+                                <li v-for="lang in languageOptions" :key="lang.value">
                                     <span class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
                                         @click="selectedLanguage = lang.value">
                                         <img :src="lang.value === 'hu'
@@ -85,7 +115,7 @@ const toggleTheme = () => {
                                 <div> <img src="/logo.webp" alt="Profilkép" /></div>
 
                                 <div class="d-flex flex-column align-items-start">
-                                    <p class="text-truncate usernameToggle">HosszúFelhasználónév</p>
+                                    <p class="text-truncate usernameToggle">{{ displayUsername }}</p>
                                 </div>
                             </button>
 
@@ -97,9 +127,10 @@ const toggleTheme = () => {
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="flex-grow-1">
-                                            <p class="fw-bold text-truncate m-0">felhasznalonev</p>
+                                            <p class="fw-bold text-truncate m-0">{{ displayUsername }}</p>
                                             <p class="text-muted small text-break">
-                                                hosszufelhasznalonev<br>@bankitatabanya.hu </p>
+                                                {{ displayEmail }}
+                                            </p>
                                         </div>
                                     </div>
                                 </li>
@@ -129,7 +160,7 @@ const toggleTheme = () => {
 
                                 <li class="p-2">
                                     <button class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 "
-                                        type="button">
+                                        type="button" @click="handleSignOut">
                                         <span class="fw-semibold text-orange"><i class="bi bi-box-arrow-right"></i>
                                             Kijelentkezés</span>
                                     </button>
