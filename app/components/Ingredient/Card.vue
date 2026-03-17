@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { B } from 'vue-router/dist/router-CWoNjPRp.mjs';
 import type { CardTagItem, FreshnessVariants } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
 
