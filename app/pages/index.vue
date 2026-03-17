@@ -10,6 +10,7 @@ const buttonColor = computed(() => {
     if (colorMode.value === "dark") return "soft"
     return "dark"
 })
+
 const categories = [
     { name: "Összes", icon: "bi bi-three-dots" },
     { name: "Reggeli", icon: "bi bi-sun" },

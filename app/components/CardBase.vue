@@ -135,7 +135,6 @@ const divider = computed(() => {
 
 .card--media-left {
     width: 120px;
-    min-width: var(--min-image-size);
     aspect-ratio: 1;
 }
 
@@ -147,7 +146,6 @@ const divider = computed(() => {
 
 .content-settings {
     padding: 0 !important;
-    max-height: 80px;
     justify-content: space-evenly;
 }
 

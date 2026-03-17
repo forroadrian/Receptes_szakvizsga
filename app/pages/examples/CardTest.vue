@@ -12,6 +12,7 @@ const tagsFirstCard: CardTagItem[] = [
     <div class="container py-4">
         <h1 class="mb-4">Kartyak :D</h1>
         <IngredientCardAmount :amount="0" description="hamarosan lejar" image="/images/background.webp"/>
+        <IngredientCard image="/images/background.webp" name="Tej" :amount="1" unit="liter" :tag="'Haramosan Lejár'"/>
         <section class="mb-5">
             <CardBase variant="outline" media-position="topLeft" tags-position="below" show-divider class="mb-3">
                 <template #media>

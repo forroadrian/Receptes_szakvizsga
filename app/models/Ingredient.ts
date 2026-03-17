@@ -1,19 +1,24 @@
+
+import type { FreshnessVariants } from "~/interfaces/cardInterfaces/CardGenericInterfaces";
 import type Identifiable from "~/interfaces/Identifiable";
 import type { IngredientTag, IngredientTagOptions } from "~/interfaces/ModelInterfaces/Tags";
 
 export default class Ingredient implements IngredientTag, Identifiable{
     private _id: number;
-    private _tag: IngredientTagOptions;
+    private _tag: FreshnessVariants;
     private _name: string;
     private _amount: number;
     private _unit: string;
+    private _expiry: Date;
 
-    constructor(id: number, name: string, amount: number, unit: string, tag?: IngredientTagOptions) {
+    constructor(id: number, name: string, amount: number, unit: string, expiry?: Date, tag?: FreshnessVariants) {
         this._id = id
         this._name = name;
         this._amount = amount;
         this._unit = unit;
-        this._tag = tag ?? "friss";
+        this._expiry = expiry ?? new Date("2000-01-01")
+
+        this._tag = tag ?? "Friss";
     }
 
 
@@ -48,11 +53,11 @@ export default class Ingredient implements IngredientTag, Identifiable{
     }
     
     
-    public set tag(v : IngredientTagOptions) {
+    public set tag(v : FreshnessVariants) {
         this._tag = v;
     }
     
-    public get tag() {
+    public get tag(): FreshnessVariants {
         return this._tag;
     }
 
@@ -63,4 +68,15 @@ export default class Ingredient implements IngredientTag, Identifiable{
     public set id(v : number) {
         this._id = v;
     }
+
+    public get expiry() : Date {
+        return this._expiry
+    }
+
+    
+    public set expiry(v : Date) {
+        this._expiry = v;
+    }
+    
+    
 }

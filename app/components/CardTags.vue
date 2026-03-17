@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { type CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
+
+const colorMode = useColorMode()
+
+const buttonColor = computed(() => {
+    return colorMode.value === "dark" ? "#e9ecef" : "#212529";
+})
+
+const textColor = computed(() => {
+    return colorMode.value === "dark" ? "#000" : "#fff";
+})
+
 const props = defineProps<{
     items: CardTagItem[]
 }>()
@@ -17,8 +28,8 @@ const props = defineProps<{
 
 <style scoped>
     .card-tag--active {
-        background-color: #212529;
-        color: #ffffff;
+        background-color: v-bind(buttonColor);
+        color: v-bind(textColor);
     }
 
     .card-tag--outline {
@@ -28,7 +39,7 @@ const props = defineProps<{
     }
 
     .card-tag--greyed {
-        background-color: #e9ecef;
+        background-color: v-bind(buttonColor);
         color: var(--bs-body-color);
     }
 </style>
