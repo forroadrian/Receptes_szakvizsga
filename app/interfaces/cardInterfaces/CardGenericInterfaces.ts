@@ -1,4 +1,5 @@
 type TagVariant = 'active'|'outline'|'greyed'
+export type FreshnessVariants = "Lejárt" | "Hamarosan Lejár" | "Friss"
 
 export interface CardTagItem {
     label: string,

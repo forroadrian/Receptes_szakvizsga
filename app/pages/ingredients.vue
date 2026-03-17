@@ -2,11 +2,21 @@
 import type SearchParams from "~/interfaces/SearchParams";
 import Ingredient from "~/models/Ingredient";
 
+
 const showAlert = ref<boolean>()
 
+const colorMode = useColorMode()
+
+const buttonColor = computed(() => {
+    if (colorMode.value === "dark") return "soft"
+    return "dark"
+})
+
+const ing = new Ingredient(1,"alma", 10, "kg")
+ing.tag = "Hamarosan Lejár"
 
 const ingredients: Ingredient[] = [
-    new Ingredient(1,"alma", 10, "kg"),
+    ing,
     new Ingredient(2,"körte", 10, "dkg"),
     new Ingredient(3,"Tej", 2, "l"),
 ];
@@ -63,7 +73,7 @@ function saveIngredient() {
                 sed sapiente nobis!
             </p>
 
-            <Button class="col-lg-4 col-10 m-auto align-self-center" icon="bi bi-plus" type="button" color="dark"
+            <Button class="col-lg-4 col-10 m-auto align-self-center" icon="bi bi-plus" type="button" :color="buttonColor"
                 @click="openIngredientModal">Új
                 hozzávaló hozzáadása</Button>
             <Button class="d-md-none col-1 border-2" outline color="dark" icon="bi bi-graph-up" iconPosition="left"
@@ -91,11 +101,10 @@ function saveIngredient() {
             <SearchBar v-model="params.query" placeholder="Keresés" />
             <div>
                 <h3 class="fs-3 mt-3">Találatok az alábbi keresésre:</h3>
-                <div class="row g-3 mb-5 mt-4">
-                    <div class="pe-1 col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center"
+                <div class="g-3 row mb-5 mt-4">
+                    <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                         v-for="ingredient in results">
-                        <IngredientCardAmount :amount="ingredient.amount" image="/logo.webp" class="w-100"
-                            :description="ingredient.name" />
+                        <IngredientCard class="h-100" :amount="ingredient.amount" :name="ingredient.name" :expiry="ingredient.expiry.toString()" :unit="ingredient.unit" :tag="ingredient.tag" :image="'images/background.webp'"/>
                     </div>
                 </div>
             </div>
@@ -165,6 +174,10 @@ function saveIngredient() {
     width: 100%;
     max-width: 420px;
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+}
+
+.card--wrapper-media {
+    min-width: 80px;
 }
 
 @media (min-width: 992px) {
