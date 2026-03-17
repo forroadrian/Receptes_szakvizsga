@@ -1,3 +1,222 @@
+<script setup lang="ts">
+const colorMode = useColorMode()
+
+const filterButtonColor = computed(() => {
+    return colorMode.value === 'dark' ? 'light' : 'dark'
+})
+
+const search = ref('')
+const activeDuration = ref('all')
+
+const durationOptions = [
+    { label: 'Összes', value: 'all' },
+    { label: '0–30 perc', value: 'short' },
+    { label: '30–60 perc', value: 'medium' },
+    { label: '60+ perc', value: 'long' },
+]
+
+const recipes = [
+    {
+        id: 1,
+        title: 'Lorem ipsum dolor sit amet',
+        description: 'Aperiam ipsum adipisicing. Nisi quasi error aliquam laborum.',
+        time: '30 perc',
+        servings: '2 fő',
+        tags: [
+            { label: 'Sós', variant: 'active' },
+            { label: 'Gyors', variant: 'outline' },
+            { label: 'Tejmentes', variant: 'outline' },
+        ],
+        footer: {
+            allergyWarning: 'Glutén',
+        },
+    },
+    {
+        id: 2,
+        title: 'Lorem ipsum dolor sit amet',
+        description: 'Aperiam ipsum adipisicing. Nisi quasi error aliquam laborum.',
+        time: '30 perc',
+        servings: '2 fő',
+        tags: [
+            { label: 'Édes', variant: 'active' },
+            { label: 'Süti', variant: 'outline' },
+            { label: 'Tejmentes', variant: 'outline' },
+        ],
+        footer: {
+            allergyWarning: '',
+        },
+    },
+]
+const displayedRecipes = computed(() => recipes)
+</script>
+
 <template>
-    <h2>Receptek</h2>
+    <section class="recipes-page">
+        <div class="recipes-shell mx-auto p-5">
+            <h1 class="recipes-title mb-2">Receptek</h1>
+            <p class="recipes-subtitle mb-4">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus
+            </p>
+
+            <div class="row align-items-center mb-4 justify-content-between">
+                <div class="col-lg-6 col-md-9 search-wrap">
+                    <SearchBar v-model="search" placeholder="Keress keresési szó vagy recept alapján..."
+                        class="recipes-search w-100" />
+                </div>
+
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <Button :color="filterButtonColor" outline icon="bi bi-funnel" class="w-100 px-4 text-nowrap"
+                        data-bs-toggle="offcanvas" data-bs-target="#recipeFiltersOffcanvas"
+                        aria-controls="recipeFiltersOffcanvas">
+                        Szűrők
+                    </Button>
+                </div>
+            </div>
+
+            <nav class="recipes-tabs">
+                <ul class="d-flex flex-wrap list-unstyled gap-3">
+                    <li>Alapértelmezett</li>
+                    <li>Saját</li>
+                    <li>Kedvelt</li>
+                    <li>Kipróbált</li>
+                    <li>AI ajánlás</li>
+                </ul>
+            </nav>
+
+            <div class="row">
+                <div class="addRecipe col-12 col-md-6 col-lg-4 d-flex justify-content-center align-items-center">
+                    <div class="row text-center">
+                        <span class="plus-icon">+</span>
+                        <p>Új recept hozzáadása</p>
+                    </div>
+                </div>
+
+                <div v-for="recipe in displayedRecipes" class="col-12 col-md-6 col-lg-4">
+                    <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
+                        metadata-class="w-100" footer-class="w-100" class="h-100">
+                        <template #media>
+                            <div class="row pt-4">
+                                <div class="d-flex justify-content-center">
+                                    <img src="/images/background.webp" alt="recipename image" width="90%">
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #header>
+                            <CardHeader class="w-100 py-3 justify-content-center">
+                                <CardTitle :rank="5">{{ recipe.title }}</CardTitle>
+                                <template #actions>
+                                    <span title="User">👤</span>
+                                </template>
+                            </CardHeader>
+                        </template>
+
+                        <template #body>
+                            <div class="row justify-content-center">
+                                <div class="col-10 col-lg-8">
+                                    <p class="text-center mb-3 small">
+                                        {{ recipe.description }}
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #metadata>
+                            <div class="row justify-content-center mb-3 py-2">
+                                <div class="col-auto">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ recipe.time }}
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-people me-1"></i>
+                                    {{ recipe.servings }}
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-center mb-3">
+                                <div class="col-auto">
+                                    <!-- <CardTags :items="recipe.tags" /> -->
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #footer>
+                            <div class="row pt-2">
+                                <div class="col-12 text-center small my-auto">
+                                    <div v-if="recipe.footer.allergyWarning">
+                                        <strong><i class="bi bi-exclamation-triangle-fill p-2"></i> Allergént tartalmaz:
+                                            {{ recipe.footer.allergyWarning }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </CardBase>
+                </div>
+            </div>
+
+            <div id="recipeFiltersOffcanvas" class="offcanvas offcanvas-end" tabindex="-1"
+                aria-labelledby="recipeFiltersOffcanvasLabel">
+                <div class="offcanvas-header">
+                    <h5 id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold">Szűrők</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></button>
+                </div>
+
+                <div class="offcanvas-body">
+                    <div class="filters-panel offcanvas-filters">
+                        <div class="filter-item">
+                            <p class="filter-title">Időtartam</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button v-for="option in durationOptions" type="button" class="filter-pill"
+                                    @click="activeDuration = option.value">
+                                    {{ option.label }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </template>
+
+<style scoped>
+.search-wrap input {
+    height: 50px;
+}
+
+.addRecipe {
+    border-radius: var(--radius-sm);
+}
+
+.plus-icon {
+    font-size: var(--medium-icon-size);
+}
+
+.addRecipe {
+    border: 2px dashed var(--bs-emphasis-color);
+    cursor: pointer;
+}
+
+.recipes-tabs li {
+    padding: 0px 10px;
+}
+
+.tab-link.active,
+.tab-link:hover {
+    color: var(--bs-emphasis-color);
+}
+
+.filter-item {
+    padding: 20px 0px;
+}
+
+.filter-title {
+
+    font-weight: 700
+}
+
+.filter-pill {
+    border-radius: var(--radius-sm);
+    font-size: var(--small-text);
+}
+</style>

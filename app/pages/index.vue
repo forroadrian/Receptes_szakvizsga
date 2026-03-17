@@ -89,7 +89,7 @@ const cards = ref([
     </section>
 
     <section class="ourFeatures">
-        <div class="container">
+        <div class="container-fluid px-5">
             <h2 class="text-center d-flex">Miért válassz minket?</h2>
             <div class=" row flex flex-wrap text-center py-4">
                 <div class="col-lg-4 col-md-6 col-sm-12 p-4">
@@ -151,51 +151,53 @@ const cards = ref([
     </section>
 
     <section class="topRecipe">
-        <h4 class="text-center grad-text text-orange">Ajánlatunk</h4>
-        <h2 class="text-center">Legfelkapottabb receptek</h2>
-        <div class="row">
-            <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto" v-for="(card, index) in cards">
-                <CardBase variant="subtle" media-position="top" tags-position="above" :class="{ 'mt-lg-5': index != 1 }"
-                    show-divider class="h-100">
-                    <template #media>
-                        <div class="d-flex align-items-center justify-content-center w-100 h-100">
-                            <span>📷</span>
-                        </div>
-                    </template>
+        <div class="container">
+            <h4 class="text-center grad-text text-orange">Ajánlatunk</h4>
+            <h2 class="text-center">Legfelkapottabb receptek</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto" v-for="(card, index) in cards">
+                    <CardBase variant="subtle" media-position="top" tags-position="above"
+                        :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100">
+                        <template #media>
+                            <div class="d-flex align-items-center justify-content-center w-100 h-100">
+                                <span>📷</span>
+                            </div>
+                        </template>
 
-                    <template #badge>
-                        <span class="badge dark rounded-pill px-4 py-2">
-                            {{ card.badge }}
-                        </span>
-                    </template>
+                        <template #badge>
+                            <span class="badge dark rounded-pill px-4 py-2">
+                                {{ card.badge }}
+                            </span>
+                        </template>
 
-                    <template #header>
-                        <CardHeader>
-                            <CardTitle :rank="3">{{ card.title }}</CardTitle>
-                        </CardHeader>
-                    </template>
+                        <template #header>
+                            <CardHeader>
+                                <CardTitle :rank="3">{{ card.title }}</CardTitle>
+                            </CardHeader>
+                        </template>
 
-                    <template #body>
-                        <p class="text-center">
-                            {{ card.description }}
-                        </p>
-                    </template>
+                        <template #body>
+                            <p class="text-center">
+                                {{ card.description }}
+                            </p>
+                        </template>
 
-                    <template #footer>
-                        <p class="text-center mb-0">
-                            <strong><i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i> Allergént tartalmaz:
-                                {{ card.allergen }}</strong>
-                        </p>
-                    </template>
-                </CardBase>
-            </div>
-            <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
-                <ClientOnly>
-                    <Button to="/recipes" :color="buttonColor" icon="bi bi-arrow-right" iconPosition="right"
-                        class="my-5">Keress
-                        további
-                        recepteket</Button>
-                </ClientOnly>
+                        <template #footer>
+                            <p class="text-center mb-0">
+                                <strong><i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i> Allergént tartalmaz:
+                                    {{ card.allergen }}</strong>
+                            </p>
+                        </template>
+                    </CardBase>
+                </div>
+                <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
+                    <ClientOnly>
+                        <Button to="/recipes" :color="buttonColor" icon="bi bi-arrow-right" iconPosition="right"
+                            class="my-5">Keress
+                            további
+                            recepteket</Button>
+                    </ClientOnly>
+                </div>
             </div>
         </div>
     </section>
@@ -222,7 +224,7 @@ const cards = ref([
                         </p>
                         <p class="about-text">
                             Számtalan receptből válogathatnak, saját ízlésüknek megfelelően:
-                            <strong>kereshetnek, tervezhetnek</strong> szabadon. 
+                            <strong>kereshetnek, tervezhetnek</strong> szabadon.
                         </p>
                     </div>
                 </div>
