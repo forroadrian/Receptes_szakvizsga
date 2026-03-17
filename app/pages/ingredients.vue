@@ -12,13 +12,13 @@ const buttonColor = computed(() => {
     return "dark"
 })
 
-const ing = new Ingredient(1,"alma", 10, "kg")
+const ing = new Ingredient(1, "alma", 10, "kg")
 ing.tag = "Hamarosan Lejár"
 
 const ingredients: Ingredient[] = [
     ing,
-    new Ingredient(2,"körte", 10, "dkg"),
-    new Ingredient(3,"Tej", 2, "l"),
+    new Ingredient(2, "körte", 10, "dkg"),
+    new Ingredient(3, "Tej", 2, "l"),
 ];
 
 const params = ref<SearchParams<Ingredient>>({
@@ -50,11 +50,11 @@ function closeIngredientModal() {
 
 function saveIngredient() {
     const currentNew = newIngredient.value
-    if(currentNew.name.length == 0 || currentNew.amount == null || currentNew?.amount < 0 || currentNew.unit.length == 0 || currentNew.expiresAt.length == 0){
+    if (currentNew.name.length == 0 || currentNew.amount == null || currentNew?.amount < 0 || currentNew.unit.length == 0 || currentNew.expiresAt.length == 0) {
         showAlert.value = true
         return;
     }
-    const ing = new Ingredient(-1,currentNew.name, currentNew.amount, currentNew.unit)
+    const ing = new Ingredient(-1, currentNew.name, currentNew.amount, currentNew.unit)
     ingredients.push(ing)
 
     closeIngredientModal();
@@ -73,8 +73,8 @@ function saveIngredient() {
                 sed sapiente nobis!
             </p>
 
-            <Button class="col-lg-4 col-10 m-auto align-self-center" icon="bi bi-plus" type="button" :color="buttonColor"
-                @click="openIngredientModal">Új
+            <Button class="col-lg-4 col-10 m-auto align-self-center" icon="bi bi-plus" type="button"
+                :color="buttonColor" @click="openIngredientModal">Új
                 hozzávaló hozzáadása</Button>
             <Button class="d-md-none col-1 border-2" outline color="dark" icon="bi bi-graph-up" iconPosition="left"
                 icon-only type="button" data-bs-toggle="collapse" data-bs-target="#statsCollapse">
@@ -83,16 +83,20 @@ function saveIngredient() {
         <div id="statsCollapse" class="collapse d-md-block pb-4 border-bottom mt-4 mt-md-0">
             <div class="row row-gap-4 justify-content-between text-center">
                 <div class="col-lg-3 col-md-6 mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Összes" class="mx-auto" loading="lazy" />
+                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Összes" class="mx-auto"
+                        loading="lazy" />
                 </div>
                 <div class="col-lg-3 col-md-6 mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Friss" class="mx-auto" loading="lazy"/>
+                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Friss" class="mx-auto"
+                        loading="lazy" />
                 </div>
                 <div class="col-lg-3 col-md-6 mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Hamarosan Lejár" class="mx-auto" loading="lazy"/>
+                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Hamarosan Lejár" class="mx-auto"
+                        loading="lazy" />
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Lejárt" class="mx-auto" loading="lazy"/>
+                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Lejárt" class="mx-auto"
+                        loading="lazy" />
                 </div>
             </div>
         </div>
@@ -104,7 +108,9 @@ function saveIngredient() {
                 <div class="g-3 row mb-5 mt-4">
                     <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                         v-for="ingredient in results">
-                        <IngredientCard class="h-100" :amount="ingredient.amount" :name="ingredient.name" :expiry="ingredient.expiry.toString()" :unit="ingredient.unit" :tag="ingredient.tag" :image="'images/background.webp'"/>
+                        <IngredientCard class="h-100" :amount="ingredient.amount" :name="ingredient.name"
+                            :expiry="ingredient.expiry.toString()" :unit="ingredient.unit" :tag="ingredient.tag"
+                            :image="'images/background.webp'" />
                     </div>
                 </div>
             </div>
@@ -147,7 +153,7 @@ function saveIngredient() {
         </div>
     </div>
 
-    <Alert message="Helytelen adat." :show="showAlert" type="error"  @close="showAlert = false"/>
+    <Alert message="Helytelen adat." :show="showAlert" type="error" @close="showAlert = false" />
 </template>
 
 <style>
