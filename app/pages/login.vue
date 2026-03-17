@@ -1,4 +1,7 @@
 <script setup>
+definePageMeta({
+  middleware: 'guest-only'
+});
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 

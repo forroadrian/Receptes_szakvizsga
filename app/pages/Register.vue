@@ -1,4 +1,7 @@
 ﻿<script setup>
+definePageMeta({
+  middleware: 'guest-only'
+});
 import { ref, computed, watch } from 'vue';
 import EmailConfirmationModal from '~/components/auth/EmailConfirmationModal.vue';
 const supabase = useSupabaseClient();

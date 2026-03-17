@@ -1,7 +1,9 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth-only'
+});
 import type SearchParams from "~/interfaces/SearchParams";
 import Ingredient from "~/models/Ingredient";
-
 
 const showAlert = ref<boolean>()
 

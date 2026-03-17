@@ -1,4 +1,7 @@
 ﻿<script setup>
+definePageMeta({
+  middleware: 'auth-only'
+});
 import { computed, ref } from "vue";
 
 const { showAlert } = useAlert()
