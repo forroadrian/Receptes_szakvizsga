@@ -75,9 +75,10 @@ function handleClick(event) {
 </template>
 
 <style scoped>
-i {
+button i,
+a i {
     font-size: 20px;
-    padding: 0px 10px;
+    padding: 0 10px;
 }
 
 .outline {
@@ -125,14 +126,6 @@ i {
 }
 
 
-.grad:hover {
-    transform: translateY(-2px);
-}
-
-.grad:active {
-    transform: translateY(2px);
-}
-
 .grad::after {
     content: "";
     position: absolute;
@@ -149,19 +142,6 @@ i {
     to {
         transform: translateX(100%)
     }
-}
-
-.dropdown-menu {
-    display: block;
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-    transition: opacity 160ms ease, transform 160ms ease;
-}
-
-.dropdown-menu.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
 }
 
 @media (max-width: 576px) {

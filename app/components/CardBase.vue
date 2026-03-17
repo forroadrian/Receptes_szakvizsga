@@ -128,18 +128,15 @@ const divider = computed(() => {
 </template>
 
 <style scoped>
-
 .card--media-top {
     width: 100%;
     aspect-ratio: 16/9;
-    background-color: #e9ecef;
 }
 
 .card--media-left {
     width: 120px;
-    min-width: 120px;
+    min-width: var(--min-image-size);
     aspect-ratio: 1;
-    background-color: #e9ecef;
 }
 
 .card--divider {
@@ -162,4 +159,6 @@ const divider = computed(() => {
     max-width: 60px;
     min-width: 0 !important;
 }
+
+
 </style>
