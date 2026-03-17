@@ -54,6 +54,8 @@ const onSubmit = async () => {
     submitAttempted.value = true;
     authError.value = "";
     authSuccess.value = "";
+    resendMessage.value = "";
+    resendError.value = "";
     setCustomInputValidity();
 
     if (!formRef.value || !formRef.value.checkValidity()) {
@@ -63,12 +65,47 @@ const onSubmit = async () => {
     signupLoading.value = true;
 
     try {
-        const { data, error } = await supabase.auth.signUp({
-            email: email.value,
+        const trimmedEmail = email.value.trim().toLowerCase();
+        const trimmedUsername = username.value.trim();
+
+        const { data: existingEmailUser, error: emailCheckError } = await supabase
+            .from('user')
+            .select('id')
+            .eq('email', trimmedEmail)
+            .maybeSingle();
+
+        if (emailCheckError) {
+            authError.value = 'Nem sikerült ellenőrizni az email címet.';
+            return;
+        }
+
+        if (existingEmailUser) {
+            authError.value = 'Ezzel az email címmel már regisztráltak.';
+            return;
+        }
+
+        const { data: existingUsernameUser, error: usernameCheckError } = await supabase
+            .from('user')
+            .select('id')
+            .eq('username', trimmedUsername)
+            .maybeSingle();
+
+        if (usernameCheckError) {
+            authError.value = 'Nem sikerült ellenőrizni a felhasználónevet.';
+            return;
+        }
+
+        if (existingUsernameUser) {
+            authError.value = 'Ez a felhasználónév már foglalt.';
+            return;
+        }
+
+        const { error } = await supabase.auth.signUp({
+            email: trimmedEmail,
             password: password.value,
             options: {
                 data: {
-                    username: username.value
+                    username: trimmedUsername
                 }
             }
         });
@@ -78,7 +115,7 @@ const onSubmit = async () => {
             return;
         }
 
-        confirmationEmail.value = email.value;
+        confirmationEmail.value = trimmedEmail;
         authSuccess.value = "Sikeres regisztráció!";
         showConfirmationModal.value = true;
 
