@@ -5,6 +5,11 @@ import { computed } from 'vue';
 import ButtonTest from './examples/ButtonTest.vue';
 
 const colorMode = useColorMode()
+const user = useSupabaseUser()
+
+const ingredientsButtonTo = computed(() => {
+    return user.value ? "/ingredients" : "/login"
+})
 
 const buttonColor = computed(() => {
     if (colorMode.value === "dark") return "soft"
@@ -65,7 +70,7 @@ const cards = ref([
                     <div class="d-flex flex-wrap gap-2">
                         <Button to="/recipes" color="yellow" icon="bi bi-arrow-right" iconPosition="right">Receptek
                             megtekintése</Button>
-                        <Button to="/login" color="orange outline" icon="bi bi-basket3"
+                        <Button :to="ingredientsButtonTo" color="orange outline" icon="bi bi-basket3"
                             iconPosition="right">Alapanyagaim</Button>
                     </div>
                 </div>

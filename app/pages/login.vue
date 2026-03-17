@@ -23,6 +23,7 @@ const onSubmit = async () => {
         loginValue.value = ''
         password.value = ''
         submitAttempted.value = false
+        authStore.clearMessages()
 
         await navigateTo('/')
     }
