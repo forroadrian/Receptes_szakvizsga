@@ -182,9 +182,12 @@ const handleSave = () => {
                                 <div class="mb-4">
                                     <h6 class="mb-2">Nem kedvelt alapanyagok</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span v-for="(ingredient, index) in dislikedIngredients" :key="`${ingredient}-${index}`" class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                        <span v-for="(ingredient, index) in dislikedIngredients"
+                                            :key="`${ingredient}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
                                             {{ ingredient }}
-                                            <button type="button" class="chip-btn" @click="removeDislikedIngredient(index)">
+                                            <button type="button" class="chip-btn"
+                                                @click="removeDislikedIngredient(index)">
                                                 <i class="bi bi-x"></i>
                                             </button>
                                         </span>
@@ -194,7 +197,8 @@ const handleSave = () => {
                                 <div class="mb-4">
                                     <h6 class="mb-2">Allergének</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span v-for="(allergen, index) in allergens" :key="`${allergen}-${index}`" class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                        <span v-for="(allergen, index) in allergens" :key="`${allergen}-${index}`"
+                                            class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
                                             {{ allergen }}
                                             <button type="button" class="chip-btn" @click="removeAllergen(index)">
                                                 <i class="bi bi-x"></i>
@@ -207,19 +211,22 @@ const handleSave = () => {
 
                         <div class="mt-4">
                             <div class="list-group menu">
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: isProfileSettingsActive }" @click="resetToMenu">
                                     <i class="bi bi-person-lines-fill"></i>
                                     <span>Profil beállítások</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: activeSection === 'allergen' }" @click="openSection('allergen')">
                                     <i class="bi bi-shield-plus"></i>
                                     <span>Allergén hozzáadása</span>
                                 </button>
 
-                                <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     :class="{ active: activeSection === 'dislikedIngredient' }"
                                     @click="openSection('dislikedIngredient')">
                                     <i class="bi bi-slash-circle"></i>
@@ -281,11 +288,13 @@ const handleSave = () => {
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
@@ -299,7 +308,8 @@ const handleSave = () => {
 
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-3">
-                                            <FormInput v-model="currentPasswordInput" label="Aktuális jelszó" type="password" />
+                                            <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                type="password" />
                                         </div>
 
                                         <div class="mb-3">
@@ -307,15 +317,18 @@ const handleSave = () => {
                                         </div>
 
                                         <div class="mb-4">
-                                            <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad" type="password" />
+                                            <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad"
+                                                type="password" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
@@ -329,19 +342,21 @@ const handleSave = () => {
 
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-3">
-                                            <FormInput v-model="emailInput" label="Email" type="email"/>
+                                            <FormInput v-model="emailInput" label="Email" type="email" />
                                         </div>
 
                                         <div class="mb-4">
-                                            <FormInput v-model="newEmailInput" label="Új email" type="email"/>
+                                            <FormInput v-model="newEmailInput" label="Új email" type="email" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Mentés
                                             </Button>
                                         </div>
@@ -359,11 +374,13 @@ const handleSave = () => {
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Hozzáadás
                                             </Button>
                                         </div>
@@ -377,15 +394,18 @@ const handleSave = () => {
 
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
-                                            <FormInput v-model="dislikedIngredientInput" label="Nem kedvelt alapanyag neve" type="text" />
+                                            <FormInput v-model="dislikedIngredientInput"
+                                                label="Nem kedvelt alapanyag neve" type="text" />
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="resetToMenu">
+                                            <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill"
+                                                @click="resetToMenu">
                                                 Mégsem
                                             </Button>
 
-                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" @click="handleSave">
+                                            <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
+                                                @click="handleSave">
                                                 Hozzáadás
                                             </Button>
                                         </div>

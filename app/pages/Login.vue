@@ -40,30 +40,13 @@ const onSubmit = async () => {
                                 <h1 class="fs-1">Bejelentkezés</h1>
                             </div>
 
-                            <form
-                                ref="formRef"
-                                class="needs-validation"
-                                :class="{ 'was-validated': submitAttempted }"
-                                novalidate
-                                @submit.prevent="onSubmit"
-                            >
-                                <FormInput
-                                    class="pt-3"
-                                    v-model="loginValue"
-                                    label="Email cím vagy felhasználónév"
-                                    type="text"
-                                    placeholder="Add meg az emailed vagy a felhasználóneved"
-                                    required
-                                />
+                            <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }"
+                                novalidate @submit.prevent="onSubmit">
+                                <FormInput class="pt-3" v-model="loginValue" label="Email cím vagy felhasználónév"
+                                    type="text" placeholder="Add meg az emailed vagy a felhasználóneved" required />
 
-                                <FormInput
-                                    class="pt-3"
-                                    v-model="password"
-                                    label="Jelszó"
-                                    type="password"
-                                    placeholder="Add meg a jelszavad"
-                                    required
-                                />
+                                <FormInput class="pt-3" v-model="password" label="Jelszó" type="password"
+                                    placeholder="Add meg a jelszavad" required />
 
                                 <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
                                     {{ authStore.errorMessage }}
@@ -73,11 +56,8 @@ const onSubmit = async () => {
                                     {{ authStore.successMessage }}
                                 </div>
 
-                                <Button
-                                    type="submit"
-                                    class="btn grad green w-100 py-2 mt-4"
-                                    :disabled="authStore.loading"
-                                >
+                                <Button type="submit" class="btn grad green w-100 py-2 mt-4"
+                                    :disabled="authStore.loading">
                                     {{ authStore.loading ? 'Bejelentkezés...' : 'Bejelentkezés' }}
                                 </Button>
 
