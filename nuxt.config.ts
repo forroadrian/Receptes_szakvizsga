@@ -20,6 +20,11 @@ export default defineNuxtConfig({
     },
     supabase: {
         redirect: false,
+        cookieOptions: {
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 8,
+        },
         redirectOptions: {
             login: '/login',
             callback: '/confirm',
