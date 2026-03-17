@@ -15,6 +15,12 @@
     position: relative;
 }
 
+.avatar-circle img {
+    width: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
 .profile-page .form-control:focus {
     border-color: var(--accent-border);
     box-shadow: 0 0 0 0.2rem var(--accent-shadow);

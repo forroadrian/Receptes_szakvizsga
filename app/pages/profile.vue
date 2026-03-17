@@ -165,12 +165,12 @@ const handleSave = () => {
             <div class="profile-shell p-3 p-md-4 rounded-3 shadow w-100">
                 <div class="row g-4">
                     <div class="col-12 col-lg-4">
-                        <div class="card shadow-sm rounded-3">
-                            <div class="card-body p-4">
+                        <div class="shadow-sm rounded-3">
+                            <div class="card-body shadow-sm p-4">
                                 <div class="text-center mb-4">
                                     <div class="avatar-wrap mx-auto mb-3 position-relative">
-                                        <div class="avatar-circle d-flex align-items-center justify-content-center border">
-                                            <i class="bi bi-image"></i>
+                                        <div class="avatar-circle d-flex align-items-center justify-content-center">
+                                            <img src="/icons/profile.png" alt="Profile" title="Profile picture">
                                         </div>
                                         <button class="avatar-camera" type="button">
                                             <i class="bi bi-camera-fill"></i>

@@ -19,6 +19,10 @@ onMounted(() => {
     isReady.value = true
 })
 
+const displayProfileImage = computed(() => {
+    return '/icons/profile.png'
+})
+
 const displayUsername = computed(() => {
     if (!user.value) return ""
 
@@ -118,7 +122,7 @@ const handleSignOut = async () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <p><img src="/logo.webp" alt="Profilkép" /></p>
+                                <p><img :src="displayProfileImage" alt="Profilkép" title="Profilkép"/></p>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">{{ displayUsername }}</p>
@@ -128,13 +132,13 @@ const handleSignOut = async () => {
                             <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img class="account-avatar" src="/logo.webp" alt="Profilkép" />
+                                        <img :src="displayProfileImage" alt="Profilkép" title="Profilkép"/>
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="flex-grow-1">
                                             <p class="fw-bold text-truncate m-0">{{ displayUsername }}</p>
-                                            <p class="text-muted small text-break">
+                                            <p class="text-muted small">
                                                 {{ displayEmail }}
                                             </p>
                                         </div>
@@ -224,6 +228,12 @@ const handleSignOut = async () => {
 .navbar-brand img {
     width: var(--brand-logo-width);
     height: auto;
+}
+
+.account-avatar-wrap img {
+    width: 100%;
+    width: 100%;
+    object-fit: contain;
 }
 
 .auth-area {
