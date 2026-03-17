@@ -59,7 +59,7 @@ const handleSignOut = async () => {
                     <img src="/logo.webp" alt="Brand logo" title="Brand logo" class="brand-logo" />
                 </NuxtLink>
 
-                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                     aria-controls="mainNav" aria-expanded="false" aria-label="Menü megnyitása">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -81,8 +81,14 @@ const handleSignOut = async () => {
                     </ul>
 
                     <div v-if="!isLoggedIn" class="auth-area">
-                        <NuxtLink class="grad orange outline w-lg-auto" to="/signup"> Regisztráció</NuxtLink>
-                        <NuxtLink class="grad orange w-lg-auto" to="/login">Belépés</NuxtLink>
+                        <p @click="toggleTheme" class="baseMode d-flex m-0  justify-content-center pe-lg-4">
+                            {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
+                            <span class="my-auto ms-1">
+                                {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
+                            </span>
+                        </p>
+                        <NuxtLink class="w-lg-auto me-3 grad orange" to="/register"> Regisztráció</NuxtLink>
+                        <NuxtLink class="grad orange w-lg-auto  me-3" to="/login">Belépés</NuxtLink>
                     </div>
 
                     <div v-else class="auth-area">
@@ -112,7 +118,7 @@ const handleSignOut = async () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div> <img src="/logo.webp" alt="Profilkép" /></div>
+                                <p><img src="/logo.webp" alt="Profilkép" /></p>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">{{ displayUsername }}</p>
@@ -181,23 +187,22 @@ const handleSignOut = async () => {
     border: none !important;
 }
 
-.nav-link:hover::after {
-    width: 100%;
-}
-
 .nav-link,
-.account-avatar-wrap {
+.account-avatar-wrap,
+.lang-dropdown,
+.user-dropdown {
     position: relative;
 }
 
 .dropdown button p {
     color: var(--orange);
-    margin: 0px auto;
+    margin: 0 auto;
 }
 
-.nav-link {
-    font-size: 18px;
-    transition: .18s;
+.nav-link,
+.baseMode span {
+    font-size: var(--base-font-size);
+    transition: 0.18s;
 }
 
 .nav-link::after {
@@ -208,12 +213,12 @@ const handleSignOut = async () => {
     width: 0;
     height: 2px;
     background: var(--grad-orange);
-    transition: width .5s ease;
+    transition: width 0.5s ease;
 }
 
 .nav-link.router-link-exact-active {
     font-weight: 700;
-    color: var(--dark)
+    color: var(--dark);
 }
 
 .navbar-brand img {
@@ -226,16 +231,12 @@ const handleSignOut = async () => {
     flex-direction: column;
 }
 
-.nav-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    flex: 0 auto;
+.nav-avatar, .account-avatar{
+    border-radius: var(--radius-rounded);
 }
 
 .lang-dropdown .dropdown-menu {
     min-width: 100%;
-    width: auto;
 }
 
 .usernameToggle {
@@ -251,28 +252,22 @@ const handleSignOut = async () => {
 }
 
 .form-switch input:focus {
-    box-shadow: none !important
+    box-shadow: none !important;
 }
 
-#userDropdown img {
+#userDropdown img,
+.nav-avatar {
     width: 30px;
     height: 30px;
 }
 
-
 .dropdown-menu,
 .account-menu {
-    display: block;
     opacity: 0;
     transform: translateY(-8px);
     visibility: hidden;
     pointer-events: none;
-    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
-}
-
-.account-menu {
-    min-width: 250px;
-    margin-left: 10px;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
 }
 
 .dropdown-menu.show,
@@ -283,10 +278,25 @@ const handleSignOut = async () => {
     pointer-events: auto;
 }
 
+.lang-menu {
+    left: 0;
+    right: auto;
+}
+
+.account-menu {
+    right: 0;
+    left: auto;
+    margin-left: 0;
+}
+
 .account-avatar-wrap {
     width: 55px;
     height: 55px;
     margin: 0 auto;
+}
+
+.account-avatar {
+    object-fit: cover;
 }
 
 .account-edit {
@@ -313,11 +323,16 @@ const handleSignOut = async () => {
 }
 
 .lang-btn {
-    border-radius: 14px;
+    border-radius: var(--radius-sm);
 }
 
 .lang-btn:hover {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.baseMode {
+    font-size: var(--nav-icon-size);
+    cursor: pointer;
 }
 
 @media (min-width: 992px) {
@@ -334,19 +349,29 @@ const handleSignOut = async () => {
         justify-content: space-evenly;
     }
 
-    .lang-select {
-        width: 140px;
+    .baseMode span {
+        display: none;
+    }
+
+    .lang-btn,
+    #userDropdown {
+        width: auto;
+        justify-content: flex-start;
+    }
+
+    .lang-menu {
+        min-width: 100%;
+        width: max-content;
+    }
+
+    .account-menu {
+        min-width: 250px;
     }
 }
 
-@media (max-width: 992px) {
-    .lang-select {
-        width: 50%;
-        text-align: center;
-    }
-
+@media (max-width: 991.98px) {
     .navbar-collapse {
-        padding-top: .75rem;
+        padding-top: 0.75rem;
     }
 
     .nav-links .nav-item {
@@ -356,7 +381,7 @@ const handleSignOut = async () => {
 
     .nav-link {
         max-width: 520px;
-        margin: 10px 0px;
+        margin: 10px 0;
     }
 
     .auth-area {
@@ -364,5 +389,14 @@ const handleSignOut = async () => {
         padding-top: 20px;
         gap: 20px;
     }
+
+    .account-menu {
+        min-width: 300px;
+    }
+
+    .account-menu {
+        right: -70% ;
+    }
+
 }
 </style>

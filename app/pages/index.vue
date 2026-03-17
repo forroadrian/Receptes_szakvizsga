@@ -2,6 +2,7 @@
 import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 import { ref } from 'vue';
 import { computed } from 'vue';
+import ButtonTest from './examples/ButtonTest.vue';
 
 const colorMode = useColorMode()
 
@@ -66,7 +67,6 @@ const cards = ref([
                         <Button to="/login" color="orange outline" icon="bi bi-basket3"
                             iconPosition="right">Alapanyagaim</Button>
                     </div>
-
                 </div>
                 <div class="col-lg-5 hero-image d-flex"></div>
             </div>
