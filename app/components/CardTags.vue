@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type CardTagItem from '~/interfaces/cardInterfaces/CardGenericInterfaces';
+import { type CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 
 const props = defineProps<{
     items: CardTagItem[]
