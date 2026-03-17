@@ -6,7 +6,10 @@ const filterButtonColor = computed(() => {
 })
 
 const search = ref('')
-const activeDuration = ref('all')
+const activeDuration = ref('all');
+const typeOptions = ['összes', 'sós', 'édes', 'leves', 'főétel', 'saláta', 'tészta', 'desszert'];
+const mealOptions = ['reggeli', 'ebéd', 'vacsora', 'snack'];
+const allergenSearch = ref('');
 
 const durationOptions = [
     { label: 'Összes', value: 'all' },
@@ -172,6 +175,47 @@ const displayedRecipes = computed(() => recipes)
                                 </button>
                             </div>
                         </div>
+                        <div class="filter-item">
+                            <p class="filter-title">Étkezés</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button v-for="meal in mealOptions" type="button" class="filter-pill">
+                                    {{ meal }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="filter-item">
+                            <p class="filter-title">Típus</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button v-for="type in typeOptions" type="button" class="filter-pill">
+                                    {{ type }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="filter-item">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <p class="filter-title mb-0">Nem kedvelt alapanyagok</p>
+                                <i class="bi bi-chevron-down small"></i>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" name="isdisliked" type="radio" checked id="ondisliked">
+                                <label class="form-check-label" for="ondisliked">Számít</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="isdisliked" type="radio" id="offdisliked">
+                                <label class="form-check-label" for="offdisliked">Nem számít</label>
+                            </div>
+                        </div>
+                        <div class="filter-item">
+                            <div class="row g-2">
+                                <p class="filter-title mb-0">Allergén, ételérzékenység</p>
+                                <div class="col-12">
+                                    <SearchBar v-model="allergenSearch" placeholder="Allergén neve / típusa..."
+                                        class=" w-100" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -215,7 +259,8 @@ const displayedRecipes = computed(() => recipes)
     font-weight: 700
 }
 
-.filter-pill {
+.filter-pill,
+.form-check-label {
     border-radius: var(--radius-sm);
     font-size: var(--small-text);
 }
