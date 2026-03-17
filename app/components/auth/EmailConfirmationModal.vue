@@ -87,6 +87,7 @@ const emit = defineEmits(["close", "resend"])
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
     padding: 40px 32px 28px;
     text-align: center;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .confirm-close {
@@ -99,6 +100,7 @@ const emit = defineEmits(["close", "resend"])
     line-height: 1;
     color: #6c757d;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .confirm-icon-wrap {
@@ -117,14 +119,24 @@ const emit = defineEmits(["close", "resend"])
     color: #20c997;
 }
 
+.confirm-title,
+.confirm-text {
+    transition: color 0.25s ease;
+}
+
 .confirm-title {
     font-size: 2rem;
     margin-bottom: 16px;
+    color: #212121;
+}
+
+.confirm-text,
+.confirm-resend {
+    color: #555;
 }
 
 .confirm-text {
     font-size: 1.05rem;
-    color: #555;
     margin-bottom: 10px;
 }
 
@@ -144,6 +156,7 @@ const emit = defineEmits(["close", "resend"])
     gap: 8px;
     flex-wrap: wrap;
     font-size: 1rem;
+    transition: color 0.25s ease, border-color 0.25s ease;
 }
 
 .confirm-resend-link {
@@ -186,6 +199,42 @@ const emit = defineEmits(["close", "resend"])
 .confirm-fade-leave-from .confirm-modal {
     opacity: 1;
     transform: scale(1) translateY(0);
+}
+
+[data-bs-theme="dark"] .confirm-modal {
+    background: #212121;
+    color: #f5f5f5;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+[data-bs-theme="dark"] .confirm-title,
+[data-bs-theme="dark"] .confirm-close {
+    color: #f5f5f5;
+}
+
+[data-bs-theme="dark"] .confirm-text,
+[data-bs-theme="dark"] .confirm-resend {
+    color: #d8d8d8;
+}
+
+[data-bs-theme="dark"] .confirm-resend {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .confirm-close:hover {
+    color: #ff7231;
+}
+
+[data-bs-theme="dark"] .alert-success {
+    background-color: rgba(53, 165, 90, 0.18);
+    color: #c8f1d3;
+    border-color: rgba(53, 165, 90, 0.35);
+}
+
+[data-bs-theme="dark"] .alert-danger {
+    background-color: rgba(220, 53, 69, 0.18);
+    color: #ffd3d8;
+    border-color: rgba(220, 53, 69, 0.35);
 }
 
 @media (max-width: 576px) {
