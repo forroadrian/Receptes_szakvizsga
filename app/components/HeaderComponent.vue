@@ -224,6 +224,10 @@ const handleSignOut = async () => {
     transition: width 0.5s ease;
 }
 
+.nav-link:hover::after, .account-avatar-wrap img {
+    width: 100%;
+}
+
 .nav-link.router-link-exact-active {
     font-weight: 700;
     color: var(--dark);
@@ -235,8 +239,6 @@ const handleSignOut = async () => {
 }
 
 .account-avatar-wrap img {
-    width: 100%;
-    width: 100%;
     object-fit: contain;
 }
 
@@ -334,14 +336,13 @@ const handleSignOut = async () => {
     height: 16px;
     object-fit: cover;
     border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .lang-btn {
     border-radius: var(--radius-sm);
 }
 
-.lang-btn:hover {
+.lang-btn:hover,  .flag-icon {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
