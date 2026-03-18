@@ -22,48 +22,51 @@ defineProps({
     }
 })
 
-const emit = defineEmits(["close", "resend"])
+const emit = defineEmits(["close", "resend"]);
 </script>
 
 <template>
-    <Transition name="confirm-fade">
-        <div v-if="show" class="confirm-overlay">
-            <div class="confirm-modal">
-                <button type="button" class="confirm-close" @click="emit('close')">×</button>
+    <Teleport to="body">
+        <Transition name="confirm-fade">
+            <div v-if="show" class="confirm-overlay">
+                <div class="confirm-modal">
+                    <button type="button" class="confirm-close" @click="emit('close')">×</button>
 
-                <div class="confirm-icon-wrap">
-                    <img src="../../assets/images/authentication.png" alt="Authentication" title="Authentication">
-                </div>
+                    <div class="confirm-icon-wrap">
+                        <img src="../../assets/images/authentication.png" alt="Authentication" title="Authentication">
+                    </div>
 
-                <h2 class="confirm-title">Email megerősítés</h2>
+                    <h2 class="confirm-title">Email megerősítés</h2>
 
-                <p class="confirm-text">
-                    Küldtünk egy megerősítő emailt erre a címre:
-                    <span class="confirm-email">{{ email }}</span>
-                </p>
+                    <p class="confirm-text">
+                        Küldtünk egy megerősítő emailt erre a címre:
+                        <span class="confirm-email">{{ email }}</span>
+                    </p>
 
-                <p class="confirm-text mb-0">
-                    Kérjük, nyissa meg az emailjeit, és kattintson a levélben található linkre a regisztráció
-                    befejezéséhez.
-                </p>
+                    <p class="confirm-text mb-0">
+                        Kérjük, nyissa meg az emailjeit, és kattintson a levélben található linkre a regisztráció
+                        befejezéséhez.
+                    </p>
 
-                <div v-if="resendMessage" class="alert alert-success mt-4 mb-2">
-                    {{ resendMessage }}
-                </div>
+                    <div v-if="resendMessage" class="alert alert-success mt-4 mb-2">
+                        {{ resendMessage }}
+                    </div>
 
-                <div v-if="resendError" class="alert alert-danger mt-4 mb-2">
-                    {{ resendError }}
-                </div>
+                    <div v-if="resendError" class="alert alert-danger mt-4 mb-2">
+                        {{ resendError }}
+                    </div>
 
-                <div class="confirm-resend">
-                    <span>Nem kaptad meg az emailt?</span>
-                    <button type="button" class="confirm-resend-link" :disabled="resendLoading" @click="emit('resend')">
-                        {{ resendLoading ? 'Újraküldés...' : 'Újraküldés' }}
-                    </button>
+                    <div class="confirm-resend">
+                        <span>Nem kaptad meg az emailt?</span>
+                        <button type="button" class="confirm-resend-link" :disabled="resendLoading"
+                            @click="emit('resend')">
+                            {{ resendLoading ? 'Újraküldés...' : 'Újraküldés' }}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </Transition>
+        </Transition>
+    </Teleport>
 </template>
 
 <style scoped>

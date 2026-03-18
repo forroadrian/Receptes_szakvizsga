@@ -1,9 +1,12 @@
 ﻿<script setup>
 definePageMeta({
-  middleware: 'guest-only'
+    middleware: 'guest-only',
+    layout: 'auth'
 });
+
 import { ref, computed, watch } from 'vue';
 import EmailConfirmationModal from '~/components/auth/EmailConfirmationModal.vue';
+
 const supabase = useSupabaseClient();
 
 const email = ref("");
@@ -39,15 +42,21 @@ const setCustomInputValidity = () => {
     const repasswordInput = inputs[3];
 
     if (usernameInput) {
-        usernameInput.setCustomValidity(usernameOk.value ? "" : "A felhasználónév legalább 4 karakter legyen.");
+        usernameInput.setCustomValidity(
+            usernameOk.value ? "" : "A felhasználónév legalább 4 karakter legyen."
+        );
     }
 
     if (passwordInput) {
-        passwordInput.setCustomValidity(passwordOk.value ? "" : "A jelszó legalább 6 karakter legyen.");
+        passwordInput.setCustomValidity(
+            passwordOk.value ? "" : "A jelszó legalább 6 karakter legyen."
+        );
     }
 
     if (repasswordInput) {
-        repasswordInput.setCustomValidity(passwordsMatch.value ? "" : "A két jelszó nem egyezik.");
+        repasswordInput.setCustomValidity(
+            passwordsMatch.value ? "" : "A két jelszó nem egyezik."
+        );
     }
 };
 
@@ -181,72 +190,63 @@ const closeConfirmationModal = () => {
 </script>
 
 <template>
-    <section class="register-page">
-        <div class="register-shell d-flex align-items-center justify-content-center px-3">
-            <div class="card shadow-lg align-self-center">
-                <div class="row g-0">
-                    <div class="col-12 col-lg-6">
-                        <div class="p-4 form-side p-md-5 d-flex flex-column justify-content-center">
-                            <div class="text-center mb-4">
-                                <h1 class="fs-1">Regisztráció</h1>
-                            </div>
+    <section class="auth-form-page">
+        <div class="auth-form-shell">
+            <div class="auth-form-side d-flex flex-column justify-content-center">
+                <div class="text-center mb-2">
+                    <h1 class="fs-1">Regisztráció</h1>
+                </div>
 
-                            <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }"
-                                novalidate @submit.prevent="onSubmit">
-                                <FormInput v-model="email" label="Email cím" type="email"
-                                    placeholder="Add meg az email címed" required />
+                <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
+                    @submit.prevent="onSubmit">
+                    <FormInput v-model="email" label="Email cím" type="email" placeholder="Add meg az email címed"
+                        required />
 
-                                <FormInput v-model="username" label="Felhasználónév" type="text"
-                                    placeholder="Add meg a felhasználóneved" required />
-                                <div v-if="submitAttempted && !usernameOk" class="invalid-feedback d-block mb-2">
-                                    A felhasználónév legalább 4 karakter legyen.
-                                </div>
+                    <FormInput v-model="username" label="Felhasználónév" type="text"
+                        placeholder="Add meg a felhasználóneved" required />
+                    <div v-if="submitAttempted && !usernameOk" class="invalid-feedback d-block mb-2">
+                        A felhasználónév legalább 4 karakter legyen.
+                    </div>
 
-                                <FormInput v-model="password" label="Jelszó" type="password"
-                                    placeholder="Add meg a jelszavad" required />
-                                <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
-                                    A jelszó legalább 6 karakter legyen.
-                                </div>
+                    <FormInput v-model="password" label="Jelszó" type="password" placeholder="Add meg a jelszavad"
+                        required />
+                    <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
+                        A jelszó legalább 6 karakter legyen.
+                    </div>
 
-                                <FormInput v-model="repassword" label="Jelszó újra" type="password"
-                                    placeholder="Add meg újra a jelszavad" required />
-                                <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
-                                    A két jelszó nem egyezik.
-                                </div>
+                    <FormInput v-model="repassword" label="Jelszó újra" type="password"
+                        placeholder="Add meg újra a jelszavad" required />
+                    <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
+                        A két jelszó nem egyezik.
+                    </div>
 
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" v-model="acceptTerms" required />
-                                    <label class="form-check-label">
-                                        Elfogadom a felhasználói feltételeket
-                                    </label>
-                                    <div class="invalid-feedback">A továbblépéshez el kell fogadnod a felhasználói
-                                        feltételeket.</div>
-                                </div>
-
-                                <div v-if="authError" class="alert alert-danger">
-                                    {{ authError }}
-                                </div>
-
-                                <div v-if="authSuccess" class="alert alert-success">
-                                    {{ authSuccess }}
-                                </div>
-
-                                <Button type="submit" class="grad orange w-100 py-2" :disabled="signupLoading">
-                                    {{ signupLoading ? 'Regisztráció...' : 'Regisztrálás' }}
-                                </Button>
-
-                                <div class="mt-3 d-flex justify-content-center">
-                                    <p class="pe-3">Van már fiókod?</p>
-                                    <NuxtLink to="login">Bejelentkezés</NuxtLink>
-                                </div>
-                            </form>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" v-model="acceptTerms" required />
+                        <label class="form-check-label">
+                            Elfogadom a felhasználói feltételeket
+                        </label>
+                        <div class="invalid-feedback">
+                            A továbblépéshez el kell fogadnod a felhasználói feltételeket.
                         </div>
                     </div>
 
-                    <div class="col-lg-6 d-none d-lg-block">
-                        <img src="/images/background.webp" alt="recipe image" title="recipe image" />
+                    <div v-if="authError" class="alert alert-danger">
+                        {{ authError }}
                     </div>
-                </div>
+
+                    <div v-if="authSuccess" class="alert alert-success">
+                        {{ authSuccess }}
+                    </div>
+
+                    <Button type="submit" class="grad orange w-100 py-2" :disabled="signupLoading">
+                        {{ signupLoading ? 'Regisztráció...' : 'Regisztrálás' }}
+                    </Button>
+
+                    <div class="mt-3 d-flex justify-content-center">
+                        <p class="pe-3">Van már fiókod?</p>
+                        <NuxtLink to="/login">Bejelentkezés</NuxtLink>
+                    </div>
+                </form>
             </div>
         </div>
 
