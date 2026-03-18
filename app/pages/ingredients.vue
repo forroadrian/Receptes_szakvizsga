@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: 'auth-only'
+    middleware: 'auth-only'
 });
 import type SearchParams from "~/interfaces/SearchParams";
 import Ingredient from "~/models/Ingredient";
@@ -65,9 +65,9 @@ function saveIngredient() {
 </script>
 
 <template>
-    <div class="container mt-3">
-        <div class="row mb-3">
-            <h1 class="col-12">Itt mar ennek kell megjelennie</h1>
+    <div class="container mt-3 py-3">
+        <div class="row mb-3 py-3">
+            <h1 class="col-12 py-3">Itt mar ennek kell megjelennie</h1>
             <p class="col-lg-8 col-sm-12 pe-4 text-wrap">
                 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis officia
                 voluptatibus similique inventore assumenda quia accusantium minima
@@ -75,14 +75,14 @@ function saveIngredient() {
                 sed sapiente nobis!
             </p>
 
-            <Button class="col-lg-4 col-10 m-auto align-self-center" icon="bi bi-plus" type="button"
-                :color="buttonColor" @click="openIngredientModal">Új
+            <Button class="col-lg-4 col-10 m-auto-" icon="bi bi-plus" type="button" :color="buttonColor"
+                @click="openIngredientModal">Új
                 hozzávaló hozzáadása</Button>
             <Button class="d-md-none col-1 border-2" outline color="dark" icon="bi bi-graph-up" iconPosition="left"
                 icon-only type="button" data-bs-toggle="collapse" data-bs-target="#statsCollapse">
             </Button>
         </div>
-        <div id="statsCollapse" class="collapse d-md-block pb-4 border-bottom mt-4 mt-md-0">
+        <div id="statsCollapse" class="collapse d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
             <div class="row row-gap-4 justify-content-between text-center">
                 <div class="col-lg-3 col-md-6 mb-md-0">
                     <IngredientCardAmount :amount="0" image="/logo.webp" description="Összes" class="mx-auto"
@@ -103,10 +103,10 @@ function saveIngredient() {
             </div>
         </div>
         <div class="row mt-4">
-            <h2>Meglévő alapanyagaim</h2>
-            <SearchBar v-model="params.query" placeholder="Keresés" />
+            <h2 class="py-3">Meglévő alapanyagaim</h2>
+            <SearchBar v-model="params.query" placeholder="Keresés" class="px-3 mx-3" />
             <div>
-                <h3 class="fs-3 mt-3">Találatok az alábbi keresésre:</h3>
+                <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <div class="g-3 row mb-5 mt-4">
                     <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                         v-for="ingredient in results">
@@ -123,7 +123,7 @@ function saveIngredient() {
         <div class="ingredient-modal-panel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Új hozzávaló felvétele</h3>
-                <Button type="button" icon-only icon="bi bi-x-circle" class="p-0" @click="closeIngredientModal" />
+                <i class="bi bi-x p-0" @click="closeIngredientModal"> </i>
             </div>
 
             <div class="mb-3">

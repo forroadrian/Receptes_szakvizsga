@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 const colorMode = useColorMode()
 
 const filterButtonColor = computed(() => {
@@ -9,7 +9,16 @@ const search = ref('')
 const activeDuration = ref('all');
 const typeOptions = ['összes', 'sós', 'édes', 'leves', 'főétel', 'saláta', 'tészta', 'desszert'];
 const mealOptions = ['reggeli', 'ebéd', 'vacsora', 'snack'];
+const selectedMeals = ref([]);
 const allergenSearch = ref('');
+
+const toggleMeal = (meal) => {
+    if (selectedMeals.value.includes(meal)) {
+        selectedMeals.value = selectedMeals.value.filter(m => m !== meal)
+    } else {
+        selectedMeals.value.push(meal)
+    }
+}
 
 const durationOptions = [
     { label: 'Összes', value: 'all' },
@@ -61,13 +70,13 @@ const displayedRecipes = computed(() => recipes)
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus
             </p>
 
-            <div class="row align-items-center mb-4 justify-content-between">
-                <div class="col-lg-6 col-md-9 search-wrap">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-lg-9 col-md-9 search-wrap my-3">
                     <SearchBar v-model="search" placeholder="Keress keresési szó vagy recept alapján..."
                         class="recipes-search w-100" />
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-sm-6">
+                <div class="col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
                     <Button :color="filterButtonColor" outline icon="bi bi-funnel" class="w-100 px-4 text-nowrap"
                         data-bs-toggle="offcanvas" data-bs-target="#recipeFiltersOffcanvas"
                         aria-controls="recipeFiltersOffcanvas">
@@ -76,25 +85,36 @@ const displayedRecipes = computed(() => recipes)
                 </div>
             </div>
 
-            <nav class="recipes-tabs">
+            <nav class="recipes-tabs mt-sm-4">
                 <ul class="d-flex flex-wrap list-unstyled gap-3">
-                    <li>Alapértelmezett</li>
-                    <li>Saját</li>
-                    <li>Kedvelt</li>
-                    <li>Kipróbált</li>
-                    <li>AI ajánlás</li>
+                    <li>
+                        <button type="button" class="tab-btn active">Alapértelmezett</button>
+                    </li>
+                    <li>
+                        <button type="button" class="tab-btn">Saját</button>
+                    </li>
+                    <li>
+                        <button type="button" class="tab-btn">Kedvelt</button>
+                    </li>
+                    <li>
+                        <button type="button" class="tab-btn">Kipróbált</button>
+                    </li>
+                    <li>
+                        <button type="button" class="tab-btn">AI ajánlás</button>
+                    </li>
                 </ul>
             </nav>
 
             <div class="row">
-                <div class="addRecipe col-12 col-md-6 col-lg-4 d-flex justify-content-center align-items-center">
+                <div
+                    class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center">
                     <div class="row text-center">
                         <span class="plus-icon">+</span>
                         <p>Új recept hozzáadása</p>
                     </div>
                 </div>
 
-                <div v-for="recipe in displayedRecipes" class="col-12 col-md-6 col-lg-4">
+                <div v-for="recipe in displayedRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
                     <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                         metadata-class="w-100" footer-class="w-100" class="h-100">
                         <template #media>
@@ -178,7 +198,10 @@ const displayedRecipes = computed(() => recipes)
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
                             <div class="d-flex flex-wrap gap-2">
-                                <button v-for="meal in mealOptions" type="button" class="filter-pill">
+                                <button v-for="meal in mealOptions" :key="meal" type="button" class="filter-pill"
+                                    :class="selectedMeals.includes(meal) ? 'active' : ''" @click="toggleMeal(meal)">
+                                    <i class="bi me-1"
+                                        :class="selectedMeals.includes(meal) ? 'bi-check-lg' : 'bi-plus-lg'"></i>
                                     {{ meal }}
                                 </button>
                             </div>
@@ -241,8 +264,25 @@ const displayedRecipes = computed(() => recipes)
     cursor: pointer;
 }
 
-.recipes-tabs li {
+.recipes-tabs {
     padding: 0px 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    color: var(--dark);
+}
+
+.tab-btn.active {
+    border-bottom: 2px solid var(--bs-emphasis-color);
+    font-weight: 500;
 }
 
 .tab-link.active,
@@ -250,12 +290,21 @@ const displayedRecipes = computed(() => recipes)
     color: var(--bs-emphasis-color);
 }
 
+.filter-pill {
+    background-color: var(--soft);
+    border: 2px solid var(--bs-gray-600);
+}
+
+.filter-pill.active {
+    border: 2px solid var(--green) !important;
+    color: var(--green);
+}
+
 .filter-item {
     padding: 20px 0px;
 }
 
-.filter-title {
-
+.filter-title{
     font-weight: 700
 }
 
