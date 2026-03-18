@@ -79,15 +79,17 @@ const isLoginPage = computed(() => route.path === '/login');
 }
 
 .auth-content-pane {
-    position: relative;
+    position: absolute;
+    top: 0;
+    bottom: 0;
     width: 50%;
-    height: 640px;
-    transition: transform 0.6s ease-in-out;
+    height: 100%;
+    transition: left 0.6s ease-in-out;
     z-index: 1;
 }
 
 .mode-register .auth-content-pane {
-    transform: translateX(0);
+    left: 0;
 }
 
 .mode-register .auth-image-pane {
@@ -95,7 +97,7 @@ const isLoginPage = computed(() => route.path === '/login');
 }
 
 .mode-login .auth-content-pane {
-    transform: translateX(100%);
+    left: 50%;
 }
 
 .mode-login .auth-image-pane {
