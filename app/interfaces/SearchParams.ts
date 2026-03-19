@@ -1,5 +1,5 @@
 export default interface SearchParams<T> {
-  haystack: T[]; // ingredients
+  haystack: T[] | MaybeRefOrGetter<T[]>; // ingredients
   searchFor: (keyof T | string)[]; // [title, nev]
   query?: string; // keresett szöveg
   showAllByDefault?: boolean;

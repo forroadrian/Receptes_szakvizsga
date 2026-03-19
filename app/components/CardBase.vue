@@ -158,5 +158,8 @@ const divider = computed(() => {
     min-width: 0 !important;
 }
 
+.card-fixed {
+    height: 160px !important;   
+}
 
 </style>

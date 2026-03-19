@@ -9,15 +9,14 @@ export default class Ingredient implements IngredientTag, Identifiable{
     private _name: string;
     private _amount: number;
     private _unit: string;
-    private _expiry: Date;
+    private _expiry: string;
 
-    constructor(id: number, name: string, amount: number, unit: string, expiry?: Date, tag?: FreshnessVariants) {
+    constructor(id: number, name: string, amount: number, unit: string, expiry?: string, tag?: FreshnessVariants) {
         this._id = id
         this._name = name;
         this._amount = amount;
         this._unit = unit;
-        this._expiry = expiry ?? new Date("2000-01-01")
-
+        this._expiry = expiry ?? "2006-01-01"
         this._tag = tag ?? "Friss";
     }
 
@@ -69,12 +68,12 @@ export default class Ingredient implements IngredientTag, Identifiable{
         this._id = v;
     }
 
-    public get expiry() : Date {
+    public get expiry() : string {
         return this._expiry
     }
 
     
-    public set expiry(v : Date) {
+    public set expiry(v : string) {
         this._expiry = v;
     }
     

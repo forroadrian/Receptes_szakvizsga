@@ -17,14 +17,14 @@ const buttonColor = computed(() => {
 const ing = new Ingredient(1, "alma", 10, "kg")
 ing.tag = "Hamarosan Lejár"
 
-const ingredients: Ingredient[] = [
+const ingredients = ref([
     ing,
     new Ingredient(2, "körte", 10, "dkg"),
     new Ingredient(3, "Tej", 2, "l"),
-];
+]);
 
 const params = ref<SearchParams<Ingredient>>({
-    haystack: ingredients,
+    haystack: ingredients.value,
     searchFor: ["name"],
     showAllByDefault: true
 });
@@ -32,8 +32,6 @@ const params = ref<SearchParams<Ingredient>>({
 const results = useSearch(params);
 
 const showIngredientModal = ref(false);
-
-
 
 const newIngredient = ref({
     name: "",
@@ -57,9 +55,17 @@ function saveIngredient() {
         return;
     }
     const ing = new Ingredient(-1, currentNew.name, currentNew.amount, currentNew.unit)
-    ingredients.push(ing)
+    ingredients.value.push(ing)
 
     closeIngredientModal();
+}
+
+const onDelete = (ingredient: Ingredient) => {
+    ingredients.value.splice(ingredients.value.indexOf(ingredient),1)
+}
+
+const onEdit = (ingredient: Ingredient) => {
+
 }
 
 </script>
@@ -108,11 +114,13 @@ function saveIngredient() {
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <div class="g-3 row mb-5 mt-4">
-                    <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
+                    <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center" v-if="results.length > 0"
                         v-for="ingredient in results">
-                        <IngredientCard class="h-100" :amount="ingredient.amount" :name="ingredient.name"
-                            :expiry="ingredient.expiry.toString()" :unit="ingredient.unit" :tag="ingredient.tag"
+                        <IngredientCard :ingredient="ingredient" @delete="onDelete"
                             :image="'images/background.webp'" />
+                    </div>
+                    <div v-else>
+                        <p class="fs-2 text-center fw-bold">Sajnos nem találtunk ilyen alapanyagot :(</p>
                     </div>
                 </div>
             </div>
