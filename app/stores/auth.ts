@@ -117,32 +117,163 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const updateUsername = async (newUsername: string) => {
+        clearMessages()
+
         if (!user.value) {
             errorMessage.value = 'Nincs bejelentkezett felhasználó.'
             return false
         }
 
+        const userId = user.value.id || user.value.sub
+        const trimmedUsername = newUsername.trim()
+
+        if (!trimmedUsername) {
+            errorMessage.value = 'Add meg a felhasználónevet.'
+            return false
+        }
+
+        if (trimmedUsername.length < 4) {
+            errorMessage.value = 'A felhasználónév legalább 4 karakter legyen.'
+            return false
+        }
+
+        loading.value = true
+
         try {
-            const { error } = await supabase
+            const { data: currentUser, error: currentUserError } = await supabase
                 .from('user')
-                .update({ username: newUsername })
-                .eq('id', user.value?.id || user.value?.sub)
-        
-            if (error) throw error
-        
-            await supabase.auth.updateUser({
-                data: { username: newUsername }
+                .select('username')
+                .eq('id', userId)
+                .single()
+
+            if (currentUserError || !currentUser) {
+                errorMessage.value = 'Nem sikerült lekérni a jelenlegi felhasználónevet.'
+                return false
+            }
+
+            if (currentUser.username === trimmedUsername) {
+                errorMessage.value = 'Az új felhasználónév megegyezik a régivel.'
+                return false
+            }
+
+            const { data: existingUsernameUser, error: usernameCheckError } = await supabase
+                .from('user')
+                .select('id')
+                .eq('username', trimmedUsername)
+                .neq('id', userId)
+                .limit(1)
+                .maybeSingle()
+
+            if (usernameCheckError) {
+                errorMessage.value = 'Nem sikerült ellenőrizni a felhasználónevet.'
+                return false
+            }
+
+            if (existingUsernameUser) {
+                errorMessage.value = 'Ez a felhasználónév már foglalt.'
+                return false
+            }
+
+            const { error: dbError } = await supabase
+                .from('user')
+                .update({ username: trimmedUsername })
+                .eq('id', userId)
+
+            if (dbError) {
+                errorMessage.value = 'Nem sikerült frissíteni a felhasználónevet az adatbázisban.'
+                return false
+            }
+
+            const { error: authUpdateError } = await supabase.auth.updateUser({
+                data: { username: trimmedUsername }
             })
-        
+
+            if (authUpdateError) {
+                errorMessage.value = 'Az adatbázis frissült, de a bejelentkezési adatok nem.'
+                return false
+            }
+
             try {
                 await supabase.auth.refreshSession()
             } catch (e) {
-                console.warn("Session refresh hiba, de nem kritikus", e)
+                console.warn('Session refresh hiba, de nem kritikus', e)
             }
-        
+
+            successMessage.value = 'Sikeres felhasználónév módosítás.'
             return true
-        } catch (err) {
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Hiba történt a felhasználónév módosításakor.'
             return false
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const updatePassword = async (currentPassword: string, newPassword: string) => {
+        clearMessages()
+
+        if (!user.value) {
+            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            return false
+        }
+
+        const email = user.value.email
+
+        if (!email) {
+            errorMessage.value = 'Nem található a felhasználó email címe.'
+            return false
+        }
+
+        if (!currentPassword || !newPassword) {
+            errorMessage.value = 'Minden mezőt ki kell tölteni.'
+            return false
+        }
+
+        if (newPassword.length < 6) {
+            errorMessage.value = 'Az új jelszó legalább 6 karakter legyen.'
+            return false
+        }
+
+        if (currentPassword === newPassword) {
+            errorMessage.value = 'Az új jelszó nem egyezhet meg a régivel.'
+            return false
+        }
+
+        loading.value = true
+
+        try {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password: currentPassword
+            })
+
+            if (signInError) {
+                errorMessage.value = 'A jelenlegi jelszó hibás.'
+                return false
+            }
+
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword
+            })
+
+            if (updateError) {
+                errorMessage.value = 'Nem sikerült módosítani a jelszót.'
+                return false
+            }
+
+            try {
+                await supabase.auth.refreshSession()
+            } catch (e) {
+                console.warn('Session refresh hiba, de nem kritikus', e)
+            }
+
+            successMessage.value = 'Sikeres jelszó módosítás.'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Hiba történt a jelszó módosításakor.'
+            return false
+        } finally {
+            loading.value = false
         }
     }
 
@@ -155,6 +286,7 @@ export const useAuthStore = defineStore('auth', () => {
         signUp,
         signIn,
         signOut,
-        updateUsername
+        updateUsername,
+        updatePassword
     }
 })
