@@ -2,7 +2,6 @@
 import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 import { ref } from 'vue';
 import { computed } from 'vue';
-import ButtonTest from './examples/ButtonTest.vue';
 
 const colorMode = useColorMode()
 const user = useSupabaseUser()
@@ -221,7 +220,7 @@ const cards = ref([
                         ,, Mit főzzek a hétvégére? "
                     </h4>
                     <h2 class="about-title mb-3">A projekt célja</h2>
-                    <div class="ms-2">
+                    <div>
                         <p class="about-text">
                             Fontos számunkra, hogy felhasználóink akár már az otthon megtalálható alapanyagokból is
                             <strong>gondolkodás nélkül, gyorsan és egyszerűen</strong>
@@ -302,7 +301,7 @@ const cards = ref([
     margin-bottom: 10px;
 }
 
-.category-icon i {
+.category-icon i,  .recipe-image i {
     font-size: 30px;
     width: 70px;
     height: 70px;

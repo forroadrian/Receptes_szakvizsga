@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore()
-const user = useSupabaseUser()
+const user = useSupabaseUser();
 
 const isLoggedIn = computed(() => !!user.value);
 const selectedLanguage = ref("hu");

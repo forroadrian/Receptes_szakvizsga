@@ -72,7 +72,7 @@ const onEdit = (ingredient: Ingredient) => {
 
 <template>
     <div class="container mt-3 py-3">
-        <div class="row mb-3 py-3">
+        <div class="row mb-3 py-3 mx-sm-auto">
             <h1 class="col-12 py-3">Itt mar ennek kell megjelennie</h1>
             <p class="col-lg-8 col-sm-12 pe-4 text-wrap">
                 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Omnis officia
@@ -81,7 +81,7 @@ const onEdit = (ingredient: Ingredient) => {
                 sed sapiente nobis!
             </p>
 
-            <Button class="col-lg-4 col-10 m-auto-" icon="bi bi-plus" type="button" :color="buttonColor"
+            <Button class="col-lg-4 col-10 mx-auto" icon="bi bi-plus" type="button" :color="buttonColor"
                 @click="openIngredientModal">Új
                 hozzávaló hozzáadása</Button>
             <Button class="d-md-none col-1 border-2" outline color="dark" icon="bi bi-graph-up" iconPosition="left"

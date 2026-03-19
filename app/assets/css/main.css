@@ -87,7 +87,7 @@ h4 {
     font-size: 30px;
 }
 
-.account-edit {
+.account-edit{
     background: var(--bs-body-bg);
     color: var(--bs-body-color);
 }

@@ -1,13 +1,16 @@
 ﻿<script setup>
 definePageMeta({
-  middleware: 'auth-only'
+    middleware: 'auth-only'
 });
 import { computed, ref } from "vue";
+import { useAuthStore } from "~/stores/auth";
+
+const auth = useAuthStore()
+const supabase = useSupabaseClient()
 
 const { showAlert } = useAlert()
 
-const displayedUsername = ref("Felhasználónév");
-
+const displayedUsername = ref('');
 const usernameInput = ref(displayedUsername.value);
 const currentPasswordInput = ref("");
 const newPasswordInput = ref("");
@@ -21,6 +24,27 @@ const allergens = ref([]);
 const dislikedIngredients = ref([]);
 
 const activeSection = ref("menu");
+
+watch(
+    () => auth.user,
+    async (newUser) => {
+        const userId = newUser?.id || newUser?.sub
+
+        if (!userId) return
+
+        const { data, error } = await supabase
+            .from('user')
+            .select('username')
+            .eq('id', userId)
+            .single()
+
+        if (data) {
+            displayedUsername.value = data.username
+            usernameInput.value = data.username
+        }
+    },
+    { immediate: true }
+)
 
 const isProfileSettingsActive = computed(() =>
     ["menu", "username", "password", "email"].includes(activeSection.value)
@@ -73,15 +97,23 @@ const removeDislikedIngredient = (index) => {
     showAlert("success", "A nem kedvelt alapanyag sikeresen törölve.");
 };
 
-const handleSave = () => {
+const handleSave = async () => {
     if (activeSection.value === "username") {
         if (!usernameInput.value.trim()) {
             showAlert("danger", "Add meg a felhasználónevet.");
             return;
         }
 
+        const success = await auth.updateUsername(usernameInput.value.trim())
+
+        if (!success) {
+            showAlert("danger", "Hiba történt mentéskor.");
+            return;
+        }
+
         displayedUsername.value = usernameInput.value.trim();
-        usernameInput.value = displayedUsername.value;
+        showAlert("success", "Sikeres módosítás.");
+        resetToMenu(); usernameInput.value = displayedUsername.value;
         showAlert("success", "Sikeres módosítás.");
         resetToMenu();
         return;
