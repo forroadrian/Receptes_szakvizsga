@@ -71,7 +71,7 @@ const displayedRecipes = computed(() => recipes)
             </p>
 
             <div class="row align-items-center justify-content-between">
-                <div class="col-lg-9 col-md-9 search-wrap my-3">
+                <div class="col-lg-9 col-md-8 search-wrap my-3">
                     <SearchBar v-model="search" placeholder="Keress keresési szó vagy recept alapján..."
                         class="recipes-search w-100" />
                 </div>
@@ -85,8 +85,8 @@ const displayedRecipes = computed(() => recipes)
                 </div>
             </div>
 
-            <nav class="recipes-tabs mt-sm-4">
-                <ul class="d-flex flex-wrap list-unstyled gap-3">
+            <nav class="recipes-tabs mt-3">
+                <ul class="d-flex flex-wrap list-unstyled gap-4">
                     <li>
                         <button type="button" class="tab-btn active">Alapértelmezett</button>
                     </li>
@@ -108,7 +108,7 @@ const displayedRecipes = computed(() => recipes)
             <div class="row">
                 <div
                     class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center">
-                    <div class="row text-center">
+                    <div class="row text-center py-4">
                         <span class="plus-icon">+</span>
                         <p>Új recept hozzáadása</p>
                     </div>
@@ -312,5 +312,12 @@ const displayedRecipes = computed(() => recipes)
 .form-check-label {
     border-radius: var(--radius-sm);
     font-size: var(--small-text);
+}
+
+@media (max-width: 992px) {
+    .recipes-tabs ul{
+        justify-content: center;
+    }
+
 }
 </style>

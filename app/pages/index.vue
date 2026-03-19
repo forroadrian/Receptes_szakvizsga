@@ -221,7 +221,7 @@ const cards = ref([
                         ,, Mit főzzek a hétvégére? "
                     </h4>
                     <h2 class="about-title mb-3">A projekt célja</h2>
-                    <div class="ms-2">
+                    <div>
                         <p class="about-text">
                             Fontos számunkra, hogy felhasználóink akár már az otthon megtalálható alapanyagokból is
                             <strong>gondolkodás nélkül, gyorsan és egyszerűen</strong>
