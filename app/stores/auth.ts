@@ -13,6 +13,10 @@ export const useAuthStore = defineStore('auth', () => {
         successMessage.value = ''
     }
 
+    const isValidEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+
     const signUp = async (email: string, password: string, username: string) => {
         clearMessages()
         loading.value = true
@@ -277,6 +281,101 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const updateEmail = async (currentEmail: string, newEmail: string) => {
+    clearMessages()
+
+    const trimmedCurrentEmail = currentEmail.trim().toLowerCase()
+    const trimmedNewEmail = newEmail.trim().toLowerCase()
+
+    if (!trimmedCurrentEmail || !trimmedNewEmail) {
+        errorMessage.value = 'Töltsd ki mindkét email mezőt.'
+        return false
+    }
+
+    if (!isValidEmail(trimmedCurrentEmail) || !isValidEmail(trimmedNewEmail)) {
+        errorMessage.value = 'Adj meg érvényes email címet.'
+        return false
+    }
+
+    try {
+        const { data: authUserData, error: authUserError } = await supabase.auth.getUser()
+
+        if (authUserError || !authUserData.user) {
+            errorMessage.value = 'Nem sikerült lekérni a bejelentkezett felhasználót.'
+            return false
+        }
+
+        const authUser = authUserData.user
+        const loggedInEmail = authUser.email?.trim().toLowerCase() || ''
+        const userId = authUser.id
+
+        if (!loggedInEmail) {
+            errorMessage.value = 'Nem található a jelenlegi email cím.'
+            return false
+        }
+
+        if (trimmedCurrentEmail !== loggedInEmail) {
+            errorMessage.value = 'A jelenlegi email cím nem egyezik a bejelentkezett email címmel.'
+            return false
+        }
+
+        if (trimmedNewEmail === loggedInEmail) {
+            errorMessage.value = 'Az új email cím megegyezik a régivel.'
+            return false
+        }
+
+        if (authUser.new_email && authUser.new_email !== authUser.email) {
+            errorMessage.value = 'Már van folyamatban lévő email módosítás. Előbb azt fejezd be.'
+            return false
+        }
+
+        loading.value = true
+
+        const { data: existingEmailUser, error: emailCheckError } = await supabase
+            .from('user')
+            .select('id')
+            .eq('email', trimmedNewEmail)
+            .neq('id', userId)
+            .limit(1)
+            .maybeSingle()
+
+        if (emailCheckError) {
+            errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
+            return false
+        }
+
+        if (existingEmailUser) {
+            errorMessage.value = 'Ezzel az email címmel már regisztráltak.'
+            return false
+        }
+
+        const redirectUrl = `${window.location.origin}/confirm`
+
+        const { data, error } = await supabase.auth.updateUser(
+            { email: trimmedNewEmail },
+            { emailRedirectTo: redirectUrl }
+        )
+
+        if (error) {
+            errorMessage.value = 'Nem sikerült módosítani az email címet.'
+            return false
+        }
+
+        if (!data.user || data.user.new_email?.toLowerCase() !== trimmedNewEmail) {
+            errorMessage.value = 'Az email módosítási kérés nem indult el rendesen.'
+            return false
+        }
+
+        successMessage.value = 'Megerősítő email elküldve. Nézd meg a régi és az új email címedet is.'
+        return true
+    } catch (error: any) {
+        errorMessage.value = error?.message || 'Hiba történt az email cím módosításakor.'
+        return false
+    } finally {
+        loading.value = false
+    }
+}
+
     return {
         user,
         loading,
@@ -287,6 +386,7 @@ export const useAuthStore = defineStore('auth', () => {
         signIn,
         signOut,
         updateUsername,
-        updatePassword
+        updatePassword,
+        updateEmail
     }
 })

@@ -29,6 +29,10 @@ const activeSection = ref("menu");
 const usernameOk = computed(() => usernameInput.value.trim().length >= 4);
 const newPasswordOk = computed(() => newPasswordInput.value.length >= 6);
 
+const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+};
+
 watch(
     () => auth.user,
     async (newUser) => {
@@ -38,13 +42,24 @@ watch(
 
         const { data } = await supabase
             .from('user')
-            .select('username')
+            .select('username, email')
             .eq('id', userId)
             .single()
 
         if (data) {
             displayedUsername.value = data.username
             usernameInput.value = data.username
+        }
+
+        if (newUser?.email && data?.email !== newUser.email) {
+            const { error } = await supabase
+                .from('user')
+                .update({ email: newUser.email })
+                .eq('id', userId)
+
+            if (error) {
+                console.warn("Nem sikerült szinkronizálni az email címet a user táblába.", error)
+            }
         }
     },
     { immediate: true }
@@ -60,6 +75,7 @@ const resetToMenu = () => {
     currentPasswordInput.value = "";
     newPasswordInput.value = "";
     confirmPasswordInput.value = "";
+    emailInput.value = "";
     newEmailInput.value = "";
     allergenInput.value = "";
     dislikedIngredientInput.value = "";
@@ -73,6 +89,7 @@ const openSection = (section) => {
     }
 
     if (section === "email") {
+        emailInput.value = "";
         newEmailInput.value = "";
     }
 
@@ -135,14 +152,34 @@ const handleSave = async () => {
     }
 
     if (activeSection.value === "email") {
-        if (!emailInput.value.trim() || !newEmailInput.value.trim()) {
+        const currentEmail = emailInput.value.trim().toLowerCase();
+        const newEmail = newEmailInput.value.trim().toLowerCase();
+
+        if (!currentEmail || !newEmail) {
             showAlert("danger", "Töltsd ki mindkét email mezőt.");
             return;
         }
 
-        emailInput.value = newEmailInput.value.trim();
+        if (!isValidEmail(currentEmail) || !isValidEmail(newEmail)) {
+            showAlert("danger", "Adj meg érvényes email címet.");
+            return;
+        }
+
+        if (currentEmail === newEmail) {
+            showAlert("danger", "Az új email cím megegyezik a régivel.");
+            return;
+        }
+
+        const success = await auth.updateEmail(currentEmail, newEmail)
+
+        if (!success) {
+            showAlert("danger", auth.errorMessage || "Hiba történt mentéskor.");
+            return;
+        }
+
+        emailInput.value = "";
         newEmailInput.value = "";
-        showAlert("success", "Sikeres módosítás.");
+        showAlert("success", "Megerősítő email elküldve. Nézd meg az új és a régi email címedet is. Az email címed a jóváhagyás után frissül."); resetToMenu();
         resetToMenu();
         return;
     }
