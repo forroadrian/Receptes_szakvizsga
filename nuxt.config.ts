@@ -10,7 +10,7 @@ export default defineNuxtConfig({
         '~/assets/css/auth.css',
         '~/assets/css/profile.css'
     ],
-    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase'],
+    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt'],
     colorMode: {
         preference: 'light',
         fallback: 'light',
