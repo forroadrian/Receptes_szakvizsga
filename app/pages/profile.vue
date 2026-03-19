@@ -20,6 +20,7 @@ const emailInput = ref("");
 const newEmailInput = ref("");
 const allergenInput = ref("");
 const dislikedIngredientInput = ref("");
+const signOutEverywhere = ref(false);
 
 const allergens = ref([]);
 const dislikedIngredients = ref([]);
@@ -79,6 +80,7 @@ const resetToMenu = () => {
     newEmailInput.value = "";
     allergenInput.value = "";
     dislikedIngredientInput.value = "";
+    signOutEverywhere.value = false;
 };
 
 const openSection = (section) => {
@@ -97,6 +99,7 @@ const openSection = (section) => {
         currentPasswordInput.value = "";
         newPasswordInput.value = "";
         confirmPasswordInput.value = "";
+        signOutEverywhere.value = false;
     }
 
     if (section === "allergen") {
@@ -179,7 +182,7 @@ const handleSave = async () => {
 
         emailInput.value = "";
         newEmailInput.value = "";
-        showAlert("success", "Megerősítő email elküldve. Nézd meg az új és a régi email címedet is. Az email címed a jóváhagyás után frissül."); resetToMenu();
+        showAlert("success", "Megerősítő email elküldve. Nézd meg az új és a régi email címedet is. Az email címed a jóváhagyás után frissül.");
         resetToMenu();
         return;
     }
@@ -222,6 +225,19 @@ const handleSave = async () => {
         currentPasswordInput.value = "";
         newPasswordInput.value = "";
         confirmPasswordInput.value = "";
+
+        if (signOutEverywhere.value) {
+            const signOutSuccess = await auth.signOut();
+
+            if (!signOutSuccess) {
+                showAlert("danger", auth.errorMessage || "A kijelentkeztetés nem sikerült.");
+                return;
+            }
+
+            await navigateTo('/login');
+            return;
+        }
+
         showAlert("success", "Sikeres módosítás.");
         resetToMenu();
         return;
@@ -423,9 +439,17 @@ const handleSave = async () => {
                                             <FormInput v-model="newPasswordInput" label="Új jelszó" type="password" />
                                         </div>
 
-                                        <div class="mb-4">
+                                        <div class="mb-3">
                                             <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad"
                                                 type="password" />
+                                        </div>
+
+                                        <div class="form-check mb-4">
+                                            <input id="signOutEverywhere" v-model="signOutEverywhere"
+                                                class="form-check-input" type="checkbox">
+                                            <label class="form-check-label" for="signOutEverywhere">
+                                                Jelentkeztess ki mindenhonnan
+                                            </label>
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
