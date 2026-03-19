@@ -52,7 +52,7 @@ const toggleDescription = () => {
                     <i class="bi bi-trash3-fill me-3 mt-2 flex-fill text-end" v-if="!isSmall" @click="$emit('delete', ingredient)"></i>
                 </div>
                 <CardTags class="mb-2 ms-2" :items="items" v-if="isSmall"/>
-                <p class="ps-3 small">{{ ingredient.amount }} {{ ingredient.unit }}</p>
+                <p class="ps-3 small">{{ ingredient.quantity }} {{ ingredient.unit }}</p>
             </CardHeader>
         </template>
         <template #body>

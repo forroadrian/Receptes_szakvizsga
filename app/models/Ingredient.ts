@@ -7,14 +7,14 @@ export default class Ingredient implements IngredientTag, Identifiable{
     private _id: number;
     private _tag: FreshnessVariants;
     private _name: string;
-    private _amount: number;
+    private _quantity: number;
     private _unit: string;
     private _expiry: string;
 
-    constructor(id: number, name: string, amount: number, unit: string, expiry?: string, tag?: FreshnessVariants) {
+    constructor(id: number, name: string, quantity: number, unit: string, expiry?: string, tag?: FreshnessVariants) {
         this._id = id
         this._name = name;
-        this._amount = amount;
+        this._quantity = quantity;
         this._unit = unit;
         this._expiry = expiry ?? "2006-01-01"
         this._tag = tag ?? "Friss";
@@ -27,8 +27,8 @@ export default class Ingredient implements IngredientTag, Identifiable{
     }
 
 
-    public get amount(): number {
-        return this._amount;
+    public get quantity(): number {
+        return this._quantity;
     }
 
 
@@ -42,8 +42,8 @@ export default class Ingredient implements IngredientTag, Identifiable{
     }
 
     
-    public set amount(v : number) {
-        this._amount = v;
+    public set quantity(v : number) {
+        this._quantity = v;
     }
 
     
