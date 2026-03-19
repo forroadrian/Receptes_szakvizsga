@@ -2,7 +2,6 @@
 import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 import { ref } from 'vue';
 import { computed } from 'vue';
-import ButtonTest from './examples/ButtonTest.vue';
 
 const colorMode = useColorMode()
 const user = useSupabaseUser()
@@ -302,7 +301,7 @@ const cards = ref([
     margin-bottom: 10px;
 }
 
-.category-icon i {
+.category-icon i,  .recipe-image i {
     font-size: 30px;
     width: 70px;
     height: 70px;
