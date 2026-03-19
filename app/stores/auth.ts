@@ -117,32 +117,95 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const updateUsername = async (newUsername: string) => {
+        clearMessages()
+
         if (!user.value) {
             errorMessage.value = 'Nincs bejelentkezett felhasználó.'
             return false
         }
 
+        const userId = user.value.id || user.value.sub
+        const trimmedUsername = newUsername.trim()
+
+        if (!trimmedUsername) {
+            errorMessage.value = 'Add meg a felhasználónevet.'
+            return false
+        }
+
+        if (trimmedUsername.length < 4) {
+            errorMessage.value = 'A felhasználónév legalább 4 karakter legyen.'
+            return false
+        }
+
+        loading.value = true
+
         try {
-            const { error } = await supabase
+            const { data: currentUser, error: currentUserError } = await supabase
                 .from('user')
-                .update({ username: newUsername })
-                .eq('id', user.value?.id || user.value?.sub)
-        
-            if (error) throw error
-        
-            await supabase.auth.updateUser({
-                data: { username: newUsername }
+                .select('username')
+                .eq('id', userId)
+                .single()
+
+            if (currentUserError || !currentUser) {
+                errorMessage.value = 'Nem sikerült lekérni a jelenlegi felhasználónevet.'
+                return false
+            }
+
+            if (currentUser.username === trimmedUsername) {
+                errorMessage.value = 'Az új felhasználónév megegyezik a régivel.'
+                return false
+            }
+
+            const { data: existingUsernameUser, error: usernameCheckError } = await supabase
+                .from('user')
+                .select('id')
+                .eq('username', trimmedUsername)
+                .neq('id', userId)
+                .limit(1)
+                .maybeSingle()
+
+            if (usernameCheckError) {
+                errorMessage.value = 'Nem sikerült ellenőrizni a felhasználónevet.'
+                return false
+            }
+
+            if (existingUsernameUser) {
+                errorMessage.value = 'Ez a felhasználónév már foglalt.'
+                return false
+            }
+
+            const { error: dbError } = await supabase
+                .from('user')
+                .update({ username: trimmedUsername })
+                .eq('id', userId)
+
+            if (dbError) {
+                errorMessage.value = 'Nem sikerült frissíteni a felhasználónevet az adatbázisban.'
+                return false
+            }
+
+            const { error: authUpdateError } = await supabase.auth.updateUser({
+                data: { username: trimmedUsername }
             })
-        
+
+            if (authUpdateError) {
+                errorMessage.value = 'Az adatbázis frissült, de a bejelentkezési adatok nem.'
+                return false
+            }
+
             try {
                 await supabase.auth.refreshSession()
             } catch (e) {
-                console.warn("Session refresh hiba, de nem kritikus", e)
+                console.warn('Session refresh hiba, de nem kritikus', e)
             }
-        
+
+            successMessage.value = 'Sikeres felhasználónév módosítás.'
             return true
-        } catch (err) {
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Hiba történt a felhasználónév módosításakor.'
             return false
+        } finally {
+            loading.value = false
         }
     }
 

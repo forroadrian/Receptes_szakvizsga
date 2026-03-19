@@ -25,6 +25,8 @@ const dislikedIngredients = ref([]);
 
 const activeSection = ref("menu");
 
+const usernameOk = computed(() => usernameInput.value.trim().length >= 4);
+
 watch(
     () => auth.user,
     async (newUser) => {
@@ -99,21 +101,32 @@ const removeDislikedIngredient = (index) => {
 
 const handleSave = async () => {
     if (activeSection.value === "username") {
-        if (!usernameInput.value.trim()) {
+        const trimmedUsername = usernameInput.value.trim();
+
+        if (!trimmedUsername) {
             showAlert("danger", "Add meg a felhasználónevet.");
             return;
         }
 
-        const success = await auth.updateUsername(usernameInput.value.trim())
-
-        if (!success) {
-            showAlert("danger", "Hiba történt mentéskor.");
+        if (!usernameOk.value) {
+            showAlert("danger", "A felhasználónév legalább 4 karakter legyen.");
             return;
         }
 
-        displayedUsername.value = usernameInput.value.trim();
-        showAlert("success", "Sikeres módosítás.");
-        resetToMenu(); usernameInput.value = displayedUsername.value;
+        if (trimmedUsername === displayedUsername.value.trim()) {
+            showAlert("danger", "Az új felhasználónév megegyezik a régivel.");
+            return;
+        }
+
+        const success = await auth.updateUsername(trimmedUsername)
+
+        if (!success) {
+            showAlert("danger", auth.errorMessage || "Hiba történt mentéskor.");
+            return;
+        }
+
+        displayedUsername.value = trimmedUsername;
+        usernameInput.value = trimmedUsername;
         showAlert("success", "Sikeres módosítás.");
         resetToMenu();
         return;
