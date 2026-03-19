@@ -209,6 +209,74 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const updatePassword = async (currentPassword: string, newPassword: string) => {
+        clearMessages()
+
+        if (!user.value) {
+            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            return false
+        }
+
+        const email = user.value.email
+
+        if (!email) {
+            errorMessage.value = 'Nem található a felhasználó email címe.'
+            return false
+        }
+
+        if (!currentPassword || !newPassword) {
+            errorMessage.value = 'Minden mezőt ki kell tölteni.'
+            return false
+        }
+
+        if (newPassword.length < 6) {
+            errorMessage.value = 'Az új jelszó legalább 6 karakter legyen.'
+            return false
+        }
+
+        if (currentPassword === newPassword) {
+            errorMessage.value = 'Az új jelszó nem egyezhet meg a régivel.'
+            return false
+        }
+
+        loading.value = true
+
+        try {
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password: currentPassword
+            })
+
+            if (signInError) {
+                errorMessage.value = 'A jelenlegi jelszó hibás.'
+                return false
+            }
+
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword
+            })
+
+            if (updateError) {
+                errorMessage.value = 'Nem sikerült módosítani a jelszót.'
+                return false
+            }
+
+            try {
+                await supabase.auth.refreshSession()
+            } catch (e) {
+                console.warn('Session refresh hiba, de nem kritikus', e)
+            }
+
+            successMessage.value = 'Sikeres jelszó módosítás.'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Hiba történt a jelszó módosításakor.'
+            return false
+        } finally {
+            loading.value = false
+        }
+    }
+
     return {
         user,
         loading,
@@ -218,6 +286,7 @@ export const useAuthStore = defineStore('auth', () => {
         signUp,
         signIn,
         signOut,
-        updateUsername
+        updateUsername,
+        updatePassword
     }
 })

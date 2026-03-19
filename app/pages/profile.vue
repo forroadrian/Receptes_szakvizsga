@@ -2,7 +2,8 @@
 definePageMeta({
     middleware: 'auth-only'
 });
-import { computed, ref } from "vue";
+
+import { computed, ref, watch } from "vue";
 import { useAuthStore } from "~/stores/auth";
 
 const auth = useAuthStore()
@@ -11,7 +12,7 @@ const supabase = useSupabaseClient()
 const { showAlert } = useAlert()
 
 const displayedUsername = ref('');
-const usernameInput = ref(displayedUsername.value);
+const usernameInput = ref('');
 const currentPasswordInput = ref("");
 const newPasswordInput = ref("");
 const confirmPasswordInput = ref("");
@@ -26,6 +27,7 @@ const dislikedIngredients = ref([]);
 const activeSection = ref("menu");
 
 const usernameOk = computed(() => usernameInput.value.trim().length >= 4);
+const newPasswordOk = computed(() => newPasswordInput.value.length >= 6);
 
 watch(
     () => auth.user,
@@ -34,7 +36,7 @@ watch(
 
         if (!userId) return
 
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('user')
             .select('username')
             .eq('id', userId)
@@ -147,16 +149,36 @@ const handleSave = async () => {
 
     if (activeSection.value === "password") {
         if (
-            !currentPasswordInput.value.trim() ||
-            !newPasswordInput.value.trim() ||
-            !confirmPasswordInput.value.trim()
+            !currentPasswordInput.value ||
+            !newPasswordInput.value ||
+            !confirmPasswordInput.value
         ) {
             showAlert("danger", "Töltsd ki az összes jelszó mezőt.");
             return;
         }
 
+        if (!newPasswordOk.value) {
+            showAlert("danger", "Az új jelszó legalább 6 karakter legyen.");
+            return;
+        }
+
+        if (currentPasswordInput.value === newPasswordInput.value) {
+            showAlert("danger", "Az új jelszó nem egyezhet meg a régivel.");
+            return;
+        }
+
         if (newPasswordInput.value !== confirmPasswordInput.value) {
             showAlert("danger", "Az új jelszavak nem egyeznek.");
+            return;
+        }
+
+        const success = await auth.updatePassword(
+            currentPasswordInput.value,
+            newPasswordInput.value
+        )
+
+        if (!success) {
+            showAlert("danger", auth.errorMessage || "Hiba történt mentéskor.");
             return;
         }
 
