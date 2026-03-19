@@ -116,6 +116,34 @@ export const useAuthStore = defineStore('auth', () => {
         return true
     }
 
+    const updateUsername = async (newUsername: string) => {
+        if (!user.value) {
+            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            return false
+        }
+    
+        try {
+            const { error } = await supabase
+                .from('user')
+                .update({ username: newUsername })
+                .eq('id', user.value?.id || user.value?.sub)    
+            if (error) {
+                throw error
+            }
+    
+            await supabase.auth.updateUser({
+                data: {
+                    username: newUsername
+                }
+            })
+    
+            return true
+        } catch (err: any) {
+            errorMessage.value = 'Hiba a felhasználónév módosításakor.'
+            return false
+        }
+    }
+
     return {
         user,
         loading,
@@ -124,6 +152,7 @@ export const useAuthStore = defineStore('auth', () => {
         clearMessages,
         signUp,
         signIn,
-        signOut
+        signOut,
+        updateUsername
     }
 })
