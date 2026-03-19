@@ -121,25 +121,27 @@ export const useAuthStore = defineStore('auth', () => {
             errorMessage.value = 'Nincs bejelentkezett felhasználó.'
             return false
         }
-    
+
         try {
             const { error } = await supabase
                 .from('user')
                 .update({ username: newUsername })
-                .eq('id', user.value?.id || user.value?.sub)    
-            if (error) {
-                throw error
-            }
-    
+                .eq('id', user.value?.id || user.value?.sub)
+        
+            if (error) throw error
+        
             await supabase.auth.updateUser({
-                data: {
-                    username: newUsername
-                }
+                data: { username: newUsername }
             })
-    
+        
+            try {
+                await supabase.auth.refreshSession()
+            } catch (e) {
+                console.warn("Session refresh hiba, de nem kritikus", e)
+            }
+        
             return true
-        } catch (err: any) {
-            errorMessage.value = 'Hiba a felhasználónév módosításakor.'
+        } catch (err) {
             return false
         }
     }

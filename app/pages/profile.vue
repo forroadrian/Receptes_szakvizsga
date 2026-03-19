@@ -97,7 +97,7 @@ const removeDislikedIngredient = (index) => {
     showAlert("success", "A nem kedvelt alapanyag sikeresen törölve.");
 };
 
-const handleSave = async() => {
+const handleSave = async () => {
     if (activeSection.value === "username") {
         if (!usernameInput.value.trim()) {
             showAlert("danger", "Add meg a felhasználónevet.");
