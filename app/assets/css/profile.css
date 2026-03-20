@@ -163,3 +163,19 @@
 [data-bs-theme="dark"] .profile-page .profile-shell .card {
     background: rgba(20, 24, 29, 0.92);
 }
+
+.profile-page .allergy-suggestions {
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-radius: var(--radius-md);
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.profile-page .allergy-suggestion-btn {
+    text-align: left;
+    border: 0;
+}
+
+.profile-page .allergy-suggestion-btn:hover {
+    background: var(--accent-soft);
+}

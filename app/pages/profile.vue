@@ -3,10 +3,14 @@ definePageMeta({
     middleware: 'auth-only'
 });
 
+import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from "vue";
 import { useAuthStore } from "~/stores/auth";
+import { usePreferencesStore } from "~/stores/preferences";
 
 const auth = useAuthStore()
+const preferences = usePreferencesStore()
+const { userAllergies, selectedAllergies, saving: preferencesSaving } = storeToRefs(preferences)
 const supabase = useSupabaseClient()
 
 const { showAlert } = useAlert()
@@ -22,13 +26,15 @@ const allergenInput = ref("");
 const dislikedIngredientInput = ref("");
 const signOutEverywhere = ref(false);
 
-const allergens = ref([]);
 const dislikedIngredients = ref([]);
 
 const activeSection = ref("menu");
 
 const usernameOk = computed(() => usernameInput.value.trim().length >= 4);
 const newPasswordOk = computed(() => newPasswordInput.value.length >= 6);
+const filteredAllergies = computed(() => preferences.getFilteredAllergies(allergenInput.value));
+const hasTypedAllergen = computed(() => allergenInput.value.trim().length > 0);
+const currentAuthUserId = computed(() => auth.user?.id || auth.user?.sub || "");
 
 const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -39,7 +45,12 @@ watch(
     async (newUser) => {
         const userId = newUser?.id || newUser?.sub
 
-        if (!userId) return
+        if (!userId) {
+            displayedUsername.value = ''
+            usernameInput.value = ''
+            preferences.clearPreferenceState()
+            return
+        }
 
         const { data } = await supabase
             .from('user')
@@ -62,6 +73,12 @@ watch(
                 console.warn("Nem sikerült szinkronizálni az email címet a user táblába.", error)
             }
         }
+
+        const loadAllergyDataSuccess = await preferences.loadAllergyData(userId)
+
+        if (!loadAllergyDataSuccess) {
+            showAlert("danger", preferences.errorMessage || "Nem sikerült betölteni az allergéneket.")
+        }
     },
     { immediate: true }
 )
@@ -81,6 +98,7 @@ const resetToMenu = () => {
     allergenInput.value = "";
     dislikedIngredientInput.value = "";
     signOutEverywhere.value = false;
+    preferences.clearSelectedAllergies();
 };
 
 const openSection = (section) => {
@@ -111,8 +129,29 @@ const openSection = (section) => {
     }
 };
 
-const removeAllergen = (index) => {
-    allergens.value.splice(index, 1);
+const selectAllergy = (allergy) => {
+    const added = preferences.addSelectedAllergy(allergy)
+
+    if (!added) {
+        showAlert("danger", "Ez az allergén már szerepel a listában.");
+        return;
+    }
+
+    allergenInput.value = "";
+};
+
+const removeSelectedAllergen = (allergyId) => {
+    preferences.removeSelectedAllergy(allergyId);
+};
+
+const removeAllergen = async (allergyId) => {
+    const success = await preferences.deleteUserAllergy(allergyId, currentAuthUserId.value);
+
+    if (!success) {
+        showAlert("danger", preferences.errorMessage || "Az allergén törlése nem sikerült.");
+        return;
+    }
+
     showAlert("success", "Allergén sikeresen törölve.");
 };
 
@@ -244,20 +283,19 @@ const handleSave = async () => {
     }
 
     if (activeSection.value === "allergen") {
-        const trimmedAllergen = allergenInput.value.trim();
-
-        if (!trimmedAllergen) {
-            showAlert("danger", "Add meg az allergén nevét.");
+        if (!selectedAllergies.value.length) {
+            showAlert("danger", "Válassz ki legalább egy allergént a listából.");
             return;
         }
 
-        if (allergens.value.some((item) => item.toLowerCase() === trimmedAllergen.toLowerCase())) {
-            showAlert("danger", "Ez az allergén már szerepel a listában.");
+        const success = await preferences.saveSelectedAllergies(currentAuthUserId.value)
+
+        if (!success) {
+            showAlert("danger", preferences.errorMessage || "Hiba történt mentéskor.");
             return;
         }
 
-        allergens.value.push(trimmedAllergen);
-        showAlert("success", "Allergén sikeresen hozzáadva.");
+        showAlert("success", "Allergén(ek) sikeresen hozzáadva.");
         resetToMenu();
         return;
     }
@@ -319,15 +357,16 @@ const handleSave = async () => {
 
                                 <div class="mb-4">
                                     <h6 class="mb-2">Allergének</h6>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <span v-for="(allergen, index) in allergens" :key="`${allergen}-${index}`"
+                                    <div v-if="userAllergies.length" class="d-flex flex-wrap gap-2">
+                                        <span v-for="allergy in userAllergies" :key="allergy.id"
                                             class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
-                                            {{ allergen }}
-                                            <button type="button" class="chip-btn" @click="removeAllergen(index)">
+                                            {{ allergy.name }}
+                                            <button type="button" class="chip-btn" @click="removeAllergen(allergy.id)">
                                                 <i class="bi bi-x"></i>
                                             </button>
                                         </span>
                                     </div>
+                                    <p v-else class="text-muted small mb-0">Még nincs hozzáadott allergén.</p>
                                 </div>
                             </div>
                         </div>
@@ -502,6 +541,29 @@ const handleSave = async () => {
                                     <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                         <div class="mb-4">
                                             <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
+
+                                            <div v-if="selectedAllergies.length" class="d-flex flex-wrap gap-2 mb-3">
+                                                <span v-for="allergy in selectedAllergies" :key="allergy.id"
+                                                    class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                                                    {{ allergy.name }}
+                                                    <button type="button" class="chip-btn"
+                                                        @click="removeSelectedAllergen(allergy.id)">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+
+                                            <div v-if="hasTypedAllergen" class="allergy-suggestions list-group shadow-sm">
+                                                <button v-for="allergy in filteredAllergies" :key="allergy.id" type="button"
+                                                    class="list-group-item list-group-item-action allergy-suggestion-btn"
+                                                    @click="selectAllergy(allergy)">
+                                                    {{ allergy.name }}
+                                                </button>
+
+                                                <div v-if="!filteredAllergies.length" class="list-group-item text-muted small">
+                                                    Nincs ilyen allergén a listában.
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
@@ -511,8 +573,8 @@ const handleSave = async () => {
                                             </Button>
 
                                             <Button type="button" color="dark" class="btn-lg px-5 rounded-pill"
-                                                @click="handleSave">
-                                                Hozzáadás
+                                                :disabled="preferencesSaving" @click="handleSave">
+                                                {{ preferencesSaving ? 'Mentés...' : 'Hozzáadás' }}
                                             </Button>
                                         </div>
                                     </form>
