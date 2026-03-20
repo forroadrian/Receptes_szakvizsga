@@ -7,6 +7,8 @@ definePageMeta({
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
+const { validatePasswordResetRequest } = useAuthValidation();
+
 const authStore = useAuthStore();
 
 const email = ref('');
@@ -18,6 +20,13 @@ const onSubmit = async () => {
     authStore.clearMessages();
 
     if (!formRef.value || !formRef.value.checkValidity()) {
+        return;
+    }
+
+    const validationError = validatePasswordResetRequest(email.value);
+
+    if (validationError) {
+        authStore.errorMessage = validationError;
         return;
     }
 
@@ -48,8 +57,8 @@ const onSubmit = async () => {
 
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                     @submit.prevent="onSubmit">
-                    <FormInput v-model="email" label="Email cím" type="email"
-                        placeholder="Add meg az email címed" required />
+                    <FormInput v-model="email" label="Email cím" type="email" placeholder="Add meg az email címed"
+                        required />
 
                     <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
                         {{ authStore.errorMessage }}

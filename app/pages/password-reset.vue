@@ -6,6 +6,8 @@ definePageMeta({
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
+const { validatePasswordReset } = useAuthValidation();
+
 const authStore = useAuthStore();
 const supabase = useSupabaseClient();
 
@@ -76,6 +78,13 @@ const onSubmit = async () => {
     }
 
     if (!formRef.value || !formRef.value.checkValidity()) {
+        return;
+    }
+
+    const validationError = validatePasswordReset(password.value, repassword.value);
+
+    if (validationError) {
+        authStore.errorMessage = validationError;
         return;
     }
 

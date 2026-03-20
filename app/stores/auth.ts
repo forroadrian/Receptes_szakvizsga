@@ -16,10 +16,6 @@ export const useAuthStore = defineStore('auth', () => {
         successMessage.value = ''
     }
 
-    const isValidEmail = (email: string) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    }
-
     const setCookie = (name: string, value: string, maxAge?: number) => {
         if (!process.client) return
 
@@ -169,16 +165,6 @@ export const useAuthStore = defineStore('auth', () => {
     try {
         const trimmedEmail = email.trim().toLowerCase()
 
-        if (!trimmedEmail) {
-            errorMessage.value = 'Add meg az email címed.'
-            return false
-        }
-
-        if (!isValidEmail(trimmedEmail)) {
-            errorMessage.value = 'Adj meg érvényes email címet.'
-            return false
-        }
-
         const { data: existingUser, error: userCheckError } = await supabase
             .from('user')
             .select('id')
@@ -224,20 +210,8 @@ export const useAuthStore = defineStore('auth', () => {
         loading.value = true
 
         try {
-            const trimmedPassword = newPassword.trim()
-
-            if (!trimmedPassword) {
-                errorMessage.value = 'Add meg az új jelszót.'
-                return false
-            }
-
-            if (trimmedPassword.length < 6) {
-                errorMessage.value = 'A jelszó legalább 6 karakter legyen.'
-                return false
-            }
-
             const { error } = await supabase.auth.updateUser({
-                password: trimmedPassword
+                password: newPassword
             })
 
             if (error) {
@@ -269,34 +243,9 @@ export const useAuthStore = defineStore('auth', () => {
         const userId = user.value.id || user.value.sub
         const trimmedUsername = newUsername.trim()
 
-        if (!trimmedUsername) {
-            errorMessage.value = 'Add meg a felhasználónevet.'
-            return false
-        }
-
-        if (trimmedUsername.length < 4) {
-            errorMessage.value = 'A felhasználónév legalább 4 karakter legyen.'
-            return false
-        }
-
         loading.value = true
 
         try {
-            const { data: currentUser, error: currentUserError } = await supabase
-                .from('user')
-                .select('username')
-                .eq('id', userId)
-                .single()
-
-            if (currentUserError || !currentUser) {
-                errorMessage.value = 'Nem sikerült lekérni a jelenlegi felhasználónevet.'
-                return false
-            }
-
-            if (currentUser.username === trimmedUsername) {
-                errorMessage.value = 'Az új felhasználónév megegyezik a régivel.'
-                return false
-            }
 
             const { data: existingUsernameUser, error: usernameCheckError } = await supabase
                 .from('user')
@@ -366,21 +315,6 @@ export const useAuthStore = defineStore('auth', () => {
             return false
         }
 
-        if (!currentPassword || !newPassword) {
-            errorMessage.value = 'Minden mezőt ki kell tölteni.'
-            return false
-        }
-
-        if (newPassword.length < 6) {
-            errorMessage.value = 'Az új jelszó legalább 6 karakter legyen.'
-            return false
-        }
-
-        if (currentPassword === newPassword) {
-            errorMessage.value = 'Az új jelszó nem egyezhet meg a régivel.'
-            return false
-        }
-
         loading.value = true
 
         try {
@@ -424,16 +358,6 @@ export const useAuthStore = defineStore('auth', () => {
 
         const trimmedCurrentEmail = currentEmail.trim().toLowerCase()
         const trimmedNewEmail = newEmail.trim().toLowerCase()
-
-        if (!trimmedCurrentEmail || !trimmedNewEmail) {
-            errorMessage.value = 'Töltsd ki mindkét email mezőt.'
-            return false
-        }
-
-        if (!isValidEmail(trimmedCurrentEmail) || !isValidEmail(trimmedNewEmail)) {
-            errorMessage.value = 'Adj meg érvényes email címet.'
-            return false
-        }
 
         try {
             const { data: authUserData, error: authUserError } = await supabase.auth.getUser()

@@ -171,11 +171,6 @@ export const usePreferencesStore = defineStore('preferences', () => {
             return false
         }
 
-        if (!selectedAllergies.value.length) {
-            errorMessage.value = 'Válassz ki legalább egy allergént.'
-            return false
-        }
-
         saving.value = true
 
         try {
