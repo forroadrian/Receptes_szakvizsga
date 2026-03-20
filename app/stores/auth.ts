@@ -8,6 +8,9 @@ export const useAuthStore = defineStore('auth', () => {
     const errorMessage = ref('')
     const successMessage = ref('')
 
+    const REMEMBER_COOKIE = 'menuplanr_remember_login'
+    const SESSION_COOKIE = 'menuplanr_session_login'
+
     const clearMessages = () => {
         errorMessage.value = ''
         successMessage.value = ''
@@ -15,6 +18,41 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isValidEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+
+    const setCookie = (name: string, value: string, maxAge?: number) => {
+        if (!process.client) return
+
+        let cookie = `${name}=${value}; path=/; SameSite=Lax`
+
+        if (maxAge) {
+            cookie += `; max-age=${maxAge}`
+        }
+
+        document.cookie = cookie
+    }
+
+    const clearCookie = (name: string) => {
+        if (!process.client) return
+
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`
+    }
+
+    const saveRememberPreference = (rememberMe: boolean) => {
+        if (!process.client) return
+
+        if (rememberMe) {
+            setCookie(REMEMBER_COOKIE, '1', 60 * 60 * 24 * 30)
+            clearCookie(SESSION_COOKIE)
+        } else {
+            setCookie(SESSION_COOKIE, '1')
+            clearCookie(REMEMBER_COOKIE)
+        }
+    }
+
+    const clearRememberPreference = () => {
+        clearCookie(REMEMBER_COOKIE)
+        clearCookie(SESSION_COOKIE)
     }
 
     const signUp = async (email: string, password: string, username: string) => {
@@ -54,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    const signIn = async (loginValue: string, password: string) => {
+    const signIn = async (loginValue: string, password: string, rememberMe = false) => {
         clearMessages()
         loading.value = true
 
@@ -96,6 +134,8 @@ export const useAuthStore = defineStore('auth', () => {
                 return false
             }
 
+            saveRememberPreference(rememberMe)
+
             successMessage.value = 'Sikeres bejelentkezés!'
             return true
         } catch (error: any) {
@@ -111,6 +151,8 @@ export const useAuthStore = defineStore('auth', () => {
 
         const { error } = await supabase.auth.signOut()
 
+        clearRememberPreference()
+
         if (error) {
             errorMessage.value = 'A kijelentkezés nem sikerült.'
             return false
@@ -118,6 +160,102 @@ export const useAuthStore = defineStore('auth', () => {
 
         successMessage.value = 'Sikeres kijelentkezés!'
         return true
+    }
+
+    const requestPasswordReset = async (email: string) => {
+    clearMessages()
+    loading.value = true
+
+    try {
+        const trimmedEmail = email.trim().toLowerCase()
+
+        if (!trimmedEmail) {
+            errorMessage.value = 'Add meg az email címed.'
+            return false
+        }
+
+        if (!isValidEmail(trimmedEmail)) {
+            errorMessage.value = 'Adj meg érvényes email címet.'
+            return false
+        }
+
+        const { data: existingUser, error: userCheckError } = await supabase
+            .from('user')
+            .select('id')
+            .eq('email', trimmedEmail)
+            .maybeSingle()
+
+        if (userCheckError) {
+            errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
+            return false
+        }
+
+        if (!existingUser) {
+            errorMessage.value = 'Nincs ilyen email címmel regisztrált felhasználó.'
+            return false
+        }
+
+        const redirectTo = process.client
+            ? `${window.location.origin}/password-reset`
+            : undefined
+
+        const { error } = await supabase.auth.resetPasswordForEmail(
+            trimmedEmail,
+            redirectTo ? { redirectTo } : undefined
+        )
+
+        if (error) {
+            errorMessage.value = error.message
+            return false
+        }
+
+        successMessage.value = 'A jelszó-visszaállító email elküldve.'
+        return true
+    } catch (error: any) {
+        errorMessage.value = error?.message || 'Nem sikerült elküldeni a jelszó-visszaállító emailt.'
+        return false
+    } finally {
+        loading.value = false
+    }
+}
+
+    const completePasswordReset = async (newPassword: string) => {
+        clearMessages()
+        loading.value = true
+
+        try {
+            const trimmedPassword = newPassword.trim()
+
+            if (!trimmedPassword) {
+                errorMessage.value = 'Add meg az új jelszót.'
+                return false
+            }
+
+            if (trimmedPassword.length < 6) {
+                errorMessage.value = 'A jelszó legalább 6 karakter legyen.'
+                return false
+            }
+
+            const { error } = await supabase.auth.updateUser({
+                password: trimmedPassword
+            })
+
+            if (error) {
+                errorMessage.value = error.message
+                return false
+            }
+
+            clearRememberPreference()
+            await supabase.auth.signOut()
+
+            successMessage.value = 'A jelszó sikeresen megváltozott. Most jelentkezz be az új jelszóval.'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Nem sikerült megváltoztatni a jelszót.'
+            return false
+        } finally {
+            loading.value = false
+        }
     }
 
     const updateUsername = async (newUsername: string) => {
@@ -282,99 +420,99 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const updateEmail = async (currentEmail: string, newEmail: string) => {
-    clearMessages()
+        clearMessages()
 
-    const trimmedCurrentEmail = currentEmail.trim().toLowerCase()
-    const trimmedNewEmail = newEmail.trim().toLowerCase()
+        const trimmedCurrentEmail = currentEmail.trim().toLowerCase()
+        const trimmedNewEmail = newEmail.trim().toLowerCase()
 
-    if (!trimmedCurrentEmail || !trimmedNewEmail) {
-        errorMessage.value = 'Töltsd ki mindkét email mezőt.'
-        return false
+        if (!trimmedCurrentEmail || !trimmedNewEmail) {
+            errorMessage.value = 'Töltsd ki mindkét email mezőt.'
+            return false
+        }
+
+        if (!isValidEmail(trimmedCurrentEmail) || !isValidEmail(trimmedNewEmail)) {
+            errorMessage.value = 'Adj meg érvényes email címet.'
+            return false
+        }
+
+        try {
+            const { data: authUserData, error: authUserError } = await supabase.auth.getUser()
+
+            if (authUserError || !authUserData.user) {
+                errorMessage.value = 'Nem sikerült lekérni a bejelentkezett felhasználót.'
+                return false
+            }
+
+            const authUser = authUserData.user
+            const loggedInEmail = authUser.email?.trim().toLowerCase() || ''
+            const userId = authUser.id
+
+            if (!loggedInEmail) {
+                errorMessage.value = 'Nem található a jelenlegi email cím.'
+                return false
+            }
+
+            if (trimmedCurrentEmail !== loggedInEmail) {
+                errorMessage.value = 'A jelenlegi email cím nem egyezik a bejelentkezett email címmel.'
+                return false
+            }
+
+            if (trimmedNewEmail === loggedInEmail) {
+                errorMessage.value = 'Az új email cím megegyezik a régivel.'
+                return false
+            }
+
+            if (authUser.new_email && authUser.new_email !== authUser.email) {
+                errorMessage.value = 'Már van folyamatban lévő email módosítás. Előbb azt fejezd be.'
+                return false
+            }
+
+            loading.value = true
+
+            const { data: existingEmailUser, error: emailCheckError } = await supabase
+                .from('user')
+                .select('id')
+                .eq('email', trimmedNewEmail)
+                .neq('id', userId)
+                .limit(1)
+                .maybeSingle()
+
+            if (emailCheckError) {
+                errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
+                return false
+            }
+
+            if (existingEmailUser) {
+                errorMessage.value = 'Ezzel az email címmel már regisztráltak.'
+                return false
+            }
+
+            const redirectUrl = `${window.location.origin}/confirm`
+
+            const { data, error } = await supabase.auth.updateUser(
+                { email: trimmedNewEmail },
+                { emailRedirectTo: redirectUrl }
+            )
+
+            if (error) {
+                errorMessage.value = 'Nem sikerült módosítani az email címet.'
+                return false
+            }
+
+            if (!data.user || data.user.new_email?.toLowerCase() !== trimmedNewEmail) {
+                errorMessage.value = 'Az email módosítási kérés nem indult el rendesen.'
+                return false
+            }
+
+            successMessage.value = 'Megerősítő email elküldve. Nézd meg a régi és az új email címedet is.'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Hiba történt az email cím módosításakor.'
+            return false
+        } finally {
+            loading.value = false
+        }
     }
-
-    if (!isValidEmail(trimmedCurrentEmail) || !isValidEmail(trimmedNewEmail)) {
-        errorMessage.value = 'Adj meg érvényes email címet.'
-        return false
-    }
-
-    try {
-        const { data: authUserData, error: authUserError } = await supabase.auth.getUser()
-
-        if (authUserError || !authUserData.user) {
-            errorMessage.value = 'Nem sikerült lekérni a bejelentkezett felhasználót.'
-            return false
-        }
-
-        const authUser = authUserData.user
-        const loggedInEmail = authUser.email?.trim().toLowerCase() || ''
-        const userId = authUser.id
-
-        if (!loggedInEmail) {
-            errorMessage.value = 'Nem található a jelenlegi email cím.'
-            return false
-        }
-
-        if (trimmedCurrentEmail !== loggedInEmail) {
-            errorMessage.value = 'A jelenlegi email cím nem egyezik a bejelentkezett email címmel.'
-            return false
-        }
-
-        if (trimmedNewEmail === loggedInEmail) {
-            errorMessage.value = 'Az új email cím megegyezik a régivel.'
-            return false
-        }
-
-        if (authUser.new_email && authUser.new_email !== authUser.email) {
-            errorMessage.value = 'Már van folyamatban lévő email módosítás. Előbb azt fejezd be.'
-            return false
-        }
-
-        loading.value = true
-
-        const { data: existingEmailUser, error: emailCheckError } = await supabase
-            .from('user')
-            .select('id')
-            .eq('email', trimmedNewEmail)
-            .neq('id', userId)
-            .limit(1)
-            .maybeSingle()
-
-        if (emailCheckError) {
-            errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
-            return false
-        }
-
-        if (existingEmailUser) {
-            errorMessage.value = 'Ezzel az email címmel már regisztráltak.'
-            return false
-        }
-
-        const redirectUrl = `${window.location.origin}/confirm`
-
-        const { data, error } = await supabase.auth.updateUser(
-            { email: trimmedNewEmail },
-            { emailRedirectTo: redirectUrl }
-        )
-
-        if (error) {
-            errorMessage.value = 'Nem sikerült módosítani az email címet.'
-            return false
-        }
-
-        if (!data.user || data.user.new_email?.toLowerCase() !== trimmedNewEmail) {
-            errorMessage.value = 'Az email módosítási kérés nem indult el rendesen.'
-            return false
-        }
-
-        successMessage.value = 'Megerősítő email elküldve. Nézd meg a régi és az új email címedet is.'
-        return true
-    } catch (error: any) {
-        errorMessage.value = error?.message || 'Hiba történt az email cím módosításakor.'
-        return false
-    } finally {
-        loading.value = false
-    }
-}
 
     return {
         user,
@@ -385,6 +523,8 @@ export const useAuthStore = defineStore('auth', () => {
         signUp,
         signIn,
         signOut,
+        requestPasswordReset,
+        completePasswordReset,
         updateUsername,
         updatePassword,
         updateEmail

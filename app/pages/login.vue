@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 
 const loginValue = ref('');
 const password = ref('');
+const rememberMe = ref(false);
 const submitAttempted = ref(false);
 const formRef = ref(null);
 
@@ -22,11 +23,12 @@ const onSubmit = async () => {
         return;
     }
 
-    const success = await authStore.signIn(loginValue.value, password.value);
+    const success = await authStore.signIn(loginValue.value, password.value, rememberMe.value);
 
     if (success) {
         loginValue.value = '';
         password.value = '';
+        rememberMe.value = false;
         submitAttempted.value = false;
         authStore.clearMessages();
 
@@ -50,6 +52,17 @@ const onSubmit = async () => {
 
                     <FormInput class="pt-3" v-model="password" label="Jelszó" type="password"
                         placeholder="Add meg a jelszavad" required />
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2 mb-3">
+                        <div class="form-check m-0">
+                            <input id="rememberMe" class="form-check-input" type="checkbox" v-model="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Maradjak bejelentkezve
+                            </label>
+                        </div>
+
+                        <NuxtLink to="/forgot-password">Elfelejtette a jelszavát?</NuxtLink>
+                    </div>
 
                     <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
                         {{ authStore.errorMessage }}
