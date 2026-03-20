@@ -34,7 +34,13 @@
         padding: 0;
     }
 
+    .auth-form-shell {
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
     .auth-form-side {
-        padding: 2rem 1.25rem;
+        padding: 1.25rem 1.25rem 2rem 1.25rem;
+        justify-content: flex-start !important;
     }
 }

@@ -131,10 +131,11 @@ const isLoginPage = computed(() => route.path === '/login');
     .auth-content-pane,
     .mode-register .auth-content-pane,
     .mode-login .auth-content-pane {
+        left: 0;
         width: 100%;
-        transform: none;
         min-height: 100vh;
         height: auto;
+        transform: none;
     }
 
     .auth-slot-pane {
