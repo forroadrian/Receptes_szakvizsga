@@ -95,6 +95,12 @@ const steps = [
                         </li>
                     </ul>
                 </div>
+                <div class="similar-recipes mt-5">
+                    <h3 class="text-center ">Hasonló receptek</h3>
+                    <div class="similar-list">
+                        <SimilarRecipes />
+                    </div>
+                </div>
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
@@ -179,7 +185,7 @@ const steps = [
 }
 
 li {
-    margin: 40px !important;
+    margin: 10px 30px !important;
 }
 
 .recipe-image img {
@@ -204,7 +210,7 @@ li {
     }
 
     .recipe-aside {
-        width: 330px;
+        width: 360px;
     }
 }
 
