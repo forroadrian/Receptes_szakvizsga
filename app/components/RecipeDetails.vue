@@ -33,6 +33,10 @@ recipe.value.ingredients = [
     new Ingredient(2, "Lorem", 300, "dkg"),
     new Ingredient(2, "Lorem", 300, "dkg"),
     new Ingredient(2, "Lorem", 300, "dkg"),
+    new Ingredient(2, "Lorem", 300, "dkg"),
+    new Ingredient(2, "Lorem", 300, "dkg"),
+    new Ingredient(2, "Lorem", 300, "dkg"),
+    new Ingredient(2, "Lorem", 300, "dkg"),
 ];
 
 recipe.value.allergies = [
@@ -43,8 +47,13 @@ const steps = [
     "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia.",
+    "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia.", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
     "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia."
-
 ]
 </script>
 
@@ -197,12 +206,12 @@ li {
 @media (min-width: 992px) {
     .recipe-layout {
         display: grid;
-        gap: 2rem;
+        gap: 30px;
     }
 
     .recipe-aside {
         grid-column: 2;
-        grid-row: 1/4;
+        grid-row: 1/6;
     }
 
     .recipe-steps {

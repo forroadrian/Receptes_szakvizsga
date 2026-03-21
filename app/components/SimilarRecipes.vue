@@ -54,7 +54,7 @@ const props = withDefaults(
                 media-left-class="similar-recipes-media" content-class="similar-recipes-content" header-class="w-100">
                 <template #media>
                     <img v-if="item.image" :src="item.image" :alt="item.title" class="similar-recipes-image">
-                    <div v-else aria-hidden="true">
+                    <div v-else aria-hidden="true" class="similar-recipes-image">
                         <img src="/assets/icons/peking-duck.png" alt="">
                     </div>
                 </template>
@@ -89,7 +89,29 @@ const props = withDefaults(
 
 <style scoped>
 .similar-recipes-card {
-    padding: 10px 20px !important;
+    padding: 20px !important;
     margin: 30px 0px;
+}
+
+.similar-recipes-image {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+img {
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 992px) {
+
+    .similar-recipes-card {
+        text-align: center !important;
+    }
+
+    .card-metadata {
+        justify-content: center;
+    }
 }
 </style>
