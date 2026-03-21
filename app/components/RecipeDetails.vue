@@ -38,14 +38,22 @@ recipe.value.ingredients = [
 recipe.value.allergies = [
     new Allergy("Glutén", 1)
 ];
+
+const steps = [
+    "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia."
+
+]
 </script>
 
 <template>
     <div class="container py-5" v-if="recipe">
         <p @click="$router.back()" class="mb-5 p-0"> <i class="bi bi-arrow-left"></i> Vissza</p>
 
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="recipe-layout">
+            <section>
                 <div class="recipe-image">
                     <div class="icons d-flex w-100">
                         <span><i class="bi bi bi-share"></i></span>
@@ -56,7 +64,9 @@ recipe.value.allergies = [
                     </div>
                     <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" />
                 </div>
-                <div class="recipe-description ms-lg-2 my-5">
+            </section>
+            <section>
+                <div class="recipe-description">
                     <h3>{{ recipe.name }}</h3>
                     <p>{{ recipe.description }}</p>
 
@@ -65,31 +75,9 @@ recipe.value.allergies = [
                         <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} fő</span>
                     </div>
                 </div>
-
-                <div class="steps ms-lg-2">
-                    <h3 class="mb-3 mt-5">Elkészítés</h3>
-                    <div class="step d-flex flex-column flex-lg-row align-items-center mb-3">
-                        <p class="circle flex-shrink-0"><span>1</span></p>
-                        <p class="ms-lg-3">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at
-                            exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis
-                            explicabo.</p>
-                    </div>
-
-                    <div class="step d-flex flex-column flex-lg-row align-items-center mb-3">
-                        <p class="circle flex-shrink-0"><span>2</span></p>
-                        <p class="ms-lg-3">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.</p>
-                    </div>
-
-                    <div class="step d-flex flex-column flex-lg-row align-items-center mb-3">
-                        <p class="circle flex-shrink-0"><span>10</span></p>
-                        <p class="ms-lg-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium
-                            blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 px-5">
-                <div class="col-lg-12 col-md-12 col-sm-12 moreRecipeBtn">
+            </section>
+            <aside class="recipe-aside">
+                <div class="recipeButtons">
                     <ClientOnly>
                         <Button :color="buttonColor" iconPosition="right" class="w-100 mb-3"
                             outline>Kipróbálatlan</Button>
@@ -98,25 +86,45 @@ recipe.value.allergies = [
                     </ClientOnly>
                 </div>
 
-                <div class="ingredient-list mt-5">
-                    <h3 class="text-center">Hozzávalók</h3>
+                <div class="ingredient-list p-3">
+                    <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
-                        <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex p-0">
+                        <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
                             <p> {{ ingredient.amount }} {{ ingredient.unit }} </p>
                         </li>
                     </ul>
                 </div>
-            </div>
+            </aside>
+            <section class="steps">
+                <h3 class="my-lg-4">Elkészítés</h3>
+                <div v-for="(step, index) in steps" class="step d-flex flex-column flex-lg-row align-items-center mb-3">
+                    <p class="circle flex-shrink-0">
+                        <span>{{ index + 1 }}</span>
+                    </p>
+                    <p class="ms-lg-3">{{ step }}</p>
+                </div>
+            </section>
         </div>
     </div>
 </template>
 
 <style scoped>
+.recipe-layout {
+    display: grid;
+    gap: 30px;
+}
+
 .ingredient-list li,
 .recipe-image .icons {
     justify-content: space-between;
     align-content: center !important;
+}
+
+.ingredient-list,
+.recipe-image i,
+.step .circle {
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .ingredient-list p {
@@ -125,20 +133,24 @@ recipe.value.allergies = [
 
 .recipe-image {
     position: relative;
+
 }
 
 .recipe-image::before {
     content: "";
-    position: absolute;
     inset: 0 0 auto 0;
-    height: 100px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+    height: 200px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
 }
 
 .recipe-image .icons {
-    position: absolute;
     top: 20px;
     left: 0px;
+}
+
+.recipe-image .icons,
+.recipe-image::before {
+    position: absolute;
 }
 
 .recipe-image i {
@@ -153,7 +165,6 @@ recipe.value.allergies = [
     background: var(--grad-yellow);
     color: var(--text-dark);
     font-weight: 600;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 .step .circle {
@@ -175,6 +186,28 @@ li {
     box-shadow: 0 0 20px 20px -20px rgba(0, 0, 0, 0.8) !important;
 }
 
+
+
+@media (min-width: 992px) {
+    .recipe-layout {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .recipe-aside {
+        grid-column: 2;
+        grid-row: 1/4;
+    }
+
+    .recipe-steps {
+        grid-column: 1;
+    }
+
+    .recipe-aside {
+        width: 330px;
+    }
+}
+
 @media (max-width: 992px) {
 
     .steps,
@@ -186,7 +219,10 @@ li {
 
     .step {
         padding: 20px 40px;
+    }
 
+    .ingredient-list {
+        margin: 60px;
     }
 }
 </style>

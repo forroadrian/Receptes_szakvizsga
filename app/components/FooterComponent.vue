@@ -9,7 +9,7 @@ const scrollTop = () => {
     <footer class="footer position-relative">
         <div class="container pt-5">
             <div class="row g-4 align-items-start text-center text-lg-start">
-                <div class="col-12 col-lg-5">
+                <div class="col-lg-5 col-md-12 col-sm-12">
                     <img src="/logo.webp" alt="Logo" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit!
@@ -22,7 +22,7 @@ const scrollTop = () => {
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-3">
+                <div class="col-lg-3 col-md-12 col-sm-12">
                     <h5 class="footer-title mt-3">Gyors Linkek</h5>
                     <ul
                         class="footer-links list-unstyled m-0 d-grid gap-2 justify-content-center justify-content-lg-start">
@@ -51,7 +51,7 @@ const scrollTop = () => {
                     </ul>
                 </div>
 
-                <div class="col-12 col-lg-4">
+                <div class="col-lg-4  col-md-12 col-sm-12">
                     <div class="contact-panel">
                         <h5 class="footer-title mb-3">Elérhetőségek</h5>
 
@@ -190,17 +190,17 @@ html[data-bs-theme="light"] .footer {
 
 .scroll-top:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 20px var(--orange);
+    box-shadow: 0 5px 10px var(--orange);
 }
 
 .scroll-top {
-    font-size: 30px !important;
+    font-size: var(--nav-icon-size);
+    width: var(--large-icon-size);
+    height: var(--large-icon-size);
     position: absolute;
     left: 40px;
     bottom: 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+    border-radius: var(--radius-rounded);
     border: none;
     cursor: pointer;
     background: var(--grad-orange);
@@ -212,7 +212,8 @@ html[data-bs-theme="light"] .footer {
         margin: 0 auto;
     }
 
-    .col-12 {
+    .col-sm-12,
+    .col-md-12 {
         margin-bottom: 30px;
     }
 }
