@@ -8,7 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "gen:supabase": "supabase gen types typescript --project-id dlgyajctuldutapmkezz > types/database.types.ts"
+    "gen:supabase": "supabase gen types typescript --project-id dlgyajctuldutapmkezz > app/types/database.types.ts"
   },
   "dependencies": {
     "@nuxt/image": "^2.0.0",

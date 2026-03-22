@@ -2,7 +2,6 @@ import {serverSupabaseClient, serverSupabaseServiceRole} from "#supabase/server"
 import { Database } from "~/types/database.types";
 import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 import { requireUser } from "~~/server/utils/requireUser";
-import toSlug from "~~/server/utils/toSlug";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     const admin = await serverSupabaseServiceRole(event);
@@ -11,13 +10,12 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     requireBodyKeys(body, ["name","unit","quantity","expiry"])
 
-    const slug = toSlug(body.name);
     let ingredientId = -1
 
     const {data: ingredientData, error: ingredientError} = await client
         .from("ingredient")
         .select("id")
-        .eq("slug",slug)
+        .eq("name",body.name)
         .maybeSingle()
 
     if (ingredientError) {
@@ -37,7 +35,6 @@ export default defineEventHandler(async (event) => {
         .from("ingredient")
         .insert({
             name: body.name,
-            slug: slug, 
         })
         .select()
         .single();
@@ -66,9 +63,5 @@ export default defineEventHandler(async (event) => {
     if (connectionTableError) {
         throw createError({ statusMessage: connectionTableError.message });
     }
-
-    if(connectionTableData){
-        console.log(JSON.stringify(connectionTableData));
-        
-    }
+    return connectionTableData;
 })

@@ -4,6 +4,7 @@ definePageMeta({
 });
 import type SearchParams from "~/interfaces/SearchParams";
 import Ingredient from "~/models/Ingredient";
+import { getEnumValues } from "~/utils/supabaseEnums";
 
 const showAlert = ref<boolean>();
 
@@ -17,6 +18,7 @@ const buttonColor = computed(() => {
 });
 
 const ingredients = ref<Ingredient[]>([])
+const units = getEnumValues("unit");
 
 const params = ref<SearchParams<Ingredient>>({
     haystack: ingredients.value as Ingredient[],
@@ -54,8 +56,10 @@ const saveIngredient = async () => {
         showAlert.value = true;
         return;
     }
+    newIngredient.value.name = normalizeIngredientName(newIngredient.value.name);
 
-    await $fetch('api/ingredient', {
+
+    const res: any = await $fetch('api/ingredient', {
         method: "POST",
         body: {
             name: newIngredient.value.name,
@@ -67,7 +71,7 @@ const saveIngredient = async () => {
 
     ingredients.value.push(
         new Ingredient(
-            -1,
+            res.ingredient_id,
             newIngredient.value.name,
             newIngredient.value.quantity,
             newIngredient.value.unit,
@@ -85,19 +89,30 @@ const saveIngredient = async () => {
     closeIngredientModal();
 };
 
-const onDelete = (ingredient: Ingredient) => {
-    ingredients.value.splice(ingredients.value.indexOf(ingredient), 1);
+const onDelete = async (ingredient: Ingredient) => {
+    if (await $fetch("/api/ingredient",
+        {
+            "method": 'DELETE',
+            body: { id: ingredient.id }
+        }
+    )) {
+        const index = ingredients.value.findIndex((value) => value.id === ingredient.id)
+        if (index !== -1){
+        } ingredients.value.splice(index, 1);
+            
+        }
+
 };
 
 const onEdit = (ingredient: Ingredient) => { };
 
 onMounted(async () => {
-    const res: any = await $fetch("/api/ingredient", {method: "GET"})
+    const res: any = await $fetch("/api/ingredient", { method: "GET" })
     console.log(res);
     loadingData.value = true;
     for (const ingredientData of res) {
-        let ingredient = new Ingredient(ingredientData.ingredient.id,ingredientData.ingredient.name,ingredientData.quantity,ingredientData.unit, ingredientData.expiry_date)
-        ingredients.value.push(ingredient)      
+        let ingredient = new Ingredient(ingredientData.ingredient.id, ingredientData.ingredient.name, ingredientData.quantity, ingredientData.unit, ingredientData.expiry_date)
+        ingredients.value.push(ingredient)
     }
     loadingData.value = false;
 })
@@ -147,10 +162,14 @@ onMounted(async () => {
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <div class="g-3 row mb-5 mt-4">
-                    <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
-                        v-if="results.length > 0" v-for="ingredient in results">
-                        <IngredientCard :ingredient="ingredient" @delete="onDelete" :image="'images/background.webp'" />
-                    </div>
+                    <template v-if="results.length > 0">
+                        <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
+                            v-for="ingredient in results"
+                            :key="`${ingredient.name}-${ingredient.expiry}-${ingredient.quantity}`">
+                            <IngredientCard :ingredient="ingredient" @delete="onDelete"
+                                :image="'images/background.webp'" />
+                        </div>
+                    </template>
                     <div v-else>
                         <p class="fs-2 text-center fw-bold" v-if="!loadingData">
                             Sajnos nem találtunk ilyen alapanyagot :(
@@ -184,7 +203,9 @@ onMounted(async () => {
                 </div>
                 <div class="col-5">
                     <label class="form-label">Egység</label>
-                    <input v-model="newIngredient.unit" type="text" class="form-control" placeholder="g, ml..." />
+                    <select class="form-select" v-model="newIngredient.unit">
+                        <option v-for="unit in units" :value="unit">{{ unit }}</option>
+                    </select>
                 </div>
             </div>
 
@@ -233,6 +254,7 @@ onMounted(async () => {
 .card--wrapper-media {
     min-width: 80px;
 }
+
 
 @media (min-width: 992px) {
     .ingredient-modal-backdrop {
