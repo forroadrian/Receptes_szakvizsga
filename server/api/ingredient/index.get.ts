@@ -11,18 +11,13 @@ export default defineEventHandler(async (event) =>{
         expiry_date,
         ingredient:ingredient_id!inner (
             id,
-            name,
-            slug
+            name
         )
     `)
     .eq("user_id",user.sub)
 
     if (error) {
-        throw createError({
-            status: 404,
-            statusMessage: "Couldn't find anything for this user."
-        });
-        
+        throw createError({statusMessage: error.message});
     }
 
     return data

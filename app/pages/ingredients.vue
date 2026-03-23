@@ -2,7 +2,9 @@
 definePageMeta({
     middleware: "auth-only",
 });
+import type { FreshnessVariants } from "~/interfaces/cardInterfaces/CardGenericInterfaces";
 import type SearchParams from "~/interfaces/SearchParams";
+import ExpiryDate from "~/models/ExpiryDate";
 import Ingredient from "~/models/Ingredient";
 import { getEnumValues } from "~/utils/supabaseEnums";
 
@@ -58,7 +60,7 @@ const saveIngredient = async () => {
     }
     newIngredient.value.name = normalizeIngredientName(newIngredient.value.name);
 
-
+    const expiry = new ExpiryDate(new Date(newIngredient.value.expiry))
     const res: any = await $fetch('api/ingredient', {
         method: "POST",
         body: {
@@ -69,13 +71,16 @@ const saveIngredient = async () => {
         }
     })
 
+    console.log(res);
+    
+
     ingredients.value.push(
         new Ingredient(
             res.ingredient_id,
             newIngredient.value.name,
             newIngredient.value.quantity,
             newIngredient.value.unit,
-            newIngredient.value.expiry
+            expiry
         )
     );
 
@@ -108,10 +113,16 @@ const onEdit = (ingredient: Ingredient) => { };
 
 onMounted(async () => {
     const res: any = await $fetch("/api/ingredient", { method: "GET" })
-    console.log(res);
     loadingData.value = true;
     for (const ingredientData of res) {
-        let ingredient = new Ingredient(ingredientData.ingredient.id, ingredientData.ingredient.name, ingredientData.quantity, ingredientData.unit, ingredientData.expiry_date)
+        console.log(res.expiry_date);
+        console.log(ingredientData);
+        
+        const expiry_date = new ExpiryDate(new Date(ingredientData.expiry_date))
+        let freshness: FreshnessVariants = expiry_date.checkExpiry();
+        console.log(freshness);
+        
+        let ingredient = new Ingredient(ingredientData.ingredient.id, ingredientData.ingredient.name, ingredientData.quantity, ingredientData.unit, expiry_date, freshness)
         ingredients.value.push(ingredient)
     }
     loadingData.value = false;
@@ -137,20 +148,20 @@ onMounted(async () => {
             </Button>
         </div>
         <div id="statsCollapse" class="collapse d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
-            <div class="row row-gap-4 justify-content-between text-center">
-                <div class="col-lg-3 col-md-6 mb-md-0">
+            <div class="row row-gap-4 row-cols-lg-4 row-cols-md-2 justify-content-between text-center">
+                <div class= "mb-md-0">
                     <IngredientCardAmount :amount="0" image="/logo.webp" description="Összes" class="mx-auto"
                         loading="lazy" />
                 </div>
-                <div class="col-lg-3 col-md-6 mb-md-0">
+                <div class= "mb-md-0">
                     <IngredientCardAmount :amount="0" image="/logo.webp" description="Friss" class="mx-auto"
                         loading="lazy" />
                 </div>
-                <div class="col-lg-3 col-md-6 mb-md-0">
+                <div class= "mb-md-0">
                     <IngredientCardAmount :amount="0" image="/logo.webp" description="Hamarosan Lejár" class="mx-auto"
                         loading="lazy" />
                 </div>
-                <div class="col-lg-3 col-md-6">
+                <div>
                     <IngredientCardAmount :amount="0" image="/logo.webp" description="Lejárt" class="mx-auto"
                         loading="lazy" />
                 </div>
@@ -165,7 +176,7 @@ onMounted(async () => {
                     <template v-if="results.length > 0">
                         <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                             v-for="ingredient in results"
-                            :key="`${ingredient.name}-${ingredient.expiry}-${ingredient.quantity}`">
+                            :key="`${ingredient.name}-${ingredient.expiry.toShort()}-${ingredient.quantity}`">
                             <IngredientCard :ingredient="ingredient" @delete="onDelete"
                                 :image="'images/background.webp'" />
                         </div>

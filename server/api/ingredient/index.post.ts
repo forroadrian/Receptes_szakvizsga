@@ -9,7 +9,9 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event);
     requireBodyKeys(body, ["name","unit","quantity","expiry"])
+    console.log(body);
 
+    
     let ingredientId = -1
 
     const {data: ingredientData, error: ingredientError} = await client
@@ -29,8 +31,12 @@ export default defineEventHandler(async (event) => {
             ingredientId = ingredientData?.id as number
         }
     }
-
+    console.log("works");
+    console.log(ingredientId);
+    
     if (ingredientId === -1) {
+        console.log("creating new ingredient");
+        
         const { error, data } = await admin
         .from("ingredient")
         .insert({
@@ -38,6 +44,7 @@ export default defineEventHandler(async (event) => {
         })
         .select()
         .single();
+        console.log(error, data);
         
         if (error) {
             throw createError({ statusMessage: error.message });
@@ -63,5 +70,6 @@ export default defineEventHandler(async (event) => {
     if (connectionTableError) {
         throw createError({ statusMessage: connectionTableError.message });
     }
+    console.log("works");
     return connectionTableData;
 })

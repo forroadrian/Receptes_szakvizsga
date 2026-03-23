@@ -22,10 +22,7 @@ const props = withDefaults(defineProps<{
 const items = computed(() => {
     const tag = props.ingredient.tag
     const variant = tag === 'Friss'
-        ? 'active' 
-        : tag === "Hamarosan Lejár" 
-            ? "outline" 
-            : "greyed"
+        ? 'active' : 'outline' 
     return [{label: tag, variant: variant} as CardTagItem]
 })  
 
@@ -33,6 +30,7 @@ const toggleDescription = () => {
     showDescription.value = !showDescription.value
     return
 }
+
 
 </script>
 <template>
@@ -57,10 +55,10 @@ const toggleDescription = () => {
         </template>
         <template #body>
             <div class="mb-2 px-3 d-flex flex-column justify-content-between">
-                <p class="m-0" :class="{'border-bottom mb-2': showDescription && isSmall}">Lejár: {{ ingredient.expiry }}</p>
+                <p class="m-0" :class="{'border-bottom mb-2': showDescription && isSmall}">Lejár: {{ ingredient.expiry.toShort() }}</p>
                 <div class="d-flex flex-column flex-grow options" v-if="showDescription && isSmall">
-                    <p class="pb-1 ">Szerkesztés</p>
-                    <p>Törlés</p>
+                    <p class="pb-1" @click="$emit('edit',ingredient)">Szerkesztés</p>
+                    <p @click="$emit('delete', ingredient)">Törlés</p>
                 </div>
             </div>
         </template>

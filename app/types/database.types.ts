@@ -539,7 +539,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      refresh_user_ingredient_expired_flag: { Args: never; Returns: undefined }
+      refresh_user_ingredient_expired_flag_timestamptz: {
+        Args: never
+        Returns: number
+      }
     }
     Enums: {
       group_types: "meal_type" | "length" | "skill" | "etc"

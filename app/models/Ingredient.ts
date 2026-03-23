@@ -2,6 +2,7 @@
 import type { FreshnessVariants } from "~/interfaces/cardInterfaces/CardGenericInterfaces";
 import type Identifiable from "~/interfaces/Identifiable";
 import type { IngredientTag, IngredientTagOptions } from "~/interfaces/ModelInterfaces/Tags";
+import ExpiryDate from "./ExpiryDate";
 
 export default class Ingredient implements IngredientTag, Identifiable{
     private _id: number;
@@ -9,14 +10,14 @@ export default class Ingredient implements IngredientTag, Identifiable{
     private _name: string;
     private _quantity: number;
     private _unit: string;
-    private _expiry: string;
+    private _expiry: ExpiryDate;
 
-    constructor(id: number, name: string, quantity: number, unit: string, expiry?: string, tag?: FreshnessVariants) {
+    constructor(id: number, name: string, quantity: number, unit: string, expiry?: ExpiryDate, tag?: FreshnessVariants) {
         this._id = id
         this._name = name;
         this._quantity = quantity;
         this._unit = unit;
-        this._expiry = expiry ?? "2006-01-01"
+        this._expiry = expiry ?? new ExpiryDate(new Date("2006-01-01"))
         this._tag = tag ?? "Friss";
     }
 
@@ -68,12 +69,12 @@ export default class Ingredient implements IngredientTag, Identifiable{
         this._id = v;
     }
 
-    public get expiry() : string {
+    public get expiry() : ExpiryDate {
         return this._expiry
     }
 
     
-    public set expiry(v : string) {
+    public set expiry(v : ExpiryDate) {
         this._expiry = v;
     }
     

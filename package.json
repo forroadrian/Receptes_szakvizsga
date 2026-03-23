@@ -27,6 +27,6 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "supabase": "^2.78.1"
+    "supabase": "^2.83.0"
   }
 }
