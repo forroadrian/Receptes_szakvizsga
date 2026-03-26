@@ -7,13 +7,19 @@ export const useAuthStore = defineStore('auth', () => {
     const loading = ref(false)
     const errorMessage = ref('')
     const successMessage = ref('')
+    const profileUrl = ref('')
 
     const REMEMBER_COOKIE = 'menuplanr_remember_login'
     const SESSION_COOKIE = 'menuplanr_session_login'
+    const PROFILE_BUCKET = 'profile-images'
 
     const clearMessages = () => {
         errorMessage.value = ''
         successMessage.value = ''
+    }
+
+    const clearProfileData = () => {
+        profileUrl.value = ''
     }
 
     const setCookie = (name: string, value: string, maxAge?: number) => {
@@ -49,6 +55,142 @@ export const useAuthStore = defineStore('auth', () => {
     const clearRememberPreference = () => {
         clearCookie(REMEMBER_COOKIE)
         clearCookie(SESSION_COOKIE)
+    }
+
+    const resolveProfileImageUrl = (savedProfileUrl?: string | null) => {
+        if (!savedProfileUrl || savedProfileUrl.trim() === '') {
+            return ''
+        }
+
+        if (
+            savedProfileUrl.startsWith('/icons/') ||
+            savedProfileUrl.startsWith('http://') ||
+            savedProfileUrl.startsWith('https://') ||
+            savedProfileUrl.startsWith('data:image/')
+        ) {
+            return savedProfileUrl
+        }
+
+        const { data } = supabase
+            .storage
+            .from(PROFILE_BUCKET)
+            .getPublicUrl(savedProfileUrl)
+
+        return `${data.publicUrl}?t=${Date.now()}`
+    }
+
+    const loadProfileData = async (customUserId?: string) => {
+        const userId = customUserId || user.value?.id || user.value?.sub
+
+        if (!userId) {
+            clearProfileData()
+            return null
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('user')
+                .select('username, email, profile_url')
+                .eq('id', userId)
+                .single()
+
+            if (error) {
+                errorMessage.value = 'Nem sikerült betölteni a profiladatokat.'
+                return null
+            }
+
+            profileUrl.value = resolveProfileImageUrl(data?.profile_url)
+
+            if (user.value?.email && data?.email !== user.value.email) {
+                const { error: emailSyncError } = await supabase
+                    .from('user')
+                    .update({ email: user.value.email })
+                    .eq('id', userId)
+
+                if (emailSyncError) {
+                    console.warn('Nem sikerült szinkronizálni az email címet a user táblába.', emailSyncError)
+                }
+            }
+
+            return data
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Nem sikerült betölteni a profiladatokat.'
+            return null
+        }
+    }
+
+    const initializeProfile = async () => {
+        try {
+            const { data, error } = await supabase.auth.getUser()
+
+            if (error || !data.user) {
+                clearProfileData()
+                return null
+            }
+
+            return await loadProfileData(data.user.id)
+        } catch (error: any) {
+            clearProfileData()
+            errorMessage.value = error?.message || 'Nem sikerült betölteni a profiladatokat.'
+            return null
+        }
+    }
+
+    const updateProfileImage = async (file: File) => {
+        clearMessages()
+    
+        if (!user.value) {
+            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            return false
+        }
+    
+        const userId = user.value.id || user.value.sub
+        const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'png'
+        const filePath = `${userId}/profile-image.${fileExtension}`
+    
+        loading.value = true
+    
+        try {
+            const { error: uploadError } = await supabase
+                .storage
+                .from(PROFILE_BUCKET)
+                .upload(filePath, file, {
+                    upsert: true,
+                    contentType: file.type
+                })
+    
+            if (uploadError) {
+                console.error('Storage upload error:', uploadError)
+                errorMessage.value = uploadError.message || 'Nem sikerült feltölteni a profilképet.'
+                return false
+            }
+    
+            const { error: dbError } = await supabase
+                .from('user')
+                .update({ profile_url: filePath })
+                .eq('id', userId)
+    
+            if (dbError) {
+                console.error('DB update error:', dbError)
+                errorMessage.value = 'Nem sikerült menteni a profilképet.'
+                return false
+            }
+    
+            const { data } = supabase
+                .storage
+                .from(PROFILE_BUCKET)
+                .getPublicUrl(filePath)
+    
+            profileUrl.value = `${data.publicUrl}?t=${Date.now()}`
+            successMessage.value = 'Sikeres profilkép módosítás.'
+            return true
+        } catch (error: any) {
+            console.error('Unexpected profile image error:', error)
+            errorMessage.value = error?.message || 'Hiba történt a profilkép módosításakor.'
+            return false
+        } finally {
+            loading.value = false
+        }
     }
 
     const signUp = async (email: string, password: string, username: string) => {
@@ -131,6 +273,7 @@ export const useAuthStore = defineStore('auth', () => {
             }
 
             saveRememberPreference(rememberMe)
+            await loadProfileData(data.user.id)
 
             successMessage.value = 'Sikeres bejelentkezés!'
             return true
@@ -148,6 +291,7 @@ export const useAuthStore = defineStore('auth', () => {
         const { error } = await supabase.auth.signOut()
 
         clearRememberPreference()
+        clearProfileData()
 
         if (error) {
             errorMessage.value = 'A kijelentkezés nem sikerült.'
@@ -159,51 +303,51 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const requestPasswordReset = async (email: string) => {
-    clearMessages()
-    loading.value = true
+        clearMessages()
+        loading.value = true
 
-    try {
-        const trimmedEmail = email.trim().toLowerCase()
+        try {
+            const trimmedEmail = email.trim().toLowerCase()
 
-        const { data: existingUser, error: userCheckError } = await supabase
-            .from('user')
-            .select('id')
-            .eq('email', trimmedEmail)
-            .maybeSingle()
+            const { data: existingUser, error: userCheckError } = await supabase
+                .from('user')
+                .select('id')
+                .eq('email', trimmedEmail)
+                .maybeSingle()
 
-        if (userCheckError) {
-            errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
+            if (userCheckError) {
+                errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
+                return false
+            }
+
+            if (!existingUser) {
+                errorMessage.value = 'Nincs ilyen email címmel regisztrált felhasználó.'
+                return false
+            }
+
+            const redirectTo = process.client
+                ? `${window.location.origin}/password-reset`
+                : undefined
+
+            const { error } = await supabase.auth.resetPasswordForEmail(
+                trimmedEmail,
+                redirectTo ? { redirectTo } : undefined
+            )
+
+            if (error) {
+                errorMessage.value = error.message
+                return false
+            }
+
+            successMessage.value = 'A jelszó-visszaállító email elküldve.'
+            return true
+        } catch (error: any) {
+            errorMessage.value = error?.message || 'Nem sikerült elküldeni a jelszó-visszaállító emailt.'
             return false
+        } finally {
+            loading.value = false
         }
-
-        if (!existingUser) {
-            errorMessage.value = 'Nincs ilyen email címmel regisztrált felhasználó.'
-            return false
-        }
-
-        const redirectTo = process.client
-            ? `${window.location.origin}/password-reset`
-            : undefined
-
-        const { error } = await supabase.auth.resetPasswordForEmail(
-            trimmedEmail,
-            redirectTo ? { redirectTo } : undefined
-        )
-
-        if (error) {
-            errorMessage.value = error.message
-            return false
-        }
-
-        successMessage.value = 'A jelszó-visszaállító email elküldve.'
-        return true
-    } catch (error: any) {
-        errorMessage.value = error?.message || 'Nem sikerült elküldeni a jelszó-visszaállító emailt.'
-        return false
-    } finally {
-        loading.value = false
     }
-}
 
     const completePasswordReset = async (newPassword: string) => {
         clearMessages()
@@ -221,6 +365,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             clearRememberPreference()
             await supabase.auth.signOut()
+            clearProfileData()
 
             successMessage.value = 'A jelszó sikeresen megváltozott. Most jelentkezz be az új jelszóval.'
             return true
@@ -246,7 +391,6 @@ export const useAuthStore = defineStore('auth', () => {
         loading.value = true
 
         try {
-
             const { data: existingUsernameUser, error: usernameCheckError } = await supabase
                 .from('user')
                 .select('id')
@@ -443,7 +587,12 @@ export const useAuthStore = defineStore('auth', () => {
         loading,
         errorMessage,
         successMessage,
+        profileUrl,
         clearMessages,
+        clearProfileData,
+        loadProfileData,
+        initializeProfile,
+        updateProfileImage,
         signUp,
         signIn,
         signOut,

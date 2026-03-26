@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore()
@@ -15,16 +15,28 @@ const languageOptions = [
 ]
 
 const isReady = ref(false)
-onMounted(() => {
+onMounted(async () => {
     isReady.value = true
+    await authStore.initializeProfile()
 })
+
+watch(
+    () => user.value?.id,
+    async (newUserId) => {
+        if (newUserId) {
+            await authStore.loadProfileData(newUserId)
+        } else {
+            authStore.clearProfileData()
+        }
+    }
+)
 
 const ingredientsNavTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
 });
 
 const displayProfileImage = computed(() => {
-    return '/icons/profile.png'
+    return authStore.profileUrl || '/icons/profile.png'
 })
 
 const displayUsername = computed(() => {
@@ -224,7 +236,8 @@ const handleSignOut = async () => {
     transition: width 0.5s ease;
 }
 
-.nav-link:hover::after, .account-avatar-wrap img {
+.nav-link:hover::after,
+.account-avatar-wrap img {
     width: 100%;
 }
 
@@ -342,7 +355,8 @@ const handleSignOut = async () => {
     border-radius: var(--radius-sm);
 }
 
-.lang-btn:hover,  .flag-icon {
+.lang-btn:hover,
+.flag-icon {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 

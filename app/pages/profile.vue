@@ -10,7 +10,6 @@ import { usePreferencesStore } from '~/stores/preferences';
 
 const auth = useAuthStore();
 const preferences = usePreferencesStore();
-const supabase = useSupabaseClient();
 const { showAlert } = useAlert();
 const {
     validateUsernameChange,
@@ -34,11 +33,13 @@ const dislikedIngredientInput = ref('');
 const signOutEverywhere = ref(false);
 const dislikedIngredients = ref([]);
 const activeSection = ref('menu');
+const profileImageInput = ref(null);
 
 const currentAuthUserId = computed(() => auth.user?.id || auth.user?.sub || '');
 const filteredAllergies = computed(() => preferences.getFilteredAllergies(allergenInput.value));
 const hasTypedAllergen = computed(() => allergenInput.value.trim().length > 0);
 const isProfileSettingsActive = computed(() => ['menu', 'username', 'password', 'email'].includes(activeSection.value));
+const displayProfileImage = computed(() => auth.profileUrl || '/icons/profile.png');
 
 const sidebarItems = [
     {
@@ -122,26 +123,11 @@ const syncProfileData = async (newUser) => {
         return;
     }
 
-    const { data } = await supabase
-        .from('user')
-        .select('username, email')
-        .eq('id', userId)
-        .single();
+    const data = await auth.loadProfileData();
 
     if (data) {
         displayedUsername.value = data.username;
         usernameInput.value = data.username;
-    }
-
-    if (newUser?.email && data?.email !== newUser.email) {
-        const { error } = await supabase
-            .from('user')
-            .update({ email: newUser.email })
-            .eq('id', userId);
-
-        if (error) {
-            console.warn('Nem sikerült szinkronizálni az email címet a user táblába.', error);
-        }
     }
 
     const loadAllergyDataSuccess = await preferences.loadAllergyData(userId);
@@ -186,6 +172,41 @@ const removeAllergen = async (allergy) => {
 const removeDislikedIngredient = (_, index) => {
     dislikedIngredients.value.splice(index, 1);
     showAlert('success', 'A nem kedvelt alapanyag sikeresen törölve.');
+};
+
+const openProfileImagePicker = () => {
+    profileImageInput.value?.click();
+};
+
+const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+        showError('Csak képfájlt választhatsz ki.');
+        event.target.value = '';
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        showError('A kép mérete legfeljebb 2 MB lehet.');
+        event.target.value = '';
+        return;
+    }
+
+    const success = await auth.updateProfileImage(file);
+
+    if (!success) {
+        showError(auth.errorMessage || 'Nem sikerült módosítani a profilképet.');
+        event.target.value = '';
+        return;
+    }
+
+    showAlert('success', 'Sikeres profilkép módosítás.');
+    event.target.value = '';
 };
 
 const saveUsername = async () => {
@@ -330,11 +351,13 @@ const handleSave = async () => {
                                 <div class="text-center mb-4">
                                     <div class="avatar-wrap mx-auto mb-3 position-relative">
                                         <div class="avatar-circle d-flex align-items-center justify-content-center">
-                                            <img src="/icons/profile.png" alt="Profile" title="Profile picture">
+                                            <img :src="displayProfileImage" alt="Profile" title="Profile picture">
                                         </div>
-                                        <button class="avatar-camera" type="button">
+                                        <button class="avatar-camera" type="button" @click="openProfileImagePicker">
                                             <i class="bi bi-camera-fill"></i>
                                         </button>
+                                        <input ref="profileImageInput" type="file" accept="image/*" class="d-none"
+                                            @change="handleProfileImageChange">
                                     </div>
                                     <h5 class="mb-0">{{ displayedUsername }}</h5>
                                 </div>
