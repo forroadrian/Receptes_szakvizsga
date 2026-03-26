@@ -2,25 +2,36 @@
 definePageMeta({
     middleware: "auth-only",
 });
-import type { FreshnessVariants } from "~/interfaces/cardInterfaces/CardGenericInterfaces";
+import { storeToRefs } from "pinia";
 import type SearchParams from "~/interfaces/SearchParams";
 import ExpiryDate from "~/models/ExpiryDate";
 import Ingredient from "~/models/Ingredient";
-import { getEnumValues } from "~/utils/supabaseEnums";
+import { useIngredientStore } from "~/stores/ingredients";
 
-const showAlert = ref<boolean>();
+const ingredientState = useIngredientStore();
 
-const colorMode = useColorMode();
+const {showIngredientModal, ingredients} = storeToRefs(ingredientState)
+const {
+    units,
+    openIngredientModal,
+    closeIngredientModal,
+    loadIngredients,
+    pushIngredient,
+    removeIngredient
+} = ingredientState
 
-const loadingData = ref<boolean>(false)
+const isAlert = ref<boolean>(false);
+const loadingData = ref<boolean>(false);
 
-const buttonColor = computed(() => {
-    if (colorMode.value === "dark") return "soft";
-    return "dark";
-});
+const showModal = computed(() => showIngredientModal.value);
+const userHasIngredients = computed(() => ingredients.value.length > 0)
 
-const ingredients = ref<Ingredient[]>([])
-const units = getEnumValues("unit");
+const descriptionText = computed(() => {
+    if(loadingData.value) return "Az adatok betöltése folyamatban van";
+    if(!userHasIngredients.value) return "Még nem adtál hozzá semmit";
+    if(results.value.length == 0) return "Sajnos nem találtunk ilyen alapanyagot :(";
+    return "Ismeretlen hiba";
+})
 
 const params = ref<SearchParams<Ingredient>>({
     haystack: ingredients.value as Ingredient[],
@@ -28,106 +39,90 @@ const params = ref<SearchParams<Ingredient>>({
     showAllByDefault: true,
 });
 
-const results = useSearch(params);
-
-const showIngredientModal = ref(false);
-
 const newIngredient = ref({
     name: "",
     quantity: null as number | null,
     unit: "",
     expiry: "",
 });
+const results = useSearch(params);
 
-function openIngredientModal() {
-    showIngredientModal.value = true;
+function showAlert(){
+    isAlert.value = true;
 }
 
-function closeIngredientModal() {
-    showIngredientModal.value = false;
-}
-
-const saveIngredient = async () => {
-    if (
+const checkInput = () => 
         newIngredient.value.name.length === 0 ||
         newIngredient.value.unit === "" ||
         newIngredient.value.expiry.length === 0 ||
         newIngredient.value.quantity == null ||
         newIngredient.value.quantity <= 0
-    ) {
-        showAlert.value = true;
-        return;
-    }
-    newIngredient.value.name = normalizeIngredientName(newIngredient.value.name);
 
-    const expiry = new ExpiryDate(new Date(newIngredient.value.expiry))
-    const res: any = await $fetch('api/ingredient', {
-        method: "POST",
-        body: {
-            name: newIngredient.value.name,
-            unit: newIngredient.value.unit,
-            quantity: newIngredient.value.quantity,
-            expiry: newIngredient.value.expiry
-        }
-    })
-
-    console.log(res);
-    
-
-    ingredients.value.push(
-        new Ingredient(
-            res.ingredient_id,
-            newIngredient.value.name,
-            newIngredient.value.quantity,
-            newIngredient.value.unit,
-            expiry
-        )
-    );
-
+const resetInputData = () => {
     newIngredient.value = {
         name: "",
         quantity: null,
         unit: "",
         expiry: "",
     };
+}
 
-    closeIngredientModal();
+const saveIngredient = async () => {
+    console.log("save clicked");
+    if (checkInput()) {
+        showAlert()
+        return;
+    }
+    try {
+        newIngredient.value.name = normalizeIngredientName(newIngredient.value.name);
+        const expiry = new ExpiryDate(new Date(newIngredient.value.expiry))
+        
+        const res:any  = await $fetch('api/ingredient', {
+            method: "POST",
+            body: {
+                name: newIngredient.value.name,
+                unit: newIngredient.value.unit,
+                quantity: newIngredient.value.quantity,
+                expiry: newIngredient.value.expiry
+            }
+        })
+        const ing = new Ingredient(res.ingredient_id, newIngredient.value.name, res.quantity, res.unit, expiry, expiry.checkExpiry())
+    
+        pushIngredient(ing);
+        resetInputData();
+        closeIngredientModal();
+        
+    } catch(error: any) {
+        showAlert();
+    }
 };
 
 const onDelete = async (ingredient: Ingredient) => {
-    if (await $fetch("/api/ingredient",
-        {
-            "method": 'DELETE',
-            body: { id: ingredient.id }
-        }
-    )) {
-        const index = ingredients.value.findIndex((value) => value.id === ingredient.id)
-        if (index !== -1){
-        } ingredients.value.splice(index, 1);
-            
-        }
+    try {
+        removeIngredient(ingredient.id);
+        await $fetch('/api/ingredient', {
+            method: 'DELETE',
+            body: {
+                id: ingredient.id
+            }
+        })
+    } catch(error) {
+        showAlert();
+    }
+};
+
+const onEdit = (ingredient: Ingredient) => {
 
 };
 
-const onEdit = (ingredient: Ingredient) => { };
-
 onMounted(async () => {
-    const res: any = await $fetch("/api/ingredient", { method: "GET" })
     loadingData.value = true;
-    for (const ingredientData of res) {
-        console.log(res.expiry_date);
-        console.log(ingredientData);
-        
-        const expiry_date = new ExpiryDate(new Date(ingredientData.expiry_date))
-        let freshness: FreshnessVariants = expiry_date.checkExpiry();
-        console.log(freshness);
-        
-        let ingredient = new Ingredient(ingredientData.ingredient.id, ingredientData.ingredient.name, ingredientData.quantity, ingredientData.unit, expiry_date, freshness)
-        ingredients.value.push(ingredient)
+    try {
+        loadIngredients()    
+    } finally {
+        loadingData.value = false;
     }
-    loadingData.value = false;
 })
-
 </script>
 
 <template>
@@ -140,56 +135,15 @@ onMounted(async () => {
                 deserunt veniam qui ut, a corrupti exercitationem, itaque tempore saepe
                 sed sapiente nobis!
             </p>
-
-            <Button class="col-lg-4 col-10 mx-auto" icon="bi bi-plus" type="button" :color="buttonColor"
-                @click="openIngredientModal">Új hozzávaló hozzáadása</Button>
-            <Button class="d-md-none col-1 border-2" outline color="dark" icon="bi bi-graph-up" iconPosition="left"
-                icon-only type="button" data-bs-toggle="collapse" data-bs-target="#statsCollapse">
-            </Button>
+            <IngredientButtons @openIngredientModal="openIngredientModal"/>
         </div>
-        <div id="statsCollapse" class="collapse d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
-            <div class="row row-gap-4 row-cols-lg-4 row-cols-md-2 justify-content-between text-center">
-                <div class= "mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Összes" class="mx-auto"
-                        loading="lazy" />
-                </div>
-                <div class= "mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Friss" class="mx-auto"
-                        loading="lazy" />
-                </div>
-                <div class= "mb-md-0">
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Hamarosan Lejár" class="mx-auto"
-                        loading="lazy" />
-                </div>
-                <div>
-                    <IngredientCardAmount :amount="0" image="/logo.webp" description="Lejárt" class="mx-auto"
-                        loading="lazy" />
-                </div>
-            </div>
-        </div>
+        <IngredientStatCards />
         <div class="row mt-4">
             <h2 class="py-3">Meglévő alapanyagaim</h2>
             <SearchBar v-model="params.query" placeholder="Keresés" class="px-3 mx-3" />
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
-                <div class="g-3 row mb-5 mt-4">
-                    <template v-if="results.length > 0">
-                        <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
-                            v-for="ingredient in results"
-                            :key="`${ingredient.name}-${ingredient.expiry.toShort()}-${ingredient.quantity}`">
-                            <IngredientCard :ingredient="ingredient" @delete="onDelete"
-                                :image="'images/background.webp'" />
-                        </div>
-                    </template>
-                    <div v-else>
-                        <p class="fs-2 text-center fw-bold" v-if="!loadingData">
-                            Sajnos nem találtunk ilyen alapanyagot :(
-                        </p>
-                        <p class="fs-2 text-center fw-bold" v-else>
-                            Adatok betöltése folyamatban.
-                        </p>
-                    </div>
-                </div>
+                <IngredientList :results="results" @delete="onDelete", :loading="loadingData" :description="descriptionText"/>
             </div>
         </div>
     </div>
@@ -198,7 +152,7 @@ onMounted(async () => {
         <div class="ingredient-modal-panel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Új hozzávaló felvétele</h3>
-                <i class="bi bi-x p-0" @click="closeIngredientModal"> </i>
+                <i class="bi bi-x p-0" @click="closeIngredientModal"></i>
             </div>
 
             <div class="mb-3">
@@ -233,7 +187,7 @@ onMounted(async () => {
         </div>
     </div>
 
-    <Alert message="Helytelen adat." :show="showAlert" type="error" @close="showAlert = false" />
+    <Alert message="Helytelen adat." :show="isAlert" type="error" @close="isAlert = false" />
 </template>
 
 <style>
