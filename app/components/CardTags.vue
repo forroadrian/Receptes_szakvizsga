@@ -5,7 +5,7 @@ import { type CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfa
 const colorMode = useColorMode()
 
 const buttonColor = computed(() => {
-    return colorMode.value === "dark" ? "#e9ecef" : "#212529";
+    return colorMode.value === "dark" ? "#e9ecef" : "#444";
 })
 
 const textColor = computed(() => {
@@ -41,5 +41,9 @@ const props = defineProps<{
     .card-tag--greyed {
         background-color: v-bind(buttonColor);
         color: var(--bs-body-color);
+    }
+
+    .card-tag--custom {
+        background-color: #a52a2a;
     }
 </style>

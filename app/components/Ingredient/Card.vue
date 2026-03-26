@@ -22,7 +22,8 @@ const props = withDefaults(defineProps<{
 const items = computed(() => {
     const tag = props.ingredient.tag
     const variant = tag === 'Friss'
-        ? 'active' : 'outline' 
+        ? 'active' : tag === "Hamarosan Lejár"
+        ? 'outline' : "custom" 
     return [{label: tag, variant: variant} as CardTagItem]
 })  
 

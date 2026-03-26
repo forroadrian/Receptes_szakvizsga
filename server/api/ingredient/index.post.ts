@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
         console.log(error, data);
         
         if (error) {
-            throw createError({ statusMessage: error.message });
+            throw createError({ statusText: error.message });
         }
 
         if(data){
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
         .maybeSingle()
 
     if (connectionTableError) {
-        throw createError({ statusMessage: connectionTableError.message });
+        throw createError({ statusText: connectionTableError.message });
     }
     console.log("works");
     return connectionTableData;

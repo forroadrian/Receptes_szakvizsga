@@ -53,6 +53,22 @@
 
     --radial-yellow-bottom-right-soft:
         radial-gradient(1000px 700px at 100% 100%, var(--footer-glow-yellow-soft), transparent 70%);
+
+    --active-bg: #e7d2bf;
+    --active-text: #2f2f2f;
+    --segmentation-bg: #efeae5;
+
+    --pill-primary: #C58A5A;
+    --pill-primary-soft: #E7D2BF;
+    --pill-primary-strong: #B97A45;
+
+    --pill-text: #2F2F2F;
+    --pill-text-muted: #6B6B6B;
+    --pill-text-light: #A8A8A8;
+
+    --pill-border: #D9D4CE;
+    --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
 }
 
 html,

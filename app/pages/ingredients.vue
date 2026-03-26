@@ -12,7 +12,6 @@ const ingredientState = useIngredientStore();
 
 const {showIngredientModal, ingredients} = storeToRefs(ingredientState)
 const {
-    units,
     openIngredientModal,
     loadIngredients,
     removeIngredient
@@ -20,6 +19,10 @@ const {
 
 const isAlert = ref<boolean>(false);
 const loadingData = ref<boolean>(false);
+
+function showAlert(){
+    isAlert.value = true;
+}
 
 const showModal = computed(() => showIngredientModal.value);
 const userHasIngredients = computed(() => ingredients.value.length > 0)
@@ -31,17 +34,26 @@ const descriptionText = computed(() => {
     return "Ismeretlen hiba";
 })
 
+const fresh = computed(() => ingredients.value.filter(v => v.tag === "Friss").length)
+const almostExpired = computed(() => ingredients.value.filter(v => v.tag === "Hamarosan Lejár").length)
+const expired = computed(() => ingredients.value.filter(v => v.tag === "Lejárt").length)
+const query = ref<string[]>([])
+
 const params = ref<SearchParams<Ingredient>>({
     haystack: ingredients.value as Ingredient[],
-    searchFor: ["name"],
+    searchFor: ["name","tag"],
     showAllByDefault: true,
+    query: query.value
 });
-
 
 const results = useSearch(params);
 
-function showAlert(){
-    isAlert.value = true;
+const addToQuery = (tag: string) => {
+    if(tag !== "Összes"){
+        query.value[1] = tag;
+    }else {
+        query.value[1] = '';
+    }
 }
 
 const onDelete = async (ingredient: Ingredient) => {
@@ -78,10 +90,10 @@ onMounted(async () => {
             </p>
             <IngredientButtons @openIngredientModal="openIngredientModal"/>
         </div>
-        <IngredientStatCards />
+        <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery"/>
         <div class="row mt-4">
             <h2 class="py-3">Meglévő alapanyagaim</h2>
-            <SearchBar v-model="params.query" placeholder="Keresés" class="px-3 mx-3" />
+            <SearchBar v-model="query[0]" placeholder="Keresés" class="px-3 mx-3" />
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <IngredientList :results="results" @delete="onDelete", :loading="loadingData" :description="descriptionText"/>
@@ -104,15 +116,5 @@ onMounted(async () => {
     min-width: 80px;
 }
 
-@media (min-width: 992px) {
-    .ingredient-modal-backdrop {
-        justify-content: flex-end;
-        align-items: flex-start;
-        padding: 32px 40px;
-    }
 
-    .ingredient-modal-panel {
-        max-width: 420px;
-    }
-}
 </style>

@@ -133,6 +133,18 @@ const saveIngredient = async () => {
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
 }
 
+@media (min-width: 992px) {
+    .ingredient-modal-backdrop {
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 32px 40px;
+    }
+
+    .ingredient-modal-panel {
+        max-width: 420px;
+    }
+}
+
 i:hover {
     cursor: pointer;
 }
