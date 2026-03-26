@@ -4,10 +4,14 @@ definePageMeta({
     layout: 'auth'
 });
 
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
 const authStore = useAuthStore();
+
+onMounted(() => {
+    authStore.clearMessages();
+});
 
 const loginValue = ref('');
 const password = ref('');
