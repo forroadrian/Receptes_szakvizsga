@@ -178,7 +178,7 @@ const openProfileImagePicker = () => {
     profileImageInput.value?.click();
 };
 
-const handleProfileImageChange = (event) => {
+const handleProfileImageChange = async (event) => {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -191,35 +191,22 @@ const handleProfileImageChange = (event) => {
         return;
     }
 
-    const reader = new FileReader();
-
-    reader.onload = async () => {
-        const imageBase64 = reader.result;
-
-        if (!imageBase64) {
-            showError('Nem sikerült beolvasni a képet.');
-            event.target.value = '';
-            return;
-        }
-
-        const success = await auth.updateProfileImage(imageBase64);
-
-        if (!success) {
-            showError(auth.errorMessage || 'Nem sikerült módosítani a profilképet.');
-            event.target.value = '';
-            return;
-        }
-
-        showAlert('success', 'Sikeres profilkép módosítás.');
+    if (file.size > 2 * 1024 * 1024) {
+        showError('A kép mérete legfeljebb 2 MB lehet.');
         event.target.value = '';
-    };
+        return;
+    }
 
-    reader.onerror = () => {
-        showError('Nem sikerült beolvasni a képet.');
+    const success = await auth.updateProfileImage(file);
+
+    if (!success) {
+        showError(auth.errorMessage || 'Nem sikerült módosítani a profilképet.');
         event.target.value = '';
-    };
+        return;
+    }
 
-    reader.readAsDataURL(file);
+    showAlert('success', 'Sikeres profilkép módosítás.');
+    event.target.value = '';
 };
 
 const saveUsername = async () => {

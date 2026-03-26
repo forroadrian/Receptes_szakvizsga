@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const REMEMBER_COOKIE = 'menuplanr_remember_login'
     const SESSION_COOKIE = 'menuplanr_session_login'
+    const PROFILE_BUCKET = 'profile-images'
 
     const clearMessages = () => {
         errorMessage.value = ''
@@ -56,6 +57,28 @@ export const useAuthStore = defineStore('auth', () => {
         clearCookie(SESSION_COOKIE)
     }
 
+    const resolveProfileImageUrl = (savedProfileUrl?: string | null) => {
+        if (!savedProfileUrl || savedProfileUrl.trim() === '') {
+            return ''
+        }
+
+        if (
+            savedProfileUrl.startsWith('/icons/') ||
+            savedProfileUrl.startsWith('http://') ||
+            savedProfileUrl.startsWith('https://') ||
+            savedProfileUrl.startsWith('data:image/')
+        ) {
+            return savedProfileUrl
+        }
+
+        const { data } = supabase
+            .storage
+            .from(PROFILE_BUCKET)
+            .getPublicUrl(savedProfileUrl)
+
+        return `${data.publicUrl}?t=${Date.now()}`
+    }
+
     const loadProfileData = async (customUserId?: string) => {
         const userId = customUserId || user.value?.id || user.value?.sub
 
@@ -76,7 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
                 return null
             }
 
-            profileUrl.value = data?.profile_url || ''
+            profileUrl.value = resolveProfileImageUrl(data?.profile_url)
 
             if (user.value?.email && data?.email !== user.value.email) {
                 const { error: emailSyncError } = await supabase
@@ -113,32 +136,56 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    const updateProfileImage = async (newProfileUrl: string) => {
+    const updateProfileImage = async (file: File) => {
         clearMessages()
-
+    
         if (!user.value) {
             errorMessage.value = 'Nincs bejelentkezett felhasználó.'
             return false
         }
-
+    
         const userId = user.value.id || user.value.sub
+        const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'png'
+        const filePath = `${userId}/profile-image.${fileExtension}`
+    
         loading.value = true
-
+    
         try {
-            const { error } = await supabase
-                .from('user')
-                .update({ profile_url: newProfileUrl })
-                .eq('id', userId)
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült frissíteni a profilképet.'
+            const { error: uploadError } = await supabase
+                .storage
+                .from(PROFILE_BUCKET)
+                .upload(filePath, file, {
+                    upsert: true,
+                    contentType: file.type
+                })
+    
+            if (uploadError) {
+                console.error('Storage upload error:', uploadError)
+                errorMessage.value = uploadError.message || 'Nem sikerült feltölteni a profilképet.'
                 return false
             }
-
-            profileUrl.value = newProfileUrl
+    
+            const { error: dbError } = await supabase
+                .from('user')
+                .update({ profile_url: filePath })
+                .eq('id', userId)
+    
+            if (dbError) {
+                console.error('DB update error:', dbError)
+                errorMessage.value = 'Nem sikerült menteni a profilképet.'
+                return false
+            }
+    
+            const { data } = supabase
+                .storage
+                .from(PROFILE_BUCKET)
+                .getPublicUrl(filePath)
+    
+            profileUrl.value = `${data.publicUrl}?t=${Date.now()}`
             successMessage.value = 'Sikeres profilkép módosítás.'
             return true
         } catch (error: any) {
+            console.error('Unexpected profile image error:', error)
             errorMessage.value = error?.message || 'Hiba történt a profilkép módosításakor.'
             return false
         } finally {
