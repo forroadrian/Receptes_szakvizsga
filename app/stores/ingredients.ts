@@ -44,12 +44,32 @@ export const useIngredientStore = defineStore("ingredients", () => {
         }
     }
 
-    const removeIngredient = (id: number) => {
+    const removeIngredient = async (id: number) => {
         const index = ingredients.value.findIndex((value) => value.id === id)
         if (index !== -1) ingredients.value.splice(index, 1);
         ingredients.value = [...ingredients.value]
+        await $fetch('/api/ingredient', {
+            method: 'DELETE',
+            body: {
+                id: id
+            }
+        })
     }
 
+    const postIngredient = async (newIngredient: Ingredient) => {
+        console.log(newIngredient);
+        
+        const res:any  = await $fetch('api/ingredient', {
+            method: "POST",
+            body: {
+                name: newIngredient.name,
+                unit: newIngredient.unit,
+                quantity: newIngredient.quantity,
+                expiry: newIngredient.expiry.value
+            }
+        })
+        return res
+    }
 
     return {
         openIngredientModal,
@@ -58,6 +78,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
         fetchIngredients,
         loadIngredients,
         removeIngredient,
+        postIngredient,
         showIngredientModal,
         units,
         ingredients
