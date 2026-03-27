@@ -10,7 +10,7 @@ const scrollTop = () => {
         <div class="container pt-5">
             <div class="row g-4 align-items-start text-center text-lg-start">
                 <div class="col-lg-5 col-md-12 col-sm-12">
-                    <img src="/logo.webp" alt="Logo" class="footer-logo mb-3" />
+                    <img src="/logo.png" alt="Logo" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit!
                     </p>
@@ -216,11 +216,20 @@ html[data-bs-theme="light"] .footer {
     .col-md-12 {
         margin-bottom: 30px;
     }
+
+    .scroll-top {
+        bottom: 55px;
+        left: 45%;
+    }
 }
 
 @media (min-width: 992px) {
     .footer-title::after {
         margin: 10px 0;
+    }
+
+    .navbar-brand img {
+        width: var(--small-brand-logo-width);
     }
 }
 </style>

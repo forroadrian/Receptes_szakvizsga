@@ -76,7 +76,7 @@ const handleSignOut = async () => {
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
-                    <img src="/logo.webp" alt="Brand logo" title="Brand logo" class="brand-logo" />
+                    <img src="/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
                 </NuxtLink>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -124,7 +124,7 @@ const handleSignOut = async () => {
                             </button>
 
                             <ul class="dropdown-menu rounded-4 shadow-sm">
-                                <li v-for="lang in languageOptions" :key="lang.value">
+                                <li v-for="lang in languageOptions">
                                     <span class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
                                         @click="selectedLanguage = lang.value">
                                         <img :src="lang.value === 'hu'
@@ -399,7 +399,7 @@ const handleSignOut = async () => {
     }
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 992px) {
     .navbar-collapse {
         padding-top: 0.75rem;
     }
@@ -426,6 +426,10 @@ const handleSignOut = async () => {
 
     .account-menu {
         right: -70%;
+    }
+
+    .navbar-brand img {
+        width: var(--small-brand-logo-width);
     }
 
 }

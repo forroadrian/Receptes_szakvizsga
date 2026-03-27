@@ -17,7 +17,7 @@ const toggleTheme = () => {
     <header class="auth-topbar">
         <div class="auth-topbar-inner">
             <NuxtLink to="/" class="auth-brand" aria-label="Vissza a kezdőlapra">
-                <img src="/logo.webp" alt="Receptes logó" title="Receptes logó" class="auth-brand-logo" />
+                <img src="/logo.png" alt="Receptes logó" title="Receptes logó" class="auth-brand-logo" />
 
                 <div class="auth-brand-copy">
                     <span class="auth-brand-title">Menuplanr</span>
@@ -75,7 +75,7 @@ const toggleTheme = () => {
 }
 
 .auth-brand-logo {
-    width: 64px;
+    width: var(--brand-logo-width);
     height: auto;
     flex-shrink: 0;
 }
@@ -164,7 +164,7 @@ const toggleTheme = () => {
     }
 
     .auth-brand-logo {
-        width: 56px;
+        width: 100px;
     }
 
     .auth-brand-subtitle {
