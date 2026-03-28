@@ -1,10 +1,13 @@
-.auth-form-page {
+.auth-form-page,
+.auth-form-side {
     width: 100%;
+}
+
+.auth-form-page {
     padding: 0.75rem;
 }
 
 .auth-form-shell {
-    width: 100%;
     min-height: 100%;
     display: flex;
     align-items: center;
@@ -12,13 +15,11 @@
 }
 
 .auth-form-side {
-    width: 100%;
     padding: 2rem 1.75rem;
 }
 
 .auth-form-page a {
     color: var(--link-color);
-    cursor: pointer;
     font-size: 15px;
     text-decoration: none;
 }

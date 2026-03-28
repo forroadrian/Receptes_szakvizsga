@@ -65,9 +65,13 @@ const toggleTheme = () => {
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
 }
 
-.auth-brand {
+.auth-brand,
+.auth-theme-button {
     display: inline-flex;
     align-items: center;
+}
+
+.auth-brand {
     gap: 0.85rem;
     min-width: 0;
     text-decoration: none;
@@ -107,27 +111,25 @@ const toggleTheme = () => {
     flex-wrap: wrap;
 }
 
-.auth-theme-button {
-    height: 44px;
-    padding: 0 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    border-radius: 999px;
-    border: 1px solid var(--border-soft);
-    background: rgba(255, 255, 255, 0.82);
-    color: var(--bs-body-color);
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-
+.auth-theme-button,
 .auth-home-link {
     height: 44px;
     padding: 0 1rem;
     border-radius: 999px;
     font-size: 0.95rem;
+}
+
+.auth-theme-button {
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-soft);
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--bs-body-color);
+    font-weight: 500;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.auth-home-link {
     box-shadow: 0 12px 22px rgba(255, 114, 49, 0.24);
 }
 
