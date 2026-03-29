@@ -26,7 +26,7 @@ const props = defineProps({
 
 const getItemLabel = (item) => {
     return typeof item === 'string' ? item : item?.[props.displayKey] || '';
-}
+};
 
 const getItemKey = (item, index) => {
     if (typeof item === 'string') {
@@ -34,7 +34,7 @@ const getItemKey = (item, index) => {
     }
 
     return item?.[props.itemKey] ?? index;
-}
+};
 </script>
 
 <template>
@@ -43,7 +43,7 @@ const getItemKey = (item, index) => {
 
         <div v-if="items.length" class="d-flex flex-wrap gap-2">
             <span v-for="(item, index) in items" :key="getItemKey(item, index)"
-                class="badge rounded-pill text-bg-dark px-3 py-2 d-inline-flex align-items-center gap-2">
+                class="badge rounded-pill profile-chip px-3 py-2 d-inline-flex align-items-center gap-2">
                 {{ getItemLabel(item) }}
                 <button type="button" class="chip-btn" @click="$emit('remove', item, index)">
                     <i class="bi bi-x"></i>

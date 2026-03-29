@@ -71,6 +71,7 @@ const handleSignOut = async () => {
     }
 }
 </script>
+
 <template>
     <header class="site-header">
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
@@ -252,7 +253,11 @@ const handleSignOut = async () => {
 }
 
 .account-avatar-wrap img {
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .auth-area {
@@ -273,15 +278,25 @@ const handleSignOut = async () => {
     max-width: 190px;
 }
 
-.form-switch input {
+.form-switch .form-check-input {
     background-color: var(--yellow) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ffffff'/%3e%3c/svg%3e") !important;
 }
 
-.form-switch input:checked {
+.form-switch .form-check-input:checked {
     background-color: var(--orange) !important;
+    border-color: transparent !important;
 }
 
-.form-switch input:focus {
+.form-switch .form-check-input:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.form-switch .form-check-input:active {
     box-shadow: none !important;
 }
 
@@ -289,6 +304,9 @@ const handleSignOut = async () => {
 .nav-avatar {
     width: 30px;
     height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
 }
 
 .dropdown-menu,
@@ -323,6 +341,8 @@ const handleSignOut = async () => {
     width: 55px;
     height: 55px;
     margin: 0 auto;
+    overflow: visible;
+    border-radius: 50%;
 }
 
 .account-avatar {
@@ -331,12 +351,20 @@ const handleSignOut = async () => {
 
 .account-edit {
     position: absolute;
-    right: -10px;
-    bottom: -10px;
-    width: 30px;
-    height: 30px;
+    right: -6px;
+    bottom: -6px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 14px;
+    background: #fff;
+    color: #6b6b6b;
+    border: 1px solid #d9d9d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .account-edit,
@@ -363,6 +391,12 @@ const handleSignOut = async () => {
 .baseMode {
     font-size: var(--nav-icon-size);
     cursor: pointer;
+}
+
+[data-bs-theme="dark"] .account-edit {
+    background: var(--bs-body-bg);
+    color: #fff;
+    border-color: var(--bs-border-color);
 }
 
 @media (min-width: 992px) {

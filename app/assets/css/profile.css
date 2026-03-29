@@ -17,8 +17,9 @@
 
 .avatar-circle img {
     width: 100%;
-    width: 100%;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 100%;
 }
 
 .profile-page .form-control:focus {
@@ -156,12 +157,32 @@
     font-size: 1.1rem;
 }
 
+.profile-page .profile-chip {
+    background: #f3eadb;
+    color: #5f4630;
+    border: 1px solid rgba(95, 70, 48, 0.12);
+}
+
+.profile-page .profile-chip .chip-btn {
+    color: #5f4630;
+}
+
 [data-bs-theme="dark"] .profile-page .profile-shell {
     background: rgba(15, 18, 22, 0.65);
 }
 
 [data-bs-theme="dark"] .profile-page .profile-shell .card {
     background: rgba(20, 24, 29, 0.92);
+}
+
+[data-bs-theme="dark"] .profile-page .profile-chip {
+    background: rgba(214, 188, 142, 0.18);
+    color: #f1ddbe;
+    border-color: rgba(214, 188, 142, 0.18);
+}
+
+[data-bs-theme="dark"] .profile-page .profile-chip .chip-btn {
+    color: #f1ddbe;
 }
 
 .profile-page .allergy-suggestions {

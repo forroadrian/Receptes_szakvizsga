@@ -1,3 +1,8 @@
+<script setup>
+const route = useRoute();
+const showFooter = computed(() => !route.path.startsWith('/profile'));
+</script>
+
 <template>
     <div class="appLayouts herobg">
         <HeaderComponent />
@@ -6,7 +11,7 @@
             <slot> </slot>
         </main>
 
-        <FooterComponent />
+        <FooterComponent v-if="showFooter" />
     </div>
 </template>
 
