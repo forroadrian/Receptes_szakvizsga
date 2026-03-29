@@ -36,7 +36,7 @@ recipe.value.ingredients = [
     new Ingredient(2, "Lorem", 300, "dkg"),
     new Ingredient(2, "Lorem", 300, "dkg"),
     new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
+    new Ingredient(2, "Lorem", 300, "dkg")
 ];
 
 recipe.value.allergies = [
@@ -65,25 +65,25 @@ const steps = [
             <section>
                 <div class="recipe-image">
                     <div class="icons d-flex w-100">
-                        <span><i class="bi bi bi-share"></i></span>
+                        <span><i class="bi bi-share"></i></span>
                         <div>
                             <span><i class="bi bi-pencil-square"></i></span>
                             <span><i class="bi bi-bookmark-plus"></i></span>
                         </div>
                     </div>
-                    <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" />
+                    <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" alt="Recept képe" />
                 </div>
-            </section>
-            <section>
-                <div class="recipe-description">
-                    <h3>{{ recipe.name }}</h3>
-                    <p>{{ recipe.description }}</p>
+                <section>
+                    <div class="recipe-description mt-5 ps-lg-2">
+                        <h2>{{ recipe.name }}</h2>
+                        <p>{{ recipe.description }}</p>
 
-                    <div class="d-flex gap-5 recipe-meta-data">
-                        <span><i class="bi bi-clock me-1"></i> {{ recipe.time }} perc</span>
-                        <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} fő</span>
+                        <div class="d-flex gap-5 recipe-meta-data">
+                            <span><i class="bi bi-clock me-1"></i> {{ recipe.time }} perc</span>
+                            <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} fő</span>
+                        </div>
                     </div>
-                </div>
+                </section>
             </section>
             <aside class="recipe-aside">
                 <div class="recipeButtons">
@@ -104,12 +104,6 @@ const steps = [
                         </li>
                     </ul>
                 </div>
-                <div class="similar-recipes mt-5">
-                    <h3 class="text-center ">Hasonló receptek</h3>
-                    <div class="similar-list">
-                        <SimilarRecipes />
-                    </div>
-                </div>
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
@@ -120,14 +114,19 @@ const steps = [
                     <p class="ms-lg-3">{{ step }}</p>
                 </div>
             </section>
+            <section class="similar-recipes">
+                <h3 class="text-center">Ehhez hasonló receptek</h3>
+                <div class="similar-list">
+                    <SimilarRecipes />
+                </div>
+            </section>
         </div>
     </div>
 </template>
-
 <style scoped>
 .recipe-layout {
     display: grid;
-    gap: 30px;
+    gap: 60px;
 }
 
 .ingredient-list li,
@@ -144,11 +143,11 @@ const steps = [
 
 .ingredient-list p {
     margin: 10px 0px;
+    padding: 10px;
 }
 
 .recipe-image {
     position: relative;
-
 }
 
 .recipe-image::before {
@@ -193,37 +192,49 @@ const steps = [
     justify-content: center;
 }
 
-li {
-    margin: 10px 30px !important;
-}
 
 .recipe-image img {
     box-shadow: 0 0 20px 20px -20px rgba(0, 0, 0, 0.8) !important;
 }
 
-
+.back-link {
+    cursor: pointer;
+}
 
 @media (min-width: 992px) {
     .recipe-layout {
         display: grid;
-        gap: 30px;
+        grid-template-columns: 1fr 360px;
+        grid-template-areas:
+            "main aside"
+            "steps aside"
+            "steps similar";
+
+    }
+
+    .recipe-main-top {
+        grid-area: main;
     }
 
     .recipe-aside {
-        grid-column: 2;
-        grid-row: 1/6;
+        grid-area: aside;
     }
 
-    .recipe-steps {
-        grid-column: 1;
+    .steps {
+        grid-area: steps;
     }
 
-    .recipe-aside {
-        width: 360px;
+    .similar-recipes {
+        grid-area: similar;
     }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991.98px) {
+    .recipe-layout {
+        display: flex;
+        flex-direction: column;
+    }
+
 
     .steps,
     .recipe-description,
@@ -234,10 +245,6 @@ li {
 
     .step {
         padding: 20px 40px;
-    }
-
-    .ingredient-list {
-        margin: 60px;
     }
 }
 </style>

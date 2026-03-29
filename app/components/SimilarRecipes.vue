@@ -93,11 +93,6 @@ const props = withDefaults(
     margin: 30px 0px;
 }
 
-.similar-recipes-image {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
 
 img {
     width: 100%;
