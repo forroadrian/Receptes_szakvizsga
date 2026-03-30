@@ -1,5 +1,5 @@
-﻿<script setup>
-import ProfilePageContent from './profile/ProfilePageContent.vue';
+<script setup>
+import ProfilePageContent from './ProfilePageContent.vue';
 
 definePageMeta({
     middleware: 'auth-only'
