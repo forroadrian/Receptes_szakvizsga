@@ -200,3 +200,9 @@
 .profile-page .allergy-suggestion-btn:hover {
     background: var(--accent-soft);
 }
+
+@media (min-width: 992px) {
+    .profile-page .right-card {
+        min-height: 600px;
+    }
+}
