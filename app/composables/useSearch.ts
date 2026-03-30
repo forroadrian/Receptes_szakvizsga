@@ -14,7 +14,7 @@ export const useSearch = <T extends object>(params: Ref<SearchParams<T>>) => {
             return params.value.searchFor.some((key) => {
                 const value = getValue(element, key as string);
                 if (params.value.filter) return params.value.filter(value);
-                const func: (base: string, search: string) => boolean = funcMap[value] ?? funcMap["default"]
+                const func = funcMap[value] ?? funcMap["default"]
                 if(typeof(params.value.query) === "string"){
                     console.log("a");
                     return value.toLowerCase().includes(params.value.query.toLowerCase());

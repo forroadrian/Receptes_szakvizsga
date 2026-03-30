@@ -8,7 +8,7 @@ export default class ExpiryDate {
     }
 
     public toStamp() {
-        this.value.toISOString();
+        return this.value.toISOString();
     }
 
     public toShort(){

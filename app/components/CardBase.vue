@@ -161,16 +161,4 @@ const divider = computed(() => {
 .card-fixed {
     height: 160px !important;
 }
-
-@media (max-width: 414px) {
-    .card--row {
-        flex-direction: column !important;
-    }
-
-    .card--media-left {
-        width: 100% !important;
-        max-width: 130px;
-        margin: 10px auto;
-    }
-}
 </style>

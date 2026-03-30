@@ -64,10 +64,6 @@ const onDelete = async (ingredient: Ingredient) => {
     }
 };
 
-const onEdit = (ingredient: Ingredient) => {
-
-};
-
 onMounted(async () => {
     loadingData.value = true;
     try {
@@ -96,7 +92,7 @@ onMounted(async () => {
             <SearchBar v-model="query[0]" placeholder="Keresés" class="px-3 mx-3" />
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
-                <IngredientList :results="results" @delete="onDelete", :loading="loadingData" :description="descriptionText"/>
+                <IngredientList :results="results" @delete="onDelete" @edit="" :loading="loadingData" :description="descriptionText"/>
             </div>
         </div>
     </div>

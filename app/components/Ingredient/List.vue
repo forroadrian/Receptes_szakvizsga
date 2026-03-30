@@ -8,10 +8,10 @@ const props = defineProps<{
 <template>
     <div class="g-3 row mb-5 mt-4">
         <template v-if="results.length > 0">
-            <div class="pe-1 d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
+            <div class="d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                 v-for="ingredient in results"
                 :key="`${ingredient.id}`">
-                <IngredientCard :ingredient="ingredient" @delete="$emit('delete', ingredient)"
+                <IngredientCard :ingredient="ingredient" @delete="$emit('delete', ingredient)" @edit="$emit('edit',ingredient)"
                     :image="'images/background.webp'" />
             </div>
         </template>
