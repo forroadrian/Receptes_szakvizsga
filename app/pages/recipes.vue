@@ -1,7 +1,8 @@
 <script setup lang="ts">
-const colorMode = useColorMode()
-
+import RecipeModal from '~/components/recipe/RecipeModal.vue';
 import Recipe from '~/models/Recipe';
+const colorMode = useColorMode();
+
 const route = useRoute();
 console.log(route.params.id);
 const recipes = ref<Recipe[]>([
@@ -53,6 +54,7 @@ const durationOptions = [
 </script>
 
 <template>
+    <RecipeModal />
     <section class="recipes-page">
         <div class="recipes-shell mx-auto p-5">
             <h1 class="recipes-title mb-2">Receptek</h1>
@@ -96,8 +98,8 @@ const durationOptions = [
             </nav>
 
             <div class="row">
-                <div
-                    class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center">
+                <div class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#openAddRecipeModal">
                     <div class="row text-center py-4">
                         <span class="plus-icon">+</span>
                         <p>Új recept hozzáadása</p>
@@ -106,66 +108,67 @@ const durationOptions = [
 
                 <div v-for="recipe in recipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
                     <NuxtLink :to="`/recipe`" class="text-decoration-none text-reset h-100 d-block">
-                    <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
-                        metadata-class="w-100" footer-class="w-100" class="h-100">
-                        <template #media>
-                            <div class="row pt-4">
-                                <div class="d-flex justify-content-center">
-                                    <img src="/images/background.webp" alt="recipename image" width="90%">
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #header>
-                            <CardHeader class="w-100 py-3 justify-content-center">
-                                <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
-                                <template #actions>
-                                    <span title="User">👤</span>
-                                </template>
-                            </CardHeader>
-                        </template>
-
-                        <template #body>
-                            <div class="row justify-content-center">
-                                <div class="col-10 col-lg-8">
-                                    <p class="text-center mb-3 small">
-                                        {{ recipe.description }}
-                                    </p>
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #metadata>
-                            <div class="row justify-content-center mb-3 py-2">
-                                <div class="col-auto">
-                                    <i class="bi bi-clock me-1"></i>
-                                    {{ recipe.time }} perc
-                                </div>
-                                <div class="col-auto">
-                                    <i class="bi bi-people me-1"></i>
-                                    {{ recipe.servings }} fő
-                                </div>
-                            </div>
-
-                            <div class="row justify-content-center mb-3">
-                                <div class="col-auto">
-                                    <!-- <CardTags :items="recipe.tags" /> -->
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #footer>
-                            <div class="row pt-2">
-                                <div class="col-12 text-center small my-auto">
-                                    <div>
-                                        <strong><i class="bi bi-exclamation-triangle-fill p-2"></i> Allergént tartalmaz:
-                                        </strong>
+                        <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
+                            metadata-class="w-100" footer-class="w-100" class="h-100">
+                            <template #media>
+                                <div class="row pt-4">
+                                    <div class="d-flex justify-content-center">
+                                        <img src="/images/background.webp" alt="recipename image" width="90%">
                                     </div>
                                 </div>
-                            </div>
-                        </template>
-                    </CardBase>
-                </NuxtLink>
+                            </template>
+
+                            <template #header>
+                                <CardHeader class="w-100 py-3 justify-content-center">
+                                    <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
+                                    <template #actions>
+                                        <span title="User">👤</span>
+                                    </template>
+                                </CardHeader>
+                            </template>
+
+                            <template #body>
+                                <div class="row justify-content-center">
+                                    <div class="col-10 col-lg-8">
+                                        <p class="text-center mb-3 small">
+                                            {{ recipe.description }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #metadata>
+                                <div class="row justify-content-center mb-3 py-2">
+                                    <div class="col-auto">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ recipe.time }} perc
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-people me-1"></i>
+                                        {{ recipe.servings }} fő
+                                    </div>
+                                </div>
+
+                                <div class="row justify-content-center mb-3">
+                                    <div class="col-auto">
+                                        <!-- <CardTags :items="recipe.tags" /> -->
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #footer>
+                                <div class="row pt-2">
+                                    <div class="col-12 text-center small my-auto">
+                                        <div>
+                                            <strong><i class="bi bi-exclamation-triangle-fill p-2"></i> Allergént
+                                                tartalmaz:
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </CardBase>
+                    </NuxtLink>
                 </div>
             </div>
 
@@ -292,7 +295,7 @@ const durationOptions = [
     padding: 20px 0px;
 }
 
-.filter-title{
+.filter-title {
     font-weight: 700
 }
 
@@ -303,7 +306,7 @@ const durationOptions = [
 }
 
 @media (max-width: 992px) {
-    .recipes-tabs ul{
+    .recipes-tabs ul {
         justify-content: center;
     }
 

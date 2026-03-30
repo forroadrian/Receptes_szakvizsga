@@ -1,0 +1,168 @@
+.recipe-sidebar-wrap {
+    border-right: 1px solid var(--bs-border-color);
+}
+
+.recipe-card {
+    padding: 20px;
+    margin: 20px;
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb, 0, 0, 0), 0.08);
+    background: rgba(var(--bs-emphasis-color-rgb), 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-card,
+.recipe-progress,
+.recipe-progress-bar {
+    border-radius: var(--radius-sm);
+}
+
+.recipe-block,
+.recipe-summary-card {
+    display: grid;
+    gap: 12px;
+}
+
+.recipe-progress {
+    width: 200px;
+    height: 10px;
+    background-color: rgba(var(--bs-emphasis-color-rgb, 0, 0, 0), 0.5);
+}
+
+.recipe-progress-bar {
+    height: 100%;
+    background: var(--grad-green);
+    transition: width 0.25s ease;
+}
+
+.summary-row {
+    justify-content: space-between;
+}
+
+.summary-row,
+.step-btn {
+    display: flex;
+    align-items: center;
+}
+
+.step-btn {
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.recipe-modal-header,
+.modal-footer {
+    border: none;
+}
+
+.step-btn:hover {
+    transform: translateX(2px);
+}
+
+.step-index,
+.recipe-instruction-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.step-index {
+    border: 1px solid var(--bs-border-color);
+    background: var(--bs-tertiary-bg);
+}
+
+.step-btn.active .step-index {
+    background: var(--accent-grad);
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(193, 154, 107, 0.28);
+}
+
+.step-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.step-line {
+    position: absolute;
+    top: calc(100% - 10px);
+    left: 35px;
+    width: 2px;
+    height: 20px;
+    background: var(--accent-border);
+}
+
+.form-label {
+    font-weight: 600;
+}
+
+.form-control {
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb, 0, 0, 0), 0.08);
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.form-control:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 0.2rem var(--accent-shadow);
+}
+
+.recipe-instruction-item {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    padding: 16px;
+    border: 1px solid rgba(var(--bs-emphasis-color-rgb, 0, 0, 0), 0.08);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--bs-body-bg) 88%, #fff 12%);
+}
+
+.recipe-instruction-index {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: var(--grad-dark);
+    color: #fff;
+    box-shadow: var(--shadow-md);
+}
+
+.recipe-instruction-text,
+.form-label {
+    color: var(--bs-emphasis-color);
+}
+
+@media (max-width: 991.98px) {
+    .recipe-dialog {
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .recipe-modal {
+        min-height: 100vh;
+    }
+
+    .recipe-sidebar-wrap {
+        border-right: 0;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .recipe-progress-meta {
+        text-align: left !important;
+    }
+
+    .recipe-progress,
+    .recipe-progress-meta {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .recipe-card {
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+}

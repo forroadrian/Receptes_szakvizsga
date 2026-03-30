@@ -174,18 +174,11 @@ const steps = [
 
 .recipe-image i,
 .step .circle {
-    font-size: var(--nav-icon-size);
-    border-radius: var(--radius-rounded);
     background: var(--grad-yellow);
     color: var(--text-dark);
     font-weight: 600;
 }
 
-.step .circle {
-    width: var(--large-icon-size);
-    height: var(--large-icon-size);
-    padding: 5px 0px;
-}
 
 .step .circle span {
     display: flex;
@@ -209,7 +202,6 @@ const steps = [
             "main aside"
             "steps aside"
             "steps similar";
-
     }
 
     .recipe-main-top {
@@ -234,7 +226,6 @@ const steps = [
         display: flex;
         flex-direction: column;
     }
-
 
     .steps,
     .recipe-description,
