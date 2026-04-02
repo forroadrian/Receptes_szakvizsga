@@ -1,3 +1,5 @@
+import Ingredient from "~/models/Ingredient";
+
 export default interface RecipeConstuctorOptions {
     id?: number;
     author_id: string | null;
@@ -13,4 +15,5 @@ export default interface RecipeConstuctorOptions {
     active?: boolean;
     deleted_at?: Date;
     steps?: string[];
+    ingredients?: Ingredient[];
 }

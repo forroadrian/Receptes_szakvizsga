@@ -1,17 +1,17 @@
 import { defineStore } from "pinia";
 import Recipe from "~/models/Recipe";
+import Ingredient from "~/models/Ingredient";
 
 export const useRecipeStore = defineStore("recipes", () => {
     const recipes = ref<Recipe[]>([]);
     const showRecipeModal = ref(false);
 
-    const openRecipeModal = () => showRecipeModal.value = true;
-    const closeRecipeModal = () => showRecipeModal.value = false;
+    const openRecipeModal = () => {
+        showRecipeModal.value = true;
+    };
 
-    const getAllRecipes = computed(() => recipes.value);
-
-    const getRecipeById = (id: number) => {
-        return recipes.value.find((recipe) => recipe.id === id) ?? null;
+    const closeRecipeModal = () => {
+        showRecipeModal.value = false;
     };
 
     const addRecipe = (recipe: Recipe) => {
@@ -20,6 +20,12 @@ export const useRecipeStore = defineStore("recipes", () => {
 
     const clearRecipes = () => {
         recipes.value = [];
+    };
+
+    const getAllRecipes = computed(() => recipes.value);
+
+    const getRecipeById = (id: number) => {
+        return recipes.value.find((recipe) => recipe.id === id) ?? null;
     };
 
     const getRecipeSteps = (recipeData: any): string[] => {
@@ -42,6 +48,27 @@ export const useRecipeStore = defineStore("recipes", () => {
         return steps;
     };
 
+    const getRecipeIngredients = (recipeData: any): Ingredient[] => {
+        const ingredients: Ingredient[] = [];
+
+        if (!recipeData.recipe_ingredients?.length) {
+            return ingredients;
+        }
+
+        for (const ingredientData of recipeData.recipe_ingredients) {
+            if (!ingredientData.ingredient) {
+                continue;
+            }
+
+            const ingredient = new Ingredient(Number(ingredientData.ingredient.id),ingredientData.ingredient.name,
+                Number(ingredientData.quantity),ingredientData.unit);
+
+            ingredients.push(ingredient);
+        }
+
+        return ingredients;
+    };
+
     const createRecipe = (recipeData: any): Recipe => {
         return new Recipe({
             id: Number(recipeData.id),
@@ -59,7 +86,8 @@ export const useRecipeStore = defineStore("recipes", () => {
             deleted_at: recipeData.deleted_at
                 ? new Date(recipeData.deleted_at)
                 : undefined,
-            steps: getRecipeSteps(recipeData)
+            steps: getRecipeSteps(recipeData),
+            ingredients: getRecipeIngredients(recipeData)
         });
     };
 
@@ -69,13 +97,21 @@ export const useRecipeStore = defineStore("recipes", () => {
 
             const { data, error } = await supabase
                 .from("recipe")
-                .select(`id, author_id, name, description, saves, likes, time, servings,
+                .select(`id, author_id, name, description, saves, likes, time, servings, 
                     created_at, last_edit, is_ai_generated, active, deleted_at,
                     recipe_step (
                         step_number,
                         step (
                             step_id,
                             step_description
+                        )
+                    ),
+                    recipe_ingredients (
+                        quantity,
+                        unit,
+                        ingredient (
+                            id,
+                            name
                         )
                     )
                 `);
