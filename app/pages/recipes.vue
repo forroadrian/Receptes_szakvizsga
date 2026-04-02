@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
 import RecipeModal from "~/components/recipe/RecipeModal.vue";
 import { useRecipeStore } from "~/stores/recipe";
 
 const colorMode = useColorMode();
 const recipeStore = useRecipeStore();
-const { recipes } = storeToRefs(recipeStore);
+const allRecipes = computed(() => recipeStore.getAllRecipes);
 
 const filterButtonColor = computed(() => {
     return colorMode.value === "dark" ? "light" : "dark";
@@ -28,31 +27,6 @@ onMounted(async () => {
     await recipeStore.loadRecipes();
 });
 
-const filteredRecipes = computed(() => {
-    let result = [...recipes.value];
-
-    if (search.value.trim()) {
-        const query = search.value.toLowerCase().trim();
-        result = result.filter((recipe) =>
-            recipe.name.toLowerCase().includes(query) ||
-            recipe.description.toLowerCase().includes(query)
-        );
-    }
-
-    if (activeDuration.value === "short") {
-        result = result.filter((recipe) => recipe.time <= 30);
-    }
-
-    if (activeDuration.value === "medium") {
-        result = result.filter((recipe) => recipe.time > 30 && recipe.time <= 60);
-    }
-
-    if (activeDuration.value === "long") {
-        result = result.filter((recipe) => recipe.time > 60);
-    }
-
-    return result;
-});
 </script>
 
 <template>
@@ -98,7 +72,7 @@ const filteredRecipes = computed(() => {
                     </div>
                 </div>
 
-                <div v-for="recipe in filteredRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
+                <div v-for="recipe in allRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">

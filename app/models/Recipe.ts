@@ -15,21 +15,23 @@ export default class Recipe implements Identifiable {
     private _is_ai_generated: boolean;
     private _active: boolean;
     private _deleted_at?: Date;
+    private _steps: string[];
 
-    constructor(options: RecipeConstuctorOptions){
-        this._id = options.id ?? -1
+    constructor(options: RecipeConstuctorOptions) {
+        this._id = options.id ?? -1;
         this._author_id = options.author_id;
-        this._name = options.name
-        this._description = options.description
-        this._saves = options.saves ?? 0
-        this._likes = options.likes ?? 0
-        this._time = options.time
-        this._servings = options.servings
-        this._created_at = options.created_at
-        this._last_edit = options.last_edit
-        this._is_ai_generated = options.is_ai_generated
-        this._active = options.active ?? true
-        this._deleted_at = options.deleted_at
+        this._name = options.name;
+        this._description = options.description;
+        this._saves = options.saves ?? 0;
+        this._likes = options.likes ?? 0;
+        this._time = options.time;
+        this._servings = options.servings;
+        this._created_at = options.created_at;
+        this._last_edit = options.last_edit;
+        this._is_ai_generated = options.is_ai_generated;
+        this._active = options.active ?? true;
+        this._deleted_at = options.deleted_at;
+        this._steps = options.steps ?? [];
     }
 
     public set id(v : number) {
@@ -147,6 +149,12 @@ export default class Recipe implements Identifiable {
     public get deleted_at() : Date | null {
         return this._deleted_at ?? null;
     }
-    
-    
+
+    public set steps(v: string[]) {
+        this._steps = v;
+    }
+
+    public get steps(): string[] {
+        return this._steps;
+    }
 }

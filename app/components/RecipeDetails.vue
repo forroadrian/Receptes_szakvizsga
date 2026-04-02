@@ -1,46 +1,37 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import Allergy from "~/models/Allergy";
 import Ingredient from "~/models/Ingredient";
+import Allergy from "~/models/Allergy";
 import { useRecipeStore } from "~/stores/recipe";
 
 const route = useRoute();
 const colorMode = useColorMode();
-const recipeStore = useRecipeStore();
-const { recipes } = storeToRefs(recipeStore);
 
-const recipeId = computed(() => Number(route.params.id));
+const recipeStore = useRecipeStore();
+
+const recipeId = Number(route.params.id);
 
 const buttonColor = computed(() => {
     if (colorMode.value === "dark") return "soft";
     return "dark";
 });
 
-onMounted(async () => {
-    if (!recipes.value.length) {
-        await recipeStore.loadRecipes();
-    }
-});
+const recipe = computed(() => recipeStore.getRecipeById(recipeId));
 
-const recipe = computed(() => {
-    return recipes.value.find((item) => item.id === recipeId.value) ?? null;
-});
-
-const mockIngredients = [
+const mockIngredients = ref<Ingredient[]>([
     new Ingredient(1, "Liszt", 500, "g"),
     new Ingredient(2, "Tojás", 2, "db"),
     new Ingredient(3, "Tej", 300, "ml")
-];
+]);
 
-const mockAllergies = [
+const mockAllergies = ref<Allergy[]>([
     new Allergy("Glutén", 1)
-];
+]);
 
-const steps = [
-    "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus."
-];
+onMounted(async () => {
+    if (!recipeStore.getAllRecipes.length) {
+        await recipeStore.loadRecipes();
+    }
+});
 </script>
 
 <template>
@@ -88,11 +79,7 @@ const steps = [
                 <div class="ingredient-list p-3">
                     <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
-                        <li
-                            v-for="ingredient in mockIngredients"
-                            :key="ingredient.id"
-                            class="border-bottom d-flex"
-                        >
+                        <li v-for="ingredient in mockIngredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
                             <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
                         </li>
@@ -101,11 +88,8 @@ const steps = [
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
-                <div
-                    v-for="(step, index) in steps"
-                    :key="index"
-                    class="step d-flex flex-column flex-lg-row align-items-center mb-3"
-                >
+                <div v-for="(step, index) in recipe.steps"
+                    class="step d-flex flex-column flex-lg-row align-items-center mb-3">
                     <p class="circle flex-shrink-0">
                         <span>{{ index + 1 }}</span>
                     </p>

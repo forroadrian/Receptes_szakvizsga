@@ -12,4 +12,5 @@ export default interface RecipeConstuctorOptions {
     is_ai_generated: boolean;
     active?: boolean;
     deleted_at?: Date;
+    steps?: string[];
 }
