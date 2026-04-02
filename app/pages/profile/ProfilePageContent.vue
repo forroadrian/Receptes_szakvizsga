@@ -81,7 +81,7 @@ const settingsSectionKeys = ['username', 'password', 'email'];
 const preferenceSectionKeys = preferenceOptions.map((option) => option.key);
 
 const settingsCardDescription = 'Felhasználónév, jelszó és email kezelése';
-const preferencesCardDescription = 'Allergének és nem kedvelt alapanyagok';
+const preferencesCardDescription = 'Allergének és nem kedvelt alapanyagok hozzáadása';
 
 const isSettingsSection = (section) => settingsSectionKeys.includes(section);
 const isPreferenceSection = (section) => preferenceSectionKeys.includes(section);

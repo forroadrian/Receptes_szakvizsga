@@ -535,6 +535,37 @@ html {
     z-index: 1;
 }
 
+[data-bs-theme="dark"] .profile-page .mobile-menu-card {
+    background: linear-gradient(135deg, rgba(28, 32, 38, 0.96), rgba(20, 24, 29, 0.96));
+    border-color: rgba(214, 188, 142, 0.14);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card:hover,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card.is-open,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card.active {
+    background: linear-gradient(135deg, rgba(34, 39, 46, 0.98), rgba(24, 28, 34, 0.98));
+    border-color: rgba(214, 188, 142, 0.28);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-icon {
+    background: linear-gradient(135deg, rgba(214, 188, 142, 0.18), rgba(214, 188, 142, 0.08));
+    border-color: rgba(214, 188, 142, 0.15);
+    color: #f1ddbe;
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-text h6,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-text p,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
+    color: #f1ddbe;
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
+    background: rgba(214, 188, 142, 0.1);
+    border-color: rgba(214, 188, 142, 0.14);
+}
+
 @media (max-width: 991.98px) {
     .profile-page .right-card .card-body {
         padding: 1.5rem !important;
