@@ -13,6 +13,16 @@ export const useAuthStore = defineStore('auth', () => {
     const SESSION_COOKIE = 'menuplanr_session_login'
     const PROFILE_BUCKET = 'profile-images'
 
+    type ProfileResponse = {
+        username: string
+        email: string
+        profile_url: string
+    }
+
+    const getRequestErrorMessage = (error: any, fallback: string) => {
+        return error?.data?.statusMessage || error?.statusMessage || error?.message || fallback
+    }
+
     const clearMessages = () => {
         errorMessage.value = ''
         successMessage.value = ''
@@ -88,33 +98,13 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         try {
-            const { data, error } = await supabase
-                .from('user')
-                .select('username, email, profile_url')
-                .eq('id', userId)
-                .single()
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült betölteni a profiladatokat.'
-                return null
-            }
+            const data = await $fetch<ProfileResponse>('/api/auth/profile', { method: 'GET' })
 
             profileUrl.value = resolveProfileImageUrl(data?.profile_url)
 
-            if (user.value?.email && data?.email !== user.value.email) {
-                const { error: emailSyncError } = await supabase
-                    .from('user')
-                    .update({ email: user.value.email })
-                    .eq('id', userId)
-
-                if (emailSyncError) {
-                    console.warn('Nem sikerült szinkronizálni az email címet a user táblába.', emailSyncError)
-                }
-            }
-
             return data
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Nem sikerült betölteni a profiladatokat.'
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült betölteni a profiladatokat.')
             return null
         }
     }
@@ -138,18 +128,18 @@ export const useAuthStore = defineStore('auth', () => {
 
     const updateProfileImage = async (file: File) => {
         clearMessages()
-    
+
         if (!user.value) {
             errorMessage.value = 'Nincs bejelentkezett felhasználó.'
             return false
         }
-    
+
         const userId = user.value.id || user.value.sub
         const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'png'
         const filePath = `${userId}/profile-image.${fileExtension}`
-    
+
         loading.value = true
-    
+
         try {
             const { error: uploadError } = await supabase
                 .storage
@@ -158,35 +148,31 @@ export const useAuthStore = defineStore('auth', () => {
                     upsert: true,
                     contentType: file.type
                 })
-    
+
             if (uploadError) {
                 console.error('Storage upload error:', uploadError)
                 errorMessage.value = uploadError.message || 'Nem sikerült feltölteni a profilképet.'
                 return false
             }
-    
-            const { error: dbError } = await supabase
-                .from('user')
-                .update({ profile_url: filePath })
-                .eq('id', userId)
-    
-            if (dbError) {
-                console.error('DB update error:', dbError)
-                errorMessage.value = 'Nem sikerült menteni a profilképet.'
-                return false
-            }
-    
+
+            await $fetch('/api/auth/profile-image', {
+                method: 'PUT',
+                body: {
+                    profileUrl: filePath
+                }
+            })
+
             const { data } = supabase
                 .storage
                 .from(PROFILE_BUCKET)
                 .getPublicUrl(filePath)
-    
+
             profileUrl.value = `${data.publicUrl}?t=${Date.now()}`
             successMessage.value = 'Sikeres profilkép módosítás.'
             return true
         } catch (error: any) {
             console.error('Unexpected profile image error:', error)
-            errorMessage.value = error?.message || 'Hiba történt a profilkép módosításakor.'
+            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt a profilkép módosításakor.')
             return false
         } finally {
             loading.value = false
@@ -238,18 +224,14 @@ export const useAuthStore = defineStore('auth', () => {
             let emailToLogin = loginValue.trim()
 
             if (!emailToLogin.includes('@')) {
-                const { data: userRow, error: userError } = await supabase
-                    .from('user')
-                    .select('email')
-                    .eq('username', emailToLogin)
-                    .maybeSingle()
+                const response = await $fetch<{ email: string }>('/api/auth/login', {
+                    method: 'POST',
+                    body: {
+                        loginValue: emailToLogin
+                    }
+                })
 
-                if (userError || !userRow) {
-                    errorMessage.value = 'Nem létezik ilyen felhasználónév.'
-                    return false
-                }
-
-                emailToLogin = userRow.email
+                emailToLogin = response.email
             }
 
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -278,7 +260,7 @@ export const useAuthStore = defineStore('auth', () => {
             successMessage.value = 'Sikeres bejelentkezés!'
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Váratlan hiba történt a bejelentkezés során.'
+            errorMessage.value = getRequestErrorMessage(error, 'Váratlan hiba történt a bejelentkezés során.')
             return false
         } finally {
             loading.value = false
@@ -309,21 +291,12 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const trimmedEmail = email.trim().toLowerCase()
 
-            const { data: existingUser, error: userCheckError } = await supabase
-                .from('user')
-                .select('id')
-                .eq('email', trimmedEmail)
-                .maybeSingle()
-
-            if (userCheckError) {
-                errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
-                return false
-            }
-
-            if (!existingUser) {
-                errorMessage.value = 'Nincs ilyen email címmel regisztrált felhasználó.'
-                return false
-            }
+            await $fetch('/api/auth/password-reset', {
+                method: 'POST',
+                body: {
+                    email: trimmedEmail
+                }
+            })
 
             const redirectTo = process.client
                 ? `${window.location.origin}/password-reset`
@@ -342,7 +315,7 @@ export const useAuthStore = defineStore('auth', () => {
             successMessage.value = 'A jelszó-visszaállító email elküldve.'
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Nem sikerült elküldeni a jelszó-visszaállító emailt.'
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült elküldeni a jelszó-visszaállító emailt.')
             return false
         } finally {
             loading.value = false
@@ -385,39 +358,17 @@ export const useAuthStore = defineStore('auth', () => {
             return false
         }
 
-        const userId = user.value.id || user.value.sub
         const trimmedUsername = newUsername.trim()
 
         loading.value = true
 
         try {
-            const { data: existingUsernameUser, error: usernameCheckError } = await supabase
-                .from('user')
-                .select('id')
-                .eq('username', trimmedUsername)
-                .neq('id', userId)
-                .limit(1)
-                .maybeSingle()
-
-            if (usernameCheckError) {
-                errorMessage.value = 'Nem sikerült ellenőrizni a felhasználónevet.'
-                return false
-            }
-
-            if (existingUsernameUser) {
-                errorMessage.value = 'Ez a felhasználónév már foglalt.'
-                return false
-            }
-
-            const { error: dbError } = await supabase
-                .from('user')
-                .update({ username: trimmedUsername })
-                .eq('id', userId)
-
-            if (dbError) {
-                errorMessage.value = 'Nem sikerült frissíteni a felhasználónevet az adatbázisban.'
-                return false
-            }
+            await $fetch('/api/auth/username', {
+                method: 'PUT',
+                body: {
+                    username: trimmedUsername
+                }
+            })
 
             const { error: authUpdateError } = await supabase.auth.updateUser({
                 data: { username: trimmedUsername }
@@ -437,7 +388,7 @@ export const useAuthStore = defineStore('auth', () => {
             successMessage.value = 'Sikeres felhasználónév módosítás.'
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Hiba történt a felhasználónév módosításakor.'
+            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt a felhasználónév módosításakor.')
             return false
         } finally {
             loading.value = false
@@ -512,23 +463,6 @@ export const useAuthStore = defineStore('auth', () => {
             }
 
             const authUser = authUserData.user
-            const loggedInEmail = authUser.email?.trim().toLowerCase() || ''
-            const userId = authUser.id
-
-            if (!loggedInEmail) {
-                errorMessage.value = 'Nem található a jelenlegi email cím.'
-                return false
-            }
-
-            if (trimmedCurrentEmail !== loggedInEmail) {
-                errorMessage.value = 'A jelenlegi email cím nem egyezik a bejelentkezett email címmel.'
-                return false
-            }
-
-            if (trimmedNewEmail === loggedInEmail) {
-                errorMessage.value = 'Az új email cím megegyezik a régivel.'
-                return false
-            }
 
             if (authUser.new_email && authUser.new_email !== authUser.email) {
                 errorMessage.value = 'Már van folyamatban lévő email módosítás. Előbb azt fejezd be.'
@@ -537,23 +471,13 @@ export const useAuthStore = defineStore('auth', () => {
 
             loading.value = true
 
-            const { data: existingEmailUser, error: emailCheckError } = await supabase
-                .from('user')
-                .select('id')
-                .eq('email', trimmedNewEmail)
-                .neq('id', userId)
-                .limit(1)
-                .maybeSingle()
-
-            if (emailCheckError) {
-                errorMessage.value = 'Nem sikerült ellenőrizni az email címet.'
-                return false
-            }
-
-            if (existingEmailUser) {
-                errorMessage.value = 'Ezzel az email címmel már regisztráltak.'
-                return false
-            }
+            await $fetch('/api/auth/email', {
+                method: 'PUT',
+                body: {
+                    currentEmail: trimmedCurrentEmail,
+                    newEmail: trimmedNewEmail
+                }
+            })
 
             const redirectUrl = `${window.location.origin}/confirm`
 
@@ -575,7 +499,7 @@ export const useAuthStore = defineStore('auth', () => {
             successMessage.value = 'Megerősítő email elküldve. Nézd meg a régi és az új email címedet is.'
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Hiba történt az email cím módosításakor.'
+            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt az email cím módosításakor.')
             return false
         } finally {
             loading.value = false
