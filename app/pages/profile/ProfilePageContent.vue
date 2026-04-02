@@ -62,6 +62,34 @@ const sidebarItems = [
     },
 ];
 
+const preferenceOptions = [
+    {
+        key: 'allergen',
+        icon: 'bi-shield-plus',
+        title: 'Allergének',
+    },
+    {
+        key: 'dislikedIngredient',
+        icon: 'bi-slash-circle',
+        title: 'Nem kedvelt alapanyagok',
+    },
+];
+
+const expandedMobileGroup = ref(null);
+
+const settingsSectionKeys = ['username', 'password', 'email'];
+const preferenceSectionKeys = preferenceOptions.map((option) => option.key);
+
+const settingsCardDescription = 'Felhasználónév, jelszó és email kezelése';
+const preferencesCardDescription = 'Allergének és nem kedvelt alapanyagok';
+
+const isSettingsSection = (section) => settingsSectionKeys.includes(section);
+const isPreferenceSection = (section) => preferenceSectionKeys.includes(section);
+
+const toggleMobileGroup = (group) => {
+    expandedMobileGroup.value = expandedMobileGroup.value === group ? null : group;
+};
+
 const settingsOptions = [
     {
         key: 'username',
@@ -184,6 +212,16 @@ const syncProfileData = async (newUser) => {
 
 watch(() => route.params.section, syncSectionFromRoute, { immediate: true });
 watch(() => auth.user, syncProfileData, { immediate: true });
+watch(activeSection, (section) => {
+    if (isSettingsSection(section)) {
+        expandedMobileGroup.value = 'settings';
+        return;
+    }
+
+    if (isPreferenceSection(section)) {
+        expandedMobileGroup.value = 'preferences';
+    }
+});
 
 const showError = (message) => {
     showAlert('danger', message);
@@ -415,7 +453,7 @@ const handleSave = async () => {
                         </div>
                     </div>
 
-                    <div class="mt-4">
+                    <div class="mt-4 d-none d-lg-block">
                         <div class="list-group menu">
                             <button type="button"
                                 class="list-group-item list-group-item-action d-flex align-items-center gap-2"
@@ -432,9 +470,65 @@ const handleSave = async () => {
                             </button>
                         </div>
                     </div>
+
+                    <div class="mt-4 d-lg-none">
+                        <div class="mobile-settings-group">
+                            <button type="button" class="mobile-menu-card"
+                                :class="{ 'is-open': expandedMobileGroup === 'settings', active: isProfileSettingsActive }"
+                                @click="toggleMobileGroup('settings')">
+                                <div class="mobile-menu-card-left">
+                                    <div class="mobile-menu-card-icon">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                    </div>
+
+                                    <div class="mobile-menu-card-text">
+                                        <h6 class="mb-1">Profil beállítások</h6>
+                                        <p class="mb-0">{{ settingsCardDescription }}</p>
+                                    </div>
+                                </div>
+
+                                <i class="bi bi-chevron-down mobile-menu-card-chevron"
+                                    :class="{ rotated: expandedMobileGroup === 'settings' }"></i>
+                            </button>
+
+                            <div v-if="expandedMobileGroup === 'settings'" class="mobile-menu-panel">
+                                <div class="settings-options mobile-settings-options">
+                                    <ProfileSettingsOption v-for="option in settingsOptions" :key="option.key"
+                                        :icon="option.icon" :title="option.title" @click="openSection(option.key)" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-settings-group mt-3">
+                            <button type="button" class="mobile-menu-card"
+                                :class="{ 'is-open': expandedMobileGroup === 'preferences', active: isPreferenceSection(activeSection) }"
+                                @click="toggleMobileGroup('preferences')">
+                                <div class="mobile-menu-card-left">
+                                    <div class="mobile-menu-card-icon">
+                                        <i class="bi bi-sliders"></i>
+                                    </div>
+
+                                    <div class="mobile-menu-card-text">
+                                        <h6 class="mb-1">Ételpreferenciák</h6>
+                                        <p class="mb-0">{{ preferencesCardDescription }}</p>
+                                    </div>
+                                </div>
+
+                                <i class="bi bi-chevron-down mobile-menu-card-chevron"
+                                    :class="{ rotated: expandedMobileGroup === 'preferences' }"></i>
+                            </button>
+
+                            <div v-if="expandedMobileGroup === 'preferences'" class="mobile-menu-panel">
+                                <div class="settings-options mobile-settings-options">
+                                    <ProfileSettingsOption v-for="option in preferenceOptions" :key="option.key"
+                                        :icon="option.icon" :title="option.title" @click="openSection(option.key)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-12 col-lg-8 d-flex">
+                <div class="col-12 col-lg-8" :class="activeSection === 'menu' ? 'd-none d-lg-flex' : 'd-flex'">
                     <div class="card custshadow rounded-3 w-100 right-card">
                         <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
                             <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">

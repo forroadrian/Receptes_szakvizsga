@@ -1,3 +1,7 @@
+html {
+    scrollbar-gutter: stable;
+}
+
 .chip-btn {
     border: 0;
     background: transparent;
@@ -365,6 +369,145 @@
         width: 36px;
         height: 36px;
         min-width: 36px;
+        border-radius: 12px;
+    }
+}
+.profile-page .mobile-settings-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-page .mobile-menu-card {
+    width: 100%;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    border: 1px solid rgba(214, 188, 142, 0.22);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease;
+}
+
+.profile-page .mobile-menu-card:hover,
+.profile-page .mobile-menu-card.is-open,
+.profile-page .mobile-menu-card.active {
+    border-color: rgba(193, 154, 107, 0.35);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(248, 244, 239, 1));
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+}
+
+.profile-page .mobile-menu-card:active {
+    transform: translateY(1px);
+}
+
+.profile-page .mobile-menu-card-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.profile-page .mobile-menu-card-icon,
+.profile-page .mobile-menu-card-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-page .mobile-menu-card-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(214, 188, 142, 0.28), rgba(193, 154, 107, 0.12));
+    border: 1px solid rgba(193, 154, 107, 0.2);
+    color: #7a5a36;
+}
+
+.profile-page .mobile-menu-card-icon i {
+    font-size: 1.2rem;
+}
+
+.profile-page .mobile-menu-card-text {
+    min-width: 0;
+}
+
+.profile-page .mobile-menu-card-text h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
+}
+
+.profile-page .mobile-menu-card-text p {
+    font-size: 0.88rem;
+    color: var(--bs-secondary-color);
+}
+
+.profile-page .mobile-menu-card-chevron {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    background: rgba(214, 188, 142, 0.14);
+    border: 1px solid rgba(214, 188, 142, 0.18);
+    color: #6b4f31;
+    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+
+.profile-page .mobile-menu-card.is-open .mobile-menu-card-chevron,
+.profile-page .mobile-menu-card.active .mobile-menu-card-chevron {
+    background: var(--accent-grad);
+    color: #fff;
+}
+
+.profile-page .mobile-menu-card-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.profile-page .mobile-menu-panel {
+    padding-top: 12px;
+}
+
+.profile-page .mobile-settings-options {
+    padding: 12px;
+    border-radius: 22px;
+    box-shadow: none;
+}
+
+@media (max-width: 991.98px) {
+    .profile-page .right-card .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .profile-page .section-title h2 {
+        font-size: 1.8rem;
+    }
+
+    .profile-page .settings-options,
+    .profile-page .mobile-settings-options {
+        gap: 12px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option {
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 16px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option-arrow {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
         border-radius: 12px;
     }
 }
