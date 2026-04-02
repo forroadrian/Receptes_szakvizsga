@@ -1,37 +1,26 @@
 <script setup lang="ts">
-import Ingredient from "~/models/Ingredient";
-import Allergy from "~/models/Allergy";
 import { useRecipeStore } from "~/stores/recipe";
 
 const route = useRoute();
 const colorMode = useColorMode();
-
 const recipeStore = useRecipeStore();
 
 const recipeId = Number(route.params.id);
 
 const buttonColor = computed(() => {
-    if (colorMode.value === "dark") return "soft";
-    return "dark";
+    return colorMode.value === "dark" ? "soft" : "dark";
 });
-
-const recipe = computed(() => recipeStore.getRecipeById(recipeId));
-
-const mockIngredients = ref<Ingredient[]>([
-    new Ingredient(1, "Liszt", 500, "g"),
-    new Ingredient(2, "Tojás", 2, "db"),
-    new Ingredient(3, "Tej", 300, "ml")
-]);
-
-const mockAllergies = ref<Allergy[]>([
-    new Allergy("Glutén", 1)
-]);
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
         await recipeStore.loadRecipes();
     }
 });
+
+const recipe = computed(() => {
+    return recipeStore.getRecipeById(recipeId);
+});
+
 </script>
 
 <template>
@@ -79,7 +68,7 @@ onMounted(async () => {
                 <div class="ingredient-list p-3">
                     <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
-                        <li v-for="ingredient in mockIngredients" class="border-bottom d-flex">
+                        <li v-for="ingredient in recipe?.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
                             <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
                         </li>
