@@ -1,65 +1,53 @@
-<script setup>
-import Recipe from '~/models/Recipe';
-import Ingredient from '~/models/Ingredient';
-import Allergy from '~/models/Allergy';
+<script setup lang="ts">
+import { storeToRefs } from "pinia";
+import Allergy from "~/models/Allergy";
+import Ingredient from "~/models/Ingredient";
+import { useRecipeStore } from "~/stores/recipe";
 
 const route = useRoute();
-const recipeId = route.params.id;
 const colorMode = useColorMode();
+const recipeStore = useRecipeStore();
+const { recipes } = storeToRefs(recipeStore);
+
+const recipeId = computed(() => Number(route.params.id));
 
 const buttonColor = computed(() => {
     if (colorMode.value === "dark") return "soft";
     return "dark";
-})
+});
 
+onMounted(async () => {
+    if (!recipes.value.length) {
+        await recipeStore.loadRecipes();
+    }
+});
 
-const recipe = ref(new Recipe({
-    id: Number(recipeId),
-    name: "Példa Recept",
-    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-    time: 45,
-    servings: 2,
-    author_id: 1,
-    created_at: new Date(),
-    last_edit: new Date(),
-    is_ai_generated: false
-}));
+const recipe = computed(() => {
+    return recipes.value.find((item) => item.id === recipeId.value) ?? null;
+});
 
-
-recipe.value.ingredients = [
+const mockIngredients = [
     new Ingredient(1, "Liszt", 500, "g"),
     new Ingredient(2, "Tojás", 2, "db"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg"),
-    new Ingredient(2, "Lorem", 300, "dkg")
+    new Ingredient(3, "Tej", 300, "ml")
 ];
 
-recipe.value.allergies = [
+const mockAllergies = [
     new Allergy("Glutén", 1)
 ];
 
 const steps = [
     "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
     "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia.",
-    "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iusto, at exercitationem voluptates quos sit officia ducimus cumque illum dignissimos saepe facilis explicabo.",
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia.", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, aspernatur.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus.",
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia."
-]
+    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium blanditiis adipisci vitae, accusantium mollitia id nemo vel quod sapiente repellendus."
+];
 </script>
 
 <template>
     <div class="container py-5" v-if="recipe">
-        <p @click="$router.back()" class="mb-5 p-0"> <i class="bi bi-arrow-left"></i> Vissza</p>
+        <p @click="$router.back()" class="mb-5 p-0 back-link">
+            <i class="bi bi-arrow-left"></i> Vissza
+        </p>
 
         <div class="recipe-layout">
             <section>
@@ -88,26 +76,36 @@ const steps = [
             <aside class="recipe-aside">
                 <div class="recipeButtons">
                     <ClientOnly>
-                        <Button :color="buttonColor" iconPosition="right" class="w-100 mb-3"
-                            outline>Kipróbálatlan</Button>
-                        <Button to="/recipes" color="green" class="mb-3" icon="bi bi-plus-circle"
-                            iconPosition="left">Hozzáadás menühöz...</Button>
+                        <Button :color="buttonColor" iconPosition="right" class="w-100 mb-3" outline>
+                            Kipróbálatlan
+                        </Button>
+                        <Button to="/recipes" color="green" class="mb-3" icon="bi bi-plus-circle" iconPosition="left">
+                            Hozzáadás menühöz...
+                        </Button>
                     </ClientOnly>
                 </div>
 
                 <div class="ingredient-list p-3">
                     <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
-                        <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">
+                        <li
+                            v-for="ingredient in mockIngredients"
+                            :key="ingredient.id"
+                            class="border-bottom d-flex"
+                        >
                             <p>{{ ingredient.name }}</p>
-                            <p> {{ ingredient.amount }} {{ ingredient.unit }} </p>
+                            <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
                         </li>
                     </ul>
                 </div>
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
-                <div v-for="(step, index) in steps" class="step d-flex flex-column flex-lg-row align-items-center mb-3">
+                <div
+                    v-for="(step, index) in steps"
+                    :key="index"
+                    class="step d-flex flex-column flex-lg-row align-items-center mb-3"
+                >
                     <p class="circle flex-shrink-0">
                         <span>{{ index + 1 }}</span>
                     </p>
@@ -121,6 +119,9 @@ const steps = [
                 </div>
             </section>
         </div>
+    </div>
+    <div v-else class="container py-5">
+        <p>A recept nem található.</p>
     </div>
 </template>
 <style scoped>

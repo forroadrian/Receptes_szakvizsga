@@ -1,56 +1,58 @@
 <script setup lang="ts">
-import RecipeModal from '~/components/recipe/RecipeModal.vue';
-import Recipe from '~/models/Recipe';
-const colorMode = useColorMode();
+import { storeToRefs } from "pinia";
+import RecipeModal from "~/components/recipe/RecipeModal.vue";
+import { useRecipeStore } from "~/stores/recipe";
 
-const route = useRoute();
-console.log(route.params.id);
-const recipes = ref<Recipe[]>([
-    new Recipe({
-        id: 1,
-        author_id: 101,
-        name: 'Lorem ipsum dolor',
-        description: 'Aperiam ipsum adipisicing. Nisi quasi error aliquam laborum',
-        time: 120,
-        servings: 4,
-        created_at: new Date(),
-        last_edit: new Date(),
-        is_ai_generated: false,
-        active: true
-    }),
-    new Recipe({
-        id: 2,
-        author_id: 101,
-        name: 'Lorem ipsum dolor',
-        description: 'Aperiam ipsum adipisicing. Nisi quasi error aliquam laborum',
-        time: 120,
-        servings: 4,
-        created_at: new Date(),
-        last_edit: new Date(),
-        is_ai_generated: false,
-        active: true
-    })
-]);
+const colorMode = useColorMode();
+const recipeStore = useRecipeStore();
+const { recipes } = storeToRefs(recipeStore);
 
 const filterButtonColor = computed(() => {
-    return colorMode.value === 'dark' ? 'light' : 'dark'
-})
+    return colorMode.value === "dark" ? "light" : "dark";
+});
 
-const search = ref('')
-const activeDuration = ref('all');
-const typeOptions = ['összes', 'sós', 'édes', 'leves', 'főétel', 'saláta', 'tészta', 'desszert'];
-const mealOptions = ['reggeli', 'ebéd', 'vacsora', 'snack'];
-const allergenSearch = ref('');
-
-
+const search = ref("");
+const activeDuration = ref("all");
+const typeOptions = ["összes", "sós", "édes", "leves", "főétel", "saláta", "tészta", "desszert"];
+const mealOptions = ["reggeli", "ebéd", "vacsora", "snack"];
+const allergenSearch = ref("");
 
 const durationOptions = [
-    { label: 'Összes', value: 'all' },
-    { label: '0–30 perc', value: 'short' },
-    { label: '30–60 perc', value: 'medium' },
-    { label: '60+ perc', value: 'long' },
-]
+    { label: "Összes", value: "all" },
+    { label: "0–30 perc", value: "short" },
+    { label: "30–60 perc", value: "medium" },
+    { label: "60+ perc", value: "long" },
+];
 
+onMounted(async () => {
+    await recipeStore.loadRecipes();
+});
+
+const filteredRecipes = computed(() => {
+    let result = [...recipes.value];
+
+    if (search.value.trim()) {
+        const query = search.value.toLowerCase().trim();
+        result = result.filter((recipe) =>
+            recipe.name.toLowerCase().includes(query) ||
+            recipe.description.toLowerCase().includes(query)
+        );
+    }
+
+    if (activeDuration.value === "short") {
+        result = result.filter((recipe) => recipe.time <= 30);
+    }
+
+    if (activeDuration.value === "medium") {
+        result = result.filter((recipe) => recipe.time > 30 && recipe.time <= 60);
+    }
+
+    if (activeDuration.value === "long") {
+        result = result.filter((recipe) => recipe.time > 60);
+    }
+
+    return result;
+});
 </script>
 
 <template>
@@ -79,21 +81,11 @@ const durationOptions = [
 
             <nav class="recipes-tabs mt-3">
                 <ul class="d-flex flex-wrap list-unstyled gap-4">
-                    <li>
-                        <button type="button" class="tab-btn active">Alapértelmezett</button>
-                    </li>
-                    <li>
-                        <button type="button" class="tab-btn">Saját</button>
-                    </li>
-                    <li>
-                        <button type="button" class="tab-btn">Kedvelt</button>
-                    </li>
-                    <li>
-                        <button type="button" class="tab-btn">Kipróbált</button>
-                    </li>
-                    <li>
-                        <button type="button" class="tab-btn">AI ajánlás</button>
-                    </li>
+                    <li><button type="button" class="tab-btn active">Alapértelmezett</button></li>
+                    <li><button type="button" class="tab-btn">Saját</button></li>
+                    <li><button type="button" class="tab-btn">Kedvelt</button></li>
+                    <li><button type="button" class="tab-btn">Kipróbált</button></li>
+                    <li><button type="button" class="tab-btn">AI ajánlás</button></li>
                 </ul>
             </nav>
 
@@ -106,8 +98,8 @@ const durationOptions = [
                     </div>
                 </div>
 
-                <div v-for="recipe in recipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
-                    <NuxtLink :to="`/recipe`" class="text-decoration-none text-reset h-100 d-block">
+                <div v-for="recipe in filteredRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
+                    <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
                             <template #media>
@@ -150,9 +142,7 @@ const durationOptions = [
                                 </div>
 
                                 <div class="row justify-content-center mb-3">
-                                    <div class="col-auto">
-                                        <!-- <CardTags :items="recipe.tags" /> -->
-                                    </div>
+                                    <div class="col-auto"></div>
                                 </div>
                             </template>
 
@@ -160,8 +150,9 @@ const durationOptions = [
                                 <div class="row pt-2">
                                     <div class="col-12 text-center small my-auto">
                                         <div>
-                                            <strong><i class="bi bi-exclamation-triangle-fill p-2"></i> Allergént
-                                                tartalmaz:
+                                            <strong>
+                                                <i class="bi bi-exclamation-triangle-fill p-2"></i>
+                                                Allergént tartalmaz:
                                             </strong>
                                         </div>
                                     </div>
@@ -176,7 +167,7 @@ const durationOptions = [
                 aria-labelledby="recipeFiltersOffcanvasLabel">
                 <div class="offcanvas-header">
                     <h5 id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold">Szűrők</h5>
-                    <i  class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></i>
+                    <i class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></i>
                 </div>
 
                 <div class="offcanvas-body">
@@ -184,12 +175,13 @@ const durationOptions = [
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
                             <div class="d-flex flex-wrap gap-2">
-                                <button v-for="option in durationOptions" type="button" class="filter-pill"
-                                    @click="activeDuration = option.value">
+                                <button v-for="option in durationOptions" type="button"
+                                    class="filter-pill" @click="activeDuration = option.value">
                                     {{ option.label }}
                                 </button>
                             </div>
                         </div>
+                        
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
                             <div class="d-flex flex-wrap gap-2">
@@ -221,12 +213,13 @@ const durationOptions = [
                                 <label class="form-check-label" for="offdisliked">Nem számít</label>
                             </div>
                         </div>
+
                         <div class="filter-item">
                             <div class="row g-2">
                                 <p class="filter-title mb-0">Allergén, ételérzékenység</p>
                                 <div class="col-12">
                                     <SearchBar v-model="allergenSearch" placeholder="Allergén neve / típusa..."
-                                        class=" w-100" />
+                                        class="w-100" />
                                 </div>
                             </div>
                         </div>

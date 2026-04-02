@@ -3,7 +3,7 @@ import type RecipeConstuctorOptions from "~/interfaces/ModelInterfaces/RecipeCon
 
 export default class Recipe implements Identifiable {
     private _id: number;
-    private _author_id: number;
+    private _author_id: string | null;
     private _name: string;
     private _description: string;
     private _saves: number;
@@ -18,7 +18,7 @@ export default class Recipe implements Identifiable {
 
     constructor(options: RecipeConstuctorOptions){
         this._id = options.id ?? -1
-        this._author_id = options.author_id
+        this._author_id = options.author_id;
         this._name = options.name
         this._description = options.description
         this._saves = options.saves ?? 0
@@ -41,12 +41,11 @@ export default class Recipe implements Identifiable {
         return this._id;
     }
 
-    public set author_id(v : number) {
+    public set author_id(v: string | null) {
         this._author_id = v;
     }
 
-    
-    public get author_id() : number {
+    public get author_id(): string | null {
         return this._author_id;
     }
 

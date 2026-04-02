@@ -1,6 +1,6 @@
 export default interface RecipeConstuctorOptions {
     id?: number;
-    author_id: number;
+    author_id: string | null;
     name: string;
     description: string;
     saves?: number;
