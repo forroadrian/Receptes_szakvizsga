@@ -4,7 +4,6 @@ import type { Database } from '~/types/database.types'
 type AllergyRow = Database['public']['Tables']['allergy']['Row']
 
 export const usePreferencesStore = defineStore('preferences', () => {
-    const supabase = useSupabaseClient<Database>()
     const user = useSupabaseUser()
 
     const loading = ref(false)
@@ -15,6 +14,10 @@ export const usePreferencesStore = defineStore('preferences', () => {
     const allAllergies = ref<AllergyRow[]>([])
     const userAllergies = ref<AllergyRow[]>([])
     const selectedAllergies = ref<AllergyRow[]>([])
+
+    const getRequestErrorMessage = (error: any, fallback: string) => {
+        return error?.data?.statusMessage || error?.statusMessage || error?.message || fallback
+    }
 
     const clearMessages = () => {
         errorMessage.value = ''
@@ -47,20 +50,14 @@ export const usePreferencesStore = defineStore('preferences', () => {
         clearMessages()
 
         try {
-            const { data, error } = await supabase
-                .from('allergy')
-                .select('id, name')
-                .order('name', { ascending: true })
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült betölteni az allergéneket.'
-                return false
-            }
+            const data = await $fetch<AllergyRow[]>('/api/preferences/allergy', {
+                method: 'GET'
+            })
 
             allAllergies.value = data || []
             return true
-        } catch {
-            errorMessage.value = 'Nem sikerült betölteni az allergéneket.'
+        } catch (error: any) {
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült betölteni az allergéneket.')
             return false
         }
     }
@@ -84,15 +81,9 @@ export const usePreferencesStore = defineStore('preferences', () => {
                 }
             }
 
-            const { data, error } = await supabase
-                .from('user_allergy')
-                .select('allergy_id')
-                .eq('user_id', userId)
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült betölteni a felhasználó allergiáit.'
-                return false
-            }
+            const data = await $fetch<{ allergy_id: number }[]>('/api/preferences/user-allergy', {
+                method: 'GET'
+            })
 
             const allergyIds = (data || []).map(item => item.allergy_id)
 
@@ -102,8 +93,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
 
             selectedAllergies.value = []
             return true
-        } catch {
-            errorMessage.value = 'Nem sikerült betölteni a felhasználó allergiáit.'
+        } catch (error: any) {
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült betölteni a felhasználó allergiáit.')
             return false
         }
     }
@@ -174,19 +165,12 @@ export const usePreferencesStore = defineStore('preferences', () => {
         saving.value = true
 
         try {
-            const rows = selectedAllergies.value.map(item => ({
-                user_id: userId,
-                allergy_id: item.id
-            }))
-
-            const { error } = await supabase
-                .from('user_allergy')
-                .insert(rows)
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült elmenteni az allergéneket.'
-                return false
-            }
+            await $fetch('/api/preferences/user-allergy', {
+                method: 'POST',
+                body: {
+                    allergyIds: selectedAllergies.value.map(item => item.id)
+                }
+            })
 
             userAllergies.value = sortAllergies([
                 ...userAllergies.value,
@@ -195,8 +179,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
 
             selectedAllergies.value = []
             return true
-        } catch {
-            errorMessage.value = 'Nem sikerült elmenteni az allergéneket.'
+        } catch (error: any) {
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült elmenteni az allergéneket.')
             return false
         } finally {
             saving.value = false
@@ -213,22 +197,18 @@ export const usePreferencesStore = defineStore('preferences', () => {
         }
 
         try {
-            const { error } = await supabase
-                .from('user_allergy')
-                .delete()
-                .eq('user_id', userId)
-                .eq('allergy_id', allergyId)
-
-            if (error) {
-                errorMessage.value = 'Nem sikerült törölni az allergént.'
-                return false
-            }
+            await $fetch('/api/preferences/user-allergy', {
+                method: 'DELETE',
+                body: {
+                    allergyId
+                }
+            })
 
             userAllergies.value = userAllergies.value.filter(item => item.id !== allergyId)
             selectedAllergies.value = selectedAllergies.value.filter(item => item.id !== allergyId)
             return true
-        } catch {
-            errorMessage.value = 'Nem sikerült törölni az allergént.'
+        } catch (error: any) {
+            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült törölni az allergént.')
             return false
         }
     }
