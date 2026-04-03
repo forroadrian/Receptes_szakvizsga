@@ -30,17 +30,20 @@ const recipe = computed(() => {
         </p>
 
         <div class="recipe-layout">
-            <section>
-                <div class="recipe-image">
-                    <div class="icons d-flex w-100">
-                        <span><i class="bi bi-share"></i></span>
-                        <div>
-                            <span><i class="bi bi-pencil-square"></i></span>
-                            <span><i class="bi bi-bookmark-plus"></i></span>
+            <section class="recipe-main-top">
+                <div>
+                    <div class="recipe-image">
+                        <div class="icons d-flex w-100">
+                            <span><i class="bi bi-share"></i></span>
+                            <div>
+                                <span><i class="bi bi-pencil-square"></i></span>
+                                <span><i class="bi bi-bookmark-plus"></i></span>
+                            </div>
                         </div>
+                        <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" alt="Recept képe" />
                     </div>
-                    <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" alt="Recept képe" />
                 </div>
+
                 <section>
                     <div class="recipe-description mt-5 ps-lg-2">
                         <h2>{{ recipe.name }}</h2>
@@ -77,8 +80,7 @@ const recipe = computed(() => {
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
-                <div v-for="(step, index) in recipe.steps"
-                    class="step d-flex flex-column flex-lg-row align-items-center mb-3">
+                <div v-for="(step, index) in recipe.steps" class="step d-flex flex-column flex-lg-row align-items-center mb-3">
                     <p class="circle flex-shrink-0">
                         <span>{{ index + 1 }}</span>
                     </p>
@@ -153,12 +155,14 @@ const recipe = computed(() => {
     font-weight: 600;
 }
 
-
 .step .circle span {
     display: flex;
     justify-content: center;
 }
 
+li {
+    margin: 10px 30px !important;
+}
 
 .recipe-image img {
     box-shadow: 0 0 20px 20px -20px rgba(0, 0, 0, 0.8) !important;
@@ -170,12 +174,12 @@ const recipe = computed(() => {
 
 @media (min-width: 992px) {
     .recipe-layout {
-        display: grid;
-        grid-template-columns: 1fr 360px;
+        grid-template-columns: minmax(0, 1fr) 360px;
         grid-template-areas:
             "main aside"
             "steps aside"
             "steps similar";
+        align-items: start;
     }
 
     .recipe-main-top {
@@ -184,6 +188,7 @@ const recipe = computed(() => {
 
     .recipe-aside {
         grid-area: aside;
+        width: 360px;
     }
 
     .steps {
@@ -193,6 +198,10 @@ const recipe = computed(() => {
     .similar-recipes {
         grid-area: similar;
     }
+
+    .recipe-main-top ,.recipe-aside,.steps, .similar-recipes{
+        min-width: 0;
+     }
 }
 
 @media (max-width: 991.98px) {
