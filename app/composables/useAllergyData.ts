@@ -36,7 +36,7 @@ export const useAllergyData = ({
         return currentUserId.value || user.value?.id || user.value?.sub || ''
     }
 
-    const clearPreferenceState = () => {
+    const clearAllergyState = () => {
         currentUserId.value = ''
         userAllergies.value = []
         selectedAllergies.value = []
@@ -174,7 +174,7 @@ export const useAllergyData = ({
     }
 
     return {
-        clearPreferenceState,
+        clearAllergyState,
         loadAllergies,
         loadUserAllergies,
         loadAllergyData,

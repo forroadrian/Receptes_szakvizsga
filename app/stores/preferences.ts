@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { Database } from '~/types/database.types'
 
 type AllergyRow = Database['public']['Tables']['allergy']['Row']
+type IngredientRow = Database['public']['Tables']['ingredient']['Row']
 
 export const usePreferencesStore = defineStore('preferences', () => {
     const user = useSupabaseUser()
@@ -14,6 +15,9 @@ export const usePreferencesStore = defineStore('preferences', () => {
     const allAllergies = ref<AllergyRow[]>([])
     const userAllergies = ref<AllergyRow[]>([])
     const selectedAllergies = ref<AllergyRow[]>([])
+    const allIngredients = ref<IngredientRow[]>([])
+    const userDislikedIngredients = ref<IngredientRow[]>([])
+    const selectedDislikedIngredients = ref<IngredientRow[]>([])
 
     const clearMessages = () => {
         errorMessage.value = ''
@@ -32,7 +36,19 @@ export const usePreferencesStore = defineStore('preferences', () => {
     })
 
     const {
-        clearPreferenceState,
+        sortIngredients,
+        clearSelectedDislikedIngredients,
+        getFilteredDislikedIngredients,
+        addSelectedDislikedIngredient,
+        removeSelectedDislikedIngredient
+    } = useDislikedIngredientSelection({
+        allIngredients,
+        userDislikedIngredients,
+        selectedDislikedIngredients
+    })
+
+    const {
+        clearAllergyState,
         loadAllergies,
         loadUserAllergies,
         loadAllergyData,
@@ -51,6 +67,41 @@ export const usePreferencesStore = defineStore('preferences', () => {
         clearMessages
     })
 
+    const {
+        clearDislikedIngredientState,
+        loadIngredients,
+        loadUserDislikedIngredients,
+        loadDislikedIngredientData,
+        saveSelectedDislikedIngredients,
+        deleteUserDislikedIngredient
+    } = useDislikedIngredientData({
+        errorMessage,
+        loading,
+        saving,
+        currentUserId,
+        allIngredients,
+        userDislikedIngredients,
+        selectedDislikedIngredients,
+        user,
+        sortIngredients,
+        clearMessages
+    })
+
+    const clearPreferenceState = () => {
+        clearAllergyState()
+        clearDislikedIngredientState()
+    }
+
+    const loadPreferenceData = async (userId = currentUserId.value || user.value?.id || user.value?.sub || '') => {
+        const allergySuccess = await loadAllergyData(userId)
+
+        if (!allergySuccess) {
+            return false
+        }
+
+        return await loadDislikedIngredientData(userId)
+    }
+
     return {
         loading,
         saving,
@@ -58,15 +109,28 @@ export const usePreferencesStore = defineStore('preferences', () => {
         allAllergies,
         userAllergies,
         selectedAllergies,
+        allIngredients,
+        userDislikedIngredients,
+        selectedDislikedIngredients,
         clearSelectedAllergies,
+        clearSelectedDislikedIngredients,
         clearPreferenceState,
+        loadPreferenceData,
         loadAllergyData,
         loadAllergies,
         loadUserAllergies,
+        loadDislikedIngredientData,
+        loadIngredients,
+        loadUserDislikedIngredients,
         getFilteredAllergies,
+        getFilteredDislikedIngredients,
         addSelectedAllergy,
+        addSelectedDislikedIngredient,
         removeSelectedAllergy,
+        removeSelectedDislikedIngredient,
         saveSelectedAllergies,
-        deleteUserAllergy
+        saveSelectedDislikedIngredients,
+        deleteUserAllergy,
+        deleteUserDislikedIngredient
     }
 })

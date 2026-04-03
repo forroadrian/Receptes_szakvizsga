@@ -24,14 +24,14 @@ export default defineEventHandler(async (event) => {
     if (usernameCheckError) {
         throw createError({
             statusCode: 500,
-            statusMessage: "Nem sikerült ellenőrizni a felhasználónevet.",
+            message: "Nem sikerült ellenőrizni a felhasználónevet.",
         });
     }
 
     if (existingUsernameUser) {
         throw createError({
             statusCode: 409,
-            statusMessage: "Ez a felhasználónév már foglalt.",
+            message: "Ez a felhasználónév már foglalt.",
         });
     }
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (error) {
         throw createError({
             statusCode: 500,
-            statusMessage: "Nem sikerült frissíteni a felhasználónevet az adatbázisban.",
+            message: "Nem sikerült frissíteni a felhasználónevet az adatbázisban.",
         });
     }
 

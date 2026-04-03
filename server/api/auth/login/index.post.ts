@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     if (error || !data) {
         throw createError({
             statusCode: 404,
-            statusMessage: "Nem létezik ilyen felhasználónév.",
+            message: "Nem létezik ilyen felhasználónév.",
         });
     }
 

@@ -3,14 +3,14 @@ export default function requireBodyKeys(
   keys: string[]
 ) {
   if (!body || typeof body !== "object") {
-    throw createError({ statusCode: 400, statusMessage: "Missing body" });
+    throw createError({ statusCode: 400, message: "Missing body" });
   }
   for (const key of keys) {
     const value = body[key];
     if (value === undefined || value === null || value === "") {
       throw createError({
         statusCode: 400,
-        statusMessage: `Missing required field: ${key}`,
+        message: `Missing required field: ${key}`,
       });
     }
   }

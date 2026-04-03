@@ -18,21 +18,21 @@ export default defineEventHandler(async (event) => {
     if (!loggedInEmail) {
         throw createError({
             statusCode: 400,
-            statusMessage: "Nem található a jelenlegi email cím.",
+            message: "Nem található a jelenlegi email cím.",
         });
     }
 
     if (currentEmail !== loggedInEmail) {
         throw createError({
             statusCode: 400,
-            statusMessage: "A jelenlegi email cím nem egyezik a bejelentkezett email címmel.",
+            message: "A jelenlegi email cím nem egyezik a bejelentkezett email címmel.",
         });
     }
 
     if (newEmail === loggedInEmail) {
         throw createError({
             statusCode: 400,
-            statusMessage: "Az új email cím megegyezik a régivel.",
+            message: "Az új email cím megegyezik a régivel.",
         });
     }
 
@@ -47,14 +47,14 @@ export default defineEventHandler(async (event) => {
     if (error) {
         throw createError({
             statusCode: 500,
-            statusMessage: "Nem sikerült ellenőrizni az email címet.",
+            message: "Nem sikerült ellenőrizni az email címet.",
         });
     }
 
     if (data) {
         throw createError({
             statusCode: 409,
-            statusMessage: "Ezzel az email címmel már regisztráltak.",
+            message: "Ezzel az email címmel már regisztráltak.",
         });
     }
 

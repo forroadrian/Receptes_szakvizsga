@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
         .eq("ingredient_id",body.id);
 
     if(error) {
-        throw createError({statusMessage: error.message});
+        throw createError({ message: error.message });
     }
     return true;
-})  
+});

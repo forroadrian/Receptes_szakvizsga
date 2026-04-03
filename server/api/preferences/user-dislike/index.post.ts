@@ -8,32 +8,32 @@ export default defineEventHandler(async (event) => {
     const authUser = await requireUser(event);
     const body = await readBody(event);
 
-    requireBodyKeys(body, ["allergyIds"]);
+    requireBodyKeys(body, ["ingredientIds"]);
 
-    const allergyIds: number[] = Array.isArray(body.allergyIds)
-        ? body.allergyIds.map((allergyId: unknown) => Number(allergyId))
+    const ingredientIds: number[] = Array.isArray(body.ingredientIds)
+        ? body.ingredientIds.map((ingredientId: unknown) => Number(ingredientId))
         : [];
 
-    if (!allergyIds.length) {
+    if (!ingredientIds.length) {
         throw createError({
             statusCode: 400,
-            message: "Missing required field: allergyIds",
+            message: "Missing required field: ingredientIds",
         });
     }
 
     const userId = authUser.id || authUser.sub;
-    const rows = allergyIds.map((allergyId: number) => ({
+    const rows = ingredientIds.map((ingredientId: number) => ({
         user_id: userId,
-        allergy_id: allergyId,
+        ingredient_id: ingredientId,
     }));
 
     const { error } = await client
-        .from("user_allergy")
+        .from("user_dislike")
         .insert(rows);
 
     if (error) {
         throw createError({
-            message: "Nem sikerült elmenteni az allergéneket.",
+            message: "Nem sikerült elmenteni a nem kedvelt alapanyagokat.",
         });
     }
 

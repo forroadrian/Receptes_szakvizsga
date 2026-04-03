@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         .single();
 
     if (error) {
-        throw createError({ statusMessage: error.message });
+        throw createError({ message: error.message });
     }
 
     if (authUser.email && data.email !== authUser.email) {

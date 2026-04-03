@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
     if (ingredientError) {
         throw createError({
-            "statusMessage": ingredientError.message
+            message: ingredientError.message
         })
     }
 
@@ -72,4 +72,4 @@ export default defineEventHandler(async (event) => {
     }
     console.log("works");
     return connectionTableData;
-})
+});

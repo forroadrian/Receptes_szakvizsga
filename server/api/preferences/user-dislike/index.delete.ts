@@ -8,20 +8,20 @@ export default defineEventHandler(async (event) => {
     const authUser = await requireUser(event);
     const body = await readBody(event);
 
-    requireBodyKeys(body, ["allergyId"]);
+    requireBodyKeys(body, ["ingredientId"]);
 
     const userId = authUser.id || authUser.sub;
-    const allergyId = Number(body.allergyId);
+    const ingredientId = Number(body.ingredientId);
 
     const { error } = await client
-        .from("user_allergy")
+        .from("user_dislike")
         .delete()
         .eq("user_id", userId)
-        .eq("allergy_id", allergyId);
+        .eq("ingredient_id", ingredientId);
 
     if (error) {
         throw createError({
-            message: "Nem sikerült törölni az allergént.",
+            message: "Nem sikerült törölni a nem kedvelt alapanyagot.",
         });
     }
 

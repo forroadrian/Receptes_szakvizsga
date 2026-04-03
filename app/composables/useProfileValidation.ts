@@ -74,7 +74,8 @@ export const useProfileValidation = () => {
 
     const validateDislikedIngredient = (
         ingredient: string,
-        existingIngredients: string[],
+        existingIngredients: Array<{ name?: string }>,
+        selectedIngredients: Array<{ name?: string }> = [],
     ) => {
         const trimmedIngredient = ingredient.trim()
 
@@ -82,12 +83,20 @@ export const useProfileValidation = () => {
             return 'Add meg a nem kedvelt alapanyag nevét.'
         }
 
-        const alreadyExists = existingIngredients.some(
-            (item) => item.toLowerCase() === trimmedIngredient.toLowerCase(),
+        const alreadyExists = [...existingIngredients, ...selectedIngredients].some(
+            (item) => item?.name?.toLowerCase() === trimmedIngredient.toLowerCase(),
         )
 
         if (alreadyExists) {
             return 'Ez az alapanyag már szerepel a listában.'
+        }
+
+        return ''
+    }
+
+    const validateSelectedDislikedIngredients = (selectedDislikedIngredients: unknown[]) => {
+        if (!selectedDislikedIngredients.length) {
+            return 'Válassz ki legalább egy alapanyagot a listából.'
         }
 
         return ''
@@ -98,6 +107,7 @@ export const useProfileValidation = () => {
         validateEmailChange,
         validatePasswordChange,
         validateSelectedAllergies,
+        validateSelectedDislikedIngredients,
         validateDislikedIngredient,
     }
 }

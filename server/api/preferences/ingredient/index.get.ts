@@ -1,21 +1,19 @@
 import { serverSupabaseClient } from "#supabase/server";
 import type { Database } from "~/types/database.types";
-import { requireUser } from "~~/server/utils/requireUser";
 
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
-    const authUser = await requireUser(event);
-
-    const userId = authUser.id || authUser.sub;
 
     const { data, error } = await client
-        .from("user_allergy")
-        .select("allergy_id")
-        .eq("user_id", userId);
+        .from("ingredient")
+        .select("id, name, created_at, last_used_at, is_active, deleted_at")
+        .eq("is_active", true)
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
 
     if (error) {
         throw createError({
-            message: "Nem sikerült betölteni a felhasználó allergiáit.",
+            message: "Nem sikerült betölteni az alapanyagokat.",
         });
     }
 

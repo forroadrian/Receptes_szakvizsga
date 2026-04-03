@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
     if (error) {
         throw createError({
             statusCode: 500,
-            statusMessage: "Nem sikerült ellenőrizni az email címet.",
+            message: "Nem sikerült ellenőrizni az email címet.",
         });
     }
 
     if (!data) {
         throw createError({
             statusCode: 404,
-            statusMessage: "Nincs ilyen email címmel regisztrált felhasználó.",
+            message: "Nincs ilyen email címmel regisztrált felhasználó.",
         });
     }
 

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
     if (error) {
         throw createError({
-            statusMessage: "Nem sikerült betölteni az allergéneket.",
+            message: "Nem sikerült betölteni az allergéneket.",
         });
     }
 

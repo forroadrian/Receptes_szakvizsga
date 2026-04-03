@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
         .eq("id", userId);
 
     if (error) {
-        throw createError({ statusMessage: "Nem sikerült menteni a profilképet." });
+        throw createError({ message: "Nem sikerült menteni a profilképet." });
     }
 
     return { profileUrl };

@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) =>{
     .eq("user_id",user.sub)
 
     if (error) {
-        throw createError({statusMessage: error.message});
+        throw createError({ message: error.message });
     }
 
     return data
-}) 
+});
