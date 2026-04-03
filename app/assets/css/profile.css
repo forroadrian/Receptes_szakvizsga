@@ -62,8 +62,6 @@ html {
     border-radius: 50%;
     background: var(--grad-dark);
     color: #fff;
-    align-items: center;
-    justify-content: center;
     box-shadow: var(--shadow-md);
 }
 
@@ -72,11 +70,11 @@ html {
     box-shadow: 0 0 0 0.2rem var(--accent-shadow);
 }
 
-.profile-page .profile-shell .row.g-4 > :last-child .card {
+.profile-page .profile-shell .row.g-4> :last-child .card {
     border: none;
 }
 
-.profile-page .profile-shell .row.g-4 > :last-child .card::before {
+.profile-page .profile-shell .row.g-4> :last-child .card::before {
     content: "";
     position: absolute;
     top: 0;
@@ -200,19 +198,26 @@ html {
     transform: translateY(0);
 }
 
-.profile-page .settings-option-left {
+.profile-page .settings-option-left,
+.profile-page .mobile-menu-card-left {
     display: flex;
     align-items: center;
-    gap: 16px;
     min-width: 0;
 }
 
-.profile-page .settings-option-text {
+.profile-page .settings-option-left {
+    gap: 16px;
+}
+
+.profile-page .settings-option-text,
+.profile-page .mobile-menu-card-text {
     min-width: 0;
 }
 
 .profile-page .settings-option-icon,
-.profile-page .settings-option-arrow {
+.profile-page .settings-option-arrow,
+.profile-page .mobile-menu-card-icon,
+.profile-page .mobile-menu-card-chevron {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -256,6 +261,146 @@ html {
     background: var(--accent-grad);
     border-color: transparent;
     color: #fff;
+}
+
+.profile-page .mobile-menu-card {
+    width: 100%;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    text-align: left;
+    border: 1px solid rgba(214, 188, 142, 0.22);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease;
+}
+
+.profile-page .mobile-menu-card:hover,
+.profile-page .mobile-menu-card.is-open,
+.profile-page .mobile-menu-card.active {
+    border-color: rgba(193, 154, 107, 0.35);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(248, 244, 239, 1));
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+}
+
+.profile-page .mobile-menu-card:active {
+    transform: translateY(1px);
+}
+
+.profile-page .mobile-menu-card-left {
+    gap: 14px;
+}
+
+.profile-page .mobile-menu-card-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(214, 188, 142, 0.28), rgba(193, 154, 107, 0.12));
+    border: 1px solid rgba(193, 154, 107, 0.2);
+    color: #7a5a36;
+}
+
+.profile-page .mobile-menu-card-icon i {
+    font-size: 1.2rem;
+}
+
+.profile-page .mobile-menu-card-text h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--bs-emphasis-color);
+}
+
+.profile-page .mobile-menu-card-text p {
+    font-size: 0.88rem;
+    color: var(--bs-secondary-color);
+}
+
+.profile-page .mobile-menu-card-chevron {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 12px;
+    background: rgba(214, 188, 142, 0.14);
+    border: 1px solid rgba(214, 188, 142, 0.18);
+    color: #6b4f31;
+    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+
+.profile-page .mobile-menu-card.is-open .mobile-menu-card-chevron,
+.profile-page .mobile-menu-card.active .mobile-menu-card-chevron {
+    background: var(--accent-grad);
+    color: #fff;
+}
+
+.profile-page .mobile-menu-card-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.profile-page .mobile-menu-panel {
+    padding-top: 12px;
+}
+
+.profile-page .mobile-settings-options {
+    padding: 12px;
+    border-radius: 22px;
+    box-shadow: none;
+}
+
+.profile-page .mobile-panel-switch-enter-active,
+.profile-page .mobile-panel-switch-leave-active {
+    transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+.profile-page .mobile-panel-switch-enter-active {
+    pointer-events: none;
+}
+
+.profile-page .mobile-panel-switch-enter-from {
+    opacity: 0;
+    transform: translateX(22px) scale(0.985);
+}
+
+.profile-page .mobile-panel-switch-enter-to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.profile-page .mobile-panel-switch-leave-from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.profile-page .mobile-panel-switch-leave-to {
+    opacity: 0;
+    transform: translateX(-18px) scale(0.985);
+}
+
+.profile-page .mobile-section-card {
+    position: relative;
+    overflow: hidden;
+    border: none;
+}
+
+.profile-page .mobile-section-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 15%;
+    background: linear-gradient(180deg, rgba(214, 188, 142, 0.25), rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+
+.profile-page .mobile-section-card>.card-body {
+    position: relative;
+    z-index: 1;
 }
 
 [data-bs-theme="dark"] .profile-page .profile-shell {
@@ -307,6 +452,37 @@ html {
     border-color: rgba(214, 188, 142, 0.14);
 }
 
+[data-bs-theme="dark"] .profile-page .mobile-menu-card {
+    background: linear-gradient(135deg, rgba(28, 32, 38, 0.96), rgba(20, 24, 29, 0.96));
+    border-color: rgba(214, 188, 142, 0.14);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card:hover,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card.is-open,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card.active {
+    background: linear-gradient(135deg, rgba(34, 39, 46, 0.98), rgba(24, 28, 34, 0.98));
+    border-color: rgba(214, 188, 142, 0.28);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-icon {
+    background: linear-gradient(135deg, rgba(214, 188, 142, 0.18), rgba(214, 188, 142, 0.08));
+    border-color: rgba(214, 188, 142, 0.15);
+    color: #f1ddbe;
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-text h6,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-text p,
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
+    color: #f1ddbe;
+}
+
+[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
+    background: rgba(214, 188, 142, 0.1);
+    border-color: rgba(214, 188, 142, 0.14);
+}
+
 @media (min-width: 992px) {
     .profile-page .right-card {
         min-height: 600px;
@@ -314,8 +490,36 @@ html {
 }
 
 @media (max-width: 991.98px) {
+    .profile-page .right-card .card-body {
+        padding: 1.5rem !important;
+    }
+
     .profile-page .section-title h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+
+    .profile-page .settings-options,
+    .profile-page .mobile-settings-options {
+        gap: 12px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option {
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        border-radius: 16px;
+    }
+
+    .profile-page .mobile-settings-options .settings-option-arrow {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 12px;
     }
 }
 
@@ -369,233 +573,6 @@ html {
         width: 36px;
         height: 36px;
         min-width: 36px;
-        border-radius: 12px;
-    }
-}
-.profile-page .mobile-settings-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.profile-page .mobile-menu-card {
-    width: 100%;
-    padding: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    text-align: left;
-    border: 1px solid rgba(214, 188, 142, 0.22);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, background 0.22s ease;
-}
-
-.profile-page .mobile-menu-card:hover,
-.profile-page .mobile-menu-card.is-open,
-.profile-page .mobile-menu-card.active {
-    border-color: rgba(193, 154, 107, 0.35);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(248, 244, 239, 1));
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
-}
-
-.profile-page .mobile-menu-card:active {
-    transform: translateY(1px);
-}
-
-.profile-page .mobile-menu-card-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-width: 0;
-}
-
-.profile-page .mobile-menu-card-icon,
-.profile-page .mobile-menu-card-chevron {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-page .mobile-menu-card-icon {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(214, 188, 142, 0.28), rgba(193, 154, 107, 0.12));
-    border: 1px solid rgba(193, 154, 107, 0.2);
-    color: #7a5a36;
-}
-
-.profile-page .mobile-menu-card-icon i {
-    font-size: 1.2rem;
-}
-
-.profile-page .mobile-menu-card-text {
-    min-width: 0;
-}
-
-.profile-page .mobile-menu-card-text h6 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--bs-emphasis-color);
-}
-
-.profile-page .mobile-menu-card-text p {
-    font-size: 0.88rem;
-    color: var(--bs-secondary-color);
-}
-
-.profile-page .mobile-menu-card-chevron {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    border-radius: 12px;
-    background: rgba(214, 188, 142, 0.14);
-    border: 1px solid rgba(214, 188, 142, 0.18);
-    color: #6b4f31;
-    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
-}
-
-.profile-page .mobile-menu-card.is-open .mobile-menu-card-chevron,
-.profile-page .mobile-menu-card.active .mobile-menu-card-chevron {
-    background: var(--accent-grad);
-    color: #fff;
-}
-
-.profile-page .mobile-menu-card-chevron.rotated {
-    transform: rotate(180deg);
-}
-
-.profile-page .mobile-menu-panel {
-    padding-top: 12px;
-}
-
-.profile-page .mobile-settings-options {
-    padding: 12px;
-    border-radius: 22px;
-    box-shadow: none;
-}
-
-.profile-page .mobile-stage {
-    width: 100%;
-}
-
-.profile-page .mobile-panel-switch-enter-active,
-.profile-page .mobile-panel-switch-leave-active {
-    transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
-}
-
-.profile-page .mobile-panel-switch-enter-active {
-    pointer-events: none;
-}
-
-.profile-page .mobile-panel-switch-enter-from {
-    opacity: 0;
-    transform: translateX(22px) scale(0.985);
-}
-
-.profile-page .mobile-panel-switch-enter-to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-}
-
-.profile-page .mobile-panel-switch-leave-from {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-}
-
-.profile-page .mobile-panel-switch-leave-to {
-    opacity: 0;
-    transform: translateX(-18px) scale(0.985);
-}
-
-.profile-page .mobile-section-card {
-    position: relative;
-    overflow: hidden;
-    border: none;
-}
-
-.profile-page .mobile-section-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 15%;
-    background: linear-gradient(180deg, rgba(214, 188, 142, 0.25), rgba(255, 255, 255, 0));
-    pointer-events: none;
-}
-
-.profile-page .mobile-section-card > .card-body {
-    position: relative;
-    z-index: 1;
-}
-
-[data-bs-theme="dark"] .profile-page .mobile-menu-card {
-    background: linear-gradient(135deg, rgba(28, 32, 38, 0.96), rgba(20, 24, 29, 0.96));
-    border-color: rgba(214, 188, 142, 0.14);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-}
-
-[data-bs-theme="dark"] .profile-page .mobile-menu-card:hover,
-[data-bs-theme="dark"] .profile-page .mobile-menu-card.is-open,
-[data-bs-theme="dark"] .profile-page .mobile-menu-card.active {
-    background: linear-gradient(135deg, rgba(34, 39, 46, 0.98), rgba(24, 28, 34, 0.98));
-    border-color: rgba(214, 188, 142, 0.28);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
-}
-
-[data-bs-theme="dark"] .profile-page .mobile-menu-card-icon {
-    background: linear-gradient(135deg, rgba(214, 188, 142, 0.18), rgba(214, 188, 142, 0.08));
-    border-color: rgba(214, 188, 142, 0.15);
-    color: #f1ddbe;
-}
-
-[data-bs-theme="dark"] .profile-page .mobile-menu-card-text h6,
-[data-bs-theme="dark"] .profile-page .mobile-menu-card-text p,
-[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
-    color: #f1ddbe;
-}
-
-[data-bs-theme="dark"] .profile-page .mobile-menu-card-chevron {
-    background: rgba(214, 188, 142, 0.1);
-    border-color: rgba(214, 188, 142, 0.14);
-}
-
-@media (max-width: 991.98px) {
-    .profile-page .right-card .card-body {
-        padding: 1.5rem !important;
-    }
-
-    .profile-page .section-title h2 {
-        font-size: 1.8rem;
-    }
-
-    .profile-page .settings-options,
-    .profile-page .mobile-settings-options {
-        gap: 12px;
-    }
-
-    .profile-page .mobile-settings-options .settings-option {
-        padding: 16px;
-        border-radius: 18px;
-    }
-
-    .profile-page .mobile-settings-options .settings-option-icon {
-        width: 48px;
-        height: 48px;
-        min-width: 48px;
-        border-radius: 16px;
-    }
-
-    .profile-page .mobile-settings-options .settings-option-arrow {
-        width: 38px;
-        height: 38px;
-        min-width: 38px;
         border-radius: 12px;
     }
 }
