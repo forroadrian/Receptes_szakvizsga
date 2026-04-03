@@ -1,5 +1,5 @@
-<script setup>
-import RecipeDetails from '~/components/RecipeDetails.vue';
+<script setup lang="ts">
+import RecipeDetails from '~/components/recipe/RecipeDetails.vue';
 </script>
 
 <template>

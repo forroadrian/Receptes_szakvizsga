@@ -1,4 +1,5 @@
 import Ingredient from "~/models/Ingredient";
+import type Category from "~/interfaces/Category";
 
 export default interface RecipeConstuctorOptions {
     id?: number;
@@ -16,4 +17,5 @@ export default interface RecipeConstuctorOptions {
     deleted_at?: Date;
     steps?: string[];
     ingredients?: Ingredient[];
+    categories?: Category[];
 }

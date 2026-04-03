@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
 import { useRecipeStore } from "~/stores/recipe";
+import CategoryTags from "~/components/recipe/CategoryTags.vue";
 
 const route = useRoute();
 const colorMode = useColorMode();
@@ -20,9 +22,7 @@ onMounted(async () => {
 const recipe = computed(() => {
     return recipeStore.getRecipeById(recipeId);
 });
-
 </script>
-
 <template>
     <div class="container py-5" v-if="recipe">
         <p @click="$router.back()" class="mb-5 p-0 back-link">
@@ -47,6 +47,8 @@ const recipe = computed(() => {
                 <section>
                     <div class="recipe-description mt-5 ps-lg-2">
                         <h2>{{ recipe.name }}</h2>
+                        <CategoryTags :categories="recipe.categories" />
+
                         <p>{{ recipe.description }}</p>
 
                         <div class="d-flex gap-5 recipe-meta-data">
@@ -80,7 +82,8 @@ const recipe = computed(() => {
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">Elkészítés</h3>
-                <div v-for="(step, index) in recipe.steps" class="step d-flex flex-column flex-lg-row align-items-center mb-3">
+                <div v-for="(step, index) in recipe.steps"
+                    class="step d-flex flex-column flex-lg-row align-items-center mb-3">
                     <p class="circle flex-shrink-0">
                         <span>{{ index + 1 }}</span>
                     </p>
@@ -199,9 +202,12 @@ li {
         grid-area: similar;
     }
 
-    .recipe-main-top ,.recipe-aside,.steps, .similar-recipes{
+    .recipe-main-top,
+    .recipe-aside,
+    .steps,
+    .similar-recipes {
         min-width: 0;
-     }
+    }
 }
 
 @media (max-width: 991.98px) {

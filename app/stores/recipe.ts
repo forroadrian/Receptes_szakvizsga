@@ -60,8 +60,8 @@ export const useRecipeStore = defineStore("recipes", () => {
                 continue;
             }
 
-            const ingredient = new Ingredient(Number(ingredientData.ingredient.id),ingredientData.ingredient.name,
-                Number(ingredientData.quantity),ingredientData.unit);
+            const ingredient = new Ingredient(Number(ingredientData.ingredient.id), ingredientData.ingredient.name,
+                Number(ingredientData.quantity), ingredientData.unit);
 
             ingredients.push(ingredient);
         }
@@ -87,7 +87,10 @@ export const useRecipeStore = defineStore("recipes", () => {
                 ? new Date(recipeData.deleted_at)
                 : undefined,
             steps: getRecipeSteps(recipeData),
-            ingredients: getRecipeIngredients(recipeData)
+            ingredients: getRecipeIngredients(recipeData),
+            categories: (recipeData.recipe_categories ?? [])
+                .map((item: any) => item.category)
+                .filter(Boolean)
         });
     };
 
@@ -112,6 +115,13 @@ export const useRecipeStore = defineStore("recipes", () => {
                         ingredient (
                             id,
                             name
+                        )
+                    ),
+                    recipe_categories (
+                        category (
+                            id,
+                            name,
+                            group_type
                         )
                     )
                 `);
