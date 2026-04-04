@@ -25,7 +25,7 @@ export const useRecipeStore = defineStore("recipes", () => {
     const getAllRecipes = computed(() => recipes.value);
 
     const getRecipeById = (id: number) => {
-        return recipes.value.find((recipe) => recipe.id === id) ?? null;
+        return recipes.value.find(recipe => recipe.id === id) ?? null;
     };
 
     const getRecipeSteps = (recipeData: any): string[] => {
@@ -35,9 +35,9 @@ export const useRecipeStore = defineStore("recipes", () => {
             return steps;
         }
 
-        const sortedSteps = [...recipeData.recipe_step].sort((firstStep, secondStep) => {
-            return firstStep.step_number - secondStep.step_number;
-        });
+        const sortedSteps = [...recipeData.recipe_step].sort(
+            (firstStep, secondStep) => firstStep.step_number - secondStep.step_number
+        );
 
         for (const stepData of sortedSteps) {
             if (stepData.step?.step_description) {
@@ -60,8 +60,12 @@ export const useRecipeStore = defineStore("recipes", () => {
                 continue;
             }
 
-            const ingredient = new Ingredient(Number(ingredientData.ingredient.id), ingredientData.ingredient.name,
-                Number(ingredientData.quantity), ingredientData.unit);
+            const ingredient = new Ingredient(
+                Number(ingredientData.ingredient.id),
+                ingredientData.ingredient.name,
+                Number(ingredientData.quantity),
+                ingredientData.unit
+            );
 
             ingredients.push(ingredient);
         }
@@ -83,9 +87,7 @@ export const useRecipeStore = defineStore("recipes", () => {
             last_edit: new Date(recipeData.last_edit),
             is_ai_generated: recipeData.is_ai_generated,
             active: recipeData.active ?? true,
-            deleted_at: recipeData.deleted_at
-                ? new Date(recipeData.deleted_at)
-                : undefined,
+            deleted_at: recipeData.deleted_at ? new Date(recipeData.deleted_at) : undefined,
             steps: getRecipeSteps(recipeData),
             ingredients: getRecipeIngredients(recipeData),
             categories: (recipeData.recipe_categories ?? [])
@@ -143,17 +145,13 @@ export const useRecipeStore = defineStore("recipes", () => {
 
         clearRecipes();
 
-        if (!recipeDataList.length) {
-            return;
-        }
-
         for (const recipeData of recipeDataList) {
-            const recipe = createRecipe(recipeData);
-            addRecipe(recipe);
+            addRecipe(createRecipe(recipeData));
         }
     };
 
     return {
+        recipes,
         showRecipeModal,
         openRecipeModal,
         closeRecipeModal,

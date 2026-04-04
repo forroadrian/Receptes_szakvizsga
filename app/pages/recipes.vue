@@ -1,158 +1,24 @@
 <script setup lang="ts">
-import { useRecipeStore } from "~/stores/recipe";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
-import type Category from "~/interfaces/Category";
+import { useRecipeStore } from "~/stores/recipe";
+import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
-type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
-type CategoryOption = Category;
-
-const supabase = useSupabaseClient();
 const recipeStore = useRecipeStore();
-const user = useSupabaseUser();
+const filterStore = useRecipeFilterStore();
 const colorMode = useColorMode();
-
-const search = ref("");
-const allergenSearch = ref("");
-const activeTab = ref<RecipeTab>("default");
-
-const selectedDurationId = ref<number | null>(null);
-const selectedMealId = ref<number | null>(null);
-const selectedTypeId = ref<number | null>(null);
-
-const mealOptions = ref<CategoryOption[]>([]);
-const typeOptions = ref<CategoryOption[]>([]);
-
-const durationOptions = [
-    { id: 1, label: "15 percen belül", value: "under15" },
-    { id: 2, label: "30 percen belül", value: "under30" },
-    { id: 3, label: "1 órán belül", value: "under60" },
-    { id: 4, label: "1 órán túl", value: "over60" }
-];
 
 const filterButtonColor = computed(() =>
     colorMode.value === "dark" ? "soft" : "dark"
 );
-
-const allRecipes = computed(() => recipeStore.getAllRecipes);
-
-const activeDuration = computed<string | null>(() => {
-    return durationOptions.find(option => option.id === selectedDurationId.value)?.value ?? null;
-});
-
-const durationCategories = computed<Category[]>(() =>
-    durationOptions.map(option => ({
-        id: option.id,
-        name: option.label,
-        group_type: null
-    }))
-);
-
-const tabRecipes = computed(() => {
-    if (activeTab.value === "own") {
-        return allRecipes.value.filter(recipe => recipe.author_id === user.value?.id);
-    }
-
-    if (activeTab.value === "saved") {
-        return [];
-    }
-
-    if (activeTab.value === "tried") {
-        return [];
-    }
-
-    if (activeTab.value === "ai") {
-        return [];
-    }
-
-    return allRecipes.value;
-});
-
-const hasCategory = (categories: Category[] | undefined, id: number | null) =>
-    id === null || !!categories?.find(category => category.id === id);
-
-const hasActiveFilters = computed(() =>
-    search.value ||
-    allergenSearch.value ||
-    selectedDurationId.value !== null ||
-    selectedMealId.value !== null ||
-    selectedTypeId.value !== null ||
-    activeTab.value !== "default"
-);
-
-const clearFilters = () => {
-    search.value = "";
-    allergenSearch.value = "";
-
-    selectedDurationId.value = null;
-    selectedMealId.value = null;
-    selectedTypeId.value = null;
-
-    activeTab.value = "default";
-};
-const filteredRecipes = computed(() =>
-    tabRecipes.value.filter(recipe => {
-        const query = search.value.trim().toLowerCase();
-        const allergenQuery = allergenSearch.value.trim().toLowerCase();
-
-        const matchesSearch =
-            !query ||
-            recipe.name.toLowerCase().includes(query) ||
-            recipe.description.toLowerCase().includes(query);
-
-        const matchesDuration =
-            !activeDuration.value ||
-            (activeDuration.value === "under15" && recipe.time <= 15) ||
-            (activeDuration.value === "under30" && recipe.time <= 30) ||
-            (activeDuration.value === "under60" && recipe.time <= 60) ||
-            (activeDuration.value === "over60" && recipe.time > 60);
-
-        const matchesMeal = hasCategory(recipe.categories, selectedMealId.value);
-        const matchesType = hasCategory(recipe.categories, selectedTypeId.value);
-
-        const matchesAllergen =
-            !allergenQuery ||
-            recipe.categories?.some(category =>
-                category.name.toLowerCase().includes(allergenQuery)
-            );
-
-        return (
-            matchesSearch &&
-            matchesDuration &&
-            matchesMeal &&
-            matchesType &&
-            matchesAllergen
-        );
-    })
-);
-
-const loadCategories = async () => {
-    const { data, error } = await supabase
-        .from("category")
-        .select("id, name, group_type")
-        .order("name", { ascending: true });
-
-    if (error) {
-        console.error("Hiba a kategóriák lekérése közben:", error);
-        return;
-    }
-
-    const categories = (data ?? []) as CategoryOption[];
-
-    mealOptions.value = categories.filter(
-        category => String(category.group_type).toLowerCase() === "meal"
-    );
-
-    typeOptions.value = categories.filter(
-        category => String(category.group_type).toLowerCase() === "type"
-    );
-};
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
         await recipeStore.loadRecipes();
     }
 
-    await loadCategories();
+    if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
+        await filterStore.loadCategories();
+    }
 });
 </script>
 
@@ -168,7 +34,7 @@ onMounted(async () => {
 
             <div class="row align-items-center justify-content-between">
                 <div class="col-lg-9 col-md-8 search-wrap my-3">
-                    <SearchBar v-model="search" placeholder="Keress keresési szó vagy recept alapján..."
+                    <SearchBar v-model="filterStore.search" placeholder="Keress keresési szó vagy recept alapján..."
                         class="recipes-search w-100" />
                 </div>
 
@@ -184,32 +50,32 @@ onMounted(async () => {
             <nav class="recipes-tabs mt-3">
                 <ul class="d-flex flex-wrap list-unstyled gap-4">
                     <li>
-                        <button type="button" class="tab-btn" :class="{ active: activeTab === 'default' }"
-                            @click="activeTab = 'default'">
+                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'default' }"
+                            @click="filterStore.activeTab = 'default'">
                             Alapértelmezett
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="tab-btn" :class="{ active: activeTab === 'own' }"
-                            @click="activeTab = 'own'">
+                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'own' }"
+                            @click="filterStore.activeTab = 'own'">
                             Saját
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="tab-btn" :class="{ active: activeTab === 'saved' }"
-                            @click="activeTab = 'saved'">
+                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'saved' }"
+                            @click="filterStore.activeTab = 'saved'">
                             Kedvelt
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="tab-btn" :class="{ active: activeTab === 'tried' }"
-                            @click="activeTab = 'tried'">
+                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'tried' }"
+                            @click="filterStore.activeTab = 'tried'">
                             Kipróbált
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="tab-btn" :class="{ active: activeTab === 'ai' }"
-                            @click="activeTab = 'ai'">
+                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'ai' }"
+                            @click="filterStore.activeTab = 'ai'">
                             AI ajánlás
                         </button>
                     </li>
@@ -225,7 +91,7 @@ onMounted(async () => {
                     </div>
                 </div>
 
-                <div v-for="recipe in filteredRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
+                <div v-for="recipe in filterStore.filteredRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
@@ -292,7 +158,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div v-if="!filteredRecipes.length" class="text-center py-5">
+            <div v-if="!filterStore.filteredRecipes.length" class="text-center py-5">
                 <p class="mb-0">Nincs a szűrésnek megfelelő recept.</p>
             </div>
 
@@ -304,24 +170,24 @@ onMounted(async () => {
                 </div>
 
                 <div class="offcanvas-body">
-                    <button class="deleteAll grad m-auto w-75 pt-4 ">
-                        <p @click="clearFilters"> Kijelölések törlése </p>
+                    <button class="deleteAll grad m-auto w-75 pt-4">
+                        <p @click="filterStore.clearFilters">Kijelölések törlése</p>
                     </button>
 
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
-                            <CategoryTags :categories="durationCategories" interactive v-model="selectedDurationId" />
+                            <CategoryTags :categories="filterStore.durationCategories" interactive v-model="filterStore.selectedDurationId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
-                            <CategoryTags :categories="mealOptions" interactive v-model="selectedMealId" />
+                            <CategoryTags :categories="filterStore.mealOptions" interactive v-model="filterStore.selectedMealId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Típus</p>
-                            <CategoryTags :categories="typeOptions" interactive v-model="selectedTypeId" />
+                            <CategoryTags :categories="filterStore.typeOptions" interactive v-model="filterStore.selectedTypeId" />
                         </div>
                         <div class="filter-item">
                             <div class="d-flex mb-2">
@@ -339,7 +205,7 @@ onMounted(async () => {
 
                         <div class="filter-item">
                             <p class="filter-title mb-3">Allergén, ételérzékenység</p>
-                            <SearchBar v-model="allergenSearch" placeholder="Allergén neve / típusa..." class="w-100" />
+                            <SearchBar v-model="filterStore.allergenSearch" placeholder="Allergén neve / típusa..." class="w-100" />
                         </div>
                     </div>
                 </div>
