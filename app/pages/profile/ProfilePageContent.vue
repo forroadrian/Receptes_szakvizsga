@@ -484,7 +484,7 @@ const handleSave = async () => {
         <div class="profile-shell p-3 p-md-4 rounded-3 shadow w-100">
             <div class="row g-4">
                 <div class="col-12 col-lg-4">
-                    <div class="shadow-sm rounded-3">
+                    <div class="shadow-sm rounded-3 profile-sidebar-panel">
                         <div class="card-body shadow-sm p-4">
                             <div class="text-center mb-4">
                                 <div class="avatar-wrap mx-auto mb-3 position-relative">
@@ -510,7 +510,7 @@ const handleSave = async () => {
                     </div>
 
                     <div class="mt-4 d-none d-lg-block">
-                        <div class="list-group menu">
+                        <div class="list-group menu profile-sidebar-menu">
                             <button type="button"
                                 class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                 :class="{ active: isProfileSettingsActive }" @click="resetToMenu">
