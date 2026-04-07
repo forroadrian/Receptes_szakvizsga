@@ -3,16 +3,10 @@ import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfa
 import { ref } from 'vue';
 import { computed } from 'vue';
 
-const colorMode = useColorMode()
 const user = useSupabaseUser()
 
 const ingredientsButtonTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
-})
-
-const buttonColor = computed(() => {
-    if (colorMode.value === "dark") return "soft"
-    return "dark"
 })
 
 const categories = [
@@ -196,7 +190,7 @@ const cards = ref([
                 </div>
                 <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
                     <ClientOnly>
-                        <Button to="/recipes" :color="buttonColor" icon="bi bi-arrow-right" iconPosition="right"
+                        <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right"
                             class="my-5">Keress
                             további
                             recepteket</Button>

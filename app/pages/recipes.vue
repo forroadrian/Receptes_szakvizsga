@@ -1,15 +1,11 @@
 <script setup lang="ts">
+import Button from "~/components/Button.vue";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
-const colorMode = useColorMode();
-
-const filterButtonColor = computed(() =>
-    colorMode.value === "dark" ? "soft" : "dark"
-);
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
@@ -39,7 +35,7 @@ onMounted(async () => {
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
-                    <Button :color="filterButtonColor" outline icon="bi bi-funnel" class="w-100 px-4 text-nowrap"
+                    <Button outline icon="bi bi-funnel" class="w-100 px-4 text-nowrap"
                         data-bs-toggle="offcanvas" data-bs-target="#recipeFiltersOffcanvas"
                         aria-controls="recipeFiltersOffcanvas">
                         Szűrők
@@ -170,9 +166,9 @@ onMounted(async () => {
                 </div>
 
                 <div class="offcanvas-body">
-                    <button class="deleteAll grad m-auto w-75 pt-4">
+                    <Button :outline="true" class="deleteAll grad m-auto w-75 pt-4">
                         <p @click="filterStore.clearFilters">Kijelölések törlése</p>
-                    </button>
+                    </Button>
 
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
