@@ -4,14 +4,9 @@ import { useRecipeStore } from "~/stores/recipe";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 
 const route = useRoute();
-const colorMode = useColorMode();
 const recipeStore = useRecipeStore();
 
 const recipeId = Number(route.params.id);
-
-const buttonColor = computed(() => {
-    return colorMode.value === "dark" ? "soft" : "dark";
-});
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
@@ -61,7 +56,7 @@ const recipe = computed(() => {
             <aside class="recipe-aside">
                 <div class="recipeButtons">
                     <ClientOnly>
-                        <Button :color="buttonColor" iconPosition="right" class="w-100 mb-3" outline>
+                        <Button iconPosition="right" class="w-100 mb-3" outline>
                             Kipróbálatlan
                         </Button>
                         <Button to="/recipes" color="green" class="mb-3" icon="bi bi-plus-circle" iconPosition="left">

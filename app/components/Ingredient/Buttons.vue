@@ -1,16 +1,10 @@
 <script lang="ts" setup>
-const colorMode = useColorMode();
-
-const buttonColor = computed(() => {
-    return colorMode.value === "dark" ? "soft" : "dark";
-});
 </script>
 <template>
   <Button
     class="col-lg-4 col-10 mx-auto"
     icon="bi bi-plus"
     type="button"
-    :color="buttonColor"
     @click="$emit('openIngredientModal')"
     >Új hozzávaló hozzáadása</Button
   >

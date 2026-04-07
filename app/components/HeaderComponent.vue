@@ -108,8 +108,13 @@ const handleSignOut = async () => {
                                 {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
                             </span>
                         </p>
-                        <NuxtLink class="w-lg-auto me-3 grad orange" to="/register"> Regisztráció</NuxtLink>
-                        <NuxtLink class="grad orange w-lg-auto  me-3" to="/login">Belépés</NuxtLink>
+                        <Button to="/register" color="orange" :outline="true" class="w-lg-auto me-1">
+                            Regisztráció
+                        </Button>
+
+                        <Button to="/login" color="orange" class="w-lg-auto">
+                            Belépés
+                        </Button>
                     </div>
 
                     <div v-else class="auth-area">

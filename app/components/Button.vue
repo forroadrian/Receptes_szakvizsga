@@ -4,7 +4,7 @@ import { computed } from "vue";
 const props = defineProps({
     color: {
         type: String,
-        default: "orange",
+        default: null,
     },
     outline: {
         type: Boolean,
@@ -20,13 +20,13 @@ const props = defineProps({
     },
     to: {
         type: [String, Object],
-        default: null
+        default: null,
     },
     icon: {
-        type: String
+        type: String,
     },
     iconPosition: {
-        type: String
+        type: String,
     },
     iconOnly: {
         type: Boolean,
@@ -36,8 +36,18 @@ const props = defineProps({
 
 const emit = defineEmits(["click"]);
 
+const colorMode = useColorMode();
+
+const resolvedColor = computed(() => {
+    if (props.color) {
+        return props.color;
+    }
+
+    return colorMode.value === "dark" ? "soft" : "dark";
+});
+
 const classes = computed(() => {
-    return ["grad", props.color, props.outline ? "outline" : "",];
+    return ["grad", resolvedColor.value, props.outline ? "outline" : "",];
 });
 
 const iconPosition = computed(() => {
@@ -52,8 +62,9 @@ function handleClick(event) {
     }
 }
 </script>
+
 <template>
-    <NuxtLink v-if="isLink" :to="to" :class="classes" @click="handleClick">
+    <NuxtLink v-if="isLink" :to="disabled ? null : to" :class="classes" @click="handleClick">
         <i v-if="icon && iconPosition === 'left'" :class="icon"></i>
 
         <span v-if="!iconOnly">
@@ -64,13 +75,13 @@ function handleClick(event) {
     </NuxtLink>
 
     <button v-else :type="type" :class="classes" :disabled="disabled" @click="handleClick">
-        <i v-if="icon && iconPosition === 'left'" :class="icon"> </i>
+        <i v-if="icon && iconPosition === 'left'" :class="icon"></i>
 
         <span v-if="!iconOnly">
             <slot />
         </span>
 
-        <i v-if="icon && iconPosition === 'right'" :class="icon"> </i>
+        <i v-if="icon && iconPosition === 'right'" :class="icon"></i>
     </button>
 </template>
 
