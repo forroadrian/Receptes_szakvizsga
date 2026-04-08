@@ -57,7 +57,7 @@ const onSubmit = async () => {
                     <FormInput class="pt-3" v-model="password" label="Jelszó" type="password"
                         placeholder="Add meg a jelszavad" required />
 
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2 mb-3">
+                    <div class="auth-login-options d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2 mb-3">
                         <div class="form-check m-0">
                             <input id="rememberMe" class="form-check-input" type="checkbox" v-model="rememberMe">
                             <label class="form-check-label" for="rememberMe">

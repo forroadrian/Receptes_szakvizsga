@@ -47,6 +47,8 @@ const toggleTheme = () => {
 <style scoped>
 .auth-topbar {
     padding: 1rem 1rem 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-topbar-inner {
@@ -58,6 +60,7 @@ const toggleTheme = () => {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    box-sizing: border-box;
     border-radius: 22px;
     border: 1px solid rgba(255, 255, 255, 0.45);
     background: rgba(255, 255, 255, 0.72);
@@ -161,35 +164,52 @@ const toggleTheme = () => {
     }
 
     .auth-topbar-inner {
-        padding: 0.85rem 0.95rem;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
         border-radius: 18px;
+    }
+
+    .auth-brand {
+        width: 100%;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.45rem;
     }
 
     .auth-brand-logo {
         width: 100px;
     }
 
+    .auth-brand-copy {
+        align-items: center;
+    }
+
     .auth-brand-subtitle {
         display: none;
+    }
+
+    .auth-topbar-actions {
+        width: 100%;
+        justify-content: center;
+        gap: 0.85rem;
+        flex-wrap: nowrap;
+    }
+
+    .auth-theme-button,
+    .auth-home-link {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        font-size: 0.9rem;
+        padding: 0 0.8rem;
     }
 }
 
 @media (max-width: 575.98px) {
     .auth-topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .auth-topbar-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .auth-theme-button,
-    .auth-home-link {
-        flex: 1 1 calc(50% - 0.375rem);
-        font-size: 0.9rem;
-        padding: 0 0.8rem;
+        padding: 0.95rem;
     }
 }
 </style>

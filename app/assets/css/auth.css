@@ -1,13 +1,21 @@
 .auth-form-page,
-.auth-form-side {
+.auth-form-side,
+.auth-form-shell {
     width: 100%;
+    box-sizing: border-box;
 }
 
 .auth-form-page {
     padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .auth-form-shell {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
     min-height: 100%;
     display: flex;
     align-items: center;
@@ -15,7 +23,12 @@
 }
 
 .auth-form-side {
+    min-height: 100%;
     padding: 2rem 1.75rem;
+}
+
+.auth-form-page form {
+    width: 100%;
 }
 
 .auth-form-page a {
@@ -33,15 +46,45 @@
 @media (max-width: 991.98px) {
     .auth-form-page {
         padding: 0;
+        align-items: stretch;
     }
 
     .auth-form-shell {
-        align-items: flex-start;
-        justify-content: flex-start;
+        align-items: stretch;
+        justify-content: center;
     }
 
     .auth-form-side {
-        padding: 1.25rem 1.25rem 2rem 1.25rem;
+        padding: 1.5rem 1.25rem 2rem;
         justify-content: flex-start !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .auth-form-page {
+        min-height: 100%;
+    }
+
+    .auth-form-shell {
+        max-width: none;
+    }
+
+    .auth-form-side {
+        padding: 1.5rem 1.15rem 1.9rem;
+    }
+
+    .auth-login-options {
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        text-align: left;
+    }
+
+    .auth-login-options .form-check {
+        margin-right: auto;
+    }
+
+    .auth-login-options > a {
+        margin-left: auto;
+        text-align: right;
     }
 }

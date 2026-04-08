@@ -73,16 +73,21 @@ const authPanelContent = computed(() => {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    width: 100%;
 }
 
 .auth-layout-shell {
     position: relative;
     overflow: hidden;
+    min-height: 100dvh;
+    width: 100%;
 }
 
 .authLayoutMain {
     flex: 1;
     display: flex;
+    min-height: 0;
+    width: 100%;
 }
 
 .auth-stage {
@@ -92,6 +97,7 @@ const authPanelContent = computed(() => {
     align-items: center;
     justify-content: center;
     padding: 1.25rem 1rem 1.5rem;
+    box-sizing: border-box;
 }
 
 .auth-switch-card {
@@ -105,6 +111,7 @@ const authPanelContent = computed(() => {
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(14px);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
 }
 
 .auth-image-pane,
@@ -204,13 +211,21 @@ const authPanelContent = computed(() => {
 }
 
 @media (max-width: 991.98px) {
+    .authLayoutMain {
+        min-height: calc(100dvh - 116px);
+    }
+
     .auth-stage {
         padding: 0.75rem;
-        align-items: flex-start;
+        align-items: stretch;
     }
 
     .auth-switch-card {
-        min-height: auto;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100%;
         border-radius: 22px;
     }
 
@@ -234,13 +249,21 @@ const authPanelContent = computed(() => {
 
     .auth-slot-pane {
         width: 100%;
-        min-height: auto;
+        min-height: 100%;
     }
 }
 
 @media (max-width: 575.98px) {
+    .authLayoutMain {
+        min-height: calc(100dvh - 184px);
+    }
+
     .auth-stage {
         padding: 0.5rem;
+    }
+
+    .auth-switch-card {
+        border-radius: 20px;
     }
 }
 </style>
