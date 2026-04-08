@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="profile-section-actions mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+    <div class="profile-section-actions mt-auto d-flex flex-row gap-3 justify-content-end">
         <Button
             type="button"
             color="outline-dark"
@@ -38,7 +38,9 @@ defineProps({
 
 <style scoped>
 .profile-section-actions :deep(.profile-action-button) {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
 }
 
 @media (min-width: 576px) {
