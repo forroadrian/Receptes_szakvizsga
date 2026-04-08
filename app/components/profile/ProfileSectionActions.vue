@@ -4,7 +4,7 @@ defineEmits(['cancel', 'save']);
 defineProps({
     saveText: {
         type: String,
-        default: 'MentĂ©s',
+        default: 'Mentés',
     },
     saveDisabled: {
         type: Boolean,
@@ -21,7 +21,7 @@ defineProps({
             class="profile-action-button btn-lg px-5 rounded-pill"
             @click="$emit('cancel')"
         >
-            MĂ©gsem
+            Mégsem
         </Button>
 
         <Button

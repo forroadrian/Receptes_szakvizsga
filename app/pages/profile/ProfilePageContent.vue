@@ -720,124 +720,135 @@ const handleSave = async () => {
                         <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
                             <Transition name="desktop-panel-switch" mode="out-in">
                                 <div :key="activeSection" class="desktop-panel-stage h-100 d-flex flex-column">
-                            <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">
-                                <div class="settings-options">
-                                    <ProfileSettingsOption v-for="option in settingsOptions" :key="option.key"
-                                        :icon="option.icon" :title="option.title" @click="openSection(option.key)" />
-                                </div>
-                            </ProfileSectionCard>
-
-                            <ProfileSectionCard v-else-if="activeSection === 'username'" title="Felhasználónév módosítása">
-                                <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
-                                    <div class="mb-4">
-                                        <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
-                                    </div>
-
-                                    <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
-                                </form>
-                            </ProfileSectionCard>
-
-                            <ProfileSectionCard v-else-if="activeSection === 'password'" title="Jelszó módosítása">
-                                <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
-                                    <div class="mb-3">
-                                        <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
-                                            type="password" />
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <FormInput v-model="newPasswordInput" label="Új jelszó" type="password" />
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <FormInput v-model="confirmPasswordInput" label="Add meg újra a jelszavad"
-                                            type="password" />
-                                    </div>
-
-                                    <div class="form-check mb-4">
-                                        <input id="signOutEverywhere" v-model="signOutEverywhere"
-                                            class="form-check-input" type="checkbox">
-                                        <label class="form-check-label" for="signOutEverywhere">
-                                            Jelentkeztess ki mindenhonnan
-                                        </label>
-                                    </div>
-
-                                    <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
-                                </form>
-                            </ProfileSectionCard>
-
-                            <ProfileSectionCard v-else-if="activeSection === 'email'" title="Email módosítása">
-                                <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
-                                    <div class="mb-3">
-                                        <FormInput v-model="emailInput" label="Email" type="email" />
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <FormInput v-model="newEmailInput" label="Új email" type="email" />
-                                    </div>
-
-                                    <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
-                                </form>
-                            </ProfileSectionCard>
-
-                            <ProfileSectionCard v-else-if="activeSection === 'allergen'" title="Allergén hozzáadása">
-                                <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
-                                    <div class="mb-4 position-relative">
-                                        <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
-
-                                        <ProfileBadgeList v-if="selectedAllergies.length" class="mb-3"
-                                            :items="selectedAllergies" display-key="name"
-                                            @remove="removeSelectedAllergen" />
-
-                                        <div v-if="hasTypedAllergen" class="allergy-suggestions list-group shadow-sm">
-                                            <button v-for="allergy in filteredAllergies" :key="allergy.id" type="button"
-                                                class="list-group-item list-group-item-action allergy-suggestion-btn"
-                                                @click="selectAllergy(allergy)">
-                                                {{ allergy.name }}
-                                            </button>
-
-                                            <div v-if="!filteredAllergies.length"
-                                                class="list-group-item text-muted small">
-                                                Nincs ilyen allergén a listában.
-                                            </div>
+                                    <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">
+                                        <div class="settings-options">
+                                            <ProfileSettingsOption v-for="option in settingsOptions" :key="option.key"
+                                                :icon="option.icon" :title="option.title"
+                                                @click="openSection(option.key)" />
                                         </div>
-                                    </div>
+                                    </ProfileSectionCard>
 
-                                    <ProfileSectionActions :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
-                                        :save-disabled="preferencesSaving" @cancel="resetToMenu" @save="handleSave" />
-                                </form>
-                            </ProfileSectionCard>
-
-                            <ProfileSectionCard v-else-if="activeSection === 'dislikedIngredient'"
-                                title="Nem kedvelt alapanyagok hozzáadása">
-                                <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
-                                    <div class="mb-4 position-relative">
-                                        <FormInput v-model="dislikedIngredientInput" label="Nem kedvelt alapanyag neve"
-                                            type="text" />
-
-                                        <ProfileBadgeList v-if="selectedDislikedIngredients.length" class="mb-3"
-                                            :items="selectedDislikedIngredients" display-key="name"
-                                            @remove="removeSelectedDislikedIngredient" />
-
-                                        <div v-if="hasTypedDislikedIngredient"
-                                            class="allergy-suggestions list-group shadow-sm">
-                                            <button v-for="ingredient in filteredDislikedIngredients"
-                                                :key="ingredient.id" type="button"
-                                                class="list-group-item list-group-item-action allergy-suggestion-btn"
-                                                @click="selectDislikedIngredient(ingredient)">
-                                                {{ ingredient.name }}
-                                            </button>
-
-                                            <div v-if="!filteredDislikedIngredients.length"
-                                                class="list-group-item text-muted small">
-                                                Nincs ilyen alapanyag a listában.
+                                    <ProfileSectionCard v-else-if="activeSection === 'username'"
+                                        title="Felhasználónév módosítása">
+                                        <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                            <div class="mb-4">
+                                                <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <ProfileSectionActions :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
-                                        :save-disabled="preferencesSaving" @cancel="resetToMenu" @save="handleSave" />
-                                </form>
-                            </ProfileSectionCard>
+                                            <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
+                                        </form>
+                                    </ProfileSectionCard>
+
+                                    <ProfileSectionCard v-else-if="activeSection === 'password'"
+                                        title="Jelszó módosítása">
+                                        <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                            <div class="mb-3">
+                                                <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                    type="password" />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <FormInput v-model="newPasswordInput" label="Új jelszó"
+                                                    type="password" />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <FormInput v-model="confirmPasswordInput"
+                                                    label="Add meg újra a jelszavad" type="password" />
+                                            </div>
+
+                                            <div class="form-check mb-4">
+                                                <input id="signOutEverywhere" v-model="signOutEverywhere"
+                                                    class="form-check-input" type="checkbox">
+                                                <label class="form-check-label" for="signOutEverywhere">
+                                                    Jelentkeztess ki mindenhonnan
+                                                </label>
+                                            </div>
+
+                                            <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
+                                        </form>
+                                    </ProfileSectionCard>
+
+                                    <ProfileSectionCard v-else-if="activeSection === 'email'" title="Email módosítása">
+                                        <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                            <div class="mb-3">
+                                                <FormInput v-model="emailInput" label="Email" type="email" />
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <FormInput v-model="newEmailInput" label="Új email" type="email" />
+                                            </div>
+
+                                            <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
+                                        </form>
+                                    </ProfileSectionCard>
+
+                                    <ProfileSectionCard v-else-if="activeSection === 'allergen'"
+                                        title="Allergén hozzáadása">
+                                        <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                            <div class="mb-4 position-relative">
+                                                <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
+
+                                                <ProfileBadgeList v-if="selectedAllergies.length" class="mb-3"
+                                                    :items="selectedAllergies" display-key="name"
+                                                    @remove="removeSelectedAllergen" />
+
+                                                <div v-if="hasTypedAllergen"
+                                                    class="allergy-suggestions list-group shadow-sm">
+                                                    <button v-for="allergy in filteredAllergies" :key="allergy.id"
+                                                        type="button"
+                                                        class="list-group-item list-group-item-action allergy-suggestion-btn"
+                                                        @click="selectAllergy(allergy)">
+                                                        {{ allergy.name }}
+                                                    </button>
+
+                                                    <div v-if="!filteredAllergies.length"
+                                                        class="list-group-item text-muted small">
+                                                        Nincs ilyen allergén a listában.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <ProfileSectionActions
+                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-disabled="preferencesSaving" @cancel="resetToMenu"
+                                                @save="handleSave" />
+                                        </form>
+                                    </ProfileSectionCard>
+
+                                    <ProfileSectionCard v-else-if="activeSection === 'dislikedIngredient'"
+                                        title="Nem kedvelt alapanyagok hozzáadása">
+                                        <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
+                                            <div class="mb-4 position-relative">
+                                                <FormInput v-model="dislikedIngredientInput"
+                                                    label="Nem kedvelt alapanyag neve" type="text" />
+
+                                                <ProfileBadgeList v-if="selectedDislikedIngredients.length" class="mb-3"
+                                                    :items="selectedDislikedIngredients" display-key="name"
+                                                    @remove="removeSelectedDislikedIngredient" />
+
+                                                <div v-if="hasTypedDislikedIngredient"
+                                                    class="allergy-suggestions list-group shadow-sm">
+                                                    <button v-for="ingredient in filteredDislikedIngredients"
+                                                        :key="ingredient.id" type="button"
+                                                        class="list-group-item list-group-item-action allergy-suggestion-btn"
+                                                        @click="selectDislikedIngredient(ingredient)">
+                                                        {{ ingredient.name }}
+                                                    </button>
+
+                                                    <div v-if="!filteredDislikedIngredients.length"
+                                                        class="list-group-item text-muted small">
+                                                        Nincs ilyen alapanyag a listában.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <ProfileSectionActions
+                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-disabled="preferencesSaving" @cancel="resetToMenu"
+                                                @save="handleSave" />
+                                        </form>
+                                    </ProfileSectionCard>
                                 </div>
                             </Transition>
                         </div>
