@@ -718,6 +718,8 @@ const handleSave = async () => {
                 <div class="col-12 col-lg-8 d-none d-lg-flex">
                     <div class="card custshadow rounded-3 w-100 right-card">
                         <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
+                            <Transition name="desktop-panel-switch" mode="out-in">
+                                <div :key="activeSection" class="desktop-panel-stage h-100 d-flex flex-column">
                             <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">
                                 <div class="settings-options">
                                     <ProfileSettingsOption v-for="option in settingsOptions" :key="option.key"
@@ -725,7 +727,7 @@ const handleSave = async () => {
                                 </div>
                             </ProfileSectionCard>
 
-                            <ProfileSectionCard v-if="activeSection === 'username'" title="Felhasználónév módosítása">
+                            <ProfileSectionCard v-else-if="activeSection === 'username'" title="Felhasználónév módosítása">
                                 <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                     <div class="mb-4">
                                         <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
@@ -735,7 +737,7 @@ const handleSave = async () => {
                                 </form>
                             </ProfileSectionCard>
 
-                            <ProfileSectionCard v-if="activeSection === 'password'" title="Jelszó módosítása">
+                            <ProfileSectionCard v-else-if="activeSection === 'password'" title="Jelszó módosítása">
                                 <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                     <div class="mb-3">
                                         <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
@@ -763,7 +765,7 @@ const handleSave = async () => {
                                 </form>
                             </ProfileSectionCard>
 
-                            <ProfileSectionCard v-if="activeSection === 'email'" title="Email módosítása">
+                            <ProfileSectionCard v-else-if="activeSection === 'email'" title="Email módosítása">
                                 <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                     <div class="mb-3">
                                         <FormInput v-model="emailInput" label="Email" type="email" />
@@ -777,7 +779,7 @@ const handleSave = async () => {
                                 </form>
                             </ProfileSectionCard>
 
-                            <ProfileSectionCard v-if="activeSection === 'allergen'" title="Allergén hozzáadása">
+                            <ProfileSectionCard v-else-if="activeSection === 'allergen'" title="Allergén hozzáadása">
                                 <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                     <div class="mb-4 position-relative">
                                         <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
@@ -805,7 +807,7 @@ const handleSave = async () => {
                                 </form>
                             </ProfileSectionCard>
 
-                            <ProfileSectionCard v-if="activeSection === 'dislikedIngredient'"
+                            <ProfileSectionCard v-else-if="activeSection === 'dislikedIngredient'"
                                 title="Nem kedvelt alapanyagok hozzáadása">
                                 <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                     <div class="mb-4 position-relative">
@@ -836,6 +838,8 @@ const handleSave = async () => {
                                         :save-disabled="preferencesSaving" @cancel="resetToMenu" @save="handleSave" />
                                 </form>
                             </ProfileSectionCard>
+                                </div>
+                            </Transition>
                         </div>
                     </div>
                 </div>

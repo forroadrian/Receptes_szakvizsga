@@ -301,6 +301,7 @@ html {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 239, 0.96));
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    isolation: isolate;
 }
 
 .profile-page .settings-option::before {
@@ -315,6 +316,26 @@ html {
     pointer-events: none;
 }
 
+.profile-page .settings-option::after,
+.profile-page .menu .list-group-item::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(120deg,
+            transparent 0%,
+            transparent 22%,
+            rgba(255, 255, 255, 0.18) 40%,
+            rgba(255, 255, 255, 0.6) 50%,
+            rgba(255, 255, 255, 0.18) 60%,
+            transparent 78%,
+            transparent 100%);
+    opacity: 0;
+    transform: translateX(-130%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
 .profile-page .settings-option:hover {
     transform: translateY(-3px);
     border-color: rgba(193, 154, 107, 0.45);
@@ -326,6 +347,14 @@ html {
     transform: translateY(0);
 }
 
+.profile-page .settings-option:hover::after,
+.profile-page .settings-option:focus-visible::after,
+.profile-page .menu .list-group-item:hover::after,
+.profile-page .menu .list-group-item:focus-visible::after {
+    opacity: 1;
+    transform: translateX(130%);
+}
+
 .profile-page .settings-option-left,
 .profile-page .mobile-menu-card-left {
     display: flex;
@@ -335,6 +364,8 @@ html {
 
 .profile-page .settings-option-left {
     gap: 16px;
+    position: relative;
+    z-index: 1;
 }
 
 .profile-page .settings-option-text,
@@ -351,6 +382,11 @@ html {
     justify-content: center;
 }
 
+.profile-page .settings-option-arrow {
+    position: relative;
+    z-index: 1;
+}
+
 .profile-page .settings-option-icon {
     width: 54px;
     height: 54px;
@@ -359,6 +395,8 @@ html {
     background: linear-gradient(135deg, rgba(214, 188, 142, 0.3), rgba(193, 154, 107, 0.14));
     border: 1px solid rgba(193, 154, 107, 0.24);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .profile-page .settings-option-left i {
@@ -531,6 +569,46 @@ html {
     z-index: 1;
 }
 
+.profile-page .desktop-panel-stage {
+    position: relative;
+}
+
+.profile-page .desktop-panel-switch-enter-active,
+.profile-page .desktop-panel-switch-leave-active {
+    transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform, filter;
+}
+
+.profile-page .desktop-panel-switch-enter-active {
+    pointer-events: none;
+}
+
+.profile-page .desktop-panel-switch-enter-from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+    filter: blur(8px);
+}
+
+.profile-page .desktop-panel-switch-enter-to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+.profile-page .desktop-panel-switch-leave-from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+.profile-page .desktop-panel-switch-leave-to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.985);
+    filter: blur(6px);
+}
+
 [data-bs-theme="dark"] .profile-page .profile-shell {
     background: rgba(20, 24, 29, 0.92);
     border: 1px solid rgba(214, 188, 142, 0.12);
@@ -645,6 +723,18 @@ html {
     background: linear-gradient(135deg, rgba(34, 39, 46, 0.98), rgba(24, 28, 34, 0.98));
 }
 
+[data-bs-theme="dark"] .profile-page .settings-option::after,
+[data-bs-theme="dark"] .profile-page .menu .list-group-item::after {
+    background: linear-gradient(120deg,
+            transparent 0%,
+            transparent 18%,
+            rgba(241, 221, 190, 0.06) 38%,
+            rgba(241, 221, 190, 0.24) 50%,
+            rgba(241, 221, 190, 0.06) 62%,
+            transparent 82%,
+            transparent 100%);
+}
+
 [data-bs-theme="dark"] .profile-page .settings-option-icon {
     background: linear-gradient(135deg, rgba(214, 188, 142, 0.18), rgba(214, 188, 142, 0.08));
     border-color: rgba(214, 188, 142, 0.15);
@@ -694,6 +784,19 @@ html {
 @media (min-width: 992px) {
     .profile-page .right-card {
         height: 100%;
+    }
+
+    .profile-page .menu .list-group-item:hover {
+        transform: translateX(6px);
+    }
+
+    .profile-page .settings-option:hover {
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    .profile-page .settings-option:hover .settings-option-icon {
+        transform: translateY(-1px) scale(1.04);
+        box-shadow: 0 14px 24px rgba(193, 154, 107, 0.16);
     }
 }
 
@@ -782,5 +885,31 @@ html {
         height: 36px;
         min-width: 36px;
         border-radius: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-page .menu .list-group-item,
+    .profile-page .menu .list-group-item::before,
+    .profile-page .menu .list-group-item::after,
+    .profile-page .settings-option,
+    .profile-page .settings-option::after,
+    .profile-page .settings-option-icon,
+    .profile-page .settings-option-arrow,
+    .profile-page .mobile-panel-switch-enter-active,
+    .profile-page .mobile-panel-switch-leave-active,
+    .profile-page .desktop-panel-switch-enter-active,
+    .profile-page .desktop-panel-switch-leave-active {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .profile-page .mobile-panel-switch-enter-from,
+    .profile-page .mobile-panel-switch-leave-to,
+    .profile-page .desktop-panel-switch-enter-from,
+    .profile-page .desktop-panel-switch-leave-to {
+        opacity: 1;
+        transform: none;
+        filter: none;
     }
 }
