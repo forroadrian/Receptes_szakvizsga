@@ -238,7 +238,7 @@ const closeConfirmationModal = () => {
                         {{ authSuccess }}
                     </div>
 
-                    <Button type="submit" class="grad orange w-100 py-2" :disabled="signupLoading">
+                    <Button type="submit" color="orange" class="w-100 py-2" :disabled="signupLoading">
                         {{ signupLoading ? 'Regisztráció...' : 'Regisztrálás' }}
                     </Button>
 

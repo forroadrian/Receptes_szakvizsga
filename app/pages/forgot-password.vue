@@ -72,7 +72,7 @@ const onSubmit = async () => {
                         {{ authStore.successMessage }}
                     </div>
 
-                    <Button type="submit" class="btn grad green w-100 py-2 mt-4" :disabled="authStore.loading">
+                    <Button type="submit" color="green" class="w-100 py-2 mt-4" :disabled="authStore.loading">
                         {{ authStore.loading ? 'Küldés...' : 'Jelszó-visszaállító email küldése' }}
                     </Button>
 
