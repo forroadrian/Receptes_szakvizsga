@@ -173,8 +173,16 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         });
     };
 
+    const getActiveFilterCount = () => {
+    return (
+        (selectedDurationId.value !== null ? 1 : 0) +
+        (selectedMealId.value !== null ? 1 : 0) +
+        (selectedTypeId.value !== null ? 1 : 0) +
+        (allergenSearch.value.trim() ? 1 : 0)
+    );
+};
     return { 
-        search, allergenSearch, activeTab, selectedDurationId, selectedMealId, selectedTypeId,
+        search, allergenSearch, getActiveFilterCount, activeTab, selectedDurationId, selectedMealId, selectedTypeId,
         mealOptions, typeOptions, durationOptions, durationCategories, activeDuration, tabRecipes,
         filteredRecipes, hasActiveFilters, clearFilters, loadCategories
     };

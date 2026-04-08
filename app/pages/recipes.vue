@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, onMounted } from "vue";
 import Button from "~/components/Button.vue";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 import { useRecipeStore } from "~/stores/recipe";
@@ -6,6 +7,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
+const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
@@ -34,11 +36,13 @@ onMounted(async () => {
                         class="recipes-search w-100" />
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
-                    <Button outline icon="bi bi-funnel" class="w-100 px-4 text-nowrap"
-                        data-bs-toggle="offcanvas" data-bs-target="#recipeFiltersOffcanvas"
-                        aria-controls="recipeFiltersOffcanvas">
+                <div class="filter-button col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
+                    <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
+                        data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
                         Szűrők
+                        <span v-if="activeFilterCount" class="filter-count d-inline-flex me-3">
+                            {{ activeFilterCount }}
+                        </span>
                     </Button>
                 </div>
             </div>
@@ -78,7 +82,12 @@ onMounted(async () => {
                 </ul>
             </nav>
 
-            <div class="row">
+            <div v-if="!filterStore.filteredRecipes.length" class="text-center py-5">
+                <p class="mb-0 fw-bold py-3">Nincs a szűrésnek megfelelő recept!</p>
+                <Button icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"> Új recept hozzáadása </Button>
+            </div>
+
+            <div class="row" v-else>
                 <div class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
                     data-bs-toggle="modal" data-bs-target="#openAddRecipeModal">
                     <div class="row text-center py-4">
@@ -87,7 +96,8 @@ onMounted(async () => {
                     </div>
                 </div>
 
-                <div v-for="recipe in filterStore.filteredRecipes" class="col-12 col-md-6 col-lg-4 my-sm-4">
+                <div v-for="recipe in filterStore.filteredRecipes"
+                    class="recipe-cards col-12 col-md-6 col-lg-4 my-sm-4 ">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
@@ -130,9 +140,9 @@ onMounted(async () => {
                                     </div>
                                 </div>
 
-                                <div v-if="recipe.categories?.length" class="row justify-content-center mb-3">
-                                    <div class="col-12">
-                                        <CategoryTags :categories="recipe.categories" />
+                                <div v-if="recipe.categories?.length" class="mb-3">
+                                    <div>
+                                        <CategoryTags :categories="recipe.categories" class="d-flex justify-content-center" />
                                     </div>
                                 </div>
                             </template>
@@ -154,22 +164,22 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div v-if="!filterStore.filteredRecipes.length" class="text-center py-5">
-                <p class="mb-0">Nincs a szűrésnek megfelelő recept.</p>
-            </div>
-
             <div id="recipeFiltersOffcanvas" class="offcanvas offcanvas-end" tabindex="-1"
                 aria-labelledby="recipeFiltersOffcanvasLabel">
                 <div class="offcanvas-header">
-                    <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">Szűrők</p>
+                    <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">
+                        Szűrők
+                        <span v-if="activeFilterCount" class="ms-2 text-muted">
+                            ({{ activeFilterCount }} aktív)
+                        </span>
+                    </p>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></button>
                 </div>
 
                 <div class="offcanvas-body">
-                    <Button :outline="true" class="deleteAll grad m-auto w-75 pt-4">
-                        <p @click="filterStore.clearFilters">Kijelölések törlése</p>
+                    <Button :outline="true" type="button" class="deleteAll grad m-auto w-75" 
+                        @click="filterStore.clearFilters"> Kijelölések törlése
                     </Button>
-
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
@@ -201,7 +211,8 @@ onMounted(async () => {
 
                         <div class="filter-item">
                             <p class="filter-title mb-3">Allergén, ételérzékenység</p>
-                            <SearchBar v-model="filterStore.allergenSearch" placeholder="Allergén neve / típusa..." class="w-100" />
+                            <SearchBar v-model="filterStore.allergenSearch" placeholder="Allergén neve / típusa..."
+                                class="w-100" />
                         </div>
                     </div>
                 </div>
@@ -216,9 +227,9 @@ onMounted(async () => {
 }
 
 .addRecipe {
+    height: 700px;
     border: 2px dashed var(--bs-emphasis-color);
     border-radius: var(--radius-sm);
-    cursor: pointer;
 }
 
 .plus-icon {
@@ -232,7 +243,10 @@ onMounted(async () => {
 .tab-btn {
     background: none;
     border: none;
-    color: #6b7280;
+}
+
+.addRecipe,
+.tab-btn {
     cursor: pointer;
 }
 
@@ -250,13 +264,33 @@ onMounted(async () => {
     padding: 20px 0;
 }
 
-.filter-title {
+.filter-title,
+.filter-count {
     font-weight: 700;
+}
+
+.filter-count {
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    font-size: 12px;
+    height: 20px;
+    margin: 0px 5px;
+    border-radius: var(--radius-rounded);
+    background: var(--bs-emphasis-color);
+    color: var(--bs-body-bg);
 }
 
 @media (max-width: 992px) {
     .recipes-tabs ul {
         justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .addRecipe {
+        max-height: 150px;
+        margin: 30px 0px;
     }
 }
 </style>

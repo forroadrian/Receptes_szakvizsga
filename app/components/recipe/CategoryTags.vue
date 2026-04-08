@@ -71,7 +71,7 @@ const handleClick = (id: number) => {
 
 .inactive {
     background-color: transparent;
-    color: var(--pill-text-muted);
+    color: var(--bs-secondary-color);
 }
 
 @media (max-width: 992px) {

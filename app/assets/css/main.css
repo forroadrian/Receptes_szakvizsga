@@ -115,7 +115,8 @@ h4 {
 
 .footer,
 .footer-link,
-.social-btn {
+.social-btn,
+.tab-btn {
     color: var(--bs-secondary-color);
 }
 
