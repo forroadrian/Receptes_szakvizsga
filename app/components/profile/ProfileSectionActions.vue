@@ -4,7 +4,7 @@ defineEmits(['cancel', 'save']);
 defineProps({
     saveText: {
         type: String,
-        default: 'Mentés',
+        default: 'MentĂ©s',
     },
     saveDisabled: {
         type: Boolean,
@@ -14,14 +14,49 @@ defineProps({
 </script>
 
 <template>
-    <div class="mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
-        <Button type="button" color="outline-dark" class="btn-lg px-5 rounded-pill" @click="$emit('cancel')">
-            Mégsem
+    <div class="profile-section-actions mt-auto d-flex flex-column flex-sm-row gap-3 justify-content-end">
+        <Button
+            type="button"
+            color="outline-dark"
+            class="profile-action-button btn-lg px-5 rounded-pill"
+            @click="$emit('cancel')"
+        >
+            MĂ©gsem
         </Button>
 
-        <Button type="button" color="dark" class="btn-lg px-5 rounded-pill" :disabled="saveDisabled"
-            @click="$emit('save')">
+        <Button
+            type="button"
+            color="dark"
+            class="profile-action-button btn-lg px-5 rounded-pill"
+            :disabled="saveDisabled"
+            @click="$emit('save')"
+        >
             {{ saveText }}
         </Button>
     </div>
 </template>
+
+<style scoped>
+.profile-section-actions :deep(.profile-action-button) {
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    .profile-section-actions {
+        flex-wrap: wrap;
+    }
+
+    .profile-section-actions :deep(.profile-action-button) {
+        width: auto;
+        min-width: 180px;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .profile-section-actions :deep(.profile-action-button) {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-inline: 1.75rem !important;
+    }
+}
+</style>

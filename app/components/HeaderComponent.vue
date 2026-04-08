@@ -457,14 +457,14 @@ const handleSignOut = async () => {
         margin-top: 20px;
         padding-top: 20px;
         gap: 20px;
+        width: 100%;
     }
 
     .account-menu {
-        min-width: 300px;
-    }
-
-    .account-menu {
-        right: -70%;
+        min-width: min(300px, calc(100vw - 2rem));
+        max-width: calc(100vw - 2rem);
+        right: 0;
+        left: auto;
     }
 
     .navbar-brand img {
