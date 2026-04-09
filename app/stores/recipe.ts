@@ -98,50 +98,19 @@ export const useRecipeStore = defineStore("recipes", () => {
 
     const getRecipes = async () => {
         try {
-            const supabase = useSupabaseClient();
+            const data = await $fetch("/api/recipe", {
+                method: "GET"
+            })
 
-            const { data, error } = await supabase
-                .from("recipe")
-                .select(`id, author_id, name, description, saves, likes, time, servings, 
-                    created_at, last_edit, is_ai_generated, active, deleted_at,
-                    recipe_step (
-                        step_number,
-                        step (
-                            step_id,
-                            step_description
-                        )
-                    ),
-                    recipe_ingredients (
-                        quantity,
-                        unit,
-                        ingredient (
-                            id,
-                            name
-                        )
-                    ),
-                    recipe_categories (
-                        category (
-                            id,
-                            name,
-                            group_type
-                        )
-                    )
-                `);
-
-            if (error) {
-                console.error("Hiba a receptek lekérése közben:", error);
-                return [];
-            }
-
-            return data ?? [];
+            return Array.isArray(data) ? data : []
         } catch (error) {
-            console.error("Váratlan hiba a receptek lekérése közben:", error);
+            console.error("Hiba  a receptek lekérése közben:", error)
             return [];
         }
-    };
+    }
 
     const loadRecipes = async () => {
-        const recipeDataList = await getRecipes();
+        const recipeDataList = await getRecipes() || [];
 
         clearRecipes();
 

@@ -6,7 +6,6 @@ type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
 type CategoryOption = Category;
 
 export const useRecipeFilterStore = defineStore("recipeFilters", () => {
-    const supabase = useSupabaseClient();
     const user = useSupabaseUser();
     const recipeStore = useRecipeStore();
 
@@ -129,7 +128,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
                 }
             }
 
-            return [matchesSearch, matchesDuration, matchesMeal, matchesType,matchesAllergen].every(
+            return [matchesSearch, matchesDuration, matchesMeal, matchesType, matchesAllergen].every(
                 value => value === true);
         });
     });
@@ -152,15 +151,10 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     };
 
     const loadCategories = async () => {
-        const { data, error } = await supabase
-            .from("category")
-            .select("id, name, group_type")
-            .order("name", { ascending: true });
-
-        if (error) {
-            console.error("Hiba a kategóriák lekérése közben:", error);
-            return;
-        }
+    try {
+        const data = await $fetch("/api/category", {
+            method: "GET"
+         });
 
         const categories = (data ?? []) as CategoryOption[];
 
@@ -171,6 +165,10 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         typeOptions.value = categories.filter(category => {
             return String(category.group_type).toLowerCase() === "type";
         });
+
+        } catch (error) {
+            console.error("Hiba a kategóriák lekérése közben:", error);
+        }
     };
 
     const getActiveFilterCount = () => {

@@ -7,7 +7,17 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
+const user = useSupabaseUser();
+
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
+
+const needsLoginForTab = computed(() => {
+    return !user.value && filterStore.activeTab !== "default";
+});
+
+const handleTabClick = (tab: any) => {
+    filterStore.activeTab = tab;
+};
 
 onMounted(async () => {
     if (!recipeStore.getAllRecipes.length) {
@@ -51,44 +61,57 @@ onMounted(async () => {
                 <ul class="d-flex flex-wrap list-unstyled gap-4">
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'default' }"
-                            @click="filterStore.activeTab = 'default'">
+                            @click="handleTabClick('default')">
                             Alapértelmezett
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'own' }"
-                            @click="filterStore.activeTab = 'own'">
+                            @click="handleTabClick('own')">
                             Saját
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'saved' }"
-                            @click="filterStore.activeTab = 'saved'">
+                            @click="handleTabClick('saved')">
                             Kedvelt
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'tried' }"
-                            @click="filterStore.activeTab = 'tried'">
+                            @click="handleTabClick('tried')">
                             Kipróbált
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'ai' }"
-                            @click="filterStore.activeTab = 'ai'">
+                            @click="handleTabClick('ai')">
                             AI ajánlás
                         </button>
                     </li>
                 </ul>
             </nav>
 
-            <div v-if="!filterStore.filteredRecipes.length" class="text-center py-5">
-                <p class="mb-0 fw-bold py-3">Nincs a szűrésnek megfelelő recept!</p>
-                <Button icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"> Új recept hozzáadása </Button>
+            <div v-if="needsLoginForTab" class="text-center py-4">
+                <p class="fw-bold">Ehhez a funkcióhoz be kell jelentkezned!</p> 
+                <Button @click="navigateTo('/login')"
+                    color="orange" class="mx-auto" icon="bi bi-box-arrow-in-right" icon-position="right"> 
+                    Tovább a belépéshez 
+                </Button>
             </div>
 
-            <div class="row" v-else>
-                <div class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
+            <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length" class="text-center py-5">
+                <p class="mb-0 fw-bold py-3">
+                    Nincs a szűrésnek megfelelő recept!
+                </p>
+                <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3">
+                    Új recept hozzáadása
+                </Button>
+            </div>
+
+            <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
+                <div v-if="user"
+                    class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
                     data-bs-toggle="modal" data-bs-target="#openAddRecipeModal">
                     <div class="row text-center py-4">
                         <span class="plus-icon">+</span>
@@ -195,7 +218,7 @@ onMounted(async () => {
                             <p class="filter-title">Típus</p>
                             <CategoryTags :categories="filterStore.typeOptions" interactive v-model="filterStore.selectedTypeId" />
                         </div>
-                        <div class="filter-item">
+                        <div class="filter-item" v-if="user">
                             <div class="d-flex mb-2">
                                 <p class="filter-title mb-0">Nem kedvelt alapanyagok</p>
                             </div>

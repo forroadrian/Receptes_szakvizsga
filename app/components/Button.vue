@@ -43,7 +43,8 @@ const resolvedColor = computed(() => {
         return props.color;
     }
 
-    return colorMode.value === "dark" ? "soft" : "dark";
+    const mode = colorMode.preference === "system" ? "light": colorMode.preference;
+    return mode === "dark" ? "soft" : "dark";
 });
 
 const classes = computed(() => {
