@@ -1,9 +1,5 @@
 import { ref, watch } from "vue";
 
-type UserAllergyRow = {
-    allergy_id: number;
-};
-
 export const useRecipeAllergyWarnings = () => {
     const user = useSupabaseUser();
     const userAllergyIds = ref<number[]>([]);
@@ -15,21 +11,27 @@ export const useRecipeAllergyWarnings = () => {
         }
 
         try {
-            const data = await $fetch<UserAllergyRow[]>("/api/preferences/user-allergy", {
-                method: "GET"
-            });
+            const response = await $fetch("/api/preferences/user-allergy");
+            userAllergyIds.value = [];
 
-            userAllergyIds.value = (data ?? []).map(item => Number(item.allergy_id));
-        } catch (error) {
-            console.error("Nem sikerült betölteni a felhasználó allergiáit:", error);
+            if (response) {
+                for (const item of response) {
+                    const allergyId = Number(item.allergy_id);
+                    userAllergyIds.value.push(allergyId);
+                }
+            }
+        } catch {
             userAllergyIds.value = [];
         }
     };
 
     const getMatchingAllergies = (recipe: any) => {
-        return (recipe.allergies ?? []).filter((allergy: any) =>
-            userAllergyIds.value.includes(Number(allergy.id))
-        );
+        if (!recipe.allergies) return [];
+
+        return recipe.allergies.filter((allergy: any) => {
+            const recipeAllergyId = Number(allergy.id);
+            return userAllergyIds.value.includes(recipeAllergyId);
+        });
     };
 
     const hasAllergyWarning = (recipe: any) => {
@@ -37,21 +39,16 @@ export const useRecipeAllergyWarnings = () => {
     };
 
     const getMatchingAllergyNames = (recipe: any) => {
-        return getMatchingAllergies(recipe).map((item: any) => item.name).join(", ");
+        const matchingAllergies = getMatchingAllergies(recipe);
+        return matchingAllergies.map((allergy: any) => allergy.name).join(", ");
     };
 
-    watch(
-        () => user.value?.id,
-        async () => {
-            await loadUserAllergies();
-        },
+    watch(() => user.value && user.value.id,loadUserAllergies,
         { immediate: true }
     );
 
     return {
         userAllergyIds,
-        loadUserAllergies,
-        getMatchingAllergies,
         hasAllergyWarning,
         getMatchingAllergyNames
     };
