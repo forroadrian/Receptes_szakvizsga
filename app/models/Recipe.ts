@@ -2,6 +2,7 @@ import type Identifiable from "~/interfaces/Identifiable";
 import Ingredient from "~/models/Ingredient";
 import type RecipeConstuctorOptions from "~/interfaces/ModelInterfaces/RecipeConstructorOptions";
 import type Category from "~/interfaces/Category";
+import Allergy from "~/models/Allergy";
 
 export default class Recipe implements Identifiable {
     private _id: number;
@@ -20,6 +21,7 @@ export default class Recipe implements Identifiable {
     private _steps: string[];
     private _ingredients: Ingredient[];
     private _categories: Category[];
+    private _allergies: Allergy[];
 
     constructor(options: RecipeConstuctorOptions) {
         this._id = options.id ?? -1;
@@ -38,6 +40,7 @@ export default class Recipe implements Identifiable {
         this._steps = options.steps ?? [];
         this._ingredients = options.ingredients ?? [];
         this._categories = options.categories ?? [];
+        this._allergies = options.allergies ?? [];
     }
 
     public set id(v : number) {
@@ -174,5 +177,11 @@ export default class Recipe implements Identifiable {
 
     public get categories(): Category[] {
         return this._categories;
+    }
+    public set allergies(v: Allergy[]) {
+    }
+
+    public get allergies(): Allergy[] {
+        return this._allergies;
     }
 }

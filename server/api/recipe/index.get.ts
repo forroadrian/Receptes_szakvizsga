@@ -22,7 +22,13 @@ export default defineEventHandler(async (event) => {
                 unit,
                 ingredient (
                     id,
-                    name
+                    name,
+                    ingredient_allergy (
+                    allergy (
+                        id,
+                        name
+                        )
+                    )
                 )
             ),
             recipe_categories (

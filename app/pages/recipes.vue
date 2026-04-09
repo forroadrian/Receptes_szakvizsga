@@ -4,6 +4,7 @@ import Button from "~/components/Button.vue";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
+const { hasAllergyWarning, getMatchingAllergyNames } = useRecipeAllergyWarnings();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
@@ -171,14 +172,13 @@ onMounted(async () => {
                             </template>
 
                             <template #footer>
-                                <div class="row pt-2">
-                                    <div class="col-12 text-center small my-auto">
-                                        <div>
-                                            <strong>
-                                                <i class="bi bi-exclamation-triangle-fill p-2"></i>
-                                                Allergént tartalmaz:
-                                            </strong>
-                                        </div>
+                                <div v-if="user && hasAllergyWarning(recipe)" class="row pt-2">
+                                    <div class="col-12 text-center small my-auto text-danger">
+                                        <strong>
+                                            <i class="bi bi-exclamation-triangle-fill p-2"></i>
+                                            Figyelem! Allergént tartalmaz:
+                                        </strong>
+                                        {{ getMatchingAllergyNames(recipe) }}
                                     </div>
                                 </div>
                             </template>

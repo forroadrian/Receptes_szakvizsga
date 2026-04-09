@@ -1,5 +1,6 @@
 import Ingredient from "~/models/Ingredient";
 import type Category from "~/interfaces/Category";
+import Allergy from "~/models/Allergy";
 
 export default interface RecipeConstuctorOptions {
     id?: number;
@@ -18,4 +19,5 @@ export default interface RecipeConstuctorOptions {
     steps?: string[];
     ingredients?: Ingredient[];
     categories?: Category[];
+    allergies?: Allergy[];
 }

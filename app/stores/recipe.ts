@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import Recipe from "~/models/Recipe";
 import Ingredient from "~/models/Ingredient";
+import Allergy from "~/models/Allergy";
 
 export const useRecipeStore = defineStore("recipes", () => {
     const recipes = ref<Recipe[]>([]);
@@ -73,6 +74,34 @@ export const useRecipeStore = defineStore("recipes", () => {
         return ingredients;
     };
 
+    const getRecipeAllergies = (recipeData: any): Allergy[] => {
+        const allergyMap = new Map<number, Allergy>();
+
+        if (!recipeData.recipe_ingredients?.length) {
+            return [];
+        }
+
+        for (const ingredientData of recipeData.recipe_ingredients) {
+            const ingredientAllergies = ingredientData.ingredient?.ingredient_allergy ?? [];
+
+            for (const relation of ingredientAllergies) {
+                const allergy = relation.allergy;
+
+                if (allergy?.id && allergy?.name) {
+                    const allergyId = Number(allergy.id);
+
+                    if (!allergyMap.has(allergyId)) {
+                        allergyMap.set(
+                            allergyId,
+                            new Allergy(allergy.name, allergyId)
+                        );
+                    }
+                }
+            }
+        }
+        return [...allergyMap.values()];
+    };
+
     const createRecipe = (recipeData: any): Recipe => {
         return new Recipe({
             id: Number(recipeData.id),
@@ -90,6 +119,7 @@ export const useRecipeStore = defineStore("recipes", () => {
             deleted_at: recipeData.deleted_at ? new Date(recipeData.deleted_at) : undefined,
             steps: getRecipeSteps(recipeData),
             ingredients: getRecipeIngredients(recipeData),
+            allergies: getRecipeAllergies(recipeData),
             categories: (recipeData.recipe_categories ?? [])
                 .map((item: any) => item.category)
                 .filter(Boolean)

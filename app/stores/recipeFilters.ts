@@ -117,15 +117,11 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
             let matchesAllergen = true;
 
             if (allergenQuery) {
-                if (!recipe.categories) {
-                    matchesAllergen = false;
-                } else {
-                    const found = recipe.categories.find(category =>
-                        category.name.toLowerCase().includes(allergenQuery)
-                    );
+                const found = (recipe.allergies ?? []).find(allergy =>
+                    allergy.name.toLowerCase().includes(allergenQuery)
+                );
 
-                    matchesAllergen = found !== undefined;
-                }
+            matchesAllergen = found !== undefined;
             }
 
             return [matchesSearch, matchesDuration, matchesMeal, matchesType, matchesAllergen].every(
@@ -177,8 +173,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         (selectedMealId.value !== null ? 1 : 0) +
         (selectedTypeId.value !== null ? 1 : 0) +
         (allergenSearch.value.trim() ? 1 : 0)
-    );
-};
+        );
+    };
     return { 
         search, allergenSearch, getActiveFilterCount, activeTab, selectedDurationId, selectedMealId, selectedTypeId,
         mealOptions, typeOptions, durationOptions, durationCategories, activeDuration, tabRecipes,
