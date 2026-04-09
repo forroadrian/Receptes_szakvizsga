@@ -179,6 +179,7 @@ export default class Recipe implements Identifiable {
         return this._categories;
     }
     public set allergies(v: Allergy[]) {
+        this._allergies = v;
     }
 
     public get allergies(): Allergy[] {
