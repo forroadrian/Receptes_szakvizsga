@@ -5,6 +5,7 @@ import Ingredient from "~/models/Ingredient";
 
 export const useIngredientStore = defineStore("ingredients", () => {
     const ingredients = ref<Ingredient[]>([]);
+    const availableIngredients = ref<{ id: number; name: string }[]>([]);
     const units = getEnumValues("unit");
     const showIngredientModal = ref(false);
 
@@ -16,6 +17,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
     }
 
     const fetchIngredients = async () => {
+
         try {
             const res = await $fetch("/api/ingredient", { method: "GET" })
             return res
@@ -25,6 +27,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
     }
 
     const loadIngredients = async () => {
+        ingredients.value = [];
         const res = await fetchIngredients()
         if(res?.length != 0 && res != undefined){
             for (const ingredientData of res) {
@@ -56,6 +59,12 @@ export const useIngredientStore = defineStore("ingredients", () => {
         })
     }
 
+    const loadAvailableIngredients = async () => {
+        if (availableIngredients.value.length > 0) return;
+        const res = await $fetch("/api/ingredient/catalog", { method: "GET" });
+        if (res) availableIngredients.value = res as { id: number; name: string }[];
+    }
+
     const postIngredient = async (newIngredient: Ingredient) => {
         console.log(newIngredient);
         
@@ -77,10 +86,12 @@ export const useIngredientStore = defineStore("ingredients", () => {
         pushIngredient,
         fetchIngredients,
         loadIngredients,
+        loadAvailableIngredients,
         removeIngredient,
         postIngredient,
         showIngredientModal,
         units,
-        ingredients
+        ingredients,
+        availableIngredients
     }
 })

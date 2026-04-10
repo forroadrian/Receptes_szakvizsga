@@ -22,11 +22,11 @@ export default class ExpiryDate {
     public checkExpiry(): FreshnessVariants{
         const saved = this._date.valueOf();
         const today = Date.now();
-        const day = 60 * 60 * 24;
-        
-        return saved <=today 
-            ? "Lejárt" : saved <= today - day
-            ? "Hamarosan Lejár" : "Friss";
+        const threeDays = 3 * 24 * 60 * 60 * 1000;
+
+        return saved <= today
+            ? "Lejárt" : saved <= today + threeDays
+            ? "Hamarosan" : "Friss";
     }
 
     get value() {

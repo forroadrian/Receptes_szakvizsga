@@ -9,7 +9,9 @@ const {
     units,
     closeIngredientModal,
     pushIngredient,
-    postIngredient
+    postIngredient,
+    loadAvailableIngredients,
+    availableIngredients
 } = ingredientState
 
 const isAlert = ref<boolean>(false);
@@ -24,8 +26,32 @@ const input = ref({
     expiry: "",
 });
 
-const checkInput = () => 
-        input.value.name.length === 0 ||
+const showDropdown = ref(false);
+
+const filteredIngredients = computed(() => {
+    const q = input.value.name.toLowerCase().trim();
+    if (!q) return availableIngredients.slice(0, 10);
+    return availableIngredients
+        .filter(i => i.name.toLowerCase().includes(q))
+        .slice(0, 10);
+});
+
+const nameIsValid = computed(() =>
+    availableIngredients.some(i => i.name === input.value.name)
+);
+
+const selectIngredient = (name: string) => {
+    input.value.name = name;
+    showDropdown.value = false;
+};
+
+const onBlur = () => {
+    showDropdown.value = false;
+    if (!nameIsValid.value) input.value.name = "";
+};
+
+const checkInput = () =>
+        !nameIsValid.value ||
         input.value.unit === "" ||
         input.value.expiry.length === 0 ||
         input.value.quantity == null ||
@@ -41,7 +67,6 @@ const resetInputData = () => {
 }
 
 const saveIngredient = async () => {
-    console.log("save clicked");
     if (checkInput()) {
         throw createError({
             status: 404,
@@ -49,29 +74,30 @@ const saveIngredient = async () => {
         });
     }
     try {
-        input.value.name = normalizeIngredientName(input.value.name);
-
         const expiry = new ExpiryDate(new Date(input.value.expiry));
-        
-        const newIngredient: Ingredient = new Ingredient(-1, 
+
+        const newIngredient: Ingredient = new Ingredient(-1,
             input.value.name,
             input.value.quantity as number,
-            input.value.unit, 
+            input.value.unit,
             expiry
         );
         const res: any = postIngredient(newIngredient);
         newIngredient.id = res.ingredient_id;
         newIngredient.tag = expiry.checkExpiry();
-    
+
         pushIngredient(newIngredient);
         resetInputData();
         closeIngredientModal();
-        
+
     } catch(error: any) {
         showAlert();
     }
 };
 
+onMounted(() => {
+    loadAvailableIngredients();
+});
 </script>
 <template>
     <div class="ingredient-modal-backdrop" @click.self="closeIngredientModal">
@@ -80,12 +106,33 @@ const saveIngredient = async () => {
                 <h3 class="mb-0">Új hozzávaló felvétele</h3>
                 <i class="bi bi-x p-0" @click="closeIngredientModal"></i>
             </div>
-    
-            <div class="mb-3">
+
+            <div class="mb-3 position-relative">
                 <label class="form-label">Hozzávaló megnevezése</label>
-                <input v-model="input.name" type="text" class="form-control" placeholder="Pl. Tej" />
+                <input
+                    v-model="input.name"
+                    type="text"
+                    class="form-control"
+                    placeholder="Pl. Tej"
+                    autocomplete="off"
+                    @focus="showDropdown = true"
+                    @blur="onBlur"
+                />
+                <ul
+                    v-if="showDropdown"
+                    class="ingredient-dropdown list-group position-absolute w-100"
+                >
+                    <li
+                        v-for="item in filteredIngredients"
+                        :key="item.id"
+                        class="list-group-item list-group-item-action"
+                        @mousedown.prevent="selectIngredient(item.name)"
+                    >
+                        {{ item.name }}
+                    </li>
+                </ul>
             </div>
-    
+
             <div class="row g-2 mb-3">
                 <div class="col-7">
                     <label class="form-label">Mennyiség</label>
@@ -99,12 +146,12 @@ const saveIngredient = async () => {
                     </select>
                 </div>
             </div>
-    
+
             <div class="mb-4">
                 <label class="form-label">Lejárati idő</label>
                 <input v-model="input.expiry" type="date" class="form-control" />
             </div>
-    
+
             <div class="d-flex justify-content-end">
                 <Button color="dark" type="button" @click="saveIngredient">
                     MENTÉS
@@ -149,4 +196,13 @@ i:hover {
     cursor: pointer;
 }
 
+.ingredient-dropdown {
+    top: 100%;
+    left: 0;
+    z-index: 1060;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 </style>

@@ -26,8 +26,8 @@ const prevId = props.ingredient.id
 const items = computed(() => {
     const tag = props.ingredient.tag
     const variant = tag === 'Friss'
-        ? 'active' : tag === "Hamarosan Lejár"
-        ? 'outline' : "custom" 
+        ? 'active' : tag === "Hamarosan"
+        ? 'warning' : "custom"
     return [{label: tag, variant: variant} as CardTagItem]
 })  
 
@@ -66,8 +66,8 @@ const onEdit = async () =>{
                 <div class="d-flex flex-row justify-content-start">
                     <CardTitle :rank="5" class="ps-3 m-0 align-self-center">{{ ingredient.name }} <i class="bi bi-pencil-square" v-if="!isSmall" @click="editing = true"></i></CardTitle>
                     <i class="bi bi-three-dots flex-fill text-end fs-2 mt-2 me-3" @click="toggleDescription" v-if="isSmall"></i>
-                    <CardTags class="mt-2 ms-3" :items="items" v-if="!isSmall"/>
-                    <i class="bi bi-trash3-fill me-3 mt-2 flex-fill text-end" v-if="!isSmall" @click="$emit('delete', ingredient)"></i>
+                    <CardTags class="ms-3 flex-fill" :items="items" v-if="!isSmall"/>
+                    <i class="bi bi-trash3-fill me-3 text-end" v-if="!isSmall" @click="$emit('delete', ingredient)"></i>
                 </div>
                 <CardTags class="mb-2 ms-2" :items="items" v-if="isSmall"/>
                 <p class="ps-3 small">{{ ingredient.quantity }} {{ ingredient.unit }}</p>

@@ -546,7 +546,7 @@ export type Database = {
       }
     }
     Enums: {
-      group_types: "meal_type" | "length" | "skill" | "etc"
+      group_types: "meal_type" | "length" | "skill" | "etc" | "meal" | "type"
       ingredient_categories:
         | "meat"
         | "vegetable"
@@ -577,6 +577,11 @@ export type Database = {
         | "gal"
         | "oz"
         | "lb"
+        | "db"
+        | "csipet"
+        | "csomag"
+        | "gerezd"
+        | "tk"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -704,7 +709,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      group_types: ["meal_type", "length", "skill", "etc"],
+      group_types: ["meal_type", "length", "skill", "etc", "meal", "type"],
       ingredient_categories: [
         "meat",
         "vegetable",
@@ -736,6 +741,11 @@ export const Constants = {
         "gal",
         "oz",
         "lb",
+        "db",
+        "csipet",
+        "csomag",
+        "gerezd",
+        "tk",
       ],
     },
   },

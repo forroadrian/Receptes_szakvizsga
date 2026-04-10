@@ -26,7 +26,7 @@ const order = computed(() => {
     },
     {
       amount: props.almostExpired,
-      name: "Hamarosan Lejár",
+      name: "Hamarosan",
     },
     {
       amount: props.expired,

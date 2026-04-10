@@ -35,7 +35,7 @@ const props = defineProps<{
     .card-tag--outline {
         background-color: transparent;
         color: var(--bs-body-color);
-        border: 1px solid rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--bs-border-color);
     }
 
     .card-tag--greyed {
@@ -45,5 +45,11 @@ const props = defineProps<{
 
     .card-tag--custom {
         background-color: #a52a2a;
+        color: #fff;
+    }
+
+    .card-tag--warning {
+        background-color: var(--orange);
+        color: #fff;
     }
 </style>
