@@ -35,7 +35,7 @@ const descriptionText = computed(() => {
 })
 
 const fresh = computed(() => ingredients.value.filter(v => v.tag === "Friss").length)
-const almostExpired = computed(() => ingredients.value.filter(v => v.tag === "Hamarosan Lejár").length)
+const almostExpired = computed(() => ingredients.value.filter(v => v.tag === "Hamarosan").length)
 const expired = computed(() => ingredients.value.filter(v => v.tag === "Lejárt").length)
 const query = ref<string[]>([])
 
