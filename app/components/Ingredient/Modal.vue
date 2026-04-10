@@ -16,7 +16,7 @@ const {
 
 const isAlert = ref<boolean>(false);
 
-function showAlert(){
+function showAlert() {
     isAlert.value = true;
 }
 
@@ -104,7 +104,7 @@ async function saveIngredient() {
         pushIngredient(newIngredient)
         resetForm()
         closeIngredientModal()
-    } catch(error: any) {
+    } catch (error: any) {
         showAlert()
     }
 }
@@ -116,83 +116,91 @@ onMounted(() => {
 <template>
     <div class="modal-backdrop" @click.self="closeIngredientModal">
         <div class="modal-panel">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">Új hozzávaló felvétele</h3>
-                <i class="bi bi-x p-0" @click="closeIngredientModal"></i>
-            </div>
 
-            <div class="position-relative mb-3">
-                <label class="form-label">Hozzávaló</label>
-                <div class="combined-input">
+            <div class="modal-inner">
 
-                    <div class="name-section">
-                        <div v-if="!nameInputOpen" class="section-trigger" @click="openNameInput">
-                            <span :class="inputName ? '' : 'text-muted'">{{ inputName || 'Pl. Tej' }}</span>
-                            <i class="bi bi-chevron-down ms-auto"></i>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="modal-icon">
+                            <i class="bi bi-basket2"></i>
                         </div>
-                        <input
-                            v-else
-                            id="ingredient-name-input"
-                            v-model="inputName"
-                            type="text"
-                            class="name-text-input"
-                            placeholder="Pl. Tej"
-                            autocomplete="off"
-                            @blur="onNameBlur"
-                        />
-                    </div>
-
-                    <div class="section-divider"></div>
-
-                    <input
-                        v-model.number="inputQuantity"
-                        type="number"
-                        class="quantity-section"
-                        placeholder="100"
-                        min="0"
-                    />
-
-                    <div class="section-divider"></div>
-
-                    <div class="unit-section">
-                        <div v-if="!unitDropdownOpen" class="section-trigger" @click="unitDropdownOpen = true">
-                            <span :class="inputUnit ? '' : 'text-muted'">{{ inputUnit || 'Egység' }}</span>
-                            <i class="bi bi-chevron-down ms-auto"></i>
+                        <div>
+                            <p class="modal-label mb-0">Alapanyagok</p>
+                            <h3 class="mb-0">Új Alapanyag</h3>
                         </div>
-                        <ul v-else class="unit-dropdown list-group position-absolute">
-                            <li
-                                v-for="unit in units"
-                                :key="unit"
-                                class="list-group-item list-group-item-action"
-                                @mousedown.prevent="selectUnit(unit)"
-                            >
-                                {{ unit }}
-                            </li>
-                        </ul>
                     </div>
+                    <button class="close-btn" @click="closeIngredientModal">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
 
-                <ul v-if="nameInputOpen" class="name-dropdown list-group position-absolute w-100">
-                    <li
-                        v-for="item in filteredIngredients"
-                        :key="item.id"
-                        class="list-group-item list-group-item-action"
-                        @mousedown.prevent="selectIngredient(item.name)"
-                    >
-                        {{ item.name }}
-                    </li>
-                </ul>
-            </div>
+                <div class="position-relative mb-3">
+                    <label class="field-label">Alapanyag neve, mennyisége, egysége</label>
+                    <div class="combined-input">
 
-            <div class="mb-4">
-                <label class="form-label">Lejárati idő</label>
-                <input v-model="inputExpiry" type="date" class="form-control" />
-            </div>
+                        <div class="name-section">
+                            <div v-if="!nameInputOpen" class="section-trigger" @click="openNameInput">
+                                <span :class="inputName ? '' : 'placeholder-text'">{{ inputName || 'Pl. Tej' }}</span>
+                                <i class="bi bi-chevron-down ms-auto"></i>
+                            </div>
+                            <input v-else id="ingredient-name-input" v-model="inputName" type="text"
+                                class="name-text-input" placeholder="Pl. Tej" autocomplete="off" @blur="onNameBlur" />
+                        </div>
 
-            <div class="d-flex justify-content-end">
-                <Button color="dark" type="button" @click="saveIngredient">
-                    MENTÉS
-                </Button>
+                        <div class="section-divider"></div>
+
+                        <input v-model.number="inputQuantity" type="number" class="quantity-section" placeholder="100"
+                            min="0" />
+
+                        <div class="section-divider"></div>
+
+                        <div class="unit-section">
+                            <div class="section-trigger" @click="unitDropdownOpen = true">
+                                <span :class="inputUnit ? '' : 'placeholder-text'">{{ inputUnit || 'Egység' }}</span>
+                                <i class="bi bi-chevron-down ms-auto"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul v-if="nameInputOpen" class="name-dropdown list-group position-absolute w-100">
+                        <li v-for="item in filteredIngredients" :key="item.id"
+                            class="list-group-item list-group-item-action"
+                            @mousedown.prevent="selectIngredient(item.name)">
+                            {{ item.name }}
+                        </li>
+                    </ul>
+                </div>
+
+                <template v-if="!unitDropdownOpen">
+                    <div class="mb-4">
+                        <label class="field-label">Lejárati dátum</label>
+                        <input v-model="inputExpiry" type="date" class="date-input form-control" />
+                    </div>
+
+                    <Button color="orange" icon="bi bi-check2" iconPosition="left" type="button" @click="saveIngredient" class="w-100">
+                        Mentés
+                    </Button>
+                </template>
+
+                <div v-else class="unit-drawer">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="field-label mb-0">Egység kiválasztása</span>
+                        <button class="unit-drawer-close" @click="unitDropdownOpen = false">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <div class="unit-pill-grid">
+                        <button
+                            v-for="unit in units"
+                            :key="unit"
+                            class="unit-pill"
+                            :class="{ active: inputUnit === unit }"
+                            @click="selectUnit(unit)"
+                        >
+                            {{ unit }}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -206,7 +214,8 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -215,11 +224,59 @@ onMounted(() => {
 
 .modal-panel {
     background: var(--bs-body-bg);
-    border-radius: 24px;
-    padding: 24px 28px;
+    border-radius: 20px;
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+    max-width: 440px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.25),
+        0 0 40px rgba(255, 114, 49, 0.12);
+    border: 1px solid var(--accent-border);
+}
+
+.modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--grad-yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text-dark);
+    box-shadow: 0 4px 12px rgba(255, 114, 49, 0.3);
+}
+
+.modal-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--orange);
+}
+
+.close-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--bs-border-color);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+    transition: background 0.15s, color 0.15s;
+}
+
+.close-btn:hover {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-emphasis-color);
+}
+
+.modal-inner {
+    padding: 24px 28px 28px;
+    position: relative;
 }
 
 @media (min-width: 992px) {
@@ -230,26 +287,33 @@ onMounted(() => {
     }
 }
 
-i:hover {
-    cursor: pointer;
+.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bs-secondary-color);
+    margin-bottom: 6px;
 }
 
 .combined-input {
     display: flex;
     align-items: stretch;
-    border: 1px solid var(--bs-border-color);
-    border-radius: 8px;
+    border: 1.5px solid var(--bs-border-color);
+    border-radius: var(--radius-sm);
     background: var(--bs-body-bg);
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .combined-input:focus-within {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-shadow);
 }
 
 .name-section {
     flex: 1;
-    padding: 8px 12px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     min-width: 0;
@@ -261,12 +325,13 @@ i:hover {
     background: transparent;
     width: 100%;
     color: var(--bs-body-color);
+    font-size: 15px;
 }
 
 .section-divider {
     width: 1px;
     background: var(--bs-border-color);
-    margin: 6px 0;
+    margin: 8px 0;
 }
 
 .quantity-section {
@@ -275,15 +340,20 @@ i:hover {
     outline: none;
     background: transparent;
     color: var(--bs-body-color);
-    padding: 8px 12px;
+    padding: 10px 14px;
     text-align: right;
+    font-size: 15px;
     -moz-appearance: textfield;
 }
 
+.quantity-section::-webkit-outer-spin-button,
+.quantity-section::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
 
 .unit-section {
-    width: 90px;
-    padding: 8px 12px;
+    width: 95px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     position: relative;
@@ -295,6 +365,11 @@ i:hover {
     cursor: pointer;
     user-select: none;
     width: 100%;
+    font-size: 15px;
+}
+
+.placeholder-text {
+    color: var(--bs-secondary-color);
 }
 
 .name-dropdown {
@@ -303,20 +378,76 @@ i:hover {
     z-index: 1060;
     max-height: 200px;
     overflow-y: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    margin-top: 4px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--accent-border);
+    margin-top: 6px;
 }
 
-.unit-dropdown {
-    top: 100%;
-    right: 0;
-    z-index: 1060;
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 100px;
-    margin-top: 4px;
+.unit-drawer {
+    border-top: 1.5px solid #E8E0D4;
+    padding-top: 18px;
 }
+
+.unit-pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.unit-pill {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #F0EBE2;
+    color: #6B5A48;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+}
+
+.unit-pill:hover {
+    background: rgba(201, 79, 30, 0.12);
+    color: #C94F1E;
+    border-color: #C94F1E;
+}
+
+.unit-pill.active {
+    background: #C94F1E;
+    color: white;
+    border-color: #C94F1E;
+}
+
+.unit-drawer-close {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--bs-border-color);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--bs-secondary-color);
+}
+
+.list-group-item-action:hover {
+    background: var(--accent-soft);
+    color: var(--bs-emphasis-color);
+}
+
+.date-input {
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--bs-border-color);
+    padding: 10px 14px;
+    font-size: 15px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.date-input:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-shadow);
+}
+
 </style>
