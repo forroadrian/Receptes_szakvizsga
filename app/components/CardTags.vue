@@ -28,8 +28,8 @@ const props = defineProps<{
 
 <style scoped>
     .card-tag--active {
-        background-color: v-bind(buttonColor);
-        color: v-bind(textColor);
+        background-color: var(--green);
+        color: #fff;
     }
 
     .card-tag--outline {
@@ -49,7 +49,7 @@ const props = defineProps<{
     }
 
     .card-tag--warning {
-        background-color: var(--orange);
-        color: #fff;
+        background-color: var(--yellow);
+        color: var(--text-dark);
     }
 </style>
