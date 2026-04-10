@@ -39,12 +39,12 @@ const almostExpired = computed(() => ingredients.value.filter(v => v.tag === "Ha
 const expired = computed(() => ingredients.value.filter(v => v.tag === "Lejárt").length)
 const query = ref<string[]>([])
 
-const params = ref<SearchParams<Ingredient>>({
+const params = computed<SearchParams<Ingredient>>(() => ({
     haystack: ingredients.value as Ingredient[],
     searchFor: ["name","tag"],
     showAllByDefault: true,
     query: query.value
-});
+}));
 
 const results = useSearch(params);
 
@@ -67,7 +67,8 @@ const onDelete = async (ingredient: Ingredient) => {
 onMounted(async () => {
     loadingData.value = true;
     try {
-        loadIngredients()    
+        await loadIngredients()    
+        
     } finally {
         loadingData.value = false;
     }
