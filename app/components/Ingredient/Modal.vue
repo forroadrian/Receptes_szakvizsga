@@ -15,113 +15,164 @@ const {
 } = ingredientState
 
 const isAlert = ref<boolean>(false);
+
 function showAlert(){
     isAlert.value = true;
 }
 
-const input = ref({
-    name: "",
-    quantity: null as number | null,
-    unit: "",
-    expiry: "",
-});
+const inputName = ref("")
+const inputQuantity = ref<number | null>(null)
+const inputUnit = ref("")
+const inputExpiry = ref("")
 
-const showDropdown = ref(false);
+const nameInputOpen = ref(false)
+const unitDropdownOpen = ref(false)
 
 const filteredIngredients = computed(() => {
-    const q = input.value.name.toLowerCase().trim();
-    if (!q) return availableIngredients.slice(0, 10);
-    return availableIngredients
-        .filter(i => i.name.toLowerCase().includes(q))
-        .slice(0, 10);
-});
+    if (inputName.value == "") {
+        return ingredientState.availableIngredients.slice(0, 10)
+    }
+    const results = []
+    for (const item of ingredientState.availableIngredients) {
+        if (item.name.toLowerCase().includes(inputName.value.toLowerCase())) {
+            results.push(item)
+        }
+        if (results.length >= 10) break
+    }
+    return results
+})
 
-const nameIsValid = computed(() =>
-    availableIngredients.some(i => i.name === input.value.name)
-);
+const nameIsValid = computed(() => {
+    let found = false
+    for (const item of ingredientState.availableIngredients) {
+        if (item.name === inputName.value) {
+            found = true
+        }
+    }
+    return found
+})
 
-const selectIngredient = (name: string) => {
-    input.value.name = name;
-    showDropdown.value = false;
-};
-
-const onBlur = () => {
-    showDropdown.value = false;
-    if (!nameIsValid.value) input.value.name = "";
-};
-
-const checkInput = () =>
-        !nameIsValid.value ||
-        input.value.unit === "" ||
-        input.value.expiry.length === 0 ||
-        input.value.quantity == null ||
-        input.value.quantity <= 0
-
-const resetInputData = () => {
-    input.value = {
-        name: "",
-        quantity: null,
-        unit: "",
-        expiry: "",
-    };
+function selectIngredient(name: string) {
+    inputName.value = name
+    nameInputOpen.value = false
 }
 
-const saveIngredient = async () => {
-    if (checkInput()) {
-        throw createError({
-            status: 404,
-            statusText: "Ingredient data is incomplete"
-        });
+function onNameBlur() {
+    nameInputOpen.value = false
+    if (!nameIsValid.value) {
+        inputName.value = ""
+    }
+}
+
+async function openNameInput() {
+    nameInputOpen.value = true
+    await nextTick()
+    document.getElementById("ingredient-name-input")?.focus()
+}
+
+function selectUnit(unit: string) {
+    inputUnit.value = unit
+    unitDropdownOpen.value = false
+}
+
+function resetForm() {
+    inputName.value = ""
+    inputQuantity.value = null
+    inputUnit.value = ""
+    inputExpiry.value = ""
+}
+
+async function saveIngredient() {
+    if (!nameIsValid.value || inputUnit.value == "" || inputExpiry.value == "" || inputQuantity.value == null || inputQuantity.value <= 0) {
+        showAlert()
+        return
     }
     try {
-        const expiry = new ExpiryDate(new Date(input.value.expiry));
+        const expiry = new ExpiryDate(new Date(inputExpiry.value))
 
-        const newIngredient: Ingredient = new Ingredient(-1,
-            input.value.name,
-            input.value.quantity as number,
-            input.value.unit,
+        const newIngredient: Ingredient = new Ingredient(
+            -1,
+            inputName.value,
+            inputQuantity.value,
+            inputUnit.value,
             expiry
-        );
-        const res: any = postIngredient(newIngredient);
-        newIngredient.id = res.ingredient_id;
-        newIngredient.tag = expiry.checkExpiry();
+        )
+        const res: any = await postIngredient(newIngredient)
+        newIngredient.id = res.ingredient_id
+        newIngredient.tag = expiry.checkExpiry()
 
-        pushIngredient(newIngredient);
-        resetInputData();
-        closeIngredientModal();
-
+        pushIngredient(newIngredient)
+        resetForm()
+        closeIngredientModal()
     } catch(error: any) {
-        showAlert();
+        showAlert()
     }
-};
+}
 
 onMounted(() => {
-    loadAvailableIngredients();
-});
+    loadAvailableIngredients()
+})
 </script>
 <template>
-    <div class="ingredient-modal-backdrop" @click.self="closeIngredientModal">
-        <div class="ingredient-modal-panel">
+    <div class="modal-backdrop" @click.self="closeIngredientModal">
+        <div class="modal-panel">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="mb-0">Új hozzávaló felvétele</h3>
                 <i class="bi bi-x p-0" @click="closeIngredientModal"></i>
             </div>
 
-            <div class="mb-3 position-relative">
-                <label class="form-label">Hozzávaló megnevezése</label>
-                <input
-                    v-model="input.name"
-                    type="text"
-                    class="form-control"
-                    placeholder="Pl. Tej"
-                    autocomplete="off"
-                    @focus="showDropdown = true"
-                    @blur="onBlur"
-                />
-                <ul
-                    v-if="showDropdown"
-                    class="ingredient-dropdown list-group position-absolute w-100"
-                >
+            <div class="position-relative mb-3">
+                <label class="form-label">Hozzávaló</label>
+                <div class="combined-input">
+
+                    <div class="name-section">
+                        <div v-if="!nameInputOpen" class="section-trigger" @click="openNameInput">
+                            <span :class="inputName ? '' : 'text-muted'">{{ inputName || 'Pl. Tej' }}</span>
+                            <i class="bi bi-chevron-down ms-auto"></i>
+                        </div>
+                        <input
+                            v-else
+                            id="ingredient-name-input"
+                            v-model="inputName"
+                            type="text"
+                            class="name-text-input"
+                            placeholder="Pl. Tej"
+                            autocomplete="off"
+                            @blur="onNameBlur"
+                        />
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <input
+                        v-model.number="inputQuantity"
+                        type="number"
+                        class="quantity-section"
+                        placeholder="100"
+                        min="0"
+                    />
+
+                    <div class="section-divider"></div>
+
+                    <div class="unit-section">
+                        <div v-if="!unitDropdownOpen" class="section-trigger" @click="unitDropdownOpen = true">
+                            <span :class="inputUnit ? '' : 'text-muted'">{{ inputUnit || 'Egység' }}</span>
+                            <i class="bi bi-chevron-down ms-auto"></i>
+                        </div>
+                        <ul v-else class="unit-dropdown list-group position-absolute">
+                            <li
+                                v-for="unit in units"
+                                :key="unit"
+                                class="list-group-item list-group-item-action"
+                                @mousedown.prevent="selectUnit(unit)"
+                            >
+                                {{ unit }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <ul v-if="nameInputOpen" class="name-dropdown list-group position-absolute w-100">
                     <li
                         v-for="item in filteredIngredients"
                         :key="item.id"
@@ -133,23 +184,9 @@ onMounted(() => {
                 </ul>
             </div>
 
-            <div class="row g-2 mb-3">
-                <div class="col-7">
-                    <label class="form-label">Mennyiség</label>
-                    <input v-model.number="input.quantity" type="number" class="form-control"
-                        placeholder="100" />
-                </div>
-                <div class="col-5">
-                    <label class="form-label">Egység</label>
-                    <select class="form-select" v-model="input.unit">
-                        <option v-for="unit in units" :value="unit">{{ unit }}</option>
-                    </select>
-                </div>
-            </div>
-
             <div class="mb-4">
                 <label class="form-label">Lejárati idő</label>
-                <input v-model="input.expiry" type="date" class="form-control" />
+                <input v-model="inputExpiry" type="date" class="form-control" />
             </div>
 
             <div class="d-flex justify-content-end">
@@ -159,11 +196,16 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
+    <Alert message="Helytelen adat." :show="isAlert" type="error" @close="isAlert = false" />
 </template>
 <style scoped>
-.ingredient-modal-backdrop {
+.modal-backdrop {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.35);
     display: flex;
     justify-content: center;
@@ -171,7 +213,7 @@ onMounted(() => {
     z-index: 1050;
 }
 
-.ingredient-modal-panel {
+.modal-panel {
     background: var(--bs-body-bg);
     border-radius: 24px;
     padding: 24px 28px;
@@ -181,14 +223,10 @@ onMounted(() => {
 }
 
 @media (min-width: 992px) {
-    .ingredient-modal-backdrop {
+    .modal-backdrop {
         justify-content: flex-end;
         align-items: flex-start;
         padding: 32px 40px;
-    }
-
-    .ingredient-modal-panel {
-        max-width: 420px;
     }
 }
 
@@ -196,7 +234,70 @@ i:hover {
     cursor: pointer;
 }
 
-.ingredient-dropdown {
+.combined-input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    background: var(--bs-body-bg);
+}
+
+.combined-input:focus-within {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.name-section {
+    flex: 1;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.name-text-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    color: var(--bs-body-color);
+}
+
+.section-divider {
+    width: 1px;
+    background: var(--bs-border-color);
+    margin: 6px 0;
+}
+
+.quantity-section {
+    width: 80px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--bs-body-color);
+    padding: 8px 12px;
+    text-align: right;
+    -moz-appearance: textfield;
+}
+
+
+.unit-section {
+    width: 90px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.section-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+}
+
+.name-dropdown {
     top: 100%;
     left: 0;
     z-index: 1060;
@@ -204,5 +305,18 @@ i:hover {
     overflow-y: auto;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: 4px;
+}
+
+.unit-dropdown {
+    top: 100%;
+    right: 0;
+    z-index: 1060;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 100px;
+    margin-top: 4px;
 }
 </style>

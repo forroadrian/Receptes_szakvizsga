@@ -137,4 +137,8 @@ const selected = ref<{ name: string; id: number }>({ name: "Friss", id: 1 });
 .inactive .bi-circle-fill {
   color: var(--pill-text-light);
 }
+
+.badge {
+    cursor: pointer;
+}
 </style>
