@@ -7,7 +7,7 @@ import { useIngredientStore } from '~/stores/ingredients';
 const ingredientState = useIngredientStore();
 const card = useTemplateRef("card")
 const { width: cardWidth } = useElementBounding(card)
-const isTiny  = computed(() => cardWidth.value <= 370)
+const isTiny = computed(() => cardWidth.value <= 370)
 
 const editing = ref(false)
 
@@ -28,18 +28,18 @@ const items = computed(() => {
     return [{ label: tag, variant: variant } as CardTagItem]
 })
 
-const editName       = ref(props.ingredient.name)
-const nameInputOpen  = ref(false)
+const editName = ref(props.ingredient.name)
+const nameInputOpen = ref(false)
 
-const originalName     = ref('')
+const originalName = ref('')
 const originalQuantity = ref(0)
-const originalUnit     = ref('')
-const originalExpiry   = ref('')
+const originalUnit = ref('')
+const originalExpiry = ref('')
 
 const isCached = computed(() =>
-    editName.value            === originalName.value     &&
+    editName.value === originalName.value &&
     props.ingredient.quantity === originalQuantity.value &&
-    props.ingredient.unit     === originalUnit.value     &&
+    props.ingredient.unit === originalUnit.value &&
     props.ingredient.expiry.toShort() === originalExpiry.value
 )
 
@@ -66,13 +66,13 @@ function onEditNameBlur() {
 }
 
 function startEditing() {
-    editName.value       = props.ingredient.name
-    originalName.value     = props.ingredient.name
+    editName.value = props.ingredient.name
+    originalName.value = props.ingredient.name
     originalQuantity.value = props.ingredient.quantity
-    originalUnit.value     = props.ingredient.unit
-    originalExpiry.value   = props.ingredient.expiry.toShort()
-    nameInputOpen.value  = false
-    editing.value        = true
+    originalUnit.value = props.ingredient.unit
+    originalExpiry.value = props.ingredient.expiry.toShort()
+    nameInputOpen.value = false
+    editing.value = true
     ingredientState.loadAvailableIngredients()
 }
 
@@ -102,15 +102,8 @@ const onEdit = async () => {
 </script>
 
 <template>
-    <CardBase
-        media-position="topLeft"
-        :show-divider="false"
-        content-class="content-settings"
-        ref="card"
-        :class="{ 'card--tiny': isTiny }"
-        :media-left-class="isTiny ? 'media-tiny' : ''"
-        v-if="!editing"
-    >
+    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card"
+        :class="{ 'card--tiny': isTiny }" :media-left-class="isTiny ? 'media-tiny' : ''" v-if="!editing">
         <template #media>
             <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
                 <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
@@ -132,7 +125,8 @@ const onEdit = async () => {
                     <button class="card-action-btn card-action-btn--edit" @click="startEditing" title="Szerkesztés">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="card-action-btn card-action-btn--delete" @click="$emit('delete', ingredient)" title="Törlés">
+                    <button class="card-action-btn card-action-btn--delete" @click="$emit('delete', ingredient)"
+                        title="Törlés">
                         <i class="bi bi-trash3"></i>
                     </button>
                 </div>
@@ -140,15 +134,8 @@ const onEdit = async () => {
         </template>
     </CardBase>
 
-    <CardBase
-        media-position="topLeft"
-        :show-divider="false"
-        content-class="content-settings"
-        ref="card"
-        :class="{ 'card--tiny': isTiny }"
-        :media-left-class="isTiny ? 'media-tiny' : ''"
-        v-else
-    >
+    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card"
+        :class="{ 'card--tiny': isTiny }" :media-left-class="isTiny ? 'media-tiny' : ''" v-else>
         <template #media>
             <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
                 <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
@@ -159,31 +146,17 @@ const onEdit = async () => {
 
                 <div class="position-relative">
                     <span class="card-edit-label">Alapanyag neve</span>
-                    <div
-                        class="card-edit-input card-edit-input--trigger"
-                        :class="{ open: nameInputOpen }"
-                        v-if="!nameInputOpen"
-                        @click="nameInputOpen = true"
-                    >
+                    <div class="card-edit-input card-edit-input--trigger" :class="{ open: nameInputOpen }"
+                        v-if="!nameInputOpen" @click="nameInputOpen = true">
                         <span :class="editName ? '' : 'card-edit-placeholder'">{{ editName || 'Keresés…' }}</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </div>
-                    <input
-                        v-else
-                        v-model="editName"
-                        type="text"
-                        class="card-edit-input"
-                        placeholder="Keresés…"
-                        autocomplete="off"
-                        @blur="onEditNameBlur"
-                    />
+                    <input v-else v-model="editName" type="text" class="card-edit-input" placeholder="Keresés…"
+                        autocomplete="off" @blur="onEditNameBlur" />
                     <ul v-if="nameInputOpen" class="card-edit-dropdown list-group position-absolute w-100">
-                        <li
-                            v-for="item in filteredEditIngredients"
-                            :key="item.id"
+                        <li v-for="item in filteredEditIngredients" :key="item.id"
                             class="list-group-item list-group-item-action"
-                            @mousedown.prevent="selectEditIngredient(item.name)"
-                        >
+                            @mousedown.prevent="selectEditIngredient(item.name)">
                             {{ item.name }}
                         </li>
                     </ul>
@@ -204,12 +177,15 @@ const onEdit = async () => {
 
                 <div>
                     <span class="card-edit-label">Lejárati dátum</span>
-                    <input type="date" class="card-edit-input" :value="ingredient.expiry.toShort()" @change="updateExpiry" />
+                    <input type="date" class="card-edit-input" :value="ingredient.expiry.toShort()"
+                        @change="updateExpiry" />
                 </div>
 
                 <div class="d-flex gap-2 mt-1">
-                    <button type="button" class="card-edit-btn card-edit-btn--cancel flex-grow-1" @click="editing = false">Mégse</button>
-                    <button type="button" class="card-edit-btn card-edit-btn--save flex-grow-1" :disabled="!editNameIsValid" @click="onEdit">
+                    <button type="button" class="card-edit-btn card-edit-btn--cancel flex-grow-1"
+                        @click="editing = false">Mégse</button>
+                    <button type="button" class="card-edit-btn card-edit-btn--save flex-grow-1"
+                        :disabled="!editNameIsValid" @click="onEdit">
                         <i class="bi bi-check2"></i> Mentés
                     </button>
                 </div>
