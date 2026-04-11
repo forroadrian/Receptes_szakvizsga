@@ -49,10 +49,10 @@ const params = computed<SearchParams<Ingredient>>(() => ({
 const results = useSearch(params);
 
 const addToQuery = (tag: string) => {
-    if(tag !== "Összes"){
-        query.value[1] = tag;
-    }else {
+    if(tag === "Összes"){
         query.value[1] = '';
+    }else {
+        query.value[1] = tag;
     }
 }
 
@@ -68,7 +68,7 @@ onMounted(async () => {
     loadingData.value = true;
     try {
         await loadIngredients()    
-        
+        addToQuery("Összes")
     } finally {
         loadingData.value = false;
     }
@@ -90,7 +90,8 @@ onMounted(async () => {
         <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery"/>
         <div class="row mt-4">
             <h2 class="py-3">Meglévő alapanyagaim</h2>
-            <SearchBar v-model="query[0]" placeholder="Keresés" class="px-3 mx-3" />
+            <SearchBar v-model="query[0]" placeholder="Keresés" class="ps-3 me-3" />
+            <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery" mobile />
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <IngredientList :results="results" @delete="onDelete" @edit="" :loading="loadingData" :description="descriptionText"/>

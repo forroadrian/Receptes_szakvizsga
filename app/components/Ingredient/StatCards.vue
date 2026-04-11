@@ -5,12 +5,14 @@ const props = withDefaults(
     fresh?: number;
     almostExpired?: number;
     expired?: number;
+    mobile?: boolean;
   }>(),
   {
     all: 0,
     fresh: 0,
     almostExpired: 0,
     expired: 0,
+    mobile: false,
   }
 );
 
@@ -35,10 +37,11 @@ const order = computed(() => {
   ];
 });
 
-const selected = ref<{ name: string; id: number }>({ name: "Friss", id: 1 });
+const selected = ref<{ name: string; id: number }>({ name: "Összes", id: 0 });
 </script>
 <template>
-  <div class="d-none d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
+  <!-- Desktop: always visible pill bar -->
+  <div v-if="!mobile" class="d-none d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
     <span
       class="rounded rounded-pill d-flex align-items-center justify-content-around badge segmentation"
     >
@@ -57,49 +60,32 @@ const selected = ref<{ name: string; id: number }>({ name: "Friss", id: 1 });
       </span>
     </span>
   </div>
-  <div
-    id="statsCollapse"
-    class="d-block d-md-none d-flex flex-column gap-3 collapse collapse-horizontal w-50 position-relative z-3 whole"
-  >
-    <CardBase :orientation="'vertical'" class="position-absolute cardthingy">
-      <template #header >
-        <CardHeader :rank="4" class="text-center fw-bold mb-1 border-bottom">Statisztikák</CardHeader>
-      </template>
-      <template #body>
-        <div class="d-flex flex-column badges">
-            <span
-              class="badge rounded-pill align-self-start w-100 text-start"
-              :class="[selected?.name === tag.name ? 'active' : 'inactive']"
-              v-for="(tag, index) in order"
-              @click="
-                selected = { name: tag.name, id: index };
-                $emit('filter', selected?.name);
-              "
-            >
-              <i class="bi bi-circle-fill me-3"></i>
-              {{ tag.name }}:
-              <strong>{{ tag.amount }}</strong>
-            </span>
-        </div>
-      </template>
-    </CardBase>
+
+  <!-- Mobile: always visible pill bar below search bar -->
+
+  <div v-if="mobile" class="d-block d-md-none mt-4">
+    <span
+      class="rounded rounded-pill d-flex align-items-center justify-content-around badge segmentation segmentation--mobile"
+    >
+      <span
+        class="badge rounded-pill flex-grow-1"
+        :class="[selected?.name === tag.name ? 'active' : 'inactive']"
+        v-for="(tag, index) in order"
+        @click="
+          selected = { name: tag.name, id: index };
+          $emit('filter', selected?.name);
+        "
+      >
+        {{ tag.name }}:
+        <strong>{{ tag.amount }}</strong>
+      </span>
+    </span>
   </div>
 </template>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
 
-
-.whole {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    left: calc(70%);
-    top: -30px;
-}
-
-.cardthingy {
-    background-color: white;
-}
 
 .segmentation > span {
   font-family: "Inter";
@@ -140,5 +126,9 @@ const selected = ref<{ name: string; id: number }>({ name: "Friss", id: 1 });
 
 .badge {
     cursor: pointer;
+}
+
+.segmentation--mobile > span {
+  font-size: 0.7rem;
 }
 </style>
