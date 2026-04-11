@@ -87,11 +87,10 @@ onMounted(async () => {
             </p>
             <IngredientButtons @openIngredientModal="openIngredientModal"/>
         </div>
-        <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery"/>
         <div class="row mt-4">
             <h2 class="py-3">Meglévő alapanyagaim</h2>
             <SearchBar v-model="query[0]" placeholder="Keresés" class="ps-3 me-3" />
-            <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery" mobile />
+            <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="almostExpired" :expired="expired" @filter="addToQuery" />
             <div>
                 <h5 class="mt-3 py-3">Találatok az alábbi keresésre:</h5>
                 <IngredientList :results="results" @delete="onDelete" @edit="" :loading="loadingData" :description="descriptionText"/>

@@ -1,0 +1,161 @@
+.card--base {
+    width: 100%;
+    height: auto;
+}
+
+.card--title {
+    text-align: start !important;
+}
+
+.card-action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.card-action-btn:active {
+    transform: scale(0.92);
+}
+
+.card-action-btn--edit {
+    background: rgba(53, 165, 90, 0.22);
+    color: #1e7a40;
+}
+
+.card-action-btn--edit:hover {
+    background: rgba(53, 165, 90, 0.35);
+}
+
+.card-action-btn--delete {
+    background: rgba(165, 42, 42, 0.18);
+    color: #8b1a1a;
+}
+
+.card-action-btn--delete:hover {
+    background: rgba(165, 42, 42, 0.28);
+}
+
+.card-edit-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--pill-text-muted);
+    margin-bottom: 3px;
+}
+
+.card-edit-input {
+    border: 1.5px solid var(--pill-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card-edit-input:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px var(--accent-shadow);
+}
+
+.card-edit-input--trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.card-edit-input--trigger.open {
+    border-radius: 8px 8px 0 0;
+    border-color: var(--accent-border);
+}
+
+.card-edit-placeholder {
+    color: var(--pill-text-muted);
+}
+
+.card-edit-dropdown {
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    max-height: 160px;
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border: 1.5px solid var(--accent-border);
+    border-top: none;
+}
+
+.list-group-item-action:hover {
+    background: var(--accent-soft);
+}
+
+.card-edit-btn {
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    border: 1.5px solid transparent;
+}
+
+.card-edit-btn--cancel {
+    background: transparent;
+    border-color: var(--pill-border);
+    color: var(--pill-text-muted);
+}
+
+.card-edit-btn--cancel:hover {
+    background: var(--accent-soft);
+}
+
+.card-edit-btn--save {
+    background: linear-gradient(135deg, #23da60, #35a55a);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.card-edit-btn--save:hover {
+    opacity: 0.88;
+}
+
+.card-edit-btn--save:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.card--tiny :deep(.media-tiny) {
+    width: 80px !important;
+}
+
+.card--tiny :deep(.card--title) {
+    font-size: 0.85rem;
+}
+
+.card--tiny :deep(.card--body p),
+.card--tiny :deep(.card--header p) {
+    font-size: 0.78rem;
+    margin-bottom: 0.15rem;
+}
+
+.card--tiny :deep(.card--content) {
+    padding: 0.4rem !important;
+}

@@ -5,14 +5,12 @@ const props = withDefaults(
     fresh?: number;
     almostExpired?: number;
     expired?: number;
-    mobile?: boolean;
   }>(),
   {
     all: 0,
     fresh: 0,
     almostExpired: 0,
     expired: 0,
-    mobile: false,
   }
 );
 
@@ -40,8 +38,7 @@ const order = computed(() => {
 const selected = ref<{ name: string; id: number }>({ name: "Összes", id: 0 });
 </script>
 <template>
-  <!-- Desktop: always visible pill bar -->
-  <div v-if="!mobile" class="d-none d-md-block pb-4 border-bottom mt-4 mt-md-0 py-3">
+  <div class="mt-4">
     <span
       class="rounded rounded-pill d-flex align-items-center justify-content-around badge segmentation"
     >
@@ -54,28 +51,7 @@ const selected = ref<{ name: string; id: number }>({ name: "Összes", id: 0 });
           $emit('filter', selected?.name);
         "
       >
-        <i class="bi bi-circle-fill me-3"></i>
-        {{ tag.name }}:
-        <strong>{{ tag.amount }}</strong>
-      </span>
-    </span>
-  </div>
-
-  <!-- Mobile: always visible pill bar below search bar -->
-
-  <div v-if="mobile" class="d-block d-md-none mt-4">
-    <span
-      class="rounded rounded-pill d-flex align-items-center justify-content-around badge segmentation segmentation--mobile"
-    >
-      <span
-        class="badge rounded-pill flex-grow-1"
-        :class="[selected?.name === tag.name ? 'active' : 'inactive']"
-        v-for="(tag, index) in order"
-        @click="
-          selected = { name: tag.name, id: index };
-          $emit('filter', selected?.name);
-        "
-      >
+        <i class="bi bi-circle-fill me-3 d-none d-md-inline"></i>
         {{ tag.name }}:
         <strong>{{ tag.amount }}</strong>
       </span>
@@ -128,7 +104,9 @@ const selected = ref<{ name: string; id: number }>({ name: "Összes", id: 0 });
     cursor: pointer;
 }
 
-.segmentation--mobile > span {
-  font-size: 0.7rem;
+@media (max-width: 767px) {
+  .segmentation > span {
+    font-size: 0.7rem;
+  }
 }
 </style>

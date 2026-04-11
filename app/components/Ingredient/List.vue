@@ -6,7 +6,7 @@ const props = defineProps<{
 }>()
 </script>
 <template>
-    <div class="g-3 row mb-5 mt-4">
+    <div class="g-3 row mb-5 mt-4 align-items-start">
         <template v-if="results.length > 0">
             <div class="d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center"
                 v-for="ingredient in results"

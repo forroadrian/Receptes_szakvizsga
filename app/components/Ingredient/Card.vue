@@ -3,59 +3,114 @@ import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfa
 import ExpiryDate from '~/models/ExpiryDate';
 import Ingredient from '~/models/Ingredient';
 import { useIngredientStore } from '~/stores/ingredients';
+
 const ingredientState = useIngredientStore();
 const card = useTemplateRef("card")
-const {width: cardWidth} = useElementBounding(card)
-const isSmall = computed(() =>  cardWidth.value <= 395 )
-const showDescription = ref<boolean>(false)
+const { width: cardWidth } = useElementBounding(card)
+const isTiny  = computed(() => cardWidth.value <= 370)
 
-const editing = ref(false);
+const editing = ref(false)
 
 const props = withDefaults(defineProps<{
     ingredient: Ingredient,
     image?: string,
     alt?: string
-}>(),
-    {
-       image: "images/background.webp",
-       alt: "here" 
-    });
+}>(), {
+    image: "images/background.webp",
+    alt: "here"
+})
 
 const prevId = props.ingredient.id
 
 const items = computed(() => {
     const tag = props.ingredient.tag
-    const variant = tag === 'Friss'
-        ? 'active' : tag === "Hamarosan"
-        ? 'warning' : "custom"
-    return [{label: tag, variant: variant} as CardTagItem]
-})  
+    const variant = tag === 'Friss' ? 'active' : tag === "Hamarosan" ? 'warning' : "custom"
+    return [{ label: tag, variant: variant } as CardTagItem]
+})
 
-const toggleDescription = () => {
-    showDescription.value = !showDescription.value;
-    return;
+const editName       = ref(props.ingredient.name)
+const nameInputOpen  = ref(false)
+
+const originalName     = ref('')
+const originalQuantity = ref(0)
+const originalUnit     = ref('')
+const originalExpiry   = ref('')
+
+const isCached = computed(() =>
+    editName.value            === originalName.value     &&
+    props.ingredient.quantity === originalQuantity.value &&
+    props.ingredient.unit     === originalUnit.value     &&
+    props.ingredient.expiry.toShort() === originalExpiry.value
+)
+
+const filteredEditIngredients = computed(() => {
+    const q = editName.value.toLowerCase()
+    if (!q) return ingredientState.availableIngredients.slice(0, 10)
+    return ingredientState.availableIngredients
+        .filter(i => i.name.toLowerCase().includes(q))
+        .slice(0, 10)
+})
+
+const editNameIsValid = computed(() =>
+    ingredientState.availableIngredients.some(i => i.name === editName.value)
+)
+
+function selectEditIngredient(name: string) {
+    editName.value = name
+    nameInputOpen.value = false
 }
 
-const updateExpiry = (val: {target: {value: string}}) => {
-    props.ingredient.expiry = new ExpiryDate(new Date(val.target.value));
+function onEditNameBlur() {
+    nameInputOpen.value = false
+    if (!editNameIsValid.value) editName.value = props.ingredient.name
 }
 
-const onEdit = async () =>{
+function startEditing() {
+    editName.value       = props.ingredient.name
+    originalName.value     = props.ingredient.name
+    originalQuantity.value = props.ingredient.quantity
+    originalUnit.value     = props.ingredient.unit
+    originalExpiry.value   = props.ingredient.expiry.toShort()
+    nameInputOpen.value  = false
+    editing.value        = true
+    ingredientState.loadAvailableIngredients()
+}
+
+const updateExpiry = (val: { target: { value: string } }) => {
+    props.ingredient.expiry = new ExpiryDate(new Date(val.target.value))
+}
+
+const onEdit = async () => {
+    if (!editNameIsValid.value) return
+    if (isCached.value) {
+        editing.value = false
+        return
+    }
     await $fetch("/api/ingredient", {
-        method:"PUT",
+        method: "PUT",
         body: {
             prev: prevId,
-            name: props.ingredient.name,
+            name: editName.value,
             quantity: props.ingredient.quantity,
             expiry: props.ingredient.expiry.toStamp(),
             unit: props.ingredient.unit,
         }
     })
+    props.ingredient.name = editName.value
+    editing.value = false
 }
-
 </script>
+
 <template>
-    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card" :class="{'card-fixed': !showDescription}" v-if="!editing">
+    <CardBase
+        media-position="topLeft"
+        :show-divider="false"
+        content-class="content-settings"
+        ref="card"
+        :class="{ 'card--tiny': isTiny }"
+        :media-left-class="isTiny ? 'media-tiny' : ''"
+        v-if="!editing"
+    >
         <template #media>
             <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
                 <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
@@ -63,110 +118,107 @@ const onEdit = async () =>{
         </template>
         <template #header>
             <CardHeader class="text-left">
-                <div class="d-flex flex-row justify-content-start">
-                    <CardTitle :rank="5" class="ps-3 m-0 align-self-center">{{ ingredient.name }} <i class="bi bi-pencil-square" v-if="!isSmall" @click="editing = true"></i></CardTitle>
-                    <i class="bi bi-three-dots flex-fill text-end fs-2 mt-2 me-3" @click="toggleDescription" v-if="isSmall"></i>
-                    <CardTags class="ms-3 flex-fill" :items="items" v-if="!isSmall"/>
-                    <i class="bi bi-trash3-fill me-3 text-end" v-if="!isSmall" @click="$emit('delete', ingredient)"></i>
+                <div class="d-flex flex-row align-items-center">
+                    <CardTitle :rank="5" class="ps-3 m-0">{{ ingredient.name }}</CardTitle>
+                    <CardTags class="ms-2 flex-shrink-0" :items="items" />
                 </div>
-                <CardTags class="mb-2 ms-2" :items="items" v-if="isSmall"/>
-                <p class="ps-3 small">{{ ingredient.quantity }} {{ ingredient.unit }}</p>
+                <p class="ps-3 mb-0 small text-muted">{{ ingredient.quantity }} {{ ingredient.unit }}</p>
             </CardHeader>
         </template>
         <template #body>
-            <div class="mb-2 px-3 d-flex flex-column justify-content-between">
-                <p class="m-0" :class="{'border-bottom mb-2': showDescription && isSmall}">Lejár: {{ ingredient.expiry.toShort() }}</p>
-                <div class="d-flex flex-column flex-grow options" v-if="showDescription && isSmall">
-                    <p class="pb-1" @click="editing = true">Szerkesztés</p>
-                    <p @click="$emit('delete', ingredient)">Törlés</p>
+            <div class="px-3 pb-2 d-flex flex-row align-items-center justify-content-between">
+                <p class="m-0 small text-muted">Lejár: {{ ingredient.expiry.toShort() }}</p>
+                <div class="d-flex gap-2">
+                    <button class="card-action-btn card-action-btn--edit" @click="startEditing" title="Szerkesztés">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="card-action-btn card-action-btn--delete" @click="$emit('delete', ingredient)" title="Törlés">
+                        <i class="bi bi-trash3"></i>
+                    </button>
                 </div>
             </div>
         </template>
     </CardBase>
-    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card" v-else>
+
+    <CardBase
+        media-position="topLeft"
+        :show-divider="false"
+        content-class="content-settings"
+        ref="card"
+        :class="{ 'card--tiny': isTiny }"
+        :media-left-class="isTiny ? 'media-tiny' : ''"
+        v-else
+    >
         <template #media>
             <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
                 <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
             </div>
         </template>
         <template #body>
-            <div class="text-left mx-3 mt-2">
-                <div class="d-flex flex-row justify-content-between">
-                    <input type="text" v-model="ingredient.name" class="ps-3 m-0 mb-2 align-self-center">
-                    <button type="button" class="btn-close" aria-label="Close" @click="editing = false"></button>
+            <div class="card-edit-form d-flex flex-column gap-2 p-2">
+
+                <div class="position-relative">
+                    <span class="card-edit-label">Alapanyag neve</span>
+                    <div
+                        class="card-edit-input card-edit-input--trigger"
+                        :class="{ open: nameInputOpen }"
+                        v-if="!nameInputOpen"
+                        @click="nameInputOpen = true"
+                    >
+                        <span :class="editName ? '' : 'card-edit-placeholder'">{{ editName || 'Keresés…' }}</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </div>
+                    <input
+                        v-else
+                        v-model="editName"
+                        type="text"
+                        class="card-edit-input"
+                        placeholder="Keresés…"
+                        autocomplete="off"
+                        @blur="onEditNameBlur"
+                    />
+                    <ul v-if="nameInputOpen" class="card-edit-dropdown list-group position-absolute w-100">
+                        <li
+                            v-for="item in filteredEditIngredients"
+                            :key="item.id"
+                            class="list-group-item list-group-item-action"
+                            @mousedown.prevent="selectEditIngredient(item.name)"
+                        >
+                            {{ item.name }}
+                        </li>
+                    </ul>
                 </div>
-                <CardTags class="mb-2 ms-2" :items="items" v-if="isSmall"/>
-                <div class="d-flex flex-column">
-                    <div class="mb-2">
-                        <input type="number" class="me-2 ps-3 text-align-right small quantityInput" v-model="ingredient.quantity">
-                        <select v-model="ingredient.unit" name="unit">
-                            <option :value="unit" v-for="unit in ingredientState.units" class="w-50">{{ unit }}</option>
+
+                <div class="d-flex gap-2">
+                    <div class="flex-grow-1">
+                        <span class="card-edit-label">Mennyiség</span>
+                        <input type="number" class="card-edit-input" v-model="ingredient.quantity" min="0" />
+                    </div>
+                    <div style="width: 90px">
+                        <span class="card-edit-label">Egység</span>
+                        <select class="card-edit-input" v-model="ingredient.unit">
+                            <option :value="unit" v-for="unit in ingredientState.units">{{ unit }}</option>
                         </select>
                     </div>
-                    <input type="date" class="border-bottom-3" @change="updateExpiry">
-                    <button type="button" class="btn btn-success my-2" @click="onEdit">Mentés</button>
                 </div>
+
+                <div>
+                    <span class="card-edit-label">Lejárati dátum</span>
+                    <input type="date" class="card-edit-input" :value="ingredient.expiry.toShort()" @change="updateExpiry" />
+                </div>
+
+                <div class="d-flex gap-2 mt-1">
+                    <button type="button" class="card-edit-btn card-edit-btn--cancel flex-grow-1" @click="editing = false">Mégse</button>
+                    <button type="button" class="card-edit-btn card-edit-btn--save flex-grow-1" :disabled="!editNameIsValid" @click="onEdit">
+                        <i class="bi bi-check2"></i> Mentés
+                    </button>
+                </div>
+
             </div>
         </template>
     </CardBase>
-
 </template>
+
 <style scoped>
-
-.quantityInput {
-    width: auto;
-    min-width: 20px;
-    max-width: 40%;
-}
-
-input {
-    border: none;
-    border-bottom: dotted 1px black
-}
-
-input:focus-visible {
-    outline: none;
-}
-
-select {
-    min-width: 40px !important;
-}
-
-option {
-    color: #000;
-}
-.card--base {
-    width: 100%;
-    height:auto;
-}
-
-.options > p {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    padding: 0;
-    margin: 0;
-    font-style: italic;
-}
-
-.options > p:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.options > p:hover {
-    transform: scale(1.02);
-    cursor: pointer;
-    
-}
-
-.card--title {
-    text-align: start !important;
-}
-
-i {
-    padding-left: 0.25vw;
-}
-
-i:hover {
-    cursor: pointer;
-}
+@import '~/assets/css/ingredientCard.css';
 </style>
