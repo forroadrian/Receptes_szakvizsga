@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import Button from "~/components/Button.vue";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
-const { hasAllergyWarning, getMatchingAllergyNames } = useRecipeAllergyWarnings();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
 const user = useSupabaseUser();
+const allergyWarnings = useRecipeAllergyWarnings();
 
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 
@@ -20,17 +20,18 @@ const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
 
-onMounted(async () => {
-    if (!recipeStore.getAllRecipes.length) {
-        await recipeStore.loadRecipes();
-    }
+if (!recipeStore.getAllRecipes.length) {
+    await recipeStore.loadRecipes();
+}
 
-    if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
-        await filterStore.loadCategories();
-    }
-});
+if (user.value) {
+    await allergyWarnings.loadUserAllergies();
+}
+
+if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
+    filterStore.loadCategories();
+}
 </script>
-
 <template>
     <RecipeModal />
 
@@ -172,13 +173,13 @@ onMounted(async () => {
                             </template>
 
                             <template #footer>
-                                <div v-if="user && hasAllergyWarning(recipe)" class="row pt-2">
+                                <div v-if="user && allergyWarnings.hasAllergyWarning(recipe)" class="row pt-2">
                                     <div class="col-12 text-center small my-auto text-danger">
                                         <strong>
                                             <i class="bi bi-exclamation-triangle-fill p-2"></i>
                                             Figyelem! Allergént tartalmaz:
                                         </strong>
-                                        {{ getMatchingAllergyNames(recipe) }}
+                                        {{ allergyWarnings.getMatchingAllergyNames(recipe) }}
                                     </div>
                                 </div>
                             </template>

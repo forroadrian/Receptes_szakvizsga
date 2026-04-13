@@ -1,36 +1,44 @@
-import { ref, watch } from "vue";
+import { ref } from "vue";
+
+const userAllergyIds = ref<number[]>([]);
+const allergyWarningsReady = ref(false);
 
 export const useRecipeAllergyWarnings = () => {
     const user = useSupabaseUser();
-    const userAllergyIds = ref<number[]>([]);
 
     const loadUserAllergies = async () => {
+        allergyWarningsReady.value = false;
+
         if (!user.value) {
             userAllergyIds.value = [];
+            allergyWarningsReady.value = true;
             return;
         }
 
         try {
-            const response = await $fetch("/api/preferences/user-allergy");
+            const response = await $fetch("/api/preferences/user-allergy", {
+                method: "GET"
+            });
+
             userAllergyIds.value = [];
 
-            if (response) {
-                for (const item of response) {
-                    const allergyId = Number(item.allergy_id);
-                    userAllergyIds.value.push(allergyId);
-                }
+            for (const item of response ?? []) {
+                userAllergyIds.value.push(Number(item.allergy_id));
             }
         } catch {
             userAllergyIds.value = [];
         }
+
+        allergyWarningsReady.value = true;
     };
 
     const getMatchingAllergies = (recipe: any) => {
-        if (!recipe.allergies) return [];
+        if (!recipe.allergies?.length) {
+            return [];
+        }
 
         return recipe.allergies.filter((allergy: any) => {
-            const recipeAllergyId = Number(allergy.id);
-            return userAllergyIds.value.includes(recipeAllergyId);
+            return userAllergyIds.value.includes(Number(allergy.id));
         });
     };
 
@@ -39,16 +47,14 @@ export const useRecipeAllergyWarnings = () => {
     };
 
     const getMatchingAllergyNames = (recipe: any) => {
-        const matchingAllergies = getMatchingAllergies(recipe);
-        return matchingAllergies.map((allergy: any) => allergy.name).join(", ");
+        return getMatchingAllergies(recipe)
+            .map((allergy: any) => allergy.name)
+            .join(", ");
     };
 
-    watch(() => user.value && user.value.id,loadUserAllergies,
-        { immediate: true }
-    );
-
     return {
-        userAllergyIds,
+        userAllergyIds, allergyWarningsReady,
+        loadUserAllergies,
         hasAllergyWarning,
         getMatchingAllergyNames
     };
