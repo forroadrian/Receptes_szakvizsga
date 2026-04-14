@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
         .insert(menuRecipes);
 
     if (menuRecipeError) {
+        await client.from("menu").delete().eq("id", menu.id)
         throw createError({ statusCode: 500, message: menuRecipeError.message });
     }
 
