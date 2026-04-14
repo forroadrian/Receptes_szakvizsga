@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
         .from("user_ingredient")
         .delete()
         .eq("ingredient_id", body.id)
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .select();
 
     if (error) {
