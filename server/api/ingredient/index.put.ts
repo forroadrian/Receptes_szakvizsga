@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         ingredientId = data?.id
     }
     
-    const {error: resp_err} = await client.from("user_ingredient")
+    const { data: updated, error: resp_err } = await client.from("user_ingredient")
         .update({
             ingredient_id: ingredientId,
             unit: body.unit,
@@ -37,7 +37,12 @@ export default defineEventHandler(async (event) => {
         })
         .eq("ingredient_id", body?.prev)
         .eq("user_id", user.id)
+        .select()
+        .single()
 
+    if (resp_err) {
+        throw createError({ statusCode: 500, message: resp_err.message });
+    }
 
-    console.log(resp_err);
+    return updated;
 });
