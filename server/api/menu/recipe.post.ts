@@ -25,6 +25,17 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 404, message: "Menu not found" });
     }
 
+    const { data: existing } = await client
+        .from("menu_recipe")
+        .select("menu_id")
+        .eq("menu_id", body.menu_id)
+        .eq("recipe_id", body.recipe_id)
+        .maybeSingle();
+
+    if (existing) {
+        throw createError({ statusCode: 409, message: "Recipe already in menu" });
+    }
+
     const { data, error } = await client
         .from("menu_recipe")
         .insert({
