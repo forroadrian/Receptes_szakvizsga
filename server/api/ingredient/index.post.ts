@@ -1,75 +1,30 @@
-import {serverSupabaseClient, serverSupabaseServiceRole} from "#supabase/server"
+import { serverSupabaseClient } from "#supabase/server";
 import { Database } from "~/types/database.types";
 import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 import { requireUser } from "~~/server/utils/requireUser";
+
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
-    const admin = await serverSupabaseServiceRole(event);
     const user = await requireUser(event);
 
     const body = await readBody(event);
-    requireBodyKeys(body, ["name","unit","quantity","expiry"])
-    console.log(body);
+    requireBodyKeys(body, ["ingredient_id", "unit", "quantity", "expiry"]);
 
-    
-    let ingredientId = -1
-
-    const {data: ingredientData, error: ingredientError} = await client
-        .from("ingredient")
-        .select("id")
-        .eq("name",body.name)
-        .maybeSingle()
-
-    if (ingredientError) {
-        throw createError({
-            message: ingredientError.message
-        })
-    }
-
-    if(!ingredientError) {
-        if(ingredientData != undefined){
-            ingredientId = ingredientData?.id as number
-        }
-    }
-    console.log("works");
-    console.log(ingredientId);
-    
-    if (ingredientId === -1) {
-        console.log("creating new ingredient");
-        
-        const { error, data } = await admin
-        .from("ingredient")
+    const { data, error } = await client
+        .from("user_ingredient")
         .insert({
-            name: body.name,
+            user_id: user.id,
+            ingredient_id: body.ingredient_id,
+            unit: body.unit,
+            quantity: body.quantity,
+            expiry_date: body.expiry,
         })
         .select()
         .single();
-        console.log(error, data);
-        
-        if (error) {
-            throw createError({ statusText: error.message });
-        }
 
-        if(data){
-            ingredientId = data.id
-        }
+    if (error) {
+        throw createError({ statusCode: 500, message: error.message });
     }
 
-    const {data: connectionTableData, error: connectionTableError} = await client
-        .from("user_ingredient")
-        .insert({
-            "user_id": user.sub,
-            "ingredient_id": ingredientId,
-            "unit": body.unit,
-            "quantity": body.quantity,
-            "expiry_date": body.expiry
-        })
-        .select()
-        .maybeSingle()
-
-    if (connectionTableError) {
-        throw createError({ statusText: connectionTableError.message });
-    }
-    console.log("works");
-    return connectionTableData;
+    return data;
 });
