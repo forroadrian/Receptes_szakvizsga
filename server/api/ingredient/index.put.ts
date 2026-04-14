@@ -35,7 +35,8 @@ export default defineEventHandler(async (event) => {
             quantity: body.quantity,
             expiry_date: body.expiry
         })
-        .eq("ingredient_id",body?.prev)
+        .eq("ingredient_id", body?.prev)
+        .eq("user_id", user.id)
 
 
     console.log(resp_err);

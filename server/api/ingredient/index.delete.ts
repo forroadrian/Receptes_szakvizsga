@@ -10,7 +10,8 @@ export default eventHandler(async (event) => {
     const {error} = await client
         .from("user_ingredient")
         .delete()
-        .eq("ingredient_id",body.id);
+        .eq("ingredient_id", body.id)
+        .eq("user_id", user.id);
 
     if(error) {
         throw createError({ message: error.message });
