@@ -21,10 +21,14 @@ export default defineEventHandler(async (event) => {
         .eq("ingredient_id", body.prev)
         .eq("user_id", user.id)
         .select()
-        .single();
+        .maybeSingle();
 
     if (error) {
         throw createError({ statusCode: 500, message: error.message });
+    }
+
+    if (!data) {
+        throw createError({ statusCode: 404, message: "Ingredient not found" });
     }
 
     return data;

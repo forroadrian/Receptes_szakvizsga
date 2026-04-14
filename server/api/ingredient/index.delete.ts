@@ -7,14 +7,20 @@ export default eventHandler(async (event) => {
     const body = await readBody(event);
     requireBodyKeys(body, ["id"]);
 
-    const {error} = await client
+    const { data, error } = await client
         .from("user_ingredient")
         .delete()
         .eq("ingredient_id", body.id)
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .select();
 
-    if(error) {
-        throw createError({ message: error.message });
+    if (error) {
+        throw createError({ statusCode: 500, message: error.message });
     }
+
+    if (!data || data.length === 0) {
+        throw createError({ statusCode: 404, message: "Ingredient not found" });
+    }
+
     return true;
 });

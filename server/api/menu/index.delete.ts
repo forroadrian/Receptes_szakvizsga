@@ -5,21 +5,27 @@ import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
-    await requireUser(event);
+    const user = await requireUser(event);
 
     const body = await readBody(event);
     requireBodyKeys(body, ["id"]);
 
-    const { error } = await client
+    const { data, error } = await client
         .from("menu")
         .update({
             active: false,
             deleted_at: new Date().toISOString(),
         })
-        .eq("id", body.id);
+        .eq("id", body.id)
+        .eq("user_id", user.id)
+        .select();
 
     if (error) {
         throw createError({ statusCode: 500, message: error.message });
+    }
+
+    if (!data || data.length === 0) {
+        throw createError({ statusCode: 404, message: "Menu not found" });
     }
 
     return { success: true };
