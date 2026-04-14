@@ -21,6 +21,7 @@ function showAlert() {
 }
 
 const inputName = ref("")
+const inputIngredientId = ref<number | null>(null)
 const inputQuantity = ref<number | null>(null)
 const inputUnit = ref("")
 const inputExpiry = ref("")
@@ -42,18 +43,11 @@ const filteredIngredients = computed(() => {
     return results
 })
 
-const nameIsValid = computed(() => {
-    let found = false
-    for (const item of ingredientState.availableIngredients) {
-        if (item.name === inputName.value) {
-            found = true
-        }
-    }
-    return found
-})
+const nameIsValid = computed(() => inputIngredientId.value !== null)
 
-function selectIngredient(name: string) {
-    inputName.value = name
+function selectIngredient(item: { id: number, name: string }) {
+    inputIngredientId.value = item.id
+    inputName.value = item.name
     nameInputOpen.value = false
 }
 
@@ -61,6 +55,7 @@ function onNameBlur() {
     nameInputOpen.value = false
     if (!nameIsValid.value) {
         inputName.value = ""
+        inputIngredientId.value = null
     }
 }
 
@@ -77,6 +72,7 @@ function selectUnit(unit: string) {
 
 function resetForm() {
     inputName.value = ""
+    inputIngredientId.value = null
     inputQuantity.value = null
     inputUnit.value = ""
     inputExpiry.value = ""
@@ -91,7 +87,7 @@ async function saveIngredient() {
         const expiry = new ExpiryDate(new Date(inputExpiry.value))
 
         const newIngredient: Ingredient = new Ingredient(
-            -1,
+            inputIngredientId.value!,
             inputName.value,
             inputQuantity.value,
             inputUnit.value,
@@ -165,7 +161,7 @@ onMounted(() => {
                     <ul v-if="nameInputOpen" class="name-dropdown list-group position-absolute w-100">
                         <li v-for="item in filteredIngredients" :key="item.id"
                             class="list-group-item list-group-item-action"
-                            @mousedown.prevent="selectIngredient(item.name)">
+                            @mousedown.prevent="selectIngredient(item)">
                             {{ item.name }}
                         </li>
                     </ul>

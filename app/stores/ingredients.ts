@@ -76,7 +76,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
             const res: any = await $fetch('api/ingredient', {
                 method: "POST",
                 body: {
-                    name: newIngredient.name,
+                    ingredient_id: newIngredient.id,
                     unit: newIngredient.unit,
                     quantity: newIngredient.quantity,
                     expiry: newIngredient.expiry.value
