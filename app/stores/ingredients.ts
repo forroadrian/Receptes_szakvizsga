@@ -51,33 +51,41 @@ export const useIngredientStore = defineStore("ingredients", () => {
         const index = ingredients.value.findIndex((value) => value.id === id)
         if (index !== -1) ingredients.value.splice(index, 1);
         ingredients.value = [...ingredients.value]
-        await $fetch('/api/ingredient', {
-            method: 'DELETE',
-            body: {
-                id: id
-            }
-        })
+        try {
+            await $fetch('/api/ingredient', {
+                method: 'DELETE',
+                body: { id }
+            })
+        } catch (error) {
+            throw error
+        }
     }
 
     const loadAvailableIngredients = async () => {
         if (availableIngredients.value.length > 0) return;
-        const res = await $fetch("/api/ingredient/catalog", { method: "GET" });
-        if (res) availableIngredients.value = res as { id: number; name: string }[];
+        try {
+            const res = await $fetch("/api/ingredient/catalog", { method: "GET" });
+            if (res) availableIngredients.value = res as { id: number; name: string }[];
+        } catch (error) {
+            throw error
+        }
     }
 
     const postIngredient = async (newIngredient: Ingredient) => {
-        console.log(newIngredient);
-        
-        const res:any  = await $fetch('api/ingredient', {
-            method: "POST",
-            body: {
-                name: newIngredient.name,
-                unit: newIngredient.unit,
-                quantity: newIngredient.quantity,
-                expiry: newIngredient.expiry.value
-            }
-        })
-        return res
+        try {
+            const res: any = await $fetch('api/ingredient', {
+                method: "POST",
+                body: {
+                    name: newIngredient.name,
+                    unit: newIngredient.unit,
+                    quantity: newIngredient.quantity,
+                    expiry: newIngredient.expiry.value
+                }
+            })
+            return res
+        } catch (error) {
+            throw error
+        }
     }
 
     return {
