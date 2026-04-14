@@ -6,6 +6,7 @@ import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
+    const userId = user.sub;
 
     const body = await readBody(event);
     requireBodyKeys(body, ["id"]);
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
             deleted_at: new Date().toISOString(),
         })
         .eq("id", body.id)
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .select();
 
     if (error) {

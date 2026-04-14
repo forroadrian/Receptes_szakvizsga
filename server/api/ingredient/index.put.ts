@@ -6,6 +6,7 @@ import { requireUser } from "~~/server/utils/requireUser";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
+    const userId = user.sub;
 
     const body = await readBody(event);
     requireBodyKeys(body, ["prev", "ingredient_id", "unit", "quantity", "expiry"]);
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
             expiry_date: body.expiry,
         })
         .eq("ingredient_id", body.prev)
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .select()
         .maybeSingle();
 

@@ -6,6 +6,7 @@ import { requireUser } from "~~/server/utils/requireUser";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
+    const userId = user.sub;
 
     const body = await readBody(event);
     requireBodyKeys(body, ["ingredient_id", "unit", "quantity", "expiry"]);
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await client
         .from("user_ingredient")
         .insert({
-            user_id: user.id,
+            user_id: userId,
             ingredient_id: body.ingredient_id,
             unit: body.unit,
             quantity: body.quantity,

@@ -6,6 +6,7 @@ import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
+    const userId = user.sub;
 
     const body = await readBody(event);
     requireBodyKeys(body, ["name", "date", "recipe_ids"]);
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
         .insert({
             name: body.name,
             planned_date: body.date,
-            user_id: user.id,
+            user_id: userId,
         })
         .select()
         .single();

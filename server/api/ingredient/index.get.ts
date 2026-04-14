@@ -4,19 +4,20 @@ import { Database } from "~/types/database.types";
 export default defineEventHandler(async (event) =>{
     const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
+    const userId = user.sub;
 
     const {data, error} = await client
     .from("user_ingredient")
     .select(`
         quantity,
-        unit, 
+        unit,
         expiry_date,
         ingredient:ingredient_id!inner (
             id,
             name
         )
     `)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
 
     if (error) {
         throw createError({ message: error.message });
