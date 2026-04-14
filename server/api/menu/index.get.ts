@@ -4,7 +4,7 @@ import { requireUser } from "~~/server/utils/requireUser";
 
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
-    await requireUser(event);
+    const user = await requireUser(event);
 
     const { data, error } = await client
         .from("menu")
@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
                 recipe (*)
             )
         `)
-        .eq("active", true);
+        .eq("active", true)
+        .eq("user_id", user.id);
 
     if (error) {
         throw createError({ statusCode: 500, message: error.message });
