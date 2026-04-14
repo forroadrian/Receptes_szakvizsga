@@ -1,6 +1,8 @@
-import {serverSupabaseClient} from "#supabase/server"
+import { serverSupabaseClient } from "#supabase/server";
+import { Database } from "~/types/database.types";
+
 export default defineEventHandler(async (event) =>{
-    const client = await serverSupabaseClient(event);
+    const client = await serverSupabaseClient<Database>(event);
     const user = await requireUser(event);
 
     const {data, error} = await client
@@ -14,7 +16,7 @@ export default defineEventHandler(async (event) =>{
             name
         )
     `)
-    .eq("user_id",user.sub)
+    .eq("user_id", user.id)
 
     if (error) {
         throw createError({ message: error.message });
