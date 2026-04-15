@@ -58,7 +58,7 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                     <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
                         data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
                         Szűrők
-                        <span v-if="activeFilterCount" class="filter-count d-inline-flex me-3">
+                        <span v-if="isHydrated && activeFilterCount" class="filter-count d-inline-flex me-3">
                             {{ activeFilterCount }}
                         </span>
                     </Button>
@@ -171,7 +171,8 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
 
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                        <CategoryTags :categories="recipe.categories" class="d-flex justify-content-center" />
+                                        <CategoryTags :categories="recipe.categories"
+                                            class="d-flex justify-content-center" />
                                     </div>
                                 </div>
                             </template>
@@ -179,9 +180,11 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                             <template #footer>
                                 <div class="row pt-2">
                                     <div class="col-12 text-center small my-auto text-danger">
-                                        <template v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
+                                        <template
+                                            v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
                                             <strong>
-                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> Figyelem! Allergént tartalmaz:
+                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> Figyelem! Allergént
+                                                tartalmaz:
                                             </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
                                         </template>
                                     </div>
@@ -197,7 +200,7 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                 <div class="offcanvas-header">
                     <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">
                         Szűrők
-                        <span v-if="activeFilterCount" class="ms-2 text-muted">
+                        <span v-if="isHydrated && activeFilterCount" class="ms-2 text-muted">
                             ({{ activeFilterCount }} aktív)
                         </span>
                     </p>

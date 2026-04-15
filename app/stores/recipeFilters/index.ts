@@ -21,8 +21,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const selectedTypeId = ref<number | null>(null);
     const mealOptions = ref<CategoryOption[]>([]);
     const typeOptions = ref<CategoryOption[]>([]);
-    const respectDislikedIngredients = ref(true);
     const userDislikedIngredientIds = ref<number[]>([]);
+    const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
     const durationCategories = computed(() => getDurationCategories());
     const activeDuration = computed(() => getActiveDuration(selectedDurationId.value));
@@ -52,7 +52,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         selectedMealId.value = null;
         selectedTypeId.value = null;
         activeTab.value = "default";
-        respectDislikedIngredients.value = true;
     };
 
     const loadCategories = async () => {
@@ -89,7 +88,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         search, allergenSearch, getActiveFilterCount, activeTab, selectedDurationId,
         selectedMealId, selectedTypeId, mealOptions, typeOptions, durationOptions,
         durationCategories, activeDuration, tabRecipes, filteredRecipes,
-        hasActiveFilters, clearFilters, loadCategories,  respectDislikedIngredients,
+        hasActiveFilters, clearFilters, loadCategories, respectDislikedIngredients,
         userDislikedIngredientIds, loadUserDislikedIngredientIds
     };
 });
