@@ -10,11 +10,31 @@ const ingredientsButtonTo = computed(() => {
 })
 
 const categories = [
-    { name: "Összes", icon: "bi bi-three-dots" },
-    { name: "Reggeli", icon: "bi bi-sun" },
-    { name: "Ebéd", icon: "bi bi-egg-fried" },
-    { name: "Vacsora", icon: "bi bi-moon" },
-    { name: "Snack", icon: "bi bi-cookie" },
+    {
+        name: "Összes",
+        icon: "bi bi-three-dots",
+        description: "Böngészd át egy helyen az összes inspiráló receptötletet."
+    },
+    {
+        name: "Reggeli",
+        icon: "bi bi-sun",
+        description: "Indítsd jól a napot tartalmas, lendületes reggelikkel."
+    },
+    {
+        name: "Ebéd",
+        icon: "bi bi-egg-fried",
+        description: "Laktató és kiegyensúlyozott fogások a nap közepére."
+    },
+    {
+        name: "Vacsora",
+        icon: "bi bi-moon",
+        description: "Könnyű vagy kiadós ötletek az esti közös étkezésekhez."
+    },
+    {
+        name: "Snack",
+        icon: "bi bi-cookie",
+        description: "Gyors harapnivalók két étkezés között vagy útközben."
+    },
 ]
 
 const tagsFirstCard: CardTagItem[] = [
@@ -72,15 +92,24 @@ const cards = ref([
         </div>
     </section>
 
-    <section class="py-4">
+    <section class="meal-section py-5">
         <div class="container text-center">
-            <h2 class="my-5">Étkezések</h2>
-            <div class="row justify-content-center">
-                <div class="align-items-center col-auto g-5 m-2" v-for="item in categories">
-                    <div class="category-icon">
-                        <i :class="item.icon"></i>
+            <div class="meal-section__inner">
+                <h2 class="meal-section__title">Étkezések</h2>
+                <p class="meal-section__lead">
+                    Válassz étkezéstípus szerint, és fedezz fel hozzád illő recepteket, amelyek támogatják a céljaidat
+                    a rohanós hétköznapoktól a nyugodtabb közös étkezésekig.
+                </p>
+                <div class="row meal-grid justify-content-center g-0">
+                    <div class="col-12 col-sm-6 col-lg" v-for="item in categories" :key="item.name">
+                        <div class="meal-card">
+                            <div class="category-icon">
+                                <i :class="item.icon"></i>
+                            </div>
+                            <h3 class="meal-card__title">{{ item.name }}</h3>
+                            <p class="meal-card__text">{{ item.description }}</p>
+                        </div>
                     </div>
-                    <p class="mt-2">{{ item.name }}</p>
                 </div>
             </div>
         </div>
@@ -190,8 +219,7 @@ const cards = ref([
                 </div>
                 <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
                     <ClientOnly>
-                        <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right"
-                            class="my-5">Keress
+                        <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right" class="my-5">Keress
                             további
                             recepteket</Button>
                     </ClientOnly>
@@ -273,6 +301,142 @@ const cards = ref([
     pointer-events: none;
 }
 
+.meal-section {
+    position: relative;
+}
+
+.meal-section__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.meal-section__title {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding-bottom: 0.9rem;
+}
+
+.meal-section__title::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 108px;
+    height: 3px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(250, 180, 100, 0.35), rgba(255, 114, 49, 0.95), rgba(250, 180, 100, 0.35));
+    box-shadow: 0 0 10px rgba(255, 114, 49, 0.18);
+}
+
+.meal-section__lead {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--bs-secondary-color);
+}
+
+.meal-grid {
+    align-items: stretch;
+}
+
+.meal-grid>div {
+    position: relative;
+}
+
+.meal-grid>div:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 1.25rem;
+    right: 0;
+    width: 1px;
+    height: calc(100% - 2.5rem);
+    background: linear-gradient(to bottom, transparent, rgba(33, 33, 33, 0.12), transparent);
+}
+
+.meal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 1.5rem 1.25rem 0.5rem;
+    text-align: center;
+}
+
+.category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    transition: transform .18s ease;
+}
+
+.category-icon i,
+.recipe-image i {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: var(--orange);
+    border: 1px solid rgba(240, 218, 194, 0.95);
+    border-radius: 20px;
+    background: linear-gradient(180deg, #fffdfb, #fffaf5);
+    box-shadow:
+        0 16px 18px rgba(85, 71, 58, 0.18),
+        0 6px 12px rgba(255, 180, 100, 0.18),
+        inset 0 2px 6px rgba(255, 255, 255, 0.95);
+}
+
+.meal-card__title {
+    margin-bottom: 0.65rem;
+    font-family: "Caveat Brush", cursive;
+    font-size: 1.9rem;
+    line-height: 1;
+}
+
+.meal-card__text {
+    max-width: 220px;
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--bs-secondary-color);
+}
+
+[data-bs-theme="dark"] .meal-section__lead {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+[data-bs-theme="dark"] .meal-grid>div:not(:last-child)::after {
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+[data-bs-theme="dark"] .category-icon i,
+[data-bs-theme="dark"] .recipe-image i {
+    color: #ffb15e;
+    border: 1px solid rgba(255, 145, 44, 0.16);
+    background: linear-gradient(180deg, rgba(46, 49, 53, 0.98), rgba(38, 41, 45, 0.98));
+    box-shadow:
+        0 10px 16px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255, 145, 44, 0.04),
+        0 0 10px rgba(255, 174, 79, 0.12),
+        0 0 18px rgba(255, 174, 79, 0.14),
+        0 0 28px rgba(255, 174, 79, 0.08);
+}
+
+[data-bs-theme="dark"] .meal-card__title {
+    color: #f4f4f4;
+}
+
+[data-bs-theme="dark"] .meal-card__text {
+    color: rgba(255, 255, 255, 0.78);
+}
+
 .ourFeatures h2:before,
 .ourFeatures h2:after {
     content: "";
@@ -293,23 +457,6 @@ const cards = ref([
 
 .ourFeatures img {
     margin-bottom: 10px;
-}
-
-.category-icon i,  .recipe-image i {
-    font-size: 30px;
-    width: 70px;
-    height: 70px;
-    border-radius: 30%;
-    margin-bottom: 20px;
-    color: var(--yellow);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-        0 10px 5px rgba(22, 22, 22, 0.2),
-        inset 2px 2px 5px 2px rgba(179, 95, 0, 0.301);
-
 }
 
 .card--base {
@@ -351,6 +498,24 @@ const cards = ref([
     .about-content>div {
         border: none;
     }
+
+    .meal-grid>div:nth-child(2n)::after {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .meal-section__lead {
+        margin-bottom: 2rem;
+    }
+
+    .meal-grid>div::after {
+        display: none;
+    }
+
+    .meal-card {
+        padding: 1rem 0.75rem 1.5rem;
+    }
 }
 
 @media (max-width: 576px) {
@@ -358,6 +523,14 @@ const cards = ref([
     .ourFeatures h2:before,
     .ourFeatures h2:after {
         border: none;
+    }
+
+    .meal-section__title {
+        margin-bottom: 0.75rem;
+    }
+
+    .meal-card__title {
+        font-size: 1.7rem;
     }
 
 }
