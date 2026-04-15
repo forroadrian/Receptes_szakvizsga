@@ -31,6 +31,7 @@ if (!recipeStore.getAllRecipes.length) {
 
 if (user.value) {
     await allergyWarnings.loadUserAllergies();
+    await filterStore.loadUserDislikedIngredientIds();
 }
 
 if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
@@ -231,11 +232,13 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                                 <p class="filter-title mb-0">Nem kedvelt alapanyagok</p>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" name="isdisliked" type="radio" checked id="ondisliked">
+                                <input id="ondisliked" v-model="filterStore.respectDislikedIngredients"
+                                    class="form-check-input" name="isdisliked" type="radio" :value="true">
                                 <label class="form-check-label" for="ondisliked">Számít</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" name="isdisliked" type="radio" id="offdisliked">
+                                <input id="offdisliked" v-model="filterStore.respectDislikedIngredients"
+                                    class="form-check-input" name="isdisliked" type="radio" :value="false">
                                 <label class="form-check-label" for="offdisliked">Nem számít</label>
                             </div>
                         </div>
