@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { Database } from "~/types/database.types";
+import { requireUser } from "~~/server/utils/requireUser";
 
 export default defineEventHandler(async (event) =>{
     const client = await serverSupabaseClient<Database>(event);

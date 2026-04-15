@@ -73,7 +73,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
 
     const postIngredient = async (newIngredient: Ingredient) => {
         try {
-            const res: any = await $fetch('api/ingredient', {
+            const res: any = await $fetch('/api/ingredient', {
                 method: "POST",
                 body: {
                     ingredient_id: newIngredient.id,

@@ -1,6 +1,8 @@
-import {serverSupabaseClient} from "#supabase/server"
+import { serverSupabaseClient } from "#supabase/server";
+import { requireUser } from "~~/server/utils/requireUser";
+import requireBodyKeys from "~~/server/utils/requireBodyKeys";
 
-export default eventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient(event);
     const user = await requireUser(event);
     const userId = user.sub;
