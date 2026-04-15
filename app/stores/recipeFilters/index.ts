@@ -25,7 +25,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const activeDuration = computed(() => getActiveDuration(selectedDurationId.value));
 
     const tabRecipes = computed(() => {
-        return getTabRecipes(recipeStore.getAllRecipes, activeTab.value, user.value?.id);
+        return getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id);
     });
 
     const filteredRecipes = computed(() => {

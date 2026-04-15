@@ -18,7 +18,7 @@ export const hasCategory = (categories: Category[], categoryId: number | null) =
     return false;
 };
 
-export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>,typeOptions: Ref<Category[]>) => {
+export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>, typeOptions: Ref<Category[]>) => {
     try {
         const data = await $fetch("/api/category", {
             method: "GET"
@@ -29,7 +29,12 @@ export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>,ty
         typeOptions.value = [];
 
         for (const category of categories) {
-            const groupType = String(category.group_type).toLowerCase();
+            const normalizedCategory: Category = {
+                id: category.id,
+                name: category.name,
+                group_type: category.group_type ?? ""
+            };
+            const groupType = normalizedCategory.group_type.toLowerCase();
 
             if (groupType === "meal") {
                 mealOptions.value.push(category);

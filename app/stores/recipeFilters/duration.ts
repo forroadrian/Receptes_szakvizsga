@@ -6,11 +6,11 @@ export const durationOptions = [
 ];
 
 export const getDurationCategories = () => {
-    return durationOptions.map(option => {
+    return durationOptions.map((option) => {
         return {
-            id: option.id, 
-            name: option.label, 
-            group_type: null
+            id: option.id,
+            name: option.label,
+            group_type: ""
         };
     });
 };

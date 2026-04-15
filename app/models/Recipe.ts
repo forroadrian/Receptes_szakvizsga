@@ -6,7 +6,7 @@ import Allergy from "~/models/Allergy";
 
 export default class Recipe implements Identifiable {
     private _id: number;
-    private _author_id: string | null;
+    private _author_id: string;
     private _name: string;
     private _description: string;
     private _saves: number;
@@ -17,7 +17,7 @@ export default class Recipe implements Identifiable {
     private _last_edit: Date;
     private _is_ai_generated: boolean;
     private _active: boolean;
-    private _deleted_at?: Date;
+    private _deleted_at: Date;
     private _steps: string[];
     private _ingredients: Ingredient[];
     private _categories: Category[];
@@ -25,7 +25,7 @@ export default class Recipe implements Identifiable {
 
     constructor(options: RecipeConstuctorOptions) {
         this._id = options.id ?? -1;
-        this._author_id = options.author_id;
+        this._author_id = options.author_id ?? "";
         this._name = options.name;
         this._description = options.description;
         this._saves = options.saves ?? 0;
@@ -36,7 +36,7 @@ export default class Recipe implements Identifiable {
         this._last_edit = options.last_edit;
         this._is_ai_generated = options.is_ai_generated;
         this._active = options.active ?? true;
-        this._deleted_at = options.deleted_at;
+        this._deleted_at = options.deleted_at ?? new Date(0);
         this._steps = options.steps ?? [];
         this._ingredients = options.ingredients ?? [];
         this._categories = options.categories ?? [];
@@ -52,11 +52,11 @@ export default class Recipe implements Identifiable {
         return this._id;
     }
 
-    public set author_id(v: string | null) {
+    public set author_id(v: string) {
         this._author_id = v;
     }
 
-    public get author_id(): string | null {
+    public get author_id(): string {
         return this._author_id;
     }
 
@@ -155,8 +155,8 @@ export default class Recipe implements Identifiable {
     }
 
     
-    public get deleted_at() : Date | null {
-        return this._deleted_at ?? null;
+    public get deleted_at() : Date {
+        return this._deleted_at;
     }
 
     public set steps(v: string[]) {
