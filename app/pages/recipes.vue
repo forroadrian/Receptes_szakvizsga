@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import Button from "~/components/Button.vue";
 import CategoryTags from "~/components/recipe/CategoryTags.vue";
 import { useRecipeStore } from "~/stores/recipe";
@@ -9,6 +9,11 @@ const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
+const isHydrated = ref(false);
+
+onMounted(() => {
+    isHydrated.value = true;
+});
 
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 
@@ -26,10 +31,11 @@ if (!recipeStore.getAllRecipes.length) {
 
 if (user.value) {
     await allergyWarnings.loadUserAllergies();
+    await filterStore.loadUserDislikedIngredientIds();
 }
 
 if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
-    filterStore.loadCategories();
+    await filterStore.loadCategories();
 }
 </script>
 <template>
@@ -52,7 +58,7 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                     <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
                         data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
                         Szűrők
-                        <span v-if="activeFilterCount" class="filter-count d-inline-flex me-3">
+                        <span v-if="isHydrated && activeFilterCount" class="filter-count d-inline-flex me-3">
                             {{ activeFilterCount }}
                         </span>
                     </Button>
@@ -95,10 +101,10 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
             </nav>
 
             <div v-if="needsLoginForTab" class="text-center py-4">
-                <p class="fw-bold">Ehhez a funkcióhoz be kell jelentkezned!</p> 
-                <Button @click="navigateTo('/login')"
-                    color="orange" class="mx-auto" icon="bi bi-box-arrow-in-right" icon-position="right"> 
-                    Tovább a belépéshez 
+                <p class="fw-bold">Ehhez a funkcióhoz be kell jelentkezned!</p>
+                <Button @click="navigateTo('/login')" color="orange" class="mx-auto" icon="bi bi-box-arrow-in-right"
+                    icon-position="right">
+                    Tovább a belépéshez
                 </Button>
             </div>
 
@@ -112,15 +118,13 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
             </div>
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
-                <div v-if="user"
-                    class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
-                    data-bs-toggle="modal" data-bs-target="#openAddRecipeModal">
-                    <div class="row text-center py-4">
+                <div class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
+                    :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
+                    <div v-if="user" class="row text-center py-4">
                         <span class="plus-icon">+</span>
                         <p>Új recept hozzáadása</p>
                     </div>
                 </div>
-
                 <div v-for="recipe in filterStore.filteredRecipes"
                     class="recipe-cards col-12 col-md-6 col-lg-4 my-sm-4 ">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
@@ -165,21 +169,24 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                                     </div>
                                 </div>
 
-                                <div v-if="recipe.categories?.length" class="mb-3">
-                                    <div>
-                                        <CategoryTags :categories="recipe.categories" class="d-flex justify-content-center" />
+                                <div class="mb-3">
+                                    <div v-if="recipe.categories?.length">
+                                        <CategoryTags :categories="recipe.categories"
+                                            class="d-flex justify-content-center" />
                                     </div>
                                 </div>
                             </template>
 
                             <template #footer>
-                                <div v-if="user && allergyWarnings.hasAllergyWarning(recipe)" class="row pt-2">
+                                <div class="row pt-2">
                                     <div class="col-12 text-center small my-auto text-danger">
-                                        <strong>
-                                            <i class="bi bi-exclamation-triangle-fill p-2"></i>
-                                            Figyelem! Allergént tartalmaz:
-                                        </strong>
-                                        {{ allergyWarnings.getMatchingAllergyNames(recipe) }}
+                                        <template
+                                            v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
+                                            <strong>
+                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> Figyelem! Allergént
+                                                tartalmaz:
+                                            </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
+                                        </template>
                                     </div>
                                 </div>
                             </template>
@@ -193,7 +200,7 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                 <div class="offcanvas-header">
                     <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">
                         Szűrők
-                        <span v-if="activeFilterCount" class="ms-2 text-muted">
+                        <span v-if="isHydrated && activeFilterCount" class="ms-2 text-muted">
                             ({{ activeFilterCount }} aktív)
                         </span>
                     </p>
@@ -201,34 +208,40 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                 </div>
 
                 <div class="offcanvas-body">
-                    <Button :outline="true" type="button" class="deleteAll grad m-auto w-75" 
-                        @click="filterStore.clearFilters"> Kijelölések törlése
+                    <Button :outline="true" type="button" class="deleteAll grad m-auto w-75"
+                        @click="filterStore.clearFilters">
+                        Kijelölések törlése
                     </Button>
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
-                            <CategoryTags :categories="filterStore.durationCategories" interactive v-model="filterStore.selectedDurationId" />
+                            <CategoryTags :categories="filterStore.durationCategories" interactive
+                                v-model="filterStore.selectedDurationId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
-                            <CategoryTags :categories="filterStore.mealOptions" interactive v-model="filterStore.selectedMealId" />
+                            <CategoryTags :categories="filterStore.mealOptions" interactive
+                                v-model="filterStore.selectedMealId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Típus</p>
-                            <CategoryTags :categories="filterStore.typeOptions" interactive v-model="filterStore.selectedTypeId" />
+                            <CategoryTags :categories="filterStore.typeOptions" interactive
+                                v-model="filterStore.selectedTypeId" />
                         </div>
                         <div class="filter-item" v-if="user">
                             <div class="d-flex mb-2">
                                 <p class="filter-title mb-0">Nem kedvelt alapanyagok</p>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" name="isdisliked" type="radio" checked id="ondisliked">
+                                <input id="ondisliked" v-model="filterStore.respectDislikedIngredients"
+                                    class="form-check-input" name="isdisliked" type="radio" :value="true">
                                 <label class="form-check-label" for="ondisliked">Számít</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" name="isdisliked" type="radio" id="offdisliked">
+                                <input id="offdisliked" v-model="filterStore.respectDislikedIngredients"
+                                    class="form-check-input" name="isdisliked" type="radio" :value="false">
                                 <label class="form-check-label" for="offdisliked">Nem számít</label>
                             </div>
                         </div>

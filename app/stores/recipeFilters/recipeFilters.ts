@@ -6,7 +6,9 @@ export const getFilteredRecipes = (
     allergenSearch: string,
     activeDuration: string | null,
     selectedMealId: number | null,
-    selectedTypeId: number | null
+    selectedTypeId: number | null,
+    respectDislikedIngredients: boolean,
+    dislikedIngredientIds: number[]
 ) => {
     return tabRecipes.filter(recipe => {
         const searchText = search.trim().toLowerCase();
@@ -37,6 +39,18 @@ export const getFilteredRecipes = (
             }
         }
 
-        return (matchesSearch && matchesDuration && matchesMeal && matchesType && matchesAllergen);
+        let matchesDisliked = true;
+
+        if (respectDislikedIngredients && dislikedIngredientIds.length) {
+            const hasDislikedIngredient = (recipe.ingredients ?? []).some((ingredient: any) =>
+                dislikedIngredientIds.includes(ingredient.id)
+            );
+
+            if (hasDislikedIngredient) {
+                matchesDisliked = false;
+            }
+        }
+
+        return (matchesSearch && matchesDuration && matchesMeal && matchesType && matchesAllergen && matchesDisliked);
     });
 };

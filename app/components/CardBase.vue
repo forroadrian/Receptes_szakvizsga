@@ -70,7 +70,7 @@ const divider = computed(() => {
                 <div v-if="tagPosition == 'below' && $slots.tags" class="card--tags mt-2" :class="tagsClass">
                     <slot name="tags"></slot>
                 </div>
-                <hr class="card--divider my-2" :class="[divider, dividerClass]">
+                <hr v-if="divider" class="card--divider my-2" :class="[divider, dividerClass]">
                 <div v-if="$slots.footer" class="card--footer" :class="footerClass">
                     <slot name="footer"></slot>
                 </div>

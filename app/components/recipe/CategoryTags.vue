@@ -13,29 +13,20 @@ const props = withDefaults(
     }
 );
 
-const emit = defineEmits(["update:modelValue"]);
-
-const selected = ref<number | null>(props.modelValue);
-
-watch(() => props.modelValue, (value) => {
-    selected.value = value;
-});
+const emit = defineEmits<{
+    (e: "update:modelValue", value: number | null): void
+}>();
 
 const handleClick = (id: number) => {
     if (!props.interactive) return;
-
-    const newValue = selected.value === id ? null : id;
-    selected.value = newValue;
-    emit("update:modelValue", newValue);
+    emit("update:modelValue", props.modelValue === id ? null : id);
 };
 </script>
 <template>
     <div class="d-flex flex-wrap gap-2 my-4 categories">
-        <span v-for="category in categories" class="badge rounded-pill tag-pill" @click="handleClick(category.id)"
-            :class="[
-                interactive ? 'interactive' : 'static',
-                selected === category.id ? 'active' : 'inactive']">
-
+        <span
+            v-for="category in categories" class="badge rounded-pill tag-pill" @click="handleClick(category.id)" 
+            :class="[interactive ? 'interactive' : 'static', modelValue === category.id ? 'active' : 'inactive']">
             <i class="bi bi-tag-fill me-2"></i> {{ category.name }}
         </span>
     </div>
