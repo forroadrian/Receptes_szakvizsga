@@ -8,6 +8,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
     const availableIngredients = ref<{ id: number; name: string }[]>([]);
     const units = getEnumValues("unit");
     const showIngredientModal = ref(false);
+    const recommended = ref<[{name: string, appears: number}]>();
 
     const openIngredientModal = () => showIngredientModal.value = true;
     const closeIngredientModal = () => showIngredientModal.value = false;
@@ -88,6 +89,11 @@ export const useIngredientStore = defineStore("ingredients", () => {
         }
     }
 
+    const getMissing = async() => {
+        const data = await $fetch('/api/ingredient/missing')
+        return data;
+    }
+
     return {
         openIngredientModal,
         closeIngredientModal,
@@ -97,6 +103,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
         loadAvailableIngredients,
         removeIngredient,
         postIngredient,
+        getMissing,
         showIngredientModal,
         units,
         ingredients,

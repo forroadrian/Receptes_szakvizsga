@@ -16,6 +16,7 @@ const {
     loadAvailableIngredients,
     loadIngredients,
     removeIngredient,
+    getMissing,
 } = store;
 
 const alert = ref(false);
@@ -49,6 +50,8 @@ const filtered = computed(() => {
 })
 
 const isValid = computed(() => ingredientId.value !== null)
+
+const missing = computed(async () => await getMissing())
 
 function select(item: { id: number; name: string }) {
     ingredientId.value = item.id
@@ -138,6 +141,7 @@ function tagClass(tag: string) {
 
 onMounted(async () => {
     try {
+        
         const tasks: Promise<any>[] = [loadAvailableIngredients()]
         if (store.ingredients.length === 0) {
             tasks.push(loadIngredients())
@@ -213,6 +217,7 @@ onMounted(async () => {
                             </Button>
                             <Button icon="bi-plus-circle"
                                 class="submit-btn col-9 border-0 text-white mt-0 position-relative overflow-hidden button-right align-self-center"
+                                type="submit"
                                 :disabled="saving">
                                 <span>Hozzáadás</span>
                             </Button>
