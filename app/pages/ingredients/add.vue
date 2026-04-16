@@ -198,7 +198,7 @@ onMounted(async () => {
                                 <label class="label d-block fw-bold text-uppercase">Mennyiség és egység</label>
                                 <div class="qty-group d-flex">
                                     <input v-model.number="quantity" type="number" class="field-input qty-input"
-                                        placeholder="10" min="0" />
+                                        placeholder="10" min="0" step="any" />
                                     <select v-model="unit" class="field-input unit-select">
                                         <option value="" disabled>Egys.</option>
                                         <option v-for="u in units" :key="u" :value="u">{{ u }}</option>
