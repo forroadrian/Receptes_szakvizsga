@@ -1,13 +1,16 @@
 import { defineStore } from "pinia";
 import type Category from "~/interfaces/Category";
+import type { Database } from "~/types/database.types";
 import { useRecipeStore } from "~/stores/recipe";
 import { durationOptions, getDurationCategories, getActiveDuration } from "./duration";
 import { loadRecipeFilterCategories } from "./categories";
 import { getTabRecipes } from "./recipeTabs";
 import { getFilteredRecipes } from "./recipeFilters";
+import { createAllergyFilters } from "./allergyFilters";
 
 type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
 type CategoryOption = Category;
+type AllergyRow = Database['public']['Tables']['allergy']['Row'];
 export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const user = useSupabaseUser();
     const recipeStore = useRecipeStore();
@@ -21,10 +24,18 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const mealOptions = ref<CategoryOption[]>([]);
     const typeOptions = ref<CategoryOption[]>([]);
     const userDislikedIngredientIds = ref<number[]>([]);
+    const allAllergies = ref<AllergyRow[]>([]);
+    const selectedAllergyIds = ref<number[]>([]);
     const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
     const durationCategories = computed(() => getDurationCategories());
     const activeDuration = computed(() => getActiveDuration(selectedDurationId.value));
+
+    const { selectedAllergyPills, filteredAllergyPills, loadAllergies } = createAllergyFilters(
+        allAllergies,
+        selectedAllergyIds,
+        allergenSearch
+    );
 
     const shouldRespectDislikedIngredients = computed(() => {
         return !!user.value && respectDislikedIngredients.value;
@@ -36,23 +47,25 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
     const filteredRecipes = computed(() => {
         return getFilteredRecipes(
-            tabRecipes.value, search.value, allergenSearch.value,
+            tabRecipes.value, search.value,
             activeDuration.value, selectedMealId.value, selectedTypeId.value,
             shouldRespectDislikedIngredients.value,
-            userDislikedIngredientIds.value
+            userDislikedIngredientIds.value,
+            selectedAllergyIds.value
         );
     });
 
     const hasActiveFilters = computed(() => {
-        return search.value !== "" || allergenSearch.value !== "" ||
+        return search.value !== "" ||
             selectedDurationId.value !== null || selectedMealId.value !== null ||
             selectedTypeId.value !== null || activeTab.value !== "default" ||
-            shouldRespectDislikedIngredients.value;
+            shouldRespectDislikedIngredients.value || selectedAllergyIds.value.length > 0;
     });
 
     const clearFilters = () => {
         search.value = "";
         allergenSearch.value = "";
+        selectedAllergyIds.value = [];
         selectedDurationId.value = null;
         selectedMealId.value = null;
         selectedTypeId.value = null;
@@ -81,6 +94,16 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         }
     };
 
+    const removeSelectedAllergy = (allergyId: number) => {
+        selectedAllergyIds.value = selectedAllergyIds.value.filter(id => id !== allergyId);
+    };
+
+    const addSelectedAllergy = (allergyId: number) => {
+        if (!selectedAllergyIds.value.includes(allergyId)) {
+            selectedAllergyIds.value.push(allergyId);
+        }
+    };
+
     const getActiveFilterCount = () => {
         return ((selectedDurationId.value !== null ? 1 : 0) +
             (selectedMealId.value !== null ? 1 : 0) +
@@ -100,6 +123,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         selectedMealId, selectedTypeId, mealOptions, typeOptions, durationOptions,
         durationCategories, activeDuration, tabRecipes, filteredRecipes,
         hasActiveFilters, clearFilters, loadCategories, respectDislikedIngredients,
-        userDislikedIngredientIds, loadUserDislikedIngredientIds
+        userDislikedIngredientIds, loadUserDislikedIngredientIds, allAllergies,
+        selectedAllergyIds, selectedAllergyPills, filteredAllergyPills, loadAllergies,
+        removeSelectedAllergy, addSelectedAllergy
     };
 });

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import Button from "~/components/Button.vue";
+import FormInput from "~/components/FormInput.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
+import Pills from "~/components/Pills.vue";
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
@@ -35,6 +37,10 @@ if (user.value) {
 
 if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
     await filterStore.loadCategories();
+}
+
+if (!filterStore.allAllergies.length) {
+    await filterStore.loadAllergies();
 }
 </script>
 <template>
@@ -247,8 +253,21 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
 
                         <div class="filter-item">
                             <p class="filter-title mb-3">Allergén, ételérzékenység</p>
-                            <SearchBar v-model="filterStore.allergenSearch" placeholder="Allergén neve / típusa..."
-                                class="w-100" />
+                            <FormInput v-model="filterStore.allergenSearch" placeholder="Allergia keresése..." />
+
+                            <div v-if="filterStore.selectedAllergyPills.length" class="mt-3">
+                                <p class="small text-muted mb-2">Kiválasztott allergiák:</p>
+                                <Pills :pills="filterStore.selectedAllergyPills" removable @remove="filterStore.removeSelectedAllergy" />
+                            </div>
+
+                            <div v-if="filterStore.filteredAllergyPills.length" class="mt-3">
+                                <p class="small text-muted mb-2">Elérhető allergiák:</p>
+                                <Pills :pills="filterStore.filteredAllergyPills" interactive @chose="filterStore.addSelectedAllergy" />
+                            </div>
+
+                            <div v-if="!filterStore.selectedAllergyPills.length && !filterStore.filteredAllergyPills.length" class="mt-3">
+                                <p class="small text-muted">Nincsenek allergiák.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -314,7 +333,9 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
     border: none;
 }
 
-.addRecipe,.tab-btn, .offcanvas-filters .form-check-label,
+.addRecipe,
+.tab-btn,
+.offcanvas-filters .form-check-label,
 .offcanvas-filters .form-check-input[type="radio"] {
     cursor: pointer;
 }
@@ -349,7 +370,8 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
     color: var(--bs-body-bg);
 }
 
-.filter-count, .offcanvas-filters .form-check-input[type="radio"],
+.filter-count,
+.offcanvas-filters .form-check-input[type="radio"],
 .offcanvas-filters .form-check-input[type="radio"]:checked::after {
     border-radius: var(--radius-rounded);
 }

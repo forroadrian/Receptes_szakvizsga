@@ -3,16 +3,15 @@ import { hasCategory } from "./categories";
 export const getFilteredRecipes = (
     tabRecipes: any[],
     search: string,
-    allergenSearch: string,
     activeDuration: string | null,
     selectedMealId: number | null,
     selectedTypeId: number | null,
     respectDislikedIngredients: boolean,
-    dislikedIngredientIds: number[]
+    dislikedIngredientIds: number[],
+    selectedAllergyIds: number[] = []
 ) => {
     return tabRecipes.filter(recipe => {
         const searchText = search.trim().toLowerCase();
-        const allergenQuery = allergenSearch.trim().toLowerCase();
 
         const matchesSearch =
             !searchText ||
@@ -29,14 +28,11 @@ export const getFilteredRecipes = (
         const matchesMeal = hasCategory(recipe.categories, selectedMealId);
         const matchesType = hasCategory(recipe.categories, selectedTypeId);
 
-        let matchesAllergen = !allergenQuery;
+        let matchesAllergen = selectedAllergyIds.length === 0;
 
-        if (allergenQuery) {
-            for (const allergy of recipe.allergies ?? []) {
-                if (allergy.name.toLowerCase().includes(allergenQuery)) {
-                    matchesAllergen = true;
-                }
-            }
+        if (selectedAllergyIds.length) {
+            const recipeAllergyIds = (recipe.allergies ?? []).map((allergy: any) => allergy.id);
+            matchesAllergen = !selectedAllergyIds.some(allergyId => recipeAllergyIds.includes(allergyId));
         }
 
         let matchesDisliked = true;
