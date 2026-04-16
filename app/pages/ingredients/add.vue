@@ -3,6 +3,7 @@ definePageMeta({
     middleware: "auth-only",
 });
 
+import Pills from '~/components/Pills.vue';
 import ExpiryDate from '~/models/ExpiryDate';
 import Ingredient from '~/models/Ingredient';
 import { useIngredientStore } from '~/stores/ingredients';
@@ -51,7 +52,7 @@ const filtered = computed(() => {
 
 const isValid = computed(() => ingredientId.value !== null)
 
-const missing = computed(async () => await getMissing())
+const missing = computedAsync(async () => await getMissing())
 
 function select(item: { id: number; name: string }) {
     ingredientId.value = item.id
@@ -221,9 +222,15 @@ onMounted(async () => {
                                 :disabled="saving">
                                 <span>Hozzáadás</span>
                             </Button>
-
                         </div>
-
+                        <div class="row" v-if="missing !== 'No content' && missing != undefined">
+                            <h3 class="fw-bold fs-5 pt-2">Leggyakrabban használt:</h3>
+                            <Pills :pills="dataToPillTag(missing, createConversionTable('name'))" 
+                                icon="bi-plus-circle-fill" 
+                                interactive class="pill-icon" 
+                                size="col-4"
+                                @chose="(text: string) => name = text" />
+                        </div>
                     </form>
                 </div>
             </section>

@@ -1,31 +1,37 @@
 <script setup lang="ts">
-import type Tag from '~/interfaces/Tag';
+import type Pill from '~/interfaces/Pill';
 
 const model = defineModel()
 
+const emit = defineEmits(['chose'])
+
 const props = withDefaults(
     defineProps<{
-        tags: Tag[];
-        interactive?: boolean;
-        modelValue?: number | null;
+        pills: Pill[],
+        interactive?: boolean,
+        modelValue?: number | null,
+        icon?: string,
+        size? : string,
     }>(),
     {
         interactive: false,
-        modelValue: null
+        modelValue: null,
+        icon: "bi-tag-fill"
     }
 );
 
 const handleClick = (id: number) => {
     if (!props.interactive) return;
-    model.value = props.modelValue === id ? null : id
+    model.value = props.modelValue === id ? null : id;
+    emit('chose',model.value)
 };
 </script>
 <template>
-    <div class="d-flex flex-wrap gap-2 my-4 categories">
+    <div class="my-4" :class="{'row': size !== undefined, 'd-flex flex-wrap categories gap-2': size === undefined}">
         <span
-            v-for="tag in tags" class="badge rounded-pill tag-pill" @click="handleClick(tag.id)" 
-            :class="[interactive ? 'interactive' : 'static', model === tag.id ? 'active' : 'inactive']">
-            <i class="bi bi-tag-fill me-2"></i> {{ tag.name }}
+            v-for="pill in pills" class="badge rounded-pill tag-pill" @click="handleClick(pill.identifier)" 
+            :class="[interactive ? 'interactive' : 'static', model === pill.identifier ? 'active' : 'inactive', size]">
+            <i class="bi me-2" :class="[icon]"></i> {{ pill.name }}
         </span>
     </div>
 </template>

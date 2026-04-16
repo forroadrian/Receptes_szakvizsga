@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import Button from "~/components/Button.vue";
-import Tags from "~/components/Tags.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
@@ -215,19 +214,19 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
-                            <Tags :tags="filterStore.durationCategories" interactive
+                            <Pills :pills="dataToPillTag(filterStore.durationCategories as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedDurationId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
-                            <Tags :tags="filterStore.mealOptions" interactive
+                            <Pills :pills="dataToPillTag(filterStore.mealOptions as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedMealId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Típus</p>
-                            <Tags :tags="filterStore.typeOptions" interactive
+                            <Pills :pills="dataToPillTag(filterStore.typeOptions as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedTypeId" />
                         </div>
                         <div class="filter-item" v-if="user">

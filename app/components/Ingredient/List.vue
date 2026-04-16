@@ -11,7 +11,7 @@ const props = defineProps<{
         <template v-if="results.length > 0">
             <div class="d-flex col-xl-4 col-lg-6 col-sm-12 flex-row justify-content-center card-enter"
                 v-for="(ingredient, index) in results" :key="`${ingredient.id}`"
-                :style="{ animationDelay: `${index * 50}ms` }">
+                :style="{ animationDelay: `${Number(index) * 50}ms` }">
                 <IngredientCard :ingredient="ingredient" @delete="$emit('delete', ingredient)"
                     @edit="$emit('edit', ingredient)" />
             </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
 import { useRecipeStore } from "~/stores/recipe";
-import Tags from "~/components/Tags.vue";
+import Pills from "../Pills.vue";
 
 const route = useRoute();
 const recipeStore = useRecipeStore();
@@ -42,7 +42,7 @@ const recipe = computed(() => {
                 <section>
                     <div class="recipe-description mt-5 ps-lg-2">
                         <h2>{{ recipe.name }}</h2>
-                        <Tags :tags="recipe.categories" />
+                        <Pills :pills="dataToPillTag(recipe.categories as any, BASIC_CONVERSION)" />
 
                         <p>{{ recipe.description }}</p>
 

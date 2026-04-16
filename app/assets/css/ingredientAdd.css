@@ -164,6 +164,24 @@
     background: none;
 
 }
+:deep(.tag-pill) {
+    color: #D85A30 !important;
+    background-color: #fff !important;
+    width: 30% !important;
+    padding: 0.5rem !important;
+    margin: 0.25rem
+}
+
+:deep(.active) {
+    background-color: #D85A30 !important;
+    color: #fff !important;
+    border: 2px solid #D85A30;
+}
+
+:deep(.inactive) {
+    color: #D85A30 !important;
+    background-color: #fff !important
+}
 
 @media screen and (min-width: 540px) {
     .button-left {
