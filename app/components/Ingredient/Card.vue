@@ -26,11 +26,11 @@ const items = computed(() => {
 const freshnessConfig = computed(() => {
     switch (props.ingredient.tag) {
         case 'Friss':
-            return { icon: 'bi bi-leaf', colorClass: 'freshness--fresh' }
+            return { icon: 'bi bi-leaf', colorClass: 'freshness-fresh' }
         case 'Hamarosan':
-            return { icon: 'bi bi-clock-history', colorClass: 'freshness--warning' }
+            return { icon: 'bi bi-clock-history', colorClass: 'freshness-warning' }
         default:
-            return { icon: 'bi bi-exclamation-triangle', colorClass: 'freshness--expired' }
+            return { icon: 'bi bi-exclamation-triangle', colorClass: 'freshness-expired' }
     }
 })
 
@@ -124,13 +124,13 @@ const onEdit = async () => {
 
 <template>
     <CardBase :show-divider="false" content-class="content-settings" ref="card"
-        :class="['card--ingredient', 'card--pantry', freshnessConfig.colorClass, { 'card--tiny': isTiny, 'card--editing': editing }]">
+        :class="['ingredient', 'pantry', freshnessConfig.colorClass, { 'tiny': isTiny, 'editing': editing }]">
         <template #header>
             <CardHeader class="text-left pantry-header">
                 <div class="pantry-top-row">
                     <div class="pantry-name-row">
                         <CardTitle :rank="5" class="m-0 pantry-name">{{ ingredient.name }}</CardTitle>
-                        <button class="card-action-btn card-action-btn--edit card-action--inline"
+                        <button class="action-btn action-edit action-inline"
                             @click="editing ? cancelEditing() : startEditing()"
                             :title="editing ? 'Mégse' : 'Szerkesztés'">
                             <i :class="editing ? 'bi bi-x-lg' : 'bi bi-pencil'"></i>
@@ -142,17 +142,17 @@ const onEdit = async () => {
             </CardHeader>
         </template>
         <template #body>
-            <div v-if="editing" class="card-edit-drawer">
+            <div v-if="editing" class="edit-drawer">
                 <div class="position-relative">
-                    <span class="card-edit-label">Alapanyag</span>
-                    <div class="card-edit-input card-edit-input--trigger" :class="{ open: nameInputOpen }"
+                    <span class="edit-label">Alapanyag</span>
+                    <div class="edit-input edit-trigger" :class="{ open: nameInputOpen }"
                         v-if="!nameInputOpen" @click="nameInputOpen = true">
-                        <span :class="editName ? '' : 'card-edit-placeholder'">{{ editName || 'Keresés…' }}</span>
+                        <span :class="editName ? '' : 'edit-placeholder'">{{ editName || 'Keresés…' }}</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </div>
-                    <input v-else v-model="editName" type="text" class="card-edit-input" placeholder="Keresés…"
+                    <input v-else v-model="editName" type="text" class="edit-input" placeholder="Keresés…"
                         autocomplete="off" @blur="onEditNameBlur" />
-                    <ul v-if="nameInputOpen" class="card-edit-dropdown list-group position-absolute w-100">
+                    <ul v-if="nameInputOpen" class="edit-dropdown list-group position-absolute w-100">
                         <li v-for="item in filteredEditIngredients" :key="item.id"
                             class="list-group-item list-group-item-action"
                             @mousedown.prevent="selectEditIngredient(item.name)">
@@ -161,27 +161,27 @@ const onEdit = async () => {
                     </ul>
                 </div>
 
-                <div class="card-edit-row">
-                    <div class="card-edit-field">
-                        <span class="card-edit-label">Mennyiség</span>
-                        <input type="number" class="card-edit-input" v-model="editQuantity" min="0" />
+                <div class="edit-row">
+                    <div class="edit-field">
+                        <span class="edit-label">Mennyiség</span>
+                        <input type="number" class="edit-input" v-model="editQuantity" min="0" />
                     </div>
-                    <div class="card-edit-field card-edit-field--unit">
-                        <span class="card-edit-label">Egység</span>
-                        <select class="card-edit-input" v-model="editUnit">
+                    <div class="edit-field edit-field-unit">
+                        <span class="edit-label">Egység</span>
+                        <select class="edit-input" v-model="editUnit">
                             <option :value="unit" v-for="unit in ingredientState.units">{{ unit }}</option>
                         </select>
                     </div>
-                    <div class="card-edit-field">
-                        <span class="card-edit-label">Lejárat</span>
-                        <input type="date" class="card-edit-input" v-model="editExpiry" />
+                    <div class="edit-field">
+                        <span class="edit-label">Lejárat</span>
+                        <input type="date" class="edit-input" v-model="editExpiry" />
                     </div>
                 </div>
 
-                <div class="card-edit-actions">
-                    <button type="button" class="card-edit-btn card-edit-btn--cancel"
+                <div class="edit-actions">
+                    <button type="button" class="edit-btn edit-btn-cancel"
                         @click="cancelEditing">Mégse</button>
-                    <button type="button" class="card-edit-btn card-edit-btn--save" :disabled="!editNameIsValid"
+                    <button type="button" class="edit-btn edit-btn-save" :disabled="!editNameIsValid"
                         @click="onEdit">
                         <i class="bi bi-check2"></i> Mentés
                     </button>
@@ -191,11 +191,11 @@ const onEdit = async () => {
         <template #footer>
             <div v-if="!editing" class="pantry-footer">
                 <span class="pantry-date">Lejár: {{ ingredient.expiry.toShort() }}</span>
-                <button v-if="!confirmingDelete" class="card-action-btn card-action-btn--delete card-action--corner"
+                <button v-if="!confirmingDelete" class="action-btn action-delete action-corner"
                     @click="requestDelete" title="Törlés">
                     <i class="bi bi-trash3"></i>
                 </button>
-                <button v-else class="card-action-btn card-action-btn--confirm card-action--corner"
+                <button v-else class="action-btn action-confirm action-corner"
                     @click="confirmingDelete = false; $emit('delete', ingredient)" title="Megerősítés">
                     Biztos?
                 </button>

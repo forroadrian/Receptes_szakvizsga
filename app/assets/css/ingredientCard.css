@@ -7,9 +7,173 @@
     text-align: start !important;
 }
 
-.card-action-btn {
-    width: 34px;
-    height: 34px;
+.ingredient {
+    transition: box-shadow 0.2s ease;
+}
+
+.pantry {
+    border: 1.5px solid var(--pill-border) !important;
+    border-radius: 16px !important;
+    background: var(--bs-body-bg) !important;
+}
+
+.pantry:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07) !important;
+}
+
+.pantry {
+    padding: 0.9rem 1rem !important;
+}
+
+.pantry :deep(.pantry-media) {
+    width: 56px !important;
+    min-width: 56px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pantry-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Caveat", cursive;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: auto;
+    border: 1.5px solid var(--pill-border);
+    color: var(--bs-secondary-color);
+    background: var(--bs-body-bg);
+}
+
+.pantry-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.pantry-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.action-corner {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+    border-radius: 7px !important;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s;
+}
+
+.pantry:hover .action-corner {
+    opacity: 1;
+}
+
+@media (max-width: 991px) {
+    .action-corner {
+        opacity: 1;
+    }
+}
+
+.pantry-name {
+    font-family: "Caveat", cursive;
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    color: var(--bs-body-color);
+    line-height: 1.2;
+}
+
+.action-inline {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s;
+}
+
+.pantry:hover .action-inline {
+    opacity: 1;
+}
+
+@media (max-width: 991px) {
+    .action-inline {
+        opacity: 1;
+    }
+}
+
+.pantry-qty {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+}
+
+.pantry-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0.15rem;
+}
+
+.pantry-date {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+}
+
+.pantry-tag {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.pantry-tag.freshness-fresh {
+    color: #1e7a40;
+    background: rgba(53, 165, 90, 0.12);
+}
+
+.pantry-tag.freshness-warning {
+    color: #b8860b;
+    background: rgba(250, 180, 100, 0.15);
+}
+
+.pantry-tag.freshness-expired {
+    color: #8b1a1a;
+    background: rgba(165, 42, 42, 0.1);
+}
+
+.actions {
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ingredient:hover .actions {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (max-width: 991px) {
+    .actions {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.action-btn {
+    width: 38px;
+    height: 38px;
     border-radius: 8px;
     border: none;
     display: flex;
@@ -21,29 +185,87 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.card-action-btn:active {
+.action-btn:active {
     transform: scale(0.92);
 }
 
-.card-action-btn--edit {
+.action-edit {
     background: rgba(53, 165, 90, 0.22);
     color: #1e7a40;
 }
 
-.card-action-btn--edit:hover {
+.action-edit:hover {
     background: rgba(53, 165, 90, 0.35);
 }
 
-.card-action-btn--delete {
+.action-delete {
     background: rgba(165, 42, 42, 0.18);
     color: #8b1a1a;
 }
 
-.card-action-btn--delete:hover {
+.action-delete:hover {
     background: rgba(165, 42, 42, 0.28);
 }
 
-.card-edit-label {
+.action-confirm {
+    width: auto !important;
+    padding: 0 10px !important;
+    background: #a52a2a;
+    color: #fff;
+    font-size: 11px !important;
+    font-weight: 700;
+    font-family: "Poppins", sans-serif;
+    animation: confirm-pulse 0.3s ease;
+}
+
+@keyframes confirm-pulse {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.editing {
+    box-shadow: 0 0 0 2px var(--accent-border), 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.edit-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem 0.75rem;
+    border-top: 1px solid var(--pill-border);
+    animation: drawer-open 0.2s ease both;
+}
+
+@keyframes drawer-open {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.edit-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-field {
+    flex: 1;
+    min-width: 0;
+}
+
+.edit-field-unit {
+    flex: 0 0 80px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+}
+
+.edit-actions .edit-btn {
+    flex: 1;
+}
+
+.edit-label {
     display: block;
     font-size: 10px;
     font-weight: 600;
@@ -53,7 +275,7 @@
     margin-bottom: 3px;
 }
 
-.card-edit-input {
+.edit-input {
     border: 1.5px solid var(--pill-border);
     border-radius: 8px;
     padding: 6px 10px;
@@ -66,28 +288,28 @@
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.card-edit-input:focus {
+.edit-input:focus {
     border-color: var(--accent-border);
     box-shadow: 0 0 0 3px var(--accent-shadow);
 }
 
-.card-edit-input--trigger {
+.edit-trigger {
     display: flex;
     align-items: center;
     cursor: pointer;
     user-select: none;
 }
 
-.card-edit-input--trigger.open {
+.edit-trigger.open {
     border-radius: 8px 8px 0 0;
     border-color: var(--accent-border);
 }
 
-.card-edit-placeholder {
+.edit-placeholder {
     color: var(--pill-text-muted);
 }
 
-.card-edit-dropdown {
+.edit-dropdown {
     top: 100%;
     left: 0;
     z-index: 100;
@@ -103,7 +325,7 @@
     background: var(--accent-soft);
 }
 
-.card-edit-btn {
+.edit-btn {
     padding: 7px 12px;
     border-radius: 8px;
     font-size: 12px;
@@ -114,17 +336,17 @@
     border: 1.5px solid transparent;
 }
 
-.card-edit-btn--cancel {
+.edit-btn-cancel {
     background: transparent;
     border-color: var(--pill-border);
     color: var(--pill-text-muted);
 }
 
-.card-edit-btn--cancel:hover {
+.edit-btn-cancel:hover {
     background: var(--accent-soft);
 }
 
-.card-edit-btn--save {
+.edit-btn-save {
     background: linear-gradient(135deg, #23da60, #35a55a);
     color: #fff;
     display: inline-flex;
@@ -133,29 +355,30 @@
     gap: 5px;
 }
 
-.card-edit-btn--save:hover {
+.edit-btn-save:hover {
     opacity: 0.88;
 }
 
-.card-edit-btn--save:disabled {
+.edit-btn-save:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
 
-.card--tiny :deep(.media-tiny) {
-    width: 80px !important;
+.tiny .pantry-name {
+    font-size: 1.15rem !important;
 }
 
-.card--tiny :deep(.card--title) {
-    font-size: 0.85rem;
+.tiny :deep(.pantry-media) {
+    width: 44px !important;
+    min-width: 44px !important;
 }
 
-.card--tiny :deep(.card--body p),
-.card--tiny :deep(.card--header p) {
-    font-size: 0.78rem;
-    margin-bottom: 0.15rem;
+.tiny .pantry-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
 }
 
-.card--tiny :deep(.card--content) {
-    padding: 0.4rem !important;
+.tiny :deep(.card--content) {
+    padding: 0.5rem 0.6rem 0.4rem !important;
 }

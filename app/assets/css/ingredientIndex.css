@@ -1,0 +1,322 @@
+.page {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    overflow-x: hidden;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    grid-template-areas: "sidebar main";
+    min-height: calc(100vh - 160px);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background: #fff1ec;
+    animation: fade-in 0.4s ease both;
+}
+
+.hero-wrap {
+    min-height: 280px;
+}
+
+.hero-overlay {
+    background: linear-gradient(to top, #fff1ec 0%, transparent 50%);
+}
+
+.hero-text {
+    bottom: 1.5rem;
+    left: 2rem;
+    right: 2rem;
+}
+
+.hero-title {
+    font-family: "Caveat Brush", cursive;
+    font-size: 3rem;
+    line-height: 1.05;
+    color: #251913;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+}
+
+.hero-sub {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    color: #594238;
+    opacity: 0.7;
+}
+
+.summary {
+    padding: 1.5rem 2rem;
+}
+
+.summary-title {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: #594238;
+}
+
+.stats {
+    gap: 0.6rem;
+}
+
+.stat {
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border-left: 3px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat:hover {
+    transform: translateX(3px);
+}
+
+.stat-fresh {
+    background: rgba(53, 165, 90, 0.08);
+    border-left-color: #2d9a50;
+}
+
+.stat-warning {
+    background: rgba(250, 180, 100, 0.12);
+    border-left-color: #d4940a;
+}
+
+.stat-expired {
+    background: rgba(165, 42, 42, 0.08);
+    border-left-color: #a52a2a;
+}
+
+.stat-fresh .stat-num { color: #1e7a40; }
+.stat-warning .stat-num { color: #b8860b; }
+.stat-expired .stat-num { color: #8b1a1a; }
+
+.stat-num {
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    min-width: 1.6ch;
+}
+
+.stat-text {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.82rem;
+    color: #594238;
+}
+
+.add-link {
+    padding: 1.25rem 2rem;
+    margin: 0 1.5rem 1.5rem;
+    background: #fce3da;
+    border-radius: 16px;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.add-link::after {
+    content: "";
+    position: absolute;
+    right: -16px;
+    bottom: -16px;
+    width: 80px;
+    height: 80px;
+    background: rgba(240, 105, 34, 0.06);
+    border-radius: 50%;
+    filter: blur(24px);
+    pointer-events: none;
+}
+
+.add-link:hover {
+    background: rgba(240, 105, 34, 0.12);
+    transform: translateY(-1px);
+}
+
+.add-label {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.72rem;
+    color: var(--orange);
+    margin-bottom: 0.15rem;
+}
+
+.add-title {
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--bs-body-color);
+    letter-spacing: -0.02em;
+    text-transform: none;
+    transition: color 0.2s ease;
+}
+
+.add-link:hover .add-title {
+    color: var(--orange);
+}
+
+.main {
+    grid-area: main;
+    padding: 2.5rem 3rem;
+    animation: fade-in 0.4s ease 0.05s both;
+}
+
+.main-inner {
+    max-width: 720px;
+}
+
+.main-head {
+    margin-bottom: 2rem;
+}
+
+.main-title {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.75rem;
+    color: var(--bs-body-color);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+    text-transform: none;
+}
+
+.main-desc {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+}
+
+@media (min-width: 992px) {
+    .main :deep(.col-xl-4) {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 991px) {
+    .page {
+        width: auto;
+        margin-left: 0;
+    }
+
+    .layout {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .sidebar {
+        background: transparent;
+        order: 2;
+    }
+
+    .summary {
+        padding: 1rem 0.75rem;
+    }
+
+    .summary-title {
+        font-family: "Caveat Brush", cursive;
+        font-size: 1.7rem;
+        letter-spacing: normal;
+        color: var(--bs-body-color);
+    }
+
+    .stat-fresh {
+        background: rgba(53, 165, 90, 0.06);
+    }
+    .stat-warning {
+        background: rgba(250, 180, 100, 0.08);
+    }
+    .stat-expired {
+        background: rgba(165, 42, 42, 0.06);
+    }
+
+    .stat:hover {
+        background: var(--bs-body-bg);
+    }
+
+    .add-link {
+        margin: 0 0 1rem;
+    }
+
+    .main {
+        padding: 1.25rem 0.75rem;
+        order: 1;
+    }
+
+    .main-head {
+        margin-bottom: 1.25rem;
+    }
+
+    .main-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--orange);
+        margin-bottom: 0;
+    }
+
+    .main-desc {
+        display: none;
+    }
+}
+
+[data-bs-theme="dark"] .sidebar {
+    background: #1a1412;
+}
+
+[data-bs-theme="dark"] .hero-overlay {
+    background: linear-gradient(to top, #1a1412 0%, transparent 50%);
+}
+
+[data-bs-theme="dark"] .hero-title {
+    color: #ffe9e2;
+}
+
+[data-bs-theme="dark"] .hero-sub {
+    color: #d4a890;
+}
+
+[data-bs-theme="dark"] .summary-title {
+    color: #d4a890;
+}
+
+[data-bs-theme="dark"] .stat-fresh {
+    background: rgba(53, 165, 90, 0.1);
+}
+[data-bs-theme="dark"] .stat-warning {
+    background: rgba(250, 180, 100, 0.1);
+}
+[data-bs-theme="dark"] .stat-expired {
+    background: rgba(165, 42, 42, 0.12);
+}
+[data-bs-theme="dark"] .stat-text {
+    color: #d4a890;
+}
+
+[data-bs-theme="dark"] .add-link {
+    background: rgba(252, 227, 218, 0.05);
+}
+
+[data-bs-theme="dark"] .add-link:hover {
+    background: rgba(240, 105, 34, 0.1);
+}
+
+@media (max-width: 991px) {
+    [data-bs-theme="dark"] .sidebar {
+        background: transparent;
+    }
+
+    [data-bs-theme="dark"] .stat-fresh {
+        background: rgba(53, 165, 90, 0.08);
+    }
+    [data-bs-theme="dark"] .stat-warning {
+        background: rgba(250, 180, 100, 0.08);
+    }
+    [data-bs-theme="dark"] .stat-expired {
+        background: rgba(165, 42, 42, 0.1);
+    }
+}
