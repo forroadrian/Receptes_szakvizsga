@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import Button from "~/components/Button.vue";
-import CategoryTags from "~/components/recipe/CategoryTags.vue";
+import Tags from "~/components/Tags.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 
@@ -171,7 +171,7 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
 
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                        <CategoryTags :categories="recipe.categories"
+                                        <Tags :tags="recipe.categories"
                                             class="d-flex justify-content-center" />
                                     </div>
                                 </div>
@@ -215,19 +215,19 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
                             <p class="filter-title">Időtartam</p>
-                            <CategoryTags :categories="filterStore.durationCategories" interactive
+                            <Tags :tags="filterStore.durationCategories" interactive
                                 v-model="filterStore.selectedDurationId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Étkezés</p>
-                            <CategoryTags :categories="filterStore.mealOptions" interactive
+                            <Tags :tags="filterStore.mealOptions" interactive
                                 v-model="filterStore.selectedMealId" />
                         </div>
 
                         <div class="filter-item">
                             <p class="filter-title">Típus</p>
-                            <CategoryTags :categories="filterStore.typeOptions" interactive
+                            <Tags :tags="filterStore.typeOptions" interactive
                                 v-model="filterStore.selectedTypeId" />
                         </div>
                         <div class="filter-item" v-if="user">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
 import { useRecipeStore } from "~/stores/recipe";
-import CategoryTags from "~/components/recipe/CategoryTags.vue";
+import Tags from "~/components/Tags.vue";
 
 const route = useRoute();
 const recipeStore = useRecipeStore();
@@ -42,7 +42,7 @@ const recipe = computed(() => {
                 <section>
                     <div class="recipe-description mt-5 ps-lg-2">
                         <h2>{{ recipe.name }}</h2>
-                        <CategoryTags :categories="recipe.categories" />
+                        <Tags :tags="recipe.categories" />
 
                         <p>{{ recipe.description }}</p>
 
