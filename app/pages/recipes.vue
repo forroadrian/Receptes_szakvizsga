@@ -176,7 +176,7 @@ if (!filterStore.allAllergies.length) {
 
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                        <Tags :tags="recipe.categories"
+                                          <Pills :pills="dataToPillTag(recipe.categories, BASIC_CONVERSION)"
                                             class="d-flex justify-content-center" />
                                     </div>
                                 </div>
