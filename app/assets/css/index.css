@@ -1,0 +1,242 @@
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 30%;
+    right: 0;
+    bottom: 20%;
+    left: 0;
+    background: linear-gradient(to bottom, transparent 20%, rgba(255, 138, 70, 0.3) 35%, rgba(250, 97, 8, 0.356) 50%, transparent 0%);
+    filter: blur(100px);
+}
+
+.hero-image {
+    min-height: 500px;
+    background-image: url('../images/hero-img.png');
+    background-position: center 40%;
+    background-repeat: no-repeat;
+    background-size: 80%;
+    filter: drop-shadow(0 20px 30px rgba(255, 255, 255, 0.137)) drop-shadow(0 20px 50px rgba(255, 120, 0, 0.4)) drop-shadow(0 0 80px rgba(255, 150, 50, 0.35));
+}
+
+.meal-section,
+.meal-section-inner,
+.meal-section-title,
+.meal-grid>div {
+    position: relative;
+}
+
+.meal-section-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.meal-section-title {
+    margin-bottom: 1rem;
+    padding-bottom: 0.9rem;
+}
+
+.meal-section-title::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100px;
+    height: 3px;
+    transform: translateX(-50%);
+    background: var(--grad-yellow);
+    box-shadow: 0 0 10px rgba(255, 114, 49, 0.18);
+}
+
+.meal-section-lead {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+    line-height: 1.7;
+    color: var(--bs-secondary-color);
+}
+
+.meal-grid>div:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 1.25rem;
+    right: 0;
+    width: 1px;
+    height: calc(100% - 2.5rem);
+    background: linear-gradient(to bottom, transparent, rgba(33, 33, 33, 0.13), transparent);
+}
+
+.meal-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 1.5rem 1.25rem 0.5rem;
+    text-align: center;
+}
+
+.category-icon {
+    margin-bottom: 1.2rem;
+    transition: transform .18s ease;
+}
+
+.category-icon i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 75px;
+    font-size: 30px;
+    color: var(--orange);
+    border: 1px solid rgba(240, 218, 194, 0.95);
+    border-radius: 20px;
+    background: linear-gradient(180deg, #fffdfb, #fffaf5);
+    box-shadow: 0 16px 18px rgba(85, 71, 58, 0.18), 0 6px 12px rgba(255, 180, 100, 0.18), inset 0 2px 6px rgba(255, 255, 255, 0.95);
+}
+
+.meal-card-title {
+    margin-bottom: 0.65rem;
+    font-family: "Caveat Brush", cursive;
+    font-size: 1.8rem;
+}
+
+.meal-card-text {
+    max-width: 200px;
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--bs-secondary-color);
+}
+
+.ourFeatures {
+    margin: 70px 0;
+}
+
+.ourFeatures h2::before,
+.ourFeatures h2::after {
+    content: "";
+    flex: 1 1;
+    margin: auto 10px;
+    border-bottom: 2px solid var(--bs-emphasis-color);
+}
+
+.ourFeatures p {
+    padding: 10px 60px;
+    font-size: 14px;
+}
+
+.ourFeatures img {
+    margin-bottom: 10px;
+}
+
+.ourFeatures .col-lg-4 img {
+    filter: drop-shadow(0 20px 60px var(--orange));
+}
+
+.card--base {
+    color: var(--text-dark);
+    background: var(--grad-yellow) border-box;
+    opacity: 0.9;
+    transition: all .25s ease;
+}
+
+.about-image-wrapper img {
+    width: 70%;
+}
+
+.about-text {
+    line-height: 1.8;
+}
+
+.about-content>div {
+    padding-left: 30px;
+    border-left: 3px solid var(--yellow);
+}
+
+[data-bs-theme="dark"] .meal-section-lead,
+[data-bs-theme="dark"] .meal-card-text {
+    color: #fff
+}
+
+[data-bs-theme="dark"] .meal-grid>div:not(:last-child)::after {
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+[data-bs-theme="dark"] .category-icon i {
+    color: #ffb15e;
+    border: 1px solid rgba(255, 145, 44, 0.16);
+    background: linear-gradient(180deg, rgba(46, 49, 53, 0.98), rgba(38, 41, 45, 0.98));
+    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255, 145, 44, 0.04),
+        0 0 10px rgba(255, 174, 79, 0.12),
+        0 0 18px rgba(255, 174, 79, 0.14),
+        0 0 28px rgba(255, 174, 79, 0.08);
+}
+
+[data-bs-theme="dark"] .meal-card-title {
+    color: #f4f4f4;
+}
+
+@media (max-width: 992px) {
+    .hero::before {
+        background: linear-gradient(to right, transparent 0%, rgba(255, 138, 70, 0.3) 65%, rgba(250, 97, 8, 0.356) 50%, transparent 0%);
+    }
+
+    .hero-image {
+        max-width: 600px;
+        background-size: 70%;
+    }
+
+    .hero-image,
+    .card--base,
+    .about-content {
+        margin: 0 auto;
+    }
+
+    .ourFeatures {
+        margin-top: 100px;
+    }
+
+    .card--base {
+        width: 80%;
+    }
+
+    .about-content {
+        text-align: center;
+    }
+
+    .about-content>div {
+        border: none;
+    }
+
+    .meal-grid>div:nth-child(2n)::after {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .meal-section-lead {
+        margin-bottom: 2rem;
+    }
+
+    .meal-grid>div::after {
+        display: none;
+    }
+
+    .meal-card {
+        padding: 1rem 0.75rem 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .ourFeatures h2::before,
+    .ourFeatures h2::after {
+        border: none;
+    }
+
+    .meal-section-title {
+        margin-bottom: 0.75rem;
+    }
+
+    .meal-card-title {
+        font-size: 1.7rem;
+    }
+}
