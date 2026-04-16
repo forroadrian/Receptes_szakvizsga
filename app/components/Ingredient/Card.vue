@@ -11,14 +11,9 @@ const isTiny = computed(() => cardWidth.value <= 370)
 
 const editing = ref(false)
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
     ingredient: Ingredient,
-    image?: string,
-    alt?: string
-}>(), {
-    image: "images/background.webp",
-    alt: "here"
-})
+}>()
 
 const prevId = props.ingredient.id
 
@@ -28,8 +23,23 @@ const items = computed(() => {
     return [{ label: tag, variant: variant } as CardTagItem]
 })
 
+const freshnessConfig = computed(() => {
+    switch (props.ingredient.tag) {
+        case 'Friss':
+            return { icon: 'bi bi-leaf', colorClass: 'freshness--fresh' }
+        case 'Hamarosan':
+            return { icon: 'bi bi-clock-history', colorClass: 'freshness--warning' }
+        default:
+            return { icon: 'bi bi-exclamation-triangle', colorClass: 'freshness--expired' }
+    }
+})
+
 const editName = ref(props.ingredient.name)
+const editQuantity = ref(props.ingredient.quantity)
+const editUnit = ref(props.ingredient.unit)
+const editExpiry = ref(props.ingredient.expiry.toShort())
 const nameInputOpen = ref(false)
+const confirmingDelete = ref(false)
 
 const originalName = ref('')
 const originalQuantity = ref(0)
@@ -38,9 +48,9 @@ const originalExpiry = ref('')
 
 const isCached = computed(() =>
     editName.value === originalName.value &&
-    props.ingredient.quantity === originalQuantity.value &&
-    props.ingredient.unit === originalUnit.value &&
-    props.ingredient.expiry.toShort() === originalExpiry.value
+    editQuantity.value === originalQuantity.value &&
+    editUnit.value === originalUnit.value &&
+    editExpiry.value === originalExpiry.value
 )
 
 const filteredEditIngredients = computed(() => {
@@ -67,6 +77,9 @@ function onEditNameBlur() {
 
 function startEditing() {
     editName.value = props.ingredient.name
+    editQuantity.value = props.ingredient.quantity
+    editUnit.value = props.ingredient.unit
+    editExpiry.value = props.ingredient.expiry.toShort()
     originalName.value = props.ingredient.name
     originalQuantity.value = props.ingredient.quantity
     originalUnit.value = props.ingredient.unit
@@ -76,8 +89,13 @@ function startEditing() {
     ingredientState.loadAvailableIngredients()
 }
 
-const updateExpiry = (val: { target: { value: string } }) => {
-    props.ingredient.expiry = new ExpiryDate(new Date(val.target.value))
+function cancelEditing() {
+    editing.value = false
+}
+
+function requestDelete() {
+    confirmingDelete.value = true
+    setTimeout(() => { confirmingDelete.value = false }, 3000)
 }
 
 const onEdit = async () => {
@@ -91,61 +109,42 @@ const onEdit = async () => {
         body: {
             prev: prevId,
             name: editName.value,
-            quantity: props.ingredient.quantity,
-            expiry: props.ingredient.expiry.toStamp(),
-            unit: props.ingredient.unit,
+            quantity: editQuantity.value,
+            expiry: new ExpiryDate(new Date(editExpiry.value)).toStamp(),
+            unit: editUnit.value,
         }
     })
     props.ingredient.name = editName.value
+    props.ingredient.quantity = editQuantity.value
+    props.ingredient.unit = editUnit.value
+    props.ingredient.expiry = new ExpiryDate(new Date(editExpiry.value))
     editing.value = false
 }
 </script>
 
 <template>
-    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card"
-        :class="{ 'card--tiny': isTiny }" :media-left-class="isTiny ? 'media-tiny' : ''" v-if="!editing">
-        <template #media>
-            <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
-                <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
-            </div>
-        </template>
+    <CardBase :show-divider="false" content-class="content-settings" ref="card"
+        :class="['card--ingredient', 'card--pantry', freshnessConfig.colorClass, { 'card--tiny': isTiny, 'card--editing': editing }]">
         <template #header>
-            <CardHeader class="text-left">
-                <div class="d-flex flex-row align-items-center">
-                    <CardTitle :rank="5" class="ps-3 m-0">{{ ingredient.name }}</CardTitle>
-                    <CardTags class="ms-2 flex-shrink-0" :items="items" />
+            <CardHeader class="text-left pantry-header">
+                <div class="pantry-top-row">
+                    <div class="pantry-name-row">
+                        <CardTitle :rank="5" class="m-0 pantry-name">{{ ingredient.name }}</CardTitle>
+                        <button class="card-action-btn card-action-btn--edit card-action--inline"
+                            @click="editing ? cancelEditing() : startEditing()"
+                            :title="editing ? 'Mégse' : 'Szerkesztés'">
+                            <i :class="editing ? 'bi bi-x-lg' : 'bi bi-pencil'"></i>
+                        </button>
+                    </div>
+                    <span class="pantry-tag" :class="freshnessConfig.colorClass">{{ ingredient.tag }}</span>
                 </div>
-                <p class="ps-3 mb-0 small text-muted">{{ ingredient.quantity }} {{ ingredient.unit }}</p>
+                <span v-if="!editing" class="pantry-qty">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
             </CardHeader>
         </template>
         <template #body>
-            <div class="px-3 pb-2 d-flex flex-row align-items-center justify-content-between">
-                <p class="m-0 small text-muted">Lejár: {{ ingredient.expiry.toShort() }}</p>
-                <div class="d-flex gap-2">
-                    <button class="card-action-btn card-action-btn--edit" @click="startEditing" title="Szerkesztés">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="card-action-btn card-action-btn--delete" @click="$emit('delete', ingredient)"
-                        title="Törlés">
-                        <i class="bi bi-trash3"></i>
-                    </button>
-                </div>
-            </div>
-        </template>
-    </CardBase>
-
-    <CardBase media-position="topLeft" :show-divider="false" content-class="content-settings" ref="card"
-        :class="{ 'card--tiny': isTiny }" :media-left-class="isTiny ? 'media-tiny' : ''" v-else>
-        <template #media>
-            <div class="ratio ratio-1x1 w-100 h-100 overflow-hidden d-flex align-items-center justify-content-center">
-                <NuxtImg :src="props.image" placeholder :alt="props.alt" class="w-100 h-100 object-fit-cover d-block" />
-            </div>
-        </template>
-        <template #body>
-            <div class="card-edit-form d-flex flex-column gap-2 p-2">
-
+            <div v-if="editing" class="card-edit-drawer">
                 <div class="position-relative">
-                    <span class="card-edit-label">Alapanyag neve</span>
+                    <span class="card-edit-label">Alapanyag</span>
                     <div class="card-edit-input card-edit-input--trigger" :class="{ open: nameInputOpen }"
                         v-if="!nameInputOpen" @click="nameInputOpen = true">
                         <span :class="editName ? '' : 'card-edit-placeholder'">{{ editName || 'Keresés…' }}</span>
@@ -162,34 +161,44 @@ const onEdit = async () => {
                     </ul>
                 </div>
 
-                <div class="d-flex gap-2">
-                    <div class="flex-grow-1">
+                <div class="card-edit-row">
+                    <div class="card-edit-field">
                         <span class="card-edit-label">Mennyiség</span>
-                        <input type="number" class="card-edit-input" v-model="ingredient.quantity" min="0" />
+                        <input type="number" class="card-edit-input" v-model="editQuantity" min="0" />
                     </div>
-                    <div style="width: 90px">
+                    <div class="card-edit-field card-edit-field--unit">
                         <span class="card-edit-label">Egység</span>
-                        <select class="card-edit-input" v-model="ingredient.unit">
+                        <select class="card-edit-input" v-model="editUnit">
                             <option :value="unit" v-for="unit in ingredientState.units">{{ unit }}</option>
                         </select>
                     </div>
+                    <div class="card-edit-field">
+                        <span class="card-edit-label">Lejárat</span>
+                        <input type="date" class="card-edit-input" v-model="editExpiry" />
+                    </div>
                 </div>
 
-                <div>
-                    <span class="card-edit-label">Lejárati dátum</span>
-                    <input type="date" class="card-edit-input" :value="ingredient.expiry.toShort()"
-                        @change="updateExpiry" />
-                </div>
-
-                <div class="d-flex gap-2 mt-1">
-                    <button type="button" class="card-edit-btn card-edit-btn--cancel flex-grow-1"
-                        @click="editing = false">Mégse</button>
-                    <button type="button" class="card-edit-btn card-edit-btn--save flex-grow-1"
-                        :disabled="!editNameIsValid" @click="onEdit">
+                <div class="card-edit-actions">
+                    <button type="button" class="card-edit-btn card-edit-btn--cancel"
+                        @click="cancelEditing">Mégse</button>
+                    <button type="button" class="card-edit-btn card-edit-btn--save" :disabled="!editNameIsValid"
+                        @click="onEdit">
                         <i class="bi bi-check2"></i> Mentés
                     </button>
                 </div>
-
+            </div>
+        </template>
+        <template #footer>
+            <div v-if="!editing" class="pantry-footer">
+                <span class="pantry-date">Lejár: {{ ingredient.expiry.toShort() }}</span>
+                <button v-if="!confirmingDelete" class="card-action-btn card-action-btn--delete card-action--corner"
+                    @click="requestDelete" title="Törlés">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                <button v-else class="card-action-btn card-action-btn--confirm card-action--corner"
+                    @click="confirmingDelete = false; $emit('delete', ingredient)" title="Megerősítés">
+                    Biztos?
+                </button>
             </div>
         </template>
     </CardBase>

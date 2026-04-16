@@ -105,8 +105,12 @@ async function saveIngredient() {
     }
 }
 
-onMounted(() => {
-    loadAvailableIngredients()
+onMounted(async () => {
+    try {
+        await loadAvailableIngredients()
+    } catch {
+        showAlert()
+    }
 })
 </script>
 <template>
@@ -160,8 +164,7 @@ onMounted(() => {
 
                     <ul v-if="nameInputOpen" class="name-dropdown list-group position-absolute w-100">
                         <li v-for="item in filteredIngredients" :key="item.id"
-                            class="list-group-item list-group-item-action"
-                            @mousedown.prevent="selectIngredient(item)">
+                            class="list-group-item list-group-item-action" @mousedown.prevent="selectIngredient(item)">
                             {{ item.name }}
                         </li>
                     </ul>
@@ -173,7 +176,8 @@ onMounted(() => {
                         <input v-model="inputExpiry" type="date" class="date-input form-control" />
                     </div>
 
-                    <Button color="orange" icon="bi bi-check2" iconPosition="left" type="button" @click="saveIngredient" class="w-100">
+                    <Button color="orange" icon="bi bi-check2" iconPosition="left" type="button" @click="saveIngredient"
+                        class="w-100">
                         Mentés
                     </Button>
                 </template>
@@ -186,13 +190,8 @@ onMounted(() => {
                         </button>
                     </div>
                     <div class="unit-pill-grid">
-                        <button
-                            v-for="unit in units"
-                            :key="unit"
-                            class="unit-pill"
-                            :class="{ active: inputUnit === unit }"
-                            @click="selectUnit(unit)"
-                        >
+                        <button v-for="unit in units" :key="unit" class="unit-pill"
+                            :class="{ active: inputUnit === unit }" @click="selectUnit(unit)">
                             {{ unit }}
                         </button>
                     </div>
@@ -216,6 +215,17 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     z-index: 1050;
+    animation: backdrop-in 0.2s ease both;
+}
+
+@keyframes backdrop-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-panel {
@@ -223,10 +233,24 @@ onMounted(() => {
     border-radius: 20px;
     width: 100%;
     max-width: 440px;
+    overflow: visible;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.25),
         0 0 40px rgba(255, 114, 49, 0.12);
     border: 1px solid var(--accent-border);
+    animation: panel-in 0.2s ease both;
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .modal-icon {
@@ -445,5 +469,4 @@ onMounted(() => {
     border-color: var(--accent-border);
     box-shadow: 0 0 0 3px var(--accent-shadow);
 }
-
 </style>
