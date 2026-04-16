@@ -539,6 +539,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_recommended_ingredients: {
+        Args: { p_user_id: string }
+        Returns: {
+          appears: number
+          name: string
+        }[]
+      }
       refresh_user_ingredient_expired_flag: { Args: never; Returns: undefined }
       refresh_user_ingredient_expired_flag_timestamptz: {
         Args: never
@@ -546,7 +553,13 @@ export type Database = {
       }
     }
     Enums: {
-      group_types: "meal_type" | "length" | "skill" | "etc" | "meal" | "type"
+      group_types:
+        | "meal_type"
+        | "length"
+        | "skill"
+        | "ingredient_type"
+        | "meal"
+        | "type"
       ingredient_categories:
         | "meat"
         | "vegetable"
@@ -709,7 +722,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      group_types: ["meal_type", "length", "skill", "etc", "meal", "type"],
+      group_types: [
+        "meal_type",
+        "length",
+        "skill",
+        "ingredient_type",
+        "meal",
+        "type",
+      ],
       ingredient_categories: [
         "meat",
         "vegetable",

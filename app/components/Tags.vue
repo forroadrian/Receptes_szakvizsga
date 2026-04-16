@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type Category from "~/interfaces/Category";
+import type Tag from '~/interfaces/Tag';
+
+const model = defineModel()
 
 const props = withDefaults(
     defineProps<{
-        categories: Category[];
+        tags: Tag[];
         interactive?: boolean;
         modelValue?: number | null;
     }>(),
@@ -13,21 +15,17 @@ const props = withDefaults(
     }
 );
 
-const emit = defineEmits<{
-    (e: "update:modelValue", value: number | null): void
-}>();
-
 const handleClick = (id: number) => {
     if (!props.interactive) return;
-    emit("update:modelValue", props.modelValue === id ? null : id);
+    model.value = props.modelValue === id ? null : id
 };
 </script>
 <template>
     <div class="d-flex flex-wrap gap-2 my-4 categories">
         <span
-            v-for="category in categories" class="badge rounded-pill tag-pill" @click="handleClick(category.id)" 
-            :class="[interactive ? 'interactive' : 'static', modelValue === category.id ? 'active' : 'inactive']">
-            <i class="bi bi-tag-fill me-2"></i> {{ category.name }}
+            v-for="tag in tags" class="badge rounded-pill tag-pill" @click="handleClick(tag.id)" 
+            :class="[interactive ? 'interactive' : 'static', model === tag.id ? 'active' : 'inactive']">
+            <i class="bi bi-tag-fill me-2"></i> {{ tag.name }}
         </span>
     </div>
 </template>
