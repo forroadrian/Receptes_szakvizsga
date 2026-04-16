@@ -65,7 +65,7 @@ onMounted(async () => {
     <div class="page">
         <div class="layout">
 
-            <section class="sidebar">
+            <section class="sidebar my-4">
                 <div class="d-flex flex-column h-100">
                     <div class="hero-wrap d-none d-lg-block position-relative overflow-hidden">
                         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSLN9jlsLxNa9URKbO2qra2TdszoSHF40m1iZ4-wleCqrlPDTZF5fly-No8zHGvm27CwIm1YPGnadC2OOTmr9t9eZt3Og_UePN1KtlkN1qIaCIw_2__B6Lcxfhc82McJfnVOU-hW6kPd4O5RW5TpBiDt8N6nAEG1T_5_KoVuOSVuWlh3vTKffb03SuuOmxPW02m7FZ26AfZTzyygW3geWL--ncrAyIr9Y-ZMRlySDQRkxhnmO-2QhU8wsrITA85nSBOKhc7os7X-Y"

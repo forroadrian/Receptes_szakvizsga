@@ -159,6 +159,39 @@
     background: rgba(240, 105, 34, 0.08);
 }
 
+.floating-button {
+    border: 1px solid black !important;
+    background: none;
+
+}
+
+@media screen and (min-width: 540px) {
+    .button-left {
+        border-right: none !important;
+        border-radius: 50px 0px 0px 50px;
+    }
+    
+    .button-right {
+        border-left: none !important;
+        border-radius: 0px 50px 50px 0px !important;
+    }
+}
+
+@media screen and (max-width: 540px) {
+    div.grouped-buttons {
+        flex-direction: column-reverse;
+    }
+
+    .floating-button {
+        border: 0 !important;
+        align-self: flex-start !important;
+        margin-left: 3rem;
+        margin-top: 1rem;
+    }
+}
+
+
+
 .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -231,11 +264,18 @@
     to { transform: translateX(100%); }
 }
 
+.sidebar {
+    -webkit-box-shadow: 1px -3px 30px 2px rgba(0,0,0,0.25); 
+    box-shadow: 1px -3px 30px 2px rgba(0,0,0,0.25);
+}
+
 .recent {
     grid-area: recent;
     background: #fff1ec;
     padding: 1.75rem 2rem;
     animation: fade-in 0.4s ease 0.1s both;
+    -webkit-box-shadow: 1px -3px 30px 2px rgba(0,0,0,0.25); 
+    box-shadow: 1px 3px 30px 2px rgba(0,0,0,0.25);
 }
 
 .recent-head {

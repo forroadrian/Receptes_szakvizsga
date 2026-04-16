@@ -153,7 +153,7 @@ onMounted(async () => {
     <div class="page">
         <div class="layout">
 
-            <section class="hero d-none d-lg-block position-relative overflow-hidden">
+            <section class="hero d-none d-lg-block mt-4 position-relative overflow-hidden sidebar">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSLN9jlsLxNa9URKbO2qra2TdszoSHF40m1iZ4-wleCqrlPDTZF5fly-No8zHGvm27CwIm1YPGnadC2OOTmr9t9eZt3Og_UePN1KtlkN1qIaCIw_2__B6Lcxfhc82McJfnVOU-hW6kPd4O5RW5TpBiDt8N6nAEG1T_5_KoVuOSVuWlh3vTKffb03SuuOmxPW02m7FZ26AfZTzyygW3geWL--ncrAyIr9Y-ZMRlySDQRkxhnmO-2QhU8wsrITA85nSBOKhc7os7X-Y"
                     alt="Friss zöldségek és hozzávalók"
                     class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
@@ -200,24 +200,30 @@ onMounted(async () => {
                                     <input v-model.number="quantity" type="number" class="field-input qty-input"
                                         placeholder="10" min="0" step="any" />
                                     <select v-model="unit" class="field-input unit-select">
-                                        <option value="" disabled>Egys.</option>
+                                        <option value="" disabled>Egység</option>
                                         <option v-for="u in units" :key="u" :value="u">{{ u }}</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="submit"
-                            class="submit-btn w-100 border-0 d-flex align-items-center justify-content-center text-white position-relative overflow-hidden"
-                            :disabled="saving">
-                            <i class="bi bi-plus-circle"></i>
-                            <span>Hozzáadás</span>
-                        </button>
+                        <div class="row flex justify-content-center grouped-buttons">
+                            <Button icon="bi-arrow-bar-left" outline class="floating-button button-left w-auto col-auto align-self-center" to="./">
+                                Vissza
+                            </Button>
+                            <Button icon="bi-plus-circle"
+                                class="submit-btn col-9 border-0 text-white mt-0 position-relative overflow-hidden button-right align-self-center"
+                                :disabled="saving">
+                                <span>Hozzáadás</span>
+                            </Button>
+
+                        </div>
+
                     </form>
                 </div>
             </section>
 
-            <section class="recent">
+            <section class="recent mb-4">
                 <div class="h-100">
                     <div class="recent-head d-flex justify-content-between align-items-center">
                         <h3 class="recent-title m-0 fw-bold text-uppercase">Legutóbbi hozzáadások</h3>
@@ -243,7 +249,7 @@ onMounted(async () => {
                             </div>
                             <button
                                 class="remove-btn border-0 bg-transparent d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle"
-                                @click="onDelete(item)" title="Törlés">
+                                @click="onDelete(item as Ingredient)" title="Törlés">
                                 <i class="bi bi-x"></i>
                             </button>
                         </div>
@@ -258,6 +264,7 @@ onMounted(async () => {
             <section class="cta">
                 <NuxtLink to="/recipes"
                     class="cta-card d-flex align-items-center justify-content-between text-decoration-none overflow-hidden position-relative">
+
                     <div class="position-relative z-1">
                         <p class="cta-label fw-bold">Befejezted a feltöltést?</p>
                         <h3 class="cta-title m-0">Böngéssz recepteket az alapanyagaidhoz</h3>
