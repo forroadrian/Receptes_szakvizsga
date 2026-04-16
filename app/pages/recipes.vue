@@ -117,9 +117,9 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
             </div>
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
-                <div class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
+                <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                    <div v-if="user" class="row text-center py-4">
+                    <div class="row text-center py-4">
                         <span class="plus-icon">+</span>
                         <p>Új recept hozzáadása</p>
                     </div>
@@ -276,13 +276,46 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
     padding: 0 10px;
 }
 
+.offcanvas-filters .form-check-input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--pill-border);
+  position: relative;
+  transition: .3s;
+}
+
+.offcanvas-filters .form-check-input[type="radio"]:hover {
+  border-color: var(--orange);
+}
+
+.offcanvas-filters .form-check-input[type="radio"]:checked {
+  border: 0;
+  background: var(--grad-orange);
+}
+
+.offcanvas-filters .form-check-input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--text-light);
+  transform: translate(-50%, -50%);
+}
+
+.offcanvas-filters .form-check-input[type="radio"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .tab-btn {
     background: none;
     border: none;
 }
 
-.addRecipe,
-.tab-btn {
+.addRecipe,.tab-btn, .offcanvas-filters .form-check-label,
+.offcanvas-filters .form-check-input[type="radio"] {
     cursor: pointer;
 }
 
@@ -312,9 +345,13 @@ if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
     font-size: 12px;
     height: 20px;
     margin: 0px 5px;
-    border-radius: var(--radius-rounded);
     background: var(--bs-emphasis-color);
     color: var(--bs-body-bg);
+}
+
+.filter-count, .offcanvas-filters .form-check-input[type="radio"],
+.offcanvas-filters .form-check-input[type="radio"]:checked::after {
+    border-radius: var(--radius-rounded);
 }
 
 @media (max-width: 992px) {
