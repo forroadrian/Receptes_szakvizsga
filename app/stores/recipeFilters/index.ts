@@ -8,7 +8,6 @@ import { getFilteredRecipes } from "./recipeFilters";
 
 type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
 type CategoryOption = Category;
-
 export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const user = useSupabaseUser();
     const recipeStore = useRecipeStore();
@@ -27,6 +26,10 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const durationCategories = computed(() => getDurationCategories());
     const activeDuration = computed(() => getActiveDuration(selectedDurationId.value));
 
+    const shouldRespectDislikedIngredients = computed(() => {
+        return !!user.value && respectDislikedIngredients.value;
+    });
+
     const tabRecipes = computed(() => {
         return getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id);
     });
@@ -34,7 +37,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const filteredRecipes = computed(() => {
         return getFilteredRecipes(
             tabRecipes.value, search.value, allergenSearch.value,
-            activeDuration.value, selectedMealId.value, selectedTypeId.value, respectDislikedIngredients.value,
+            activeDuration.value, selectedMealId.value, selectedTypeId.value,
+            shouldRespectDislikedIngredients.value,
             userDislikedIngredientIds.value
         );
     });
@@ -42,7 +46,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const hasActiveFilters = computed(() => {
         return search.value !== "" || allergenSearch.value !== "" ||
             selectedDurationId.value !== null || selectedMealId.value !== null ||
-            selectedTypeId.value !== null || activeTab.value !== "default" || respectDislikedIngredients.value;
+            selectedTypeId.value !== null || activeTab.value !== "default" ||
+            shouldRespectDislikedIngredients.value;
     });
 
     const clearFilters = () => {
@@ -81,8 +86,14 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
             (selectedMealId.value !== null ? 1 : 0) +
             (selectedTypeId.value !== null ? 1 : 0) +
             (allergenSearch.value.trim() ? 1 : 0) +
-            (respectDislikedIngredients.value ? 1 : 0));
+            (shouldRespectDislikedIngredients.value ? 1 : 0));
     };
+
+    watch(user, (newUser) => {
+        if (!newUser) {
+            userDislikedIngredientIds.value = [];
+        }
+    });
 
     return {
         search, allergenSearch, getActiveFilterCount, activeTab, selectedDurationId,
