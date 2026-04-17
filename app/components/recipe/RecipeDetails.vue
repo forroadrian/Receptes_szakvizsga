@@ -1,28 +1,17 @@
 <script setup lang="ts">
 import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
-import { useRecipeStore } from "~/stores/recipe";
 import Pills from "../Pills.vue";
+import type Recipe from "~/models/Recipe";
 
-const route = useRoute();
-const recipeStore = useRecipeStore();
-
-const recipeId = Number(route.params.id);
-
-onMounted(async () => {
-    if (!recipeStore.getAllRecipes.length) {
-        await recipeStore.loadRecipes();
-    }
-});
-
-const recipe = computed(() => {
-    return recipeStore.getRecipeById(recipeId);
-});
+defineProps<{
+    recipe: Recipe
+}>();
 </script>
 <template>
-    <div class="container py-5" v-if="recipe">
-        <p @click="$router.back()" class="mb-5 p-0 back-link">
-            <i class="bi bi-arrow-left"></i> Vissza
-        </p>
+    <div class="container py-5">
+        <NuxtLink to="/recipes" class="mb-5 back-link">
+            <p><i class="bi bi-arrow-left"></i> Vissza</p>
+        </NuxtLink>
 
         <div class="recipe-layout">
             <section class="recipe-main-top">
@@ -35,7 +24,7 @@ const recipe = computed(() => {
                                 <span><i class="bi bi-bookmark-plus"></i></span>
                             </div>
                         </div>
-                        <img src="/images/background.webp" class="img-fluid rounded w-100 h-100" alt="Recept képe" />
+                        <img src="/images/background.webp" class="img-fluid rounded w-100" alt="Recept képe" />
                     </div>
                 </div>
 
@@ -43,7 +32,6 @@ const recipe = computed(() => {
                     <div class="recipe-description mt-5 ps-lg-2">
                         <h2>{{ recipe.name }}</h2>
                         <Pills :pills="dataToPillTag(recipe.categories as any, BASIC_CONVERSION)" />
-
                         <p>{{ recipe.description }}</p>
 
                         <div class="d-flex gap-5 recipe-meta-data">
@@ -68,7 +56,7 @@ const recipe = computed(() => {
                 <div class="ingredient-list p-3">
                     <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
-                        <li v-for="ingredient in recipe?.ingredients" class="border-bottom d-flex">
+                        <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
                             <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
                         </li>
@@ -92,9 +80,6 @@ const recipe = computed(() => {
                 </div>
             </section>
         </div>
-    </div>
-    <div v-else class="container py-5">
-        <p>A recept nem található.</p>
     </div>
 </template>
 <style scoped>
@@ -156,6 +141,10 @@ const recipe = computed(() => {
 .step .circle span {
     display: flex;
     justify-content: center;
+}
+
+.back-link {
+    text-decoration: none;
 }
 
 li {

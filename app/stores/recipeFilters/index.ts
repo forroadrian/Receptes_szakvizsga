@@ -108,7 +108,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         return ((selectedDurationId.value !== null ? 1 : 0) +
             (selectedMealId.value !== null ? 1 : 0) +
             (selectedTypeId.value !== null ? 1 : 0) +
-            (allergenSearch.value.trim() ? 1 : 0) +
+            selectedAllergyIds.value.length +
             (shouldRespectDislikedIngredients.value ? 1 : 0));
     };
 

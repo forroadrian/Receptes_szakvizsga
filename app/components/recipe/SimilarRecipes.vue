@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { useRoute } from "#imports";
 import { useRecipeStore } from "~/stores/recipe";
 
@@ -13,22 +13,16 @@ const recipeStore = useRecipeStore();
 
 const currentRecipeId = computed(() => Number(route.params.id));
 
-onMounted(async () => {
-    if (!recipeStore.getAllRecipes.length) {
-        await recipeStore.loadRecipes();
-    }
-});
-
 const items = computed(() => {
     const currentRecipe = recipeStore.getRecipeById(currentRecipeId.value);
     if (!currentRecipe) return [];
 
-    const currentCategoryIds = currentRecipe.categories.map(c => c.id);
+    const currentCategoryIds = (currentRecipe.categories ?? []).map(c => c.id);
 
-    return recipeStore.getAllRecipes
+    return recipeStore.getAllRecipes()
         .filter(recipe => recipe.id !== currentRecipeId.value)
         .map(recipe => {
-            const recipeCategoryIds = recipe.categories.map(c => c.id);
+            const recipeCategoryIds = (recipe.categories ?? []).map(c => c.id);
 
             const common = recipeCategoryIds.filter(id =>
                 currentCategoryIds.includes(id)

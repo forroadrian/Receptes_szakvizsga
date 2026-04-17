@@ -12,8 +12,12 @@ const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const isHydrated = ref(false);
 
-onMounted(() => {
+onMounted(async() => {
     isHydrated.value = true;
+    if (user.value) {
+        await allergyWarnings.loadUserAllergies();
+        await filterStore.loadUserDislikedIngredientIds();
+    }
 });
 
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
@@ -28,11 +32,6 @@ const handleTabClick = (tab: any) => {
 
 if (!recipeStore.getAllRecipes.length) {
     await recipeStore.loadRecipes();
-}
-
-if (user.value) {
-    await allergyWarnings.loadUserAllergies();
-    await filterStore.loadUserDislikedIngredientIds();
 }
 
 if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {

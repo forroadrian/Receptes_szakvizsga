@@ -121,7 +121,8 @@ h4 {
 }
 
 .footer-link:hover,
-.footer-title {
+.footer-title,
+.back-link {
     color: var(--bs-emphasis-color);
 }
 
