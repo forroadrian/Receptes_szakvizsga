@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type RecipeConstuctorOptions from '~/interfaces/ModelInterfaces/RecipeConstructorOptions';
-import Recipe from '~/models/Recipe';
 
 const month = ref<number>(0)
 const year = ref<number>(0)
@@ -11,7 +9,6 @@ const PER_ROW = 7
 const currentDate = computed(() => new Date(year.value, month.value))
 const prevMonth = computed(() => new Date(year.value, month.value,0))
 const firstDay = computed(() => currentDate.value.getDay())
-const lastDay = computed(() => new Date(year.value, month.value+1,0).getDate())
 
 const onChanged = (p_month: number, p_year: number) => {
     month.value = p_month;
@@ -50,5 +47,15 @@ const isBleed = (day: number, row: number) => (day > 10 && row == 1) ||(day < 10
 .cell {
     width: calc(100% / 7);
     min-height: 20%;
+    cursor: pointer;
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    transition: background-color 0.125s ease-in;
+}
+
+.cell:hover:not(.overflow) {
+    background-color: var(--accent-soft);
+    border: 0.5px solid var(--accent-border) !important;
 }
 </style>
