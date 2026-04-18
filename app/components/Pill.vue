@@ -30,7 +30,7 @@ const handleRemove = () => {
 </script>
 <template>
     <span
-        class="badge rounded-pill tag-pill"
+        class="badge rounded-pill tag-pill text-truncate"
         @click="handleClick"
         :class="[(interactive || removable) ? 'interactive' : 'static', active ? 'active' : 'inactive', size]">
         <i class="bi me-2" :class="[icon]"></i> {{ pill.name }}
