@@ -21,12 +21,7 @@ const onChanged = (p_month: number, p_year: number) => {
 let dayCache = 0;
 const calculateCurrentDay = (day: number) => {
     let localCopy = new Date(prevMonth.value)
-    console.log(month.value);
-    
     localCopy.setDate(prevMonth.value.getDate() - firstDay.value + day+1 )
-    console.log(month.value);
-    
-    
     dayCache = localCopy.getDate();
     return dayCache
 }
