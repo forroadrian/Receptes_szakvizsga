@@ -97,7 +97,7 @@ const handleSignOut = async () => {
                             <NuxtLink class="nav-link" :to="ingredientsNavTo">Alapanyagok</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/menuPlanner">Menütervező</NuxtLink>
+                            <NuxtLink class="nav-link" to="/menu">Menütervező</NuxtLink>
                         </li>
                     </ul>
 
