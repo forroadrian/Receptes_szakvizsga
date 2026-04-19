@@ -32,6 +32,7 @@ export function useRecipeModal() {
     const selectedIngredientId = ref<number | null>(null);
     const selectedIngredientQuantity = ref(1);
     const selectedIngredientUnit = ref("");
+    const editingIngredientIndex = ref<number | null>(null);
     const isSaving = ref(false);
     const errorMessage = ref("");
     const closeButton = ref<HTMLButtonElement | null>(null);
@@ -81,6 +82,8 @@ export function useRecipeModal() {
         )
     );
 
+    const isEditingIngredient = computed(() => editingIngredientIndex.value !== null);
+
     const canSubmit = computed(() =>
         Boolean(user.value) &&
         recipe.value.name.trim().length > 0 &&
@@ -95,6 +98,7 @@ export function useRecipeModal() {
         selectedIngredientQuantity.value = 1;
         selectedIngredientUnit.value = availableUnits.value[0] ?? "";
         showIngredientResults.value = false;
+        editingIngredientIndex.value = null;
     }
 
     function onIngredientSearchFocus() {
@@ -112,25 +116,59 @@ export function useRecipeModal() {
         showIngredientResults.value = false;
     }
 
-    function addIngredient() {
+    function addOrUpdateIngredient() {
         const selectedIngredient = availableIngredients.value.find(
             (ingredient) => ingredient.id === selectedIngredientId.value
         );
 
         if (!selectedIngredient) return;
 
-        recipe.value.ingredients.push({
+        const ingredientItem: RecipeIngredientFormItem = {
             ingredient_id: selectedIngredient.id,
             name: selectedIngredient.name,
             quantity: Number(selectedIngredientQuantity.value),
             unit: selectedIngredientUnit.value
-        });
+        };
 
+        if (editingIngredientIndex.value !== null) {
+            recipe.value.ingredients[editingIngredientIndex.value] = ingredientItem;
+        } else {
+            recipe.value.ingredients.push(ingredientItem);
+        }
+
+        resetIngredientFields();
+    }
+
+    function editIngredient(index: number) {
+        const ingredient = recipe.value.ingredients[index];
+        if (!ingredient) return;
+
+        editingIngredientIndex.value = index;
+        selectedIngredientId.value = ingredient.ingredient_id;
+        ingredientSearch.value = ingredient.name;
+        selectedIngredientQuantity.value = ingredient.quantity;
+        selectedIngredientUnit.value = ingredient.unit;
+        showIngredientResults.value = false;
+    }
+
+    function cancelIngredientEdit() {
         resetIngredientFields();
     }
 
     function removeIngredient(index: number) {
         recipe.value.ingredients.splice(index, 1);
+
+        if (editingIngredientIndex.value === index) {
+            resetIngredientFields();
+            return;
+        }
+
+        if (
+            editingIngredientIndex.value !== null &&
+            editingIngredientIndex.value > index
+        ) {
+            editingIngredientIndex.value--;
+        }
     }
 
     function addInstruction() {
@@ -226,13 +264,35 @@ export function useRecipeModal() {
 
     return reactive({
         recipe,
-        instructionInput, ingredientSearch, showIngredientResults, 
-        selectedIngredientId, selectedIngredientQuantity, selectedIngredientUnit,
-        isSaving, errorMessage, closeButton,
-        mealTypes,tags, selectedMealType,
-        availableUnits, filteredIngredients, hasSelectedIngredient,
-        onIngredientSearchFocus, onIngredientSearchInput,
-        selectIngredient, toggleTag,  resetForm, canSubmit,
-        addIngredient, removeIngredient,addInstruction, removeInstruction,  saveRecipe
+        instructionInput,
+        ingredientSearch,
+        showIngredientResults,
+        selectedIngredientId,
+        selectedIngredientQuantity,
+        selectedIngredientUnit,
+        editingIngredientIndex,
+        isEditingIngredient,
+        isSaving,
+        errorMessage,
+        closeButton,
+        mealTypes,
+        tags,
+        selectedMealType,
+        availableUnits,
+        filteredIngredients,
+        hasSelectedIngredient,
+        canSubmit,
+        onIngredientSearchFocus,
+        onIngredientSearchInput,
+        selectIngredient,
+        addOrUpdateIngredient,
+        editIngredient,
+        cancelIngredientEdit,
+        removeIngredient,
+        addInstruction,
+        removeInstruction,
+        toggleTag,
+        resetForm,
+        saveRecipe
     });
 }
