@@ -232,7 +232,7 @@ export function useRecipeModal() {
         mealTypes,tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient,
         onIngredientSearchFocus, onIngredientSearchInput,
-        selectIngredient, toggleTag,  resetForm,
+        selectIngredient, toggleTag,  resetForm, canSubmit,
         addIngredient, removeIngredient,addInstruction, removeInstruction,  saveRecipe
     });
 }

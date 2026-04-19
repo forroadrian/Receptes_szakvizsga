@@ -136,8 +136,7 @@ function goToStep(id: number) {
                                         <div>
                                             <label class="form-label d-block">Étkezés</label>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <Button v-for="meal in recipeModal.mealTypes" type="button"
-                                                    class="rounded-pill recipe-pill"
+                                                <Button v-for="meal in recipeModal.mealTypes" type="button" class="rounded-pill recipe-pill"
                                                     :color="recipeModal.recipe.mealType === meal.id ? 'yellow' : undefined"
                                                     @click="recipeModal.recipe.mealType = meal.id">
                                                     {{ meal.name }}
@@ -187,8 +186,7 @@ function goToStep(id: number) {
                                             <div class="col-12">
                                                 <div v-if="recipeModal.showIngredientResults"
                                                     class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
-                                                    <Button v-for="ingredient in recipeModal.filteredIngredients"
-                                                        type="button"
+                                                    <Button v-for="ingredient in recipeModal.filteredIngredients" type="button"
                                                         class="rounded-pill recipe-pill ingredient-result-pill"
                                                         @click="recipeModal.selectIngredient(ingredient.id, ingredient.name)">
                                                         {{ ingredient.name }}
@@ -217,8 +215,7 @@ function goToStep(id: number) {
 
                                             <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
                                                 class="ingredient-item d-flex align-items-center justify-content-between gap-3">
-                                                <span>{{ ingredient.name }} - {{ ingredient.quantity }} {{
-                                                    ingredient.unit }}</span>
+                                                <span>{{ ingredient.name }} - {{ ingredient.quantity }} {{ingredient.unit }}</span>
 
                                                 <Button type="button" color="orange" size="sm"
                                                     @click="recipeModal.removeIngredient(index)">
@@ -251,19 +248,23 @@ function goToStep(id: number) {
                                                 Még nincs hozzáadott elkészítési lépés.
                                             </div>
 
-                                            <div v-for="(instruction, i) in recipeModal.recipe.instructions"
+                                            <div v-for="(instruction, index) in recipeModal.recipe.instructions"
                                                 class="instruction-item d-flex align-items-center justify-content-between gap-3">
                                                 <div class="d-flex align-items-center gap-3">
-                                                    <strong>{{ i + 1 }}.</strong>
+                                                    <strong>{{ index + 1 }}.</strong>
                                                     <span>{{ instruction }}</span>
                                                 </div>
 
                                                 <Button type="button" color="orange" size="sm"
-                                                    @click="recipeModal.removeInstruction(i)">
+                                                    @click="recipeModal.removeInstruction(index)">
                                                     Törlés
                                                 </Button>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div v-if="recipeModal.errorMessage" class="alert alert-danger mt-4 mb-0">
+                                        {{ recipeModal.errorMessage }}
                                     </div>
                                 </div>
                             </div>
@@ -272,16 +273,17 @@ function goToStep(id: number) {
                 </div>
 
                 <div class="modal-footer recipe-modal-footer">
-                    <Button type="button" class="btn-outline-secondary" :disabled="!canGoBack" @click="prevStep">
+                    <Button type="button" class="btn-outline-secondary":disabled="!canGoBack || recipeModal.isSaving" @click="prevStep">
                         Vissza
                     </Button>
 
-                    <Button v-if="canGoNext" type="button" color="yellow" @click="nextStep">
+                    <Button v-if="canGoNext" type="button" color="yellow" :disabled="recipeModal.isSaving" @click="nextStep">
                         Tovább
                     </Button>
 
-                    <Button v-else type="button" color="green" disabled>
-                        Mentés
+                    <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving" 
+                    @click="recipeModal.saveRecipe">
+                        {{ recipeModal.isSaving ? "Mentés..." : "Mentés" }}
                     </Button>
                 </div>
             </div>
