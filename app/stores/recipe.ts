@@ -34,8 +34,14 @@ type RecipeApiResponse = any;
 
 export const useRecipeStore = defineStore("recipes", () => {
     const recipes = ref<RecipeItem[]>([]);
+    const availableCategories = ref<Category[]>([]);
+    const showRecipeModal = ref(false);
 
     const getAllRecipes = () => recipes.value;
+    const getAvailableCategories = () => availableCategories.value;
+
+    const openRecipeModal = () => showRecipeModal.value = true;
+    const closeRecipeModal = () => showRecipeModal.value = false;
 
     const pushRecipe = (recipe: RecipeItem) => {
         recipes.value.push(recipe);
@@ -158,11 +164,35 @@ export const useRecipeStore = defineStore("recipes", () => {
         return recipes.value.find((recipe) => recipe.id === recipeId) ?? null;
     };
 
+    const loadAvailableCategories = async () => {
+        if (availableCategories.value.length > 0) return;
+
+        try {
+            const response = await $fetch<Category[]>("/api/category", {
+                method: "GET"
+            });
+
+            if (response) {
+                availableCategories.value = [...response].sort(
+                    (firstCategory, secondCategory) =>
+                        firstCategory.name.localeCompare(secondCategory.name, "hu")
+                );
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
     return {
         getAllRecipes,
+        getAvailableCategories,
         getRecipeById,
+        openRecipeModal,
+        closeRecipeModal,
         pushRecipe,
         fetchRecipes,
-        loadRecipes
+        loadRecipes,
+        loadAvailableCategories,
+        showRecipeModal
     };
 });

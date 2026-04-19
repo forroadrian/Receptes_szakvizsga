@@ -30,7 +30,7 @@ const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
 
-if (!recipeStore.getAllRecipes.length) {
+if (!recipeStore.getAllRecipes().length) {
     await recipeStore.loadRecipes();
 }
 
