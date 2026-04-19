@@ -1,30 +1,17 @@
-<script setup>
-import { computed, ref } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { useRecipeModal } from "~/composables/useRecipeModal";
+
+const recipeModal = useRecipeModal();
 
 const steps = [
-    { id: 1, title: 'Recept leírása' },
-    { id: 2, title: 'Recept típusa' },
-    { id: 3, title: 'Hozzávalók' },
-    { id: 4, title: 'Elkészítési lépések' }
-]
-
-const mealTypes = ['Reggeli', 'Ebéd', 'Vacsora', 'Snack'];
-const tags = ['Gyors', 'Időigényes', 'Csípős', 'Sós', 'Főétel', 'Előétel', 'Desszert'];
+    { id: 1, title: "Recept leírása" },
+    { id: 2, title: "Recept típusa" },
+    { id: 3, title: "Hozzávalók" },
+    { id: 4, title: "Elkészítési lépések" }
+];
 
 const currentStep = ref(1);
-const ingredientInput = ref('');
-const instructionInput = ref('');
-
-const recipe = ref({
-    name: '',
-    description: '',
-    prepTime: 60,
-    servings: 1,
-    mealType: 'Reggeli',
-    tags: [],
-    ingredients: [],
-    instructions: []
-})
 
 const progress = computed(() => `${(currentStep.value / steps.length) * 100}%`);
 const canGoBack = computed(() => currentStep.value > 1);
@@ -38,13 +25,13 @@ function prevStep() {
     if (canGoBack.value) currentStep.value--;
 }
 
-function goToStep(id) {
+function goToStep(id: number) {
     currentStep.value = id;
 }
-
 </script>
 
 <template>
+    <ClientOnly>
     <div id="openAddRecipeModal" class="modal fade" tabindex="-1" aria-labelledby="openAddRecipeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl recipe-dialog">
@@ -64,7 +51,9 @@ function goToStep(id) {
                         </div>
                     </div>
 
-                    <button type="button" class="btn-close ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button ref="recipeModal.closeButton" type="button" class="btn-close ms-3"
+                        data-bs-dismiss="modal" aria-label="Close">
+                    </button>
                 </div>
 
                 <div class="modal-body p-0">
@@ -90,22 +79,22 @@ function goToStep(id) {
                                     <div class="recipe-card recipe-summary-card mt-4">
                                         <div class="summary-row">
                                             <span>Név</span>
-                                            <strong>{{ recipe.name || '—' }}</strong>
+                                            <strong>{{ recipeModal.recipe.name || "—" }}</strong>
                                         </div>
 
                                         <div class="summary-row">
                                             <span>Étkezés</span>
-                                            <strong>{{ recipe.mealType }}</strong>
+                                            <strong>{{ recipeModal.selectedMealType?.name || "—" }}</strong>
                                         </div>
 
                                         <div class="summary-row">
                                             <span>Alapanyag</span>
-                                            <strong>{{ recipe.ingredients.length }} db</strong>
+                                            <strong>{{ recipeModal.recipe.ingredients.length }} db</strong>
                                         </div>
 
                                         <div class="summary-row">
                                             <span>Lépés</span>
-                                            <strong>{{ recipe.instructions.length }} db</strong>
+                                            <strong>{{ recipeModal.recipe.instructions.length }} db</strong>
                                         </div>
                                     </div>
                                 </aside>
@@ -117,26 +106,26 @@ function goToStep(id) {
                                         class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div>
                                             <label class="form-label">Recept neve</label>
-                                            <input v-model="recipe.name" type="text" class="form-control"
-                                                placeholder="Pl. Palacsinta">
+                                            <input v-model="recipeModal.recipe.name" type="text"
+                                                class="form-control" placeholder="Pl. Palacsinta">
                                         </div>
 
                                         <div>
                                             <label class="form-label">Recept leírása</label>
-                                            <textarea v-model="recipe.description" rows="5" class="form-control"
-                                                placeholder="Rövid leírás"></textarea>
+                                            <textarea v-model="recipeModal.recipe.description" rows="5"
+                                                class="form-control" placeholder="Rövid leírás"></textarea>
                                         </div>
 
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Elkészítési idő (perc)</label>
-                                                <input v-model="recipe.prepTime" type="number" min="1"
+                                                <input v-model="recipeModal.recipe.prepTime" type="number" min="1"
                                                     class="form-control">
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label class="form-label">Adag</label>
-                                                <input v-model="recipe.servings" type="number" min="1"
+                                                <input v-model="recipeModal.recipe.servings" type="number" min="1"
                                                     class="form-control">
                                             </div>
                                         </div>
@@ -147,81 +136,134 @@ function goToStep(id) {
                                         <div>
                                             <label class="form-label d-block">Étkezés</label>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <button v-for="meal in mealTypes" type="button"
-                                                    class="btn rounded-pill recipe-pill"
-                                                    :class="recipe.mealType === meal ? 'grad dark border-0' : 'btn-outline-secondary'">
-                                                    {{ meal }}
-                                                </button>
+                                                <Button v-for="meal in recipeModal.mealTypes" type="button"
+                                                    class="rounded-pill recipe-pill"
+                                                    :color="recipeModal.recipe.mealType === meal.id ? 'yellow' : undefined"
+                                                    @click="recipeModal.recipe.mealType = meal.id">
+                                                    {{ meal.name }}
+                                                </Button>
                                             </div>
                                         </div>
                                         <div>
                                             <label class="form-label d-block">Típus</label>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <button v-for="tag in tags" type="button"
-                                                    class="btn rounded-pill recipe-pill"
-                                                    :class="recipe.tags.includes(tag) ? 'grad dark border-0' : 'btn-outline-secondary'">
-                                                    {{ tag }}
-                                                </button>
+                                                <Button v-for="tag in recipeModal.tags" type="button"
+                                                    class="rounded-pill recipe-pill"
+                                                    :color="recipeModal.recipe.tags.includes(tag.id) ? 'yellow' : undefined"
+                                                    @click="recipeModal.toggleTag(tag.id)">
+                                                    {{ tag.name }}
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div v-else-if="currentStep === 3"
                                         class="recipe-card recipe-panel d-flex flex-column gap-4">
-                                        <div class="row g-2">
-                                            <div class="col-12 col-md">
-                                                <input v-model="ingredientInput" type="text" class="form-control h-100"
-                                                    placeholder="Pl. 2 db tojás">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label">Hozzávaló</label>
+                                                <input v-model="recipeModal.ingredientSearch" type="text"
+                                                    class="form-control" placeholder="Termék név..."
+                                                    @focus="recipeModal.onIngredientSearchFocus"
+                                                    @input="recipeModal.onIngredientSearchInput">
                                             </div>
 
-                                            <div class="col-12 col-md-auto">
-                                                <button type="button" class="btn grad dark recipe-action-btn w-100">
+                                            <div class="col-lg-6">
+                                                <label class="form-label">Mennyiség</label>
+                                                <input v-model="recipeModal.selectedIngredientQuantity"
+                                                    type="number" min="1" class="form-control">
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label class="form-label">Egység</label>
+                                                <select v-model="recipeModal.selectedIngredientUnit"
+                                                    class="form-select">
+                                                    <option v-for="unit in recipeModal.availableUnits"
+                                                        :value="unit">
+                                                        {{ unit }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <div v-if="recipeModal.showIngredientResults"
+                                                    class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
+                                                    <Button v-for="ingredient in recipeModal.filteredIngredients"
+                                                        type="button"
+                                                        class="rounded-pill recipe-pill ingredient-result-pill"
+                                                        @click="recipeModal.selectIngredient(ingredient.id, ingredient.name)">
+                                                        {{ ingredient.name }}
+                                                    </Button>
+
+                                                    <div v-if="recipeModal.filteredIngredients.length === 0"
+                                                        class="ingredient-search-empty">
+                                                        Nincs találat.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 d-flex align-items-end">
+                                                <Button type="button" color="green" class="recipe-action-btn w-100"
+                                                    :disabled="!recipeModal.hasSelectedIngredient"
+                                                    @click="recipeModal.addIngredient">
                                                     Hozzáadás
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
 
-                                        <div class="recipe-card recipe-block">
-                                            <label class="form-label">Hozzáadott alapanyagok</label>
-
-                                            <div v-if="recipe.ingredients.length" class="d-flex flex-wrap gap-2">
-                                                <span v-for="(item, i) in recipe.ingredients"
-                                                    class="badge rounded-pill px-3 py-2 recipe-chip">
-                                                    {{ item }}
-                                                    <button type="button" class="chip-btn ms-2">
-                                                        ×
-                                                    </button>
-                                                </span>
+                                        <div class="ingredient-list d-flex flex-column gap-2">
+                                            <div v-if="recipeModal.recipe.ingredients.length === 0"
+                                                class="empty-state">
+                                                Még nincs hozzáadott hozzávaló.
                                             </div>
-                                            <p v-else>Még nincs hozzáadott alapanyag.</p>
+
+                                            <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
+                                                class="ingredient-item d-flex align-items-center justify-content-between gap-3">
+                                                <span>{{ ingredient.name }} - {{ ingredient.quantity }} {{
+                                                    ingredient.unit }}</span>
+
+                                                <Button type="button" color="orange" size="sm"
+                                                    @click="recipeModal.removeIngredient(index)">
+                                                    Törlés
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div v-else class="recipe-card recipe-panel d-flex flex-column gap-4">
-                                        <div>
-                                            <label class="form-label">Új lépés hozzáadása</label>
-                                            <textarea v-model="instructionInput" rows="4" class="form-control"
-                                                placeholder="Írd le az elkészítési lépést..."></textarea>
-                                        </div>
+                                    <div v-else-if="currentStep === 4"
+                                        class="recipe-card recipe-panel d-flex flex-column gap-4">
+                                        <div class="row g-2">
+                                            <div class="col-12 col-md">
+                                                <input v-model="recipeModal.instructionInput" type="text"
+                                                    class="form-control h-100"
+                                                    placeholder="Pl. Keverd össze az alapanyagokat">
+                                            </div>
 
-                                        <div>
-                                            <button type="button" class="btn grad dark recipe-action-btn">
-                                                Lépés hozzáadása
-                                            </button>
-                                        </div>
-
-                                        <div v-if="recipe.instructions.length" class="d-flex flex-column gap-3">
-                                            <div v-for="(item) in recipe.instructions" class="recipe-instruction-item">
-                                                <div class="recipe-instruction-index">{{ i + 1 }}</div>
-                                                <div class="recipe-instruction-text">{{ item }}</div>
-
-                                                <button type="button" class="btn text-danger text-decoration-none p-0">
-                                                    Törlés
-                                                </button>
+                                            <div class="col-12 col-md-auto">
+                                                <Button type="button" color="green" class="w-100"
+                                                    @click="recipeModal.addInstruction">
+                                                    Hozzáadás
+                                                </Button>
                                             </div>
                                         </div>
 
-                                        <p v-else class="text-muted mb-0">Még nincs hozzáadott elkészítési lépés.</p>
+                                        <div class="instruction-list d-flex flex-column gap-2">
+                                            <div v-if="recipeModal.recipe.instructions.length === 0"
+                                                class="empty-state">
+                                                Még nincs hozzáadott elkészítési lépés.
+                                            </div>
+
+                                            <div v-for="(instruction, i) in recipeModal.recipe.instructions"
+                                                class="instruction-item d-flex align-items-center justify-content-between gap-3">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <strong>{{ i + 1 }}.</strong>
+                                                    <span>{{ instruction }}</span>
+                                                </div>
+
+                                                <Button type="button" color="orange" size="sm"
+                                                    @click="recipeModal.removeInstruction(i)">
+                                                    Törlés
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -229,20 +271,23 @@ function goToStep(id) {
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button v-if="canGoBack" type="button" class="btn" @click="prevStep">
+                <div class="modal-footer recipe-modal-footer">
+                    <Button type="button" class="btn-outline-secondary" :disabled="!canGoBack" @click="prevStep">
                         Vissza
-                    </button>
-                    <button v-if="canGoNext" type="button" class="btn grad green" @click="nextStep">
-                        Következő
-                    </button>
-                    <button v-else type="button" class="btn grad orange" data-bs-dismiss="modal">
+                    </Button>
+
+                    <Button v-if="canGoNext" type="button" color="yellow" @click="nextStep">
+                        Tovább
+                    </Button>
+
+                    <Button v-else type="button" color="green" disabled>
                         Mentés
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
     </div>
+    </ClientOnly>
 </template>
 <style scoped src="@/assets/css/recipeModal.css">
 .recipe-modal-header,
@@ -251,5 +296,13 @@ function goToStep(id) {
 .modal-footer,
 .recipe-dialog {
     padding: 30px;
+}
+
+.ingredient-search-results {
+    width: 100%;
+}
+
+.ingredient-result-pill {
+    white-space: nowrap;
 }
 </style>
