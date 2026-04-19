@@ -6,9 +6,12 @@ export const getTabRecipes = (
     userId?: string
 ) => {
     switch (activeTab) {
+        case "default":
+            return allRecipes.filter(recipe => recipe.author_id === null);
+
         case "own":
             return allRecipes.filter(recipe => {
-                return recipe.author_id === userId;
+                return String(recipe.author_id) === String(userId);
             });
 
         case "saved":
@@ -21,6 +24,6 @@ export const getTabRecipes = (
             return [];
 
         default:
-            return allRecipes;
+            return [];
     }
 };

@@ -42,8 +42,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     });
 
     const tabRecipes = computed(() => {
-        return getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id);
-    });
+    return getTabRecipes(recipeStore.getAllRecipes(),activeTab.value,user.value?.sub);
+});
 
     const filteredRecipes = computed(() => {
         return getFilteredRecipes(
