@@ -23,6 +23,7 @@ const createInitialRecipeState = () => ({
 export function useRecipeModal() {
     const recipeStore = useRecipeStore();
     const ingredientStore = useIngredientStore();
+    const user = useSupabaseUser();
 
     const recipe = ref(createInitialRecipeState());
     const instructionInput = ref("");
@@ -80,6 +81,14 @@ export function useRecipeModal() {
         )
     );
 
+    function resetIngredientFields() {
+        ingredientSearch.value = "";
+        selectedIngredientId.value = null;
+        selectedIngredientQuantity.value = 1;
+        selectedIngredientUnit.value = availableUnits.value[0] ?? "";
+        showIngredientResults.value = false;
+    }
+
     function onIngredientSearchFocus() {
         showIngredientResults.value = true;
     }
@@ -95,6 +104,40 @@ export function useRecipeModal() {
         showIngredientResults.value = false;
     }
 
+    function addIngredient() {
+        const selectedIngredient = availableIngredients.value.find(
+            (ingredient) => ingredient.id === selectedIngredientId.value
+        );
+
+        if (!selectedIngredient) return;
+
+        recipe.value.ingredients.push({
+            ingredient_id: selectedIngredient.id,
+            name: selectedIngredient.name,
+            quantity: Number(selectedIngredientQuantity.value),
+            unit: selectedIngredientUnit.value
+        });
+
+        resetIngredientFields();
+    }
+
+    function removeIngredient(index: number) {
+        recipe.value.ingredients.splice(index, 1);
+    }
+
+    function addInstruction() {
+        const instruction = instructionInput.value.trim();
+
+        if (!instruction) return;
+
+        recipe.value.instructions.push(instruction);
+        instructionInput.value = "";
+    }
+
+    function removeInstruction(index: number) {
+        recipe.value.instructions.splice(index, 1);
+    }
+
     function toggleTag(tagId: number) {
         if (recipe.value.tags.includes(tagId)) {
             recipe.value.tags = recipe.value.tags.filter(
@@ -106,6 +149,13 @@ export function useRecipeModal() {
         recipe.value.tags.push(tagId);
     }
 
+    function resetForm() {
+        recipe.value = createInitialRecipeState();
+        instructionInput.value = "";
+        resetIngredientFields();
+        errorMessage.value = "";
+    }
+
     return reactive({
         recipe,
         instructionInput, ingredientSearch, showIngredientResults, 
@@ -114,6 +164,7 @@ export function useRecipeModal() {
         mealTypes,tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient,
         onIngredientSearchFocus, onIngredientSearchInput,
-        selectIngredient, toggleTag
+        selectIngredient, toggleTag,  resetForm,
+        addIngredient, removeIngredient,addInstruction, removeInstruction,
     });
 }
