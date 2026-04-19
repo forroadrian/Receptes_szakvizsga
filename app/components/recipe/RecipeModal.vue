@@ -12,6 +12,7 @@ const steps = [
 ];
 
 const currentStep = ref(1);
+const draggedInstructionIndex = ref<number | null>(null);
 
 const progress = computed(() => `${(currentStep.value / steps.length) * 100}%`);
 const canGoBack = computed(() => currentStep.value > 1);
@@ -27,6 +28,37 @@ function prevStep() {
 
 function goToStep(id: number) {
     currentStep.value = id;
+}
+
+function onInstructionDragStart(index: number) {
+    draggedInstructionIndex.value = index;
+}
+
+function onInstructionDrop(targetIndex: number) {
+    if (
+        draggedInstructionIndex.value === null ||
+        draggedInstructionIndex.value === targetIndex
+    ) {
+        draggedInstructionIndex.value = null;
+        return;
+    }
+
+    const instructions = recipeModal.recipe.instructions;
+    const movedInstruction = instructions[draggedInstructionIndex.value];
+
+    if (!movedInstruction) {
+        draggedInstructionIndex.value = null;
+        return;
+    }
+
+    instructions.splice(draggedInstructionIndex.value, 1);
+    instructions.splice(targetIndex, 0, movedInstruction);
+
+    draggedInstructionIndex.value = null;
+}
+
+function onInstructionDragEnd() {
+    draggedInstructionIndex.value = null;
 }
 </script>
 
@@ -257,15 +289,17 @@ function goToStep(id: number) {
                                             </div>
 
                                             <div v-for="(instruction, index) in recipeModal.recipe.instructions"
-                                                class="instruction-item d-flex align-items-center justify-content-between gap-3">
+                                                class="instruction-item d-flex align-items-center justify-content-between gap-3"
+                                                draggable="true" @dragstart="onInstructionDragStart(index)"
+                                                @dragover.prevent @drop="onInstructionDrop(index)" @dragend="onInstructionDragEnd">
                                                 <div class="d-flex align-items-center gap-3">
+                                                    <span class="drag-handle"><i class="bi bi-arrow-down-up"></i></span>
                                                     <strong>{{ index + 1 }}.</strong>
                                                     <span>{{ instruction }}</span>
                                                 </div>
 
-                                                <Button type="button" color="orange" size="sm"
-                                                    @click="recipeModal.removeInstruction(index)">
-                                                    Törlés
+                                                <Button type="button" color="orange" icon="bi bi-trash"
+                                                    icon-only @click="recipeModal.removeInstruction(index)">
                                                 </Button>
                                             </div>
                                         </div>
