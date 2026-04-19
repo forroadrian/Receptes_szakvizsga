@@ -183,6 +183,32 @@ export const useRecipeStore = defineStore("recipes", () => {
         }
     };
 
+    const createRecipe = async (newRecipe: {
+        name: string;
+        description: string;
+        time: number;
+        servings: number;
+        category_ids: number[];
+        ingredients: {
+            ingredient_id: number;
+            quantity: number;
+            unit: string;
+        }[];
+        steps: string[];
+    }) => {
+        try {
+            const response = await $fetch("/api/recipe", {
+                method: "POST",
+                body: newRecipe
+            });
+
+            await loadRecipes();
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     return {
         getAllRecipes,
         getAvailableCategories,
@@ -193,6 +219,7 @@ export const useRecipeStore = defineStore("recipes", () => {
         fetchRecipes,
         loadRecipes,
         loadAvailableCategories,
+        createRecipe,
         showRecipeModal
     };
 });

@@ -81,6 +81,14 @@ export function useRecipeModal() {
         )
     );
 
+    const canSubmit = computed(() =>
+        Boolean(user.value) &&
+        recipe.value.name.trim().length > 0 &&
+        recipe.value.description.trim().length > 0 &&
+        Number(recipe.value.prepTime) > 0 &&
+        Number(recipe.value.servings) > 0
+    );
+
     function resetIngredientFields() {
         ingredientSearch.value = "";
         selectedIngredientId.value = null;
@@ -149,11 +157,71 @@ export function useRecipeModal() {
         recipe.value.tags.push(tagId);
     }
 
+    function getSelectedCategoryIds() {
+        const categoryIds: number[] = [];
+
+        if (recipe.value.mealType !== null) {
+            categoryIds.push(recipe.value.mealType);
+        }
+
+        for (const tagId of recipe.value.tags) {
+            if (!categoryIds.includes(tagId)) {
+                categoryIds.push(tagId);
+            }
+        }
+
+        return categoryIds;
+    }
+
+    function getRecipeIngredients() {
+        return recipe.value.ingredients.map((ingredient) => ({
+            ingredient_id: ingredient.ingredient_id,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit
+        }));
+    }
+
     function resetForm() {
         recipe.value = createInitialRecipeState();
         instructionInput.value = "";
         resetIngredientFields();
         errorMessage.value = "";
+    }
+
+    async function saveRecipe() {
+        errorMessage.value = "";
+
+        if (!user.value) {
+            errorMessage.value = "A recept mentéséhez be kell jelentkezned.";
+            return;
+        }
+
+        if (!canSubmit.value) {
+            errorMessage.value = "Töltsd ki a recept nevét, leírását, idejét és az adagok számát.";
+            return;
+        }
+
+        isSaving.value = true;
+
+        try {
+            await recipeStore.createRecipe({
+                name: recipe.value.name.trim(),
+                description: recipe.value.description.trim(),
+                time: Number(recipe.value.prepTime),
+                servings: Number(recipe.value.servings),
+                category_ids: getSelectedCategoryIds(),
+                ingredients: getRecipeIngredients(),
+                steps: recipe.value.instructions
+            });
+
+            resetForm();
+            closeButton.value?.click();
+        } catch (error: any) {
+            errorMessage.value =
+                error?.data?.message ?? error?.message ?? "Nem sikerült menteni a receptet.";
+        } finally {
+            isSaving.value = false;
+        }
     }
 
     return reactive({
@@ -165,6 +233,6 @@ export function useRecipeModal() {
         availableUnits, filteredIngredients, hasSelectedIngredient,
         onIngredientSearchFocus, onIngredientSearchInput,
         selectIngredient, toggleTag,  resetForm,
-        addIngredient, removeIngredient,addInstruction, removeInstruction,
+        addIngredient, removeIngredient,addInstruction, removeInstruction,  saveRecipe
     });
 }
