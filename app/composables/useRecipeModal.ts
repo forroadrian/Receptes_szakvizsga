@@ -34,10 +34,10 @@ export function useRecipeModal() {
     const selectedIngredientQuantity = ref(1);
     const selectedIngredientUnit = ref("");
     const editingIngredientIndex = ref<number | null>(null);
+    const editingInstructionIndex = ref<number | null>(null);
     const isSaving = ref(false);
     const errorMessage = ref("");
     const closeButton = ref<HTMLButtonElement | null>(null);
-    const ingredientError = ref("");
 
     onMounted(async () => {
         await Promise.all([
@@ -85,6 +85,7 @@ export function useRecipeModal() {
     );
 
     const isEditingIngredient = computed(() => editingIngredientIndex.value !== null);
+    const isEditingInstruction = computed(() => editingInstructionIndex.value !== null);
 
     const canSubmit = computed(() =>
         Boolean(user.value) &&
@@ -116,6 +117,14 @@ export function useRecipeModal() {
         selectedIngredientId.value = ingredientId;
         ingredientSearch.value = ingredientName;
         showIngredientResults.value = false;
+
+        const existingIngredient = recipe.value.ingredients.find(
+            (item) => item.ingredient_id === ingredientId
+        );
+
+        if (existingIngredient) {
+            selectedIngredientUnit.value = existingIngredient.unit;
+        }
     }
 
     function addOrUpdateIngredient() {
@@ -169,6 +178,7 @@ export function useRecipeModal() {
 
         resetIngredientFields();
     }
+
     function editIngredient(index: number) {
         const ingredient = recipe.value.ingredients[index];
         if (!ingredient) return;
@@ -201,19 +211,76 @@ export function useRecipeModal() {
         }
     }
 
-    function addInstruction() {
+    function addOrUpdateInstruction() {
         const instruction = instructionInput.value.trim();
 
         if (!instruction) return;
 
-        recipe.value.instructions.push(instruction);
+        if (editingInstructionIndex.value !== null) {
+            recipe.value.instructions[editingInstructionIndex.value] = instruction;
+        } else {
+            recipe.value.instructions.push(instruction);
+        }
+
         instructionInput.value = "";
+        editingInstructionIndex.value = null;
+    }
+
+    function editInstruction(index: number) {
+        const instruction = recipe.value.instructions[index];
+        if (!instruction) return;
+
+        instructionInput.value = instruction;
+        editingInstructionIndex.value = index;
+    }
+
+    function cancelInstructionEdit() {
+        instructionInput.value = "";
+        editingInstructionIndex.value = null;
     }
 
     function removeInstruction(index: number) {
         recipe.value.instructions.splice(index, 1);
+
+        if (editingInstructionIndex.value === index) {
+            cancelInstructionEdit();
+            return;
+        }
+
+        if (
+            editingInstructionIndex.value !== null &&
+            editingInstructionIndex.value > index
+        ) {
+            editingInstructionIndex.value--;
+        }
     }
 
+    function moveInstructionUp(index: number) {
+        if (index <= 0) return;
+
+        const instructions = recipe.value.instructions;
+        const currentInstruction = instructions[index];
+        const previousInstruction = instructions[index - 1];
+
+        if (currentInstruction === undefined || previousInstruction === undefined) return;
+
+        instructions[index] = previousInstruction;
+        instructions[index - 1] = currentInstruction;
+    }
+
+    function moveInstructionDown(index: number) {
+        const instructions = recipe.value.instructions;
+
+        if (index >= instructions.length - 1) return;
+
+        const currentInstruction = instructions[index];
+        const nextInstruction = instructions[index + 1];
+
+        if (currentInstruction === undefined || nextInstruction === undefined) return;
+
+        instructions[index] = nextInstruction;
+        instructions[index + 1] = currentInstruction;
+    }
     function toggleTag(tagId: number) {
         if (recipe.value.tags.includes(tagId)) {
             recipe.value.tags = recipe.value.tags.filter(
@@ -241,7 +308,7 @@ export function useRecipeModal() {
         return categoryIds;
     }
 
-    function getRecipeIngredients() {
+    function getRecipeIngredientsPayload() {
         return recipe.value.ingredients.map((ingredient) => ({
             ingredient_id: ingredient.ingredient_id,
             quantity: ingredient.quantity,
@@ -252,9 +319,9 @@ export function useRecipeModal() {
     function resetForm() {
         recipe.value = createInitialRecipeState();
         instructionInput.value = "";
+        editingInstructionIndex.value = null;
         resetIngredientFields();
         errorMessage.value = "";
-        ingredientError.value = "";
     }
 
     async function saveRecipe() {
@@ -279,52 +346,34 @@ export function useRecipeModal() {
                 time: Number(recipe.value.prepTime),
                 servings: Number(recipe.value.servings),
                 category_ids: getSelectedCategoryIds(),
-                ingredients: getRecipeIngredients(),
+                ingredients: getRecipeIngredientsPayload(),
                 steps: recipe.value.instructions
             });
 
             resetForm();
             closeButton.value?.click();
+            showAlert("success", "A recept sikeresen mentve lett.");
         } catch (error: any) {
             errorMessage.value =
                 error?.data?.message ?? error?.message ?? "Nem sikerült menteni a receptet.";
+            showAlert("danger", errorMessage.value);
         } finally {
             isSaving.value = false;
         }
     }
 
     return reactive({
-        recipe,
-        instructionInput,
-        ingredientSearch,
-        showIngredientResults,
-        selectedIngredientId,
-        selectedIngredientQuantity,
-        selectedIngredientUnit,
-        editingIngredientIndex,
-        isEditingIngredient,
-        isSaving,
-        errorMessage,
-        closeButton,
-        mealTypes,
-        tags,
-        selectedMealType,
-        availableUnits,
-        filteredIngredients,
-        hasSelectedIngredient,
-        canSubmit,
-        onIngredientSearchFocus,
-        onIngredientSearchInput,
-        selectIngredient,
-        addOrUpdateIngredient,
-        editIngredient,
-        cancelIngredientEdit,
-        removeIngredient,
-        addInstruction,
-        removeInstruction,
-        toggleTag,
-        resetForm,
-        saveRecipe,
-        ingredientError
+        recipe, instructionInput, ingredientSearch, showIngredientResults,
+        selectedIngredientId, selectedIngredientQuantity, selectedIngredientUnit,
+        editingIngredientIndex, isEditingIngredient,
+        editingInstructionIndex, isEditingInstruction,
+        isSaving, errorMessage, closeButton,
+        mealTypes, tags, selectedMealType,
+        availableUnits, filteredIngredients, hasSelectedIngredient, canSubmit,
+        onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
+        addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,
+        addOrUpdateInstruction, editInstruction, cancelInstructionEdit, removeInstruction,
+        moveInstructionUp, moveInstructionDown,
+        toggleTag, resetForm, saveRecipe
     });
 }

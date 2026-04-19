@@ -276,7 +276,7 @@ function onInstructionDragEnd() {
 
                                             <div class="col-12 col-md-auto">
                                                 <Button type="button" color="green" class="w-100"
-                                                    @click="recipeModal.addInstruction">
+                                                    @click="recipeModal.addOrUpdateInstruction">
                                                     Hozzáadás
                                                 </Button>
                                             </div>
@@ -297,10 +297,14 @@ function onInstructionDragEnd() {
                                                     <strong>{{ index + 1 }}.</strong>
                                                     <span>{{ instruction }}</span>
                                                 </div>
-
-                                                <Button type="button" color="orange" icon="bi bi-trash"
-                                                    icon-only @click="recipeModal.removeInstruction(index)">
-                                                </Button>
+                                                <div class="d-flex align-items-center gap-3">
+                                                     <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
+                                                            @click="recipeModal.editInstruction(index)">
+                                                    </Button>
+                                                    <Button type="button" color="orange" icon="bi bi-trash"
+                                                            icon-only @click="recipeModal.removeInstruction(index)">
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
