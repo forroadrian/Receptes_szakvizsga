@@ -53,7 +53,7 @@ defineProps<{
                     </ClientOnly>
                 </div>
 
-                <div class="ingredient-list p-3">
+                <div class="ingredient-list p-3" v-if="recipe">
                     <h3 class="text-center mt-3">Hozzávalók</h3>
                     <ul class="p-0">
                         <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">

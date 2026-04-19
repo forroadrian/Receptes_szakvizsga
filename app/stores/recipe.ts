@@ -1,33 +1,52 @@
 import { defineStore } from "pinia";
-import Recipe from "~/models/Recipe";
-import Ingredient from "~/models/Ingredient";
-import Allergy from "~/models/Allergy";
+import { ref } from "vue";
 import type Category from "~/interfaces/Category";
 
+export type RecipeItem = {
+    id: number;
+    author_id: string | null;
+    name: string;
+    description: string;
+    saves: number;
+    likes: number;
+    time: number;
+    servings: number;
+    created_at: string;
+    last_edit: string;
+    is_ai_generated: boolean;
+    active: boolean;
+    deleted_at: string | null;
+    steps: string[];
+    ingredients: {
+        id: number;
+        name: string;
+        quantity: number;
+        unit: string;
+    }[];
+    categories: Category[];
+    allergies: {
+        id: number;
+        name: string;
+    }[];
+};
+
+type RecipeApiResponse = any;
+
 export const useRecipeStore = defineStore("recipes", () => {
-    const recipes = ref<Recipe[]>([]);
-    const showRecipeModal = ref(false);
+    const recipes = ref<RecipeItem[]>([]);
 
-    const openRecipeModal = () => showRecipeModal.value = true;
-    const closeRecipeModal = () => showRecipeModal.value = false;
+    const getAllRecipes = () => recipes.value;
 
-    const pushRecipe = (recipe: Recipe) => {
+    const pushRecipe = (recipe: RecipeItem) => {
         recipes.value.push(recipe);
-    };
-
-    const getAllRecipes = () => {
-        return recipes.value;
-    };
-
-    const getRecipeById = (id: number) => {
-        const recipe = recipes.value.find((value) => value.id === id);
-        if (recipe != undefined) return recipe;
-        return null;
     };
 
     const fetchRecipes = async () => {
         try {
-            return await $fetch("/api/recipe", { method: "GET" });
+            const response = await $fetch<RecipeApiResponse[]>("/api/recipe", {
+                method: "GET"
+            });
+            return response;
         } catch (error) {
             alert(error);
         }
@@ -35,102 +54,115 @@ export const useRecipeStore = defineStore("recipes", () => {
 
     const loadRecipes = async () => {
         recipes.value = [];
-        const res = await fetchRecipes();
 
-        if (!res || res.length === 0) return;
+        const response = await fetchRecipes();
 
-        for (const recipeData of res) {
-            const steps: string[] = [];
-            const ingredients: Ingredient[] = [];
-            const allergies: Allergy[] = [];
-            const allergyIds: number[] = [];
-            const categories: Category[] = [];
+        if (response?.length && response !== undefined) {
+            for (const recipeData of response) {
+                const stepList: string[] = [];
+                const ingredientList: RecipeItem["ingredients"] = [];
+                const categoryList: Category[] = [];
+                const allergyList: RecipeItem["allergies"] = [];
+                const collectedAllergyIds: number[] = [];
 
-            if (recipeData.recipe_step) {
-                const sortedSteps = recipeData.recipe_step.sort(
-                    (a, b) => a.step_number - b.step_number
-                );
+                if (recipeData.recipe_step) {
+                    const sortedSteps = [...recipeData.recipe_step].sort(
+                        (firstStep, secondStep) =>
+                            firstStep.step_number - secondStep.step_number
+                    );
 
-                for (const stepItem of sortedSteps) {
-                    if (stepItem.step?.step_description) {
-                        steps.push(stepItem.step.step_description);
+                    for (const stepData of sortedSteps) {
+                        const stepDescription = stepData.step?.step_description?.trim();
+                        if (stepDescription) stepList.push(stepDescription);
                     }
                 }
-            }
 
-            if (recipeData.recipe_ingredients) {
-                for (const ingredientItem of recipeData.recipe_ingredients) {
-                    if (ingredientItem.ingredient) {
-                        const ingredient = new Ingredient(ingredientItem.ingredient.id,
-                            ingredientItem.ingredient.name, ingredientItem.quantity, ingredientItem.unit);
+                if (recipeData.recipe_ingredients) {
+                    for (const recipeIngredient of recipeData.recipe_ingredients) {
+                        const ingredientData = recipeIngredient.ingredient;
 
-                        ingredients.push(ingredient);
+                        if (ingredientData) {
+                            ingredientList.push({
+                                id: ingredientData.id,
+                                name: ingredientData.name,
+                                quantity: recipeIngredient.quantity,
+                                unit: recipeIngredient.unit
+                            });
 
-                        if (ingredientItem.ingredient.ingredient_allergy) {
-                            for (const allergyRelation of ingredientItem.ingredient.ingredient_allergy) {
-                                if (allergyRelation.allergy && !allergyIds.includes(allergyRelation.allergy.id)) {
-                                    allergyIds.push(allergyRelation.allergy.id);
-                                    allergies.push(new Allergy( allergyRelation.allergy.name, allergyRelation.allergy.id)
-                                    );
+                            if (ingredientData.ingredient_allergy) {
+                                for (const ingredientAllergyRelation of ingredientData.ingredient_allergy) {
+                                    const allergyData = ingredientAllergyRelation.allergy;
+
+                                    if (
+                                        allergyData &&
+                                        !collectedAllergyIds.includes(allergyData.id)
+                                    ) {
+                                        collectedAllergyIds.push(allergyData.id);
+                                        allergyList.push({
+                                            id: allergyData.id,
+                                            name: allergyData.name
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            if (recipeData.recipe_categories) {
-                for (const categoryItem of recipeData.recipe_categories) {
-                    const categoryData = categoryItem.category as {
-                        id: number;
-                        name: string;
-                        group_type: string | null;
-                    } | undefined;
+                if (recipeData.recipe_categories) {
+                    for (const recipeCategory of recipeData.recipe_categories) {
+                        const categoryData = recipeCategory.category;
 
-                    if (categoryData) {
-                        const category: Category = {
-                            id: categoryData.id,
-                            name: categoryData.name,
-                            group_type: categoryData.group_type ?? ""
-                        };
-
-                        categories.push(category);
+                        if (categoryData) {
+                            categoryList.push({
+                                id: categoryData.id,
+                                name: categoryData.name,
+                                group_type: categoryData.group_type ?? ""
+                            });
+                        }
                     }
                 }
+
+                const recipe: RecipeItem = {
+                    id: recipeData.id,
+                    author_id: recipeData.author_id,
+                    name: recipeData.name,
+                    description: recipeData.description,
+                    saves: recipeData.saves ?? 0,
+                    likes: recipeData.likes ?? 0,
+                    time: recipeData.time,
+                    servings: recipeData.servings,
+                    created_at: recipeData.created_at,
+                    last_edit: recipeData.last_edit,
+                    is_ai_generated: recipeData.is_ai_generated,
+                    active: recipeData.active ?? true,
+                    deleted_at: recipeData.deleted_at ?? null,
+                    steps: stepList,
+                    ingredients: ingredientList,
+                    categories: categoryList,
+                    allergies: allergyList
+                };
+
+                pushRecipe(recipe);
             }
 
-            const recipe = new Recipe({
-                id: recipeData.id,
-                author_id: recipeData.author_id,
-                name: recipeData.name,
-                description: recipeData.description,
-                saves: recipeData.saves ?? 0,
-                likes: recipeData.likes ?? 0,
-                time: recipeData.time,
-                servings: recipeData.servings,
-                created_at: new Date(recipeData.created_at),
-                last_edit: new Date(recipeData.last_edit),
-                is_ai_generated: recipeData.is_ai_generated,
-                active: recipeData.active ?? true,
-                deleted_at: recipeData.deleted_at ? new Date(recipeData.deleted_at) : undefined,
-                steps,
-                ingredients,
-                categories,
-                allergies
-            });
-
-            pushRecipe(recipe);
+            recipes.value.sort(
+                (firstRecipe, secondRecipe) =>
+                    firstRecipe.name.localeCompare(secondRecipe.name, "hu") ||
+                    firstRecipe.id - secondRecipe.id
+            );
         }
     };
 
+    const getRecipeById = (recipeId: number) => {
+        return recipes.value.find((recipe) => recipe.id === recipeId) ?? null;
+    };
+
     return {
-        openRecipeModal,
-        closeRecipeModal,
-        pushRecipe,
         getAllRecipes,
         getRecipeById,
+        pushRecipe,
         fetchRecipes,
-        loadRecipes,
-        showRecipeModal
+        loadRecipes
     };
 });
