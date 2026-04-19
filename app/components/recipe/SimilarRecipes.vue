@@ -17,29 +17,33 @@ const items = computed(() => {
     const currentRecipe = recipeStore.getRecipeById(currentRecipeId.value);
     if (!currentRecipe) return [];
 
-    const currentCategoryIds = (currentRecipe.categories ?? []).map(c => c.id);
+    const result = [];
+    const currentCategoryIds = currentRecipe.categories.map(c => c.id);
 
-    return recipeStore.getAllRecipes()
-        .filter(recipe => recipe.id !== currentRecipeId.value)
-        .map(recipe => {
-            const recipeCategoryIds = (recipe.categories ?? []).map(c => c.id);
+    for (const recipe of recipeStore.getAllRecipes()) {
+        if (recipe.id !== currentRecipeId.value) {
+            let matchCount = 0;
 
-            const common = recipeCategoryIds.filter(id =>
-                currentCategoryIds.includes(id)
-            ).length;
+            for (const category of recipe.categories) {
+                if (currentCategoryIds.includes(category.id)) {
+                    matchCount++;
+                }
+            }
+            if (matchCount > 0) {
+                result.push({
+                    id: recipe.id,
+                    title: recipe.name,
+                    pageLink: `/recipe/${recipe.id}`,
+                    time: `${recipe.time} perc`,
+                    servings: `${recipe.servings} fő`,
+                    score: matchCount
+                });
+            }
+        }
+    }
+    result.sort((a, b) => b.score - a.score);
 
-            return {
-                recipe,
-                score: common
-            };
-        })
-        .filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-        .map(({ recipe }) => ({
-            id: recipe.id, title: recipe.name,
-            pageLink: `/recipe/${recipe.id}`, time: `${recipe.time} perc`, servings: `${recipe.servings} fő`
-        }));
+    return result.slice(0, 3);
 });
 </script>
 
