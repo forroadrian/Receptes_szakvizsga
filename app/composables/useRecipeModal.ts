@@ -24,6 +24,7 @@ export function useRecipeModal() {
     const recipeStore = useRecipeStore();
     const ingredientStore = useIngredientStore();
     const user = useSupabaseUser();
+    const { showAlert } = useAlert();
 
     const recipe = ref(createInitialRecipeState());
     const instructionInput = ref("");
@@ -36,6 +37,7 @@ export function useRecipeModal() {
     const isSaving = ref(false);
     const errorMessage = ref("");
     const closeButton = ref<HTMLButtonElement | null>(null);
+    const ingredientError = ref("");
 
     onMounted(async () => {
         await Promise.all([
@@ -130,15 +132,43 @@ export function useRecipeModal() {
             unit: selectedIngredientUnit.value
         };
 
+        const ingredientsToCheck = recipe.value.ingredients.filter((_, index) => {
+            return index !== editingIngredientIndex.value;
+        });
+
+        const existingIngredientWithDifferentUnit = ingredientsToCheck.find(
+            (item) =>
+                item.ingredient_id === ingredientItem.ingredient_id &&
+                item.unit !== ingredientItem.unit
+        );
+
+        if (existingIngredientWithDifferentUnit) {
+            showAlert(
+                "danger",
+                `${ingredientItem.name} már hozzá lett adva ${existingIngredientWithDifferentUnit.unit} mértékegységgel.`
+            );
+            return;
+        }
+
         if (editingIngredientIndex.value !== null) {
-            recipe.value.ingredients[editingIngredientIndex.value] = ingredientItem;
+            recipe.value.ingredients.splice(editingIngredientIndex.value, 1);
+        }
+
+        const existingIngredient = recipe.value.ingredients.find(
+            (item) =>
+                item.ingredient_id === ingredientItem.ingredient_id &&
+                item.unit === ingredientItem.unit
+        );
+
+        if (existingIngredient) {
+            const nextQuantity = existingIngredient.quantity + ingredientItem.quantity;
+            existingIngredient.quantity = Math.round(nextQuantity * 1000) / 1000;
         } else {
             recipe.value.ingredients.push(ingredientItem);
         }
 
         resetIngredientFields();
     }
-
     function editIngredient(index: number) {
         const ingredient = recipe.value.ingredients[index];
         if (!ingredient) return;
@@ -224,6 +254,7 @@ export function useRecipeModal() {
         instructionInput.value = "";
         resetIngredientFields();
         errorMessage.value = "";
+        ingredientError.value = "";
     }
 
     async function saveRecipe() {
@@ -293,6 +324,7 @@ export function useRecipeModal() {
         removeInstruction,
         toggleTag,
         resetForm,
-        saveRecipe
+        saveRecipe,
+        ingredientError
     });
 }
