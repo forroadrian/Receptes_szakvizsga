@@ -4,7 +4,7 @@ import type Recipe from '~/models/Recipe';
 
 const props = withDefaults(defineProps<{
     active?: boolean,
-    day: number,
+    day?: number,
     weekday: number,
     overflow?: boolean,
     recipes?: Recipe[]
@@ -18,7 +18,7 @@ const isWeekend = computed(() => props.weekday == 0 || props.weekday == 6)
 <template>
     <div class="cell border" :class="{'weekend': isWeekend, 'overflow': overflow}">
         <div class="d-flex justify-content-end">
-            <p :class="[active ? 'active' : 'inactive']" class="m-2 p-1 day">{{ day }}</p>
+            <p :class="[active ? 'active' : 'inactive']" class="m-2 p-1 day text-left">{{ day }}</p>
         </div>
         <div class="cell-content">
             <Pill v-if="recipes" :pill="{name: recipes.length.toString() + ' menü'}" icon="" interactive class="w-100 mb-3"/>

@@ -2,28 +2,68 @@
 
 const month = ref<number>(0)
 const year = ref<number>(0)
+const today = ref<number>(0)
 
 const ROWS = 5
 const PER_ROW = 7
 
 const currentDate = computed(() => new Date(year.value, month.value))
 const prevMonth = computed(() => new Date(year.value, month.value,0))
-const firstDay = computed(() => currentDate.value.getDay())
+const firstDay = computed(() => currentDate.value.getDay() - 1)
+const convertedDays = ref<{
+    bleed: {
+        [index: number]: number
+    },
+    normal: {
+        [index: number]: number
+    },
+    all : {
+        [index: number]: number
+    }
+}>({
+    bleed: {},
+    normal: {},
+    all: {}
+});
 
 const onChanged = (p_month: number, p_year: number) => {
     month.value = p_month;
     year.value = p_year;
+    today.value = new Date(Date.now()).getDate();
 }
 
 let dayCache = 0;
-const calculateCurrentDay = (day: number) => {
-    let localCopy = new Date(prevMonth.value)
-    localCopy.setDate(prevMonth.value.getDate() - firstDay.value + day+1 )
-    dayCache = localCopy.getDate();
-    return dayCache
+
+const calculateDays = () => {
+    const ALL_DAYS = ROWS * PER_ROW;
+    let bleed = true;
+    for(let i = 1; i <= ALL_DAYS;i++){
+        let localCopy = new Date(prevMonth.value);
+        localCopy.setDate(prevMonth.value.getDate() - firstDay.value + i );
+        let day = localCopy.getDate();
+        if(day == 1){
+            bleed = !bleed;
+        }
+        if(bleed) {
+            convertedDays.value["bleed"][i] = day;
+        }else {
+            convertedDays.value["normal"][i] = day;
+        }
+        convertedDays.value['all'][i] = day;
+    }
 }
 
-const isBleed = (day: number, row: number) => (day > 10 && row == 1) ||(day < 10 && row == 5)
+const isToday = (day: number | undefined) => {
+    if (!day) return false;
+
+    return today.value == day
+}
+
+const getDay = (row: number, column: number) => (row-1) * 7 + column
+
+onMounted(() => {
+    calculateDays()
+})
 
 </script>
 <template>
@@ -39,7 +79,7 @@ const isBleed = (day: number, row: number) => (day > 10 && row == 1) ||(day < 10
             <p>V</p>
         </div>
         <div class="d-flex justify-content-between" v-for="row in ROWS">
-            <CalendarCell v-for="i in PER_ROW" :day="calculateCurrentDay(((row-1)*7)+i)" :weekday="i%7" :overflow="isBleed(dayCache, row)"></CalendarCell>
+            <CalendarCell v-for="column in PER_ROW" :day="convertedDays.all[getDay(row, column)]" :weekday="column%7" :overflow="typeof(convertedDays.bleed[getDay(row, column)]) == 'number'" :active="isToday(convertedDays.normal[getDay(row, column)])"></CalendarCell>
         </div>
     </section>
 </template>
