@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const isDev = process.env.NODE_ENV === 'development'
+
 export default defineNuxtConfig({
     vite: {
         optimizeDeps: {
@@ -13,8 +15,6 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
     css: [
-        'bootstrap/dist/css/bootstrap.min.css',
-        'bootstrap-icons/font/bootstrap-icons.css',
         '~/assets/css/gradients.css',
         '~/assets/css/main.css',
         '~/assets/css/auth.css',

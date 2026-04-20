@@ -43,7 +43,7 @@ const scrollTop = () => {
                             </NuxtLink>
                         </li>
                         <li>
-                            <NuxtLink to="/menuPlanner"
+                            <NuxtLink to="/menu"
                                 class="footer-link justify-content-center justify-content-lg-start">
                                 <i class="bi bi-calendar2-week"></i> Menütervező
                             </NuxtLink>
