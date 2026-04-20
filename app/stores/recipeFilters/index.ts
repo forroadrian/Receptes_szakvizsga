@@ -10,7 +10,7 @@ import { createAllergyFilters } from "./allergyFilters";
 
 type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
 type CategoryOption = Category;
-type AllergyRow = Database['public']['Tables']['allergy']['Row'];
+type AllergyRow = Database["public"]["Tables"]["allergy"]["Row"];
 export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const user = useSupabaseUser();
     const recipeStore = useRecipeStore();
@@ -26,6 +26,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const userDislikedIngredientIds = ref<number[]>([]);
     const allAllergies = ref<AllergyRow[]>([]);
     const selectedAllergyIds = ref<number[]>([]);
+    const savedRecipeIds = ref<number[]>([]);
+    const triedRecipeIds = ref<number[]>([]);
     const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
     const durationCategories = computed(() => getDurationCategories());
@@ -42,8 +44,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     });
 
     const tabRecipes = computed(() => {
-    return getTabRecipes(recipeStore.getAllRecipes(),activeTab.value,user.value?.sub);
-});
+        return getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.sub, savedRecipeIds.value, triedRecipeIds.value);
+    });
 
     const filteredRecipes = computed(() => {
         return getFilteredRecipes(
@@ -94,6 +96,32 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         }
     };
 
+    const setSavedRecipeIds = (recipeIds: number[]) => {
+        savedRecipeIds.value = [...recipeIds];
+    };
+
+    const setTriedRecipeIds = (recipeIds: number[]) => {
+        triedRecipeIds.value = [...recipeIds];
+    };
+
+    const toggleSaved = (recipeId: number) => {
+        if (savedRecipeIds.value.includes(recipeId)) {
+            savedRecipeIds.value = savedRecipeIds.value.filter(id => id !== recipeId);
+            return;
+        }
+
+        savedRecipeIds.value.push(recipeId);
+    };
+
+    const toggleTried = (recipeId: number) => {
+        if (triedRecipeIds.value.includes(recipeId)) {
+            triedRecipeIds.value = triedRecipeIds.value.filter(id => id !== recipeId);
+            return;
+        }
+
+        triedRecipeIds.value.push(recipeId);
+    };
+
     const removeSelectedAllergy = (allergyId: number) => {
         selectedAllergyIds.value = selectedAllergyIds.value.filter(id => id !== allergyId);
     };
@@ -105,26 +133,56 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     };
 
     const getActiveFilterCount = () => {
-        return ((selectedDurationId.value !== null ? 1 : 0) +
+        return (
+            (selectedDurationId.value !== null ? 1 : 0) +
             (selectedMealId.value !== null ? 1 : 0) +
             (selectedTypeId.value !== null ? 1 : 0) +
             selectedAllergyIds.value.length +
-            (shouldRespectDislikedIngredients.value ? 1 : 0));
+            (shouldRespectDislikedIngredients.value ? 1 : 0)
+        );
     };
 
     watch(user, (newUser) => {
         if (!newUser) {
             userDislikedIngredientIds.value = [];
+            savedRecipeIds.value = [];
+            triedRecipeIds.value = [];
         }
     });
 
     return {
-        search, allergenSearch, getActiveFilterCount, activeTab, selectedDurationId,
-        selectedMealId, selectedTypeId, mealOptions, typeOptions, durationOptions,
-        durationCategories, activeDuration, tabRecipes, filteredRecipes,
-        hasActiveFilters, clearFilters, loadCategories, respectDislikedIngredients,
-        userDislikedIngredientIds, loadUserDislikedIngredientIds, allAllergies,
-        selectedAllergyIds, selectedAllergyPills, filteredAllergyPills, loadAllergies,
-        removeSelectedAllergy, addSelectedAllergy
+        search,
+        allergenSearch,
+        getActiveFilterCount,
+        activeTab,
+        selectedDurationId,
+        selectedMealId,
+        selectedTypeId,
+        mealOptions,
+        typeOptions,
+        durationOptions,
+        durationCategories,
+        activeDuration,
+        tabRecipes,
+        filteredRecipes,
+        hasActiveFilters,
+        clearFilters,
+        loadCategories,
+        respectDislikedIngredients,
+        userDislikedIngredientIds,
+        loadUserDislikedIngredientIds,
+        allAllergies,
+        selectedAllergyIds,
+        selectedAllergyPills,
+        filteredAllergyPills,
+        loadAllergies,
+        removeSelectedAllergy,
+        addSelectedAllergy,
+        savedRecipeIds,
+        triedRecipeIds,
+        setSavedRecipeIds,
+        setTriedRecipeIds,
+        toggleSaved,
+        toggleTried
     };
 });

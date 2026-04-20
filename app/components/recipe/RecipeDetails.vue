@@ -2,10 +2,29 @@
 import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
 import Pills from "../Pills.vue";
 import type Recipe from "~/models/Recipe";
+import { useRecipeFilterStore } from "~/stores/recipeFilters";
+import { useRecipeStore } from "~/stores/recipe";
+const filterStore = useRecipeFilterStore();
+const recipeStore = useRecipeStore();
 
 defineProps<{
     recipe: Recipe
 }>();
+
+const route = useRoute();
+const recipeId = computed(() => Number(route.params.id));
+
+const currentRecipe = computed(() =>
+    recipeStore.getRecipeById(recipeId.value)
+);
+
+const isSaved = computed(() =>
+    currentRecipe.value ? filterStore.savedRecipeIds.includes(currentRecipe.value.id) : false
+);
+
+const isTried = computed(() =>
+    currentRecipe.value ? filterStore.triedRecipeIds.includes(currentRecipe.value.id) : false
+);
 </script>
 <template>
     <div class="container py-5">
@@ -21,7 +40,7 @@ defineProps<{
                             <span><i class="bi bi-share"></i></span>
                             <div>
                                 <span><i class="bi bi-pencil-square"></i></span>
-                                <span><i class="bi bi-bookmark-plus"></i></span>
+                                <span><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
                         <img src="/images/background.webp" class="img-fluid rounded w-100" alt="Recept képe" />
@@ -42,14 +61,25 @@ defineProps<{
                 </section>
             </section>
             <aside class="recipe-aside">
-                <div class="recipeButtons">
+                <div class="recipeButtons mb-5">
                     <ClientOnly>
-                        <Button iconPosition="right" class="w-100 mb-3" outline>
-                            Kipróbálatlan
-                        </Button>
-                        <Button to="/recipes" color="green" class="mb-3" icon="bi bi-plus-circle" iconPosition="left">
-                            Hozzáadás menühöz...
-                        </Button>
+                        <div class="d-flex flex-column gap-3 my-3">
+                            <Button to="/recipes" color="green" icon="bi bi-plus-circle" iconPosition="left">
+                                Hozzáadás menühöz...
+                            </Button>
+
+                            <div class="d-flex gap-3">
+                                <Button v-if="currentRecipe" iconPosition="left" class="w-100" color="yellow"
+                                    :outline="!isTried" :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'"
+                                    @click="filterStore.toggleTried(currentRecipe.id)">
+                                    {{ isTried ? 'Kipróbált' : 'Kipróbálom' }}
+                                </Button>
+                                <Button v-if="currentRecipe" type="button" class="w-100" color="orange" :outline="!isSaved"
+                                    :icon="isSaved ? 'bi bi-star-fill' : 'bi bi-star'" @click="filterStore.toggleSaved(currentRecipe.id)">
+                                    {{ isSaved ? 'Kedvelt' : 'Kedvelem' }}
+                                </Button>
+                            </div>
+                        </div>
                     </ClientOnly>
                 </div>
 

@@ -159,7 +159,7 @@ const handleTabClick = (tab: any) => {
                 </p>
                 <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
                 :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                    Új recept hozzáadása
+                    Új, saját recept felvétele
                 </Button>
             </div>
 

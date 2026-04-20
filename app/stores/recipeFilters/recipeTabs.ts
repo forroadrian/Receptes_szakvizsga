@@ -3,22 +3,22 @@ type RecipeTab = "default" | "own" | "saved" | "tried" | "ai";
 export const getTabRecipes = (
     allRecipes: any[],
     activeTab: RecipeTab,
-    userId?: string
+    userId?: string,
+    savedRecipeIds: number[] = [],
+    triedRecipeIds: number[] = []
 ) => {
     switch (activeTab) {
         case "default":
             return allRecipes.filter(recipe => recipe.author_id === null);
 
         case "own":
-            return allRecipes.filter(recipe => {
-                return String(recipe.author_id) === String(userId);
-            });
+            return allRecipes.filter(recipe => recipe.author_id === userId);
 
         case "saved":
-            return [];
+            return allRecipes.filter(recipe => savedRecipeIds.includes(recipe.id));
 
         case "tried":
-            return [];
+            return allRecipes.filter(recipe => triedRecipeIds.includes(recipe.id));
 
         case "ai":
             return [];
