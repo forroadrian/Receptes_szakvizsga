@@ -3,11 +3,15 @@ import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfa
 import { ref } from 'vue';
 import { computed } from 'vue';
 
-const user = useSupabaseUser()
+const user = useSupabaseUser();
 
 const ingredientsButtonTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
 })
+
+const goToRecipes = (mealName: string) => {
+    navigateTo(`/recipes?meal=${mealName}`);
+};
 
 const categories = [
     {
@@ -102,7 +106,7 @@ const cards = ref([
                 </p>
                 <div class="row meal-grid justify-content-center g-0">
                     <div class="col-12 col-sm-6 col-lg" v-for="item in categories" :key="item.name">
-                        <div class="meal-card">
+                        <div class="meal-card" @click="goToRecipes(item.name)">
                             <div class="category-icon">
                                 <i :class="item.icon"></i>
                             </div>

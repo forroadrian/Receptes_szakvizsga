@@ -6,6 +6,9 @@ import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import Pills from "~/components/Pills.vue";
 
+const route = useRoute();
+const router = useRouter();
+
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
 const user = useSupabaseUser();
@@ -14,11 +17,61 @@ const isHydrated = ref(false);
 
 onMounted(async() => {
     isHydrated.value = true;
-    if (user.value) {
-        await allergyWarnings.loadUserAllergies();
-        await filterStore.loadUserDislikedIngredientIds();
-    }
+    if (!recipeStore.getAllRecipes().length) {
+    await recipeStore.loadRecipes();
+  }
+
+  if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
+    await filterStore.loadCategories();
+  }
+
+  if (!filterStore.allAllergies.length) {
+    await filterStore.loadAllergies();
+  }
+
+  if (user.value) {
+    await allergyWarnings.loadUserAllergies();
+    await filterStore.loadUserDislikedIngredientIds();
+  }
+
+  const mealName = String(route.query.meal ?? "").toLowerCase();
+  const typeName = String(route.query.type ?? "").toLowerCase();
+  const duration = Number(route.query.duration);
+
+  if (!mealName && !typeName && !route.query.duration) {
+    filterStore.clearFilters();
+    return;
+  }
+
+  const meal = filterStore.mealOptions.find((m) => m.name.toLowerCase() === mealName);
+  const type = filterStore.typeOptions.find((t) => t.name.toLowerCase() === typeName);
+
+  filterStore.selectedMealId = meal ? meal.id : null;
+  filterStore.selectedTypeId = type ? type.id : null;
+  filterStore.selectedDurationId = !Number.isNaN(duration) && duration > 0 ? duration : null;
+
+  filterStore.activeTab = "default";
 });
+
+watch(() => [filterStore.selectedMealId,filterStore.selectedTypeId, filterStore.selectedDurationId],
+  () => {
+    const meal = filterStore.mealOptions.find((m) => m.id === filterStore.selectedMealId);
+
+    const type = filterStore.typeOptions.find((t) => t.id === filterStore.selectedTypeId);
+
+    const query: Record<string, string> = {};
+
+    if (meal) {query.meal = meal.name;}
+
+    if (type) {query.type = type.name;}
+
+    if (filterStore.selectedDurationId !== null) {
+      query.duration = String(filterStore.selectedDurationId);
+    }
+
+    router.replace({ query });
+  }
+);
 
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 
@@ -29,18 +82,6 @@ const needsLoginForTab = computed(() => {
 const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
-
-if (!recipeStore.getAllRecipes().length) {
-    await recipeStore.loadRecipes();
-}
-
-if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
-    await filterStore.loadCategories();
-}
-
-if (!filterStore.allAllergies.length) {
-    await filterStore.loadAllergies();
-}
 </script>
 <template>
     <RecipeModal />
