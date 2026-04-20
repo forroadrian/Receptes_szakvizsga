@@ -11,6 +11,7 @@
     "gen:supabase": "supabase gen types typescript --project-id dlgyajctuldutapmkezz > app/types/database.types.ts"
   },
   "dependencies": {
+    "@nuxt/fonts": "^0.14.0",
     "@nuxt/image": "^2.0.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/supabase": "^2.0.4",
@@ -27,6 +28,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "nuxt-vitalizer": "^2.0.0",
     "supabase": "^2.83.0"
   }
 }

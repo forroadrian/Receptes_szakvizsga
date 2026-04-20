@@ -17,7 +17,13 @@ const toggleTheme = () => {
     <header class="auth-topbar">
         <div class="auth-topbar-inner">
             <NuxtLink to="/" class="auth-brand" aria-label="Vissza a kezdőlapra">
-                <img src="/logo.png" alt="Receptes logó" title="Receptes logó" class="auth-brand-logo" />
+                <NuxtImg src="/logo.png" alt="Receptes logó" title="Receptes logó" 
+                :width="180" 
+                :height="128" 
+                format="webp" 
+                loading="lazy" 
+                densities="x1 x2"
+                class="auth-brand-logo" />
 
                 <div class="auth-brand-copy">
                     <span class="auth-brand-title">Menuplanr</span>

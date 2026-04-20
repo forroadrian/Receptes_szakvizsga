@@ -10,7 +10,7 @@ const scrollTop = () => {
         <div class="container pt-5">
             <div class="row g-4 align-items-start text-center text-lg-start">
                 <div class="col-lg-5 col-md-12 col-sm-12">
-                    <img src="/logo.png" alt="Logo" class="footer-logo mb-3" />
+                    <NuxtImg src="/logo.png" alt="Menu Planr" :width="180" :height="128" format="webp" loading="lazy" densities="x1 x2" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit!
                     </p>

@@ -77,7 +77,13 @@ const handleSignOut = async () => {
         <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
-                    <img src="/logo.png" alt="Brand logo" title="Brand logo" class="brand-logo" />
+                    <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" 
+                        :width="180" 
+                        :height="128" 
+                        format="webp" 
+                        loading="lazy" 
+                        densities="x1 x2" 
+                        class="brand-logo" />
                 </NuxtLink>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"

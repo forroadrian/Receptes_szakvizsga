@@ -20,7 +20,10 @@ export default defineNuxtConfig({
         '~/assets/css/auth.css',
         '~/assets/css/profile.css'
     ],
-    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt'],
+    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt', 'nuxt-vitalizer', '@nuxt/fonts'],
+    vitalizer: {
+        // disableStylesheets: 'entry'
+    },
     colorMode: {
         preference: 'light',
         fallback: 'light',

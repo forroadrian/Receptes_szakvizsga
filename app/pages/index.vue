@@ -233,8 +233,8 @@ const cards = ref([
             <div class="row align-items-center">
                 <div class="col-12 col-lg-6">
                     <div class="about-image-wrapper d-flex justify-content-center">
-                        <img src="/images/clock-plate.png" alt="Alapanyagok tányéron" title="ingredients-in-plate"
-                            class="about-image" />
+                        <NuxtImg src="/images/clock-plate.png" alt="Alapanyagok tányéron" title="Alapanyagok egy tányéron"
+                            class="about-image" :width="500" :height="500" format="webp" preload loading="eager" fetchpriority="high" densities="x1 x1" />
                     </div>
                 </div>
                 <div class="col-12 col-lg-6 about-content">
