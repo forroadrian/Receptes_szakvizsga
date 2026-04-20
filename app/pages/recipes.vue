@@ -116,7 +116,8 @@ if (!filterStore.allAllergies.length) {
                 <p class="mb-0 fw-bold py-3">
                     Nincs a szűrésnek megfelelő recept!
                 </p>
-                <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3">
+                <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
+                :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
                     Új recept hozzáadása
                 </Button>
             </div>
@@ -143,10 +144,11 @@ if (!filterStore.allAllergies.length) {
                             </template>
 
                             <template #header>
-                                <CardHeader class="w-100 py-3 justify-content-center">
+                                <CardHeader class="w-100 card-header my-4" :class="{ 'pt-5': filterStore.activeTab !== 'default' }">
                                     <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
                                     <template #actions>
-                                        <span title="User">👤</span>
+                                        <span title="User" class="top-0 start-50 translate-middle" v-if="filterStore.activeTab === 'own'"><i class="bi bi-file-earmark-person fs-4"></i></span>
+                                        <span title="User" class="top-0 start-50 translate-middle" v-if="filterStore.activeTab === 'saved'"><i class="bi bi-bookmark-check"></i></span>
                                     </template>
                                 </CardHeader>
                             </template>
@@ -294,12 +296,19 @@ if (!filterStore.allAllergies.length) {
     padding: 0 10px;
 }
 
+.card-header, .offcanvas-filters .form-check-input[type="radio"] {
+    position: relative;
+}
+
+.card-header span{
+    position: absolute;
+}
+
 .offcanvas-filters .form-check-input[type="radio"] {
   appearance: none;
   width: 20px;
   height: 20px;
   border: 2px solid var(--pill-border);
-  position: relative;
   transition: .3s;
 }
 
@@ -357,10 +366,12 @@ if (!filterStore.allAllergies.length) {
 .filter-count {
     font-weight: 700;
 }
+.filter-count, .card-header{
+    justify-content: center;
+}
 
 .filter-count {
     align-items: center;
-    justify-content: center;
     min-width: 20px;
     font-size: 12px;
     height: 20px;
