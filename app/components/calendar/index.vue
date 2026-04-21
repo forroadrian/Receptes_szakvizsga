@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-const month = ref<number>(0)
-const year = ref<number>(0)
-const today = ref<number>(0)
+const month = ref(0)
+const year = ref(0)
+const today = ref(0)
 
 const ROWS = 5
 const PER_ROW = 7
@@ -10,6 +10,7 @@ const PER_ROW = 7
 const currentDate = computed(() => new Date(year.value, month.value))
 const prevMonth = computed(() => new Date(year.value, month.value,0))
 const firstDay = computed(() => currentDate.value.getDay() - 1)
+
 const convertedDays = ref<{
     bleed: {
         [index: number]: number
@@ -32,8 +33,6 @@ const onChanged = (p_month: number, p_year: number) => {
     today.value = new Date(Date.now()).getDate();
 }
 
-let dayCache = 0;
-
 const calculateDays = () => {
     const ALL_DAYS = ROWS * PER_ROW;
     let bleed = true;
@@ -55,8 +54,10 @@ const calculateDays = () => {
 
 const isToday = (day: number | undefined) => {
     if (!day) return false;
-
-    return today.value == day
+    
+    if(today.value == day){
+        return true
+    }
 }
 
 const getDay = (row: number, column: number) => (row-1) * 7 + column
@@ -79,7 +80,12 @@ onMounted(() => {
             <p>V</p>
         </div>
         <div class="d-flex justify-content-between" v-for="row in ROWS">
-            <CalendarCell v-for="column in PER_ROW" :day="convertedDays.all[getDay(row, column)]" :weekday="column%7" :overflow="typeof(convertedDays.bleed[getDay(row, column)]) == 'number'" :active="isToday(convertedDays.normal[getDay(row, column)])"></CalendarCell>
+            <CalendarCell v-for="column in PER_ROW" 
+                :day="convertedDays.all[getDay(row, column)]" 
+                :weekday="column%7" 
+                :overflow="typeof(convertedDays.bleed[getDay(row, column)]) == 'number'" 
+                :active="isToday(convertedDays.normal[getDay(row, column)])"
+                @click=""/>
         </div>
     </section>
 </template>
