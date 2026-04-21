@@ -218,6 +218,9 @@ const handleSignOut = async () => {
 </template>
 
 <style scoped>
+.dropdown-menu :active{
+    background-color: var(--yellow);
+}
 .dropdown button,
 .dropdown-menu {
     border: none !important;
@@ -257,7 +260,7 @@ const handleSignOut = async () => {
     width: 100%;
 }
 
-.nav-link.router-link-exact-active {
+.nav-link.router-link-exact-active, .dropdown-menu :active{
     font-weight: 700;
     color: var(--dark);
 }
