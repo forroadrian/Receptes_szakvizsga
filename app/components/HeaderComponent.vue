@@ -35,6 +35,10 @@ const ingredientsNavTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
 });
 
+const menuPlannerNavTo = computed(() => {
+    return user.value ? "/menu" : "/login"
+});
+
 const displayProfileImage = computed(() => {
     return authStore.profileUrl || '/icons/profile.png'
 })
@@ -103,7 +107,7 @@ const handleSignOut = async () => {
                             <NuxtLink class="nav-link" :to="ingredientsNavTo">Alapanyagok</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/menu">Menütervező</NuxtLink>
+                            <NuxtLink class="nav-link" :to="menuPlannerNavTo">Menütervező</NuxtLink>
                         </li>
                     </ul>
 

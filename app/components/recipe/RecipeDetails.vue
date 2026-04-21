@@ -6,6 +6,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeStore } from "~/stores/recipe";
 const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
+const user = useSupabaseUser();
 
 defineProps<{
     recipe: Recipe
@@ -25,6 +26,16 @@ const isSaved = computed(() =>
 const isTried = computed(() =>
     currentRecipe.value ? filterStore.triedRecipeIds.includes(currentRecipe.value.id) : false
 );
+const addRecipeToMenu = computed(() => {
+    return user.value ? "/menu" : "/login"
+});
+
+const requireAuth = () => {
+if (!user.value) {navigateTo('/login') 
+    return false
+}
+  return true
+}
 </script>
 <template>
     <div class="container py-5">
@@ -64,18 +75,18 @@ const isTried = computed(() =>
                 <div class="recipeButtons mb-5">
                     <ClientOnly>
                         <div class="d-flex flex-column gap-3 my-3">
-                            <Button to="/recipes" color="green" icon="bi bi-plus-circle" iconPosition="left">
+                            <Button :to="addRecipeToMenu" color="green" icon="bi bi-plus-circle" iconPosition="left">
                                 Hozzáadás menühöz...
                             </Button>
 
                             <div class="d-flex gap-3">
-                                <Button v-if="currentRecipe" iconPosition="left" class="w-100" color="yellow"
-                                    :outline="!isTried" :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'"
-                                    @click="filterStore.toggleTried(currentRecipe.id)">
+                                <Button v-if="currentRecipe" class="w-100" color="yellow" :outline="!isTried"
+                                :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="requireAuth() && filterStore.toggleTried(currentRecipe.id)">
                                     {{ isTried ? 'Kipróbált' : 'Kipróbálom' }}
                                 </Button>
-                                <Button v-if="currentRecipe" type="button" class="w-100" color="orange" :outline="!isSaved"
-                                    :icon="isSaved ? 'bi bi-star-fill' : 'bi bi-star'" @click="filterStore.toggleSaved(currentRecipe.id)">
+
+                                <Button v-if="currentRecipe" class="w-100" color="orange" :outline="!isSaved" :icon="isSaved ? 'bi bi-star-fill' : 'bi bi-star'"
+                                @click="requireAuth() && filterStore.toggleSaved(currentRecipe.id)">
                                     {{ isSaved ? 'Kedvelt' : 'Kedvelem' }}
                                 </Button>
                             </div>
