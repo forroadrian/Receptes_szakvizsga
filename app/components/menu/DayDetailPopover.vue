@@ -44,19 +44,19 @@ const formatTime = (iso: string) =>
         minute: "2-digit",
     }).format(new Date(iso));
 
-const ensureModalInstance = async () => {
+const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
     if (!modalElRef.value) return null;
-    const { Modal } = await import("bootstrap");
-    modalInstance = Modal.getOrCreateInstance(modalElRef.value);
+    const bs = (window as any).bootstrap;
+    if (!bs?.Modal) return null;
+    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
     return modalInstance;
 };
 
 const open = async (targetDateKey: string) => {
     dateKey.value = targetDateKey;
     missingList.value = [];
-    const inst = await ensureModalInstance();
-    inst?.show();
+    ensureModalInstance()?.show();
 
     isLoadingMissing.value = true;
     try {
