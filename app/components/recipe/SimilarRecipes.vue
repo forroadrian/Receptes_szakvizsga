@@ -55,7 +55,7 @@ const items = computed(() => {
                 media-left-class="similar-recipes-media" content-class="similar-recipes-content" header-class="w-100">
                 <template #media>
                     <div class="similar-recipes-image">
-                        <img src="/assets/icons/peking-duck.png" alt="Recept kép">
+                        <img src="/icons/peking-duck.png" alt="Recept kép">
                     </div>
                 </template>
                 <template #header>
