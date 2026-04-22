@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Modal } from "bootstrap";
 import { computed, onMounted, ref, watch } from "vue";
 import { useMenuStore } from "~/stores/menu";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
@@ -10,7 +9,7 @@ const recipeStore = useRecipeStore();
 const user = useSupabaseUser();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: Modal | null = null;
+let modalInstance: any = null;
 
 const targetDate = ref<string>("");
 const activeTab = ref<"own" | "public">("own");
@@ -108,12 +107,21 @@ const resetState = (dateKey: string) => {
     errorMessage.value = "";
 };
 
+const ensureModalInstance = async () => {
+    if (modalInstance) return modalInstance;
+    if (!modalElRef.value) return null;
+    const { Modal } = await import("bootstrap");
+    modalInstance = Modal.getOrCreateInstance(modalElRef.value);
+    return modalInstance;
+};
+
 const openFor = async (dateKey: string) => {
     if (!recipeStore.getAllRecipes().length) {
         await recipeStore.loadRecipes();
     }
     resetState(dateKey);
-    modalInstance?.show();
+    const inst = await ensureModalInstance();
+    inst?.show();
 };
 
 const close = () => modalInstance?.hide();
@@ -141,9 +149,7 @@ const handleSave = async () => {
 };
 
 onMounted(() => {
-    if (modalElRef.value) {
-        modalInstance = Modal.getOrCreateInstance(modalElRef.value);
-    }
+    ensureModalInstance();
 });
 
 watch(hasExistingMenus, (has) => {
@@ -156,12 +162,11 @@ defineExpose({ openFor });
 </script>
 
 <template>
-    <ClientOnly>
-        <div
-            id="recipeAddModal"
-            ref="modalElRef"
-            class="modal fade"
-            tabindex="-1"
+    <div
+        id="recipeAddModal"
+        ref="modalElRef"
+        class="modal fade"
+        tabindex="-1"
             aria-labelledby="recipeAddModalLabel"
             aria-hidden="true"
         >
@@ -348,7 +353,6 @@ defineExpose({ openFor });
                 </div>
             </div>
         </div>
-    </ClientOnly>
 </template>
 
 <style scoped>

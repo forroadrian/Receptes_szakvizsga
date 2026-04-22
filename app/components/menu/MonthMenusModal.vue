@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Modal } from "bootstrap";
 import { computed, onMounted, ref } from "vue";
 import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore, type MenuItem } from "~/stores/menu";
@@ -12,7 +11,7 @@ const emit = defineEmits<{
 const menuStore = useMenuStore();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: Modal | null = null;
+let modalInstance: any = null;
 
 const year = ref<number>(new Date().getFullYear());
 const month = ref<number>(new Date().getMonth());
@@ -107,26 +106,32 @@ const onDelete = async (menuId: number) => {
     }
 };
 
-const open = (targetYear: number, targetMonth: number) => {
+const ensureModalInstance = async () => {
+    if (modalInstance) return modalInstance;
+    if (!modalElRef.value) return null;
+    const { Modal } = await import("bootstrap");
+    modalInstance = Modal.getOrCreateInstance(modalElRef.value);
+    return modalInstance;
+};
+
+const open = async (targetYear: number, targetMonth: number) => {
     year.value = targetYear;
     month.value = targetMonth;
-    modalInstance?.show();
+    const inst = await ensureModalInstance();
+    inst?.show();
 };
 
 onMounted(() => {
-    if (modalElRef.value) {
-        modalInstance = Modal.getOrCreateInstance(modalElRef.value);
-    }
+    ensureModalInstance();
 });
 
 defineExpose({ open });
 </script>
 
 <template>
-    <ClientOnly>
-        <div
-            id="monthMenusModal"
-            ref="modalElRef"
+    <div
+        id="monthMenusModal"
+        ref="modalElRef"
             class="modal fade"
             tabindex="-1"
             aria-labelledby="monthMenusModalLabel"
@@ -242,7 +247,6 @@ defineExpose({ open });
                 </div>
             </div>
         </div>
-    </ClientOnly>
 </template>
 
 <style scoped>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Modal } from "bootstrap";
 import { computed, onMounted, ref } from "vue";
 import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore, type MenuItem } from "~/stores/menu";
@@ -16,7 +15,7 @@ const menuStore = useMenuStore();
 const missing = useMissingIngredients();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: Modal | null = null;
+let modalInstance: any = null;
 
 const dateKey = ref<string>("");
 const missingList = ref<MissingIngredient[]>([]);
@@ -45,10 +44,19 @@ const formatTime = (iso: string) =>
         minute: "2-digit",
     }).format(new Date(iso));
 
+const ensureModalInstance = async () => {
+    if (modalInstance) return modalInstance;
+    if (!modalElRef.value) return null;
+    const { Modal } = await import("bootstrap");
+    modalInstance = Modal.getOrCreateInstance(modalElRef.value);
+    return modalInstance;
+};
+
 const open = async (targetDateKey: string) => {
     dateKey.value = targetDateKey;
     missingList.value = [];
-    modalInstance?.show();
+    const inst = await ensureModalInstance();
+    inst?.show();
 
     isLoadingMissing.value = true;
     try {
@@ -89,19 +97,16 @@ const handleAdd = () => {
 };
 
 onMounted(() => {
-    if (modalElRef.value) {
-        modalInstance = Modal.getOrCreateInstance(modalElRef.value);
-    }
+    ensureModalInstance();
 });
 
 defineExpose({ open });
 </script>
 
 <template>
-    <ClientOnly>
-        <div
-            id="dayDetailModal"
-            ref="modalElRef"
+    <div
+        id="dayDetailModal"
+        ref="modalElRef"
             class="modal fade"
             tabindex="-1"
             aria-labelledby="dayDetailModalLabel"
@@ -262,7 +267,6 @@ defineExpose({ open });
                 </div>
             </div>
         </div>
-    </ClientOnly>
 </template>
 
 <style scoped>
