@@ -6,13 +6,8 @@ const authStore = useAuthStore()
 const user = useSupabaseUser();
 
 const isLoggedIn = computed(() => !!user.value);
-const selectedLanguage = ref("hu");
 const colorMode = useColorMode()
 
-const languageOptions = [
-    { value: "hu", label: "Magyar" },
-    { value: "en", label: "English" }
-]
 
 const isReady = ref(false)
 onMounted(async () => {
@@ -128,28 +123,7 @@ const handleSignOut = async () => {
                     </div>
 
                     <div v-else class="auth-area">
-                        <div class="dropdown lang-dropdown mx-auto">
-                            <button class="btn lang-btn dropdown-toggle d-flex align-items-center gap-2" type="button"
-                                data-bs-toggle="dropdown">
-                                <img :src="selectedLanguage === 'hu' ? '/icons/hu.svg' : '/icons/gb.svg'"
-                                    class=" flag-icon" width="22" height="16" alt="flag" />
-
-                                <span class="fw-semibold">
-                                    {{ selectedLanguage === 'hu' ? 'Magyar' : 'English' }}
-                                </span>
-                            </button>
-
-                            <ul class="dropdown-menu rounded-4 shadow-sm">
-                                <li v-for="lang in languageOptions">
-                                    <span class="dropdown-item lang-item d-flex align-items-center gap-2 rounded-3"
-                                        @click="selectedLanguage = lang.value">
-                                        <img :src="lang.value === 'hu'
-                                            ? '/icons/hu.svg' : '/icons/gb.svg'" class=" flag-icon" alt="flag" />
-                                        <span>{{ lang.label }}</span>
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
+                        <LanguageSwitcher />
 
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
@@ -390,12 +364,7 @@ const handleSignOut = async () => {
     text-align: center;
 }
 
-.flag-icon {
-    width: 22px;
-    height: 16px;
-    object-fit: cover;
-    border-radius: 4px;
-}
+
 
 .lang-btn {
     border-radius: var(--radius-sm);
