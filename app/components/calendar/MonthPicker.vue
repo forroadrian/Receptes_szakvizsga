@@ -1,6 +1,5 @@
 <script setup lang="ts">
-
-const months = [
+const HUNGARIAN_MONTHS = [
     "Január",
     "Február",
     "Március",
@@ -12,52 +11,63 @@ const months = [
     "Szeptember",
     "Október",
     "November",
-    "December"
+    "December",
 ];
 
 const props = withDefaults(
-    defineProps<{ is?: string }>(),
-    { is: 'h3' }
+    defineProps<{
+        year: number;
+        month: number;
+        is?: string;
+    }>(),
+    { is: "h3" }
 );
 
-const emit = defineEmits(['changed']);
-
-const today: Date = new Date()
-const currentMonth = ref(today.getMonth());
-const currentYear = ref(today.getFullYear());
-
-const increment = (amt: number) => {
-    currentMonth.value += amt;
-    if (currentMonth.value > 11) {
-        currentMonth.value = 0;
-        currentYear.value++;
-    }
-    emit('changed',currentMonth.value, currentYear.value);
-}
-
-const decrement = (amt: number) => {
-    currentMonth.value -= amt;
-    if (currentMonth.value < 0) {
-        currentMonth.value = 11;
-        currentYear.value--;
-    }
-    emit('changed',currentMonth.value, currentYear.value);
-}
-
-onMounted(() => {
-    emit('changed',currentMonth.value, currentYear.value)
-})
-
+const emit = defineEmits<{
+    (e: "prev"): void;
+    (e: "next"): void;
+    (e: "today"): void;
+}>();
 </script>
+
 <template>
-    <component class="text-center d-flex justify-content-center" :is="is">
-        <i class="bi bi-arrow-left me-3" @click="decrement(1)"></i>
-        <span class="month text-truncate">{{currentYear}}. {{ months[currentMonth] }}</span>
-        <i class="bi bi-arrow-right ms-3" @click="increment(1)"></i>
+    <component :is="is" class="month-picker d-flex align-items-center justify-content-center gap-3 mb-3">
+        <button type="button" class="nav-btn" aria-label="Előző hónap" @click="emit('prev')">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <span class="month text-truncate">{{ year }}. {{ HUNGARIAN_MONTHS[month] }}</span>
+        <button type="button" class="nav-btn" aria-label="Következő hónap" @click="emit('next')">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+        <button type="button" class="today-btn ms-2" @click="emit('today')">Ma</button>
     </component>
 </template>
+
 <style scoped>
 .month {
-    width: 16rem;
+    min-width: 10rem;
+    text-align: center;
+}
+
+.nav-btn,
+.today-btn {
+    background: none;
+    border: none;
+    color: var(--bs-emphasis-color);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+    transition: background-color 0.15s ease-in;
+    cursor: pointer;
+}
+
+.nav-btn:hover,
+.today-btn:hover {
+    background-color: var(--accent-soft);
+}
+
+.today-btn {
+    font-size: var(--small-text);
+    font-weight: 600;
+    border: 1px solid var(--pill-border);
 }
 </style>

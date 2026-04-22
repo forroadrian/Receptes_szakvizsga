@@ -542,6 +542,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_missing_ingredient_counts_for_range: {
+        Args: { p_from: string; p_to: string; p_user_id: string }
+        Returns: {
+          day: string
+          missing_count: number
+        }[]
+      }
+      get_missing_ingredients_for_day: {
+        Args: { p_day: string; p_user_id: string }
+        Returns: {
+          has_expired_stock: boolean
+          ingredient_id: number
+          ingredient_name: string
+          required_quantity: number
+          required_unit: Database["public"]["Enums"]["unit"]
+        }[]
+      }
       get_recommended_ingredients: {
         Args: { p_user_id: string }
         Returns: {

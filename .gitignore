@@ -26,8 +26,17 @@ logs
 !.env.example
 .vercel
 .env*.local
+<<<<<<< Updated upstream
 
 *.md
 .claude
 *.json
 *.sql
+=======
+CLAUDE.md
+mockups
+*.sql
+postman_collection.json
+*.md
+.claude
+>>>>>>> Stashed changes
