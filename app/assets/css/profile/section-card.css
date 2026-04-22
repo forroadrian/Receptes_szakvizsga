@@ -1,0 +1,22 @@
+.profile-page .section-title {
+    position: relative;
+}
+
+.profile-page .section-title::after,
+.profile-page .menu .list-group-item.active::before {
+    content: "";
+    background: var(--accent-grad);
+}
+
+.profile-page .section-title::after {
+    position: absolute;
+    bottom: 0;
+    width: 180px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.profile-page .section-title h2 {
+    font-size: 2.3rem;
+    line-height: 1.2;
+}

@@ -1,0 +1,105 @@
+.chip-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+}
+
+.profile-page .profile-chip {
+    border: 1px solid var(--profile-chip-border);
+    background: var(--profile-chip-bg);
+}
+
+.profile-page .profile-chip,
+.profile-page .profile-chip .chip-btn {
+    color: var(--profile-chip-color);
+}
+
+.profile-page .profile-chip-list-wrap {
+    position: relative;
+}
+
+.profile-page .profile-chip-measure-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.profile-page .profile-chip-overflow {
+    display: inline-flex;
+}
+
+.profile-page .profile-chip-overflow-trigger {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-page .profile-chip-overflow-trigger:hover,
+.profile-page .profile-chip-overflow-trigger:focus-visible,
+.profile-page .profile-chip-overflow-trigger[aria-expanded="true"] {
+    transform: translateY(-1px);
+    border-color: var(--profile-chip-trigger-border);
+    box-shadow: var(--profile-chip-trigger-shadow);
+}
+
+.profile-page .profile-chip-overflow-count {
+    font-weight: 700;
+}
+
+.profile-page .profile-chip-overflow-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 25;
+    width: min(320px, 78vw);
+    padding: 14px;
+    border: 1px solid var(--profile-chip-panel-border);
+    border-radius: 18px;
+    background: var(--profile-chip-panel-bg);
+    box-shadow: var(--profile-chip-panel-shadow);
+    backdrop-filter: blur(8px);
+}
+
+.profile-page .profile-chip-overflow-panel::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    right: 24px;
+    width: 14px;
+    height: 14px;
+    border-top: 1px solid var(--profile-chip-panel-border);
+    border-left: 1px solid var(--profile-chip-panel-border);
+    background: inherit;
+    transform: rotate(45deg);
+}
+
+.profile-page .profile-chip-overflow-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--profile-chip-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.profile-page .profile-chip-overflow-summary {
+    color: var(--profile-chip-summary-color);
+    white-space: nowrap;
+}
+
+.profile-page .profile-chip-overflow-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 2px;
+}
