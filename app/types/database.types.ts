@@ -504,17 +504,20 @@ export type Database = {
       user_recipe: {
         Row: {
           recipe_id: number
-          status: Database["public"]["Enums"]["recipe_status"] | null
+          saved: boolean | null
+          tried: boolean | null
           user_id: string
         }
         Insert: {
           recipe_id: number
-          status?: Database["public"]["Enums"]["recipe_status"] | null
+          saved?: boolean | null
+          tried?: boolean | null
           user_id: string
         }
         Update: {
           recipe_id?: number
-          status?: Database["public"]["Enums"]["recipe_status"] | null
+          saved?: boolean | null
+          tried?: boolean | null
           user_id?: string
         }
         Relationships: [
