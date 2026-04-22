@@ -1,45 +1,121 @@
-<script setup>
-const today = new Date(Date.now())
-const numberToDay = [
-    "Vasárnap",
-    "Hétfő",
-    "Kedd",
-    "Szerda",
-    "Csütörtök",
-    "Péntek",
-    "Szombat"
-]
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import { useMenuStore } from "~/stores/menu";
+import { useRecipeStore } from "~/stores/recipe";
+import { toBudapestDateKey } from "~/utils/budapestDate";
 
+definePageMeta({ middleware: "auth-only" });
 
+const menuStore = useMenuStore();
+const recipeStore = useRecipeStore();
+const user = useSupabaseUser();
+
+const calendarRef = ref<any>(null);
+const addModalRef = ref<any>(null);
+const monthModalRef = ref<any>(null);
+const dayDetailRef = ref<any>(null);
+
+onMounted(async () => {
+    if (!user.value) return;
+    const tasks: Promise<unknown>[] = [];
+    if (!menuStore.isLoaded) tasks.push(menuStore.loadMenus());
+    if (!recipeStore.getAllRecipes().length) tasks.push(recipeStore.loadRecipes());
+    await Promise.all(tasks);
+});
+
+const openAddModal = (dateKey: string) => {
+    addModalRef.value?.openFor(dateKey);
+};
+
+const openDayDetail = (dateKey: string) => {
+    dayDetailRef.value?.open(dateKey);
+};
+
+const openMonthModal = () => {
+    const now = new Date();
+    monthModalRef.value?.open(now.getFullYear(), now.getMonth());
+};
+
+const handleMenuClick = (menuId: number) => {
+    const menu = menuStore.menus.find((m) => m.id === menuId);
+    if (!menu) return;
+
+    if (menu.recipes.length === 1 && menu.recipes[0]) {
+        navigateTo(`/recipe/${menu.recipes[0].recipe_id}`);
+        return;
+    }
+    openDayDetail(toBudapestDateKey(menu.planned_date));
+};
+
+const handleJump = (dateKey: string) => {
+    calendarRef.value?.goToDate(dateKey);
+    openDayDetail(dateKey);
+};
 </script>
+
 <template>
-    <section class="row mb-4">
-        <div>
-            <h1>Menütervező</h1>
-            <p class="description">Tervezd meg az étkezéseidet néhány kattintással — ebéd, vacsora, desszert. A naptárból válaszd ki a napot, és adj hozzá menüt.</p>
-        </div>
-    </section>
-    <section class="row mb-4">
-        <div class="col-lg-4 col-12 border rounded-3 text-center mt-3 statistics">
-            <p class="fs-1 fw-bold mb-0">{{ today.getDate() }}</p>
-            <p class="fs-2 fw-semibold">{{ numberToDay[today.getDay()] }}</p>
-        </div>
-        <div class="col-lg-8 col-12 ps-5">
-            <Calendar @changed="" v-model:today-as-number="todayAsNumber" v-model:today-as-day="todayAsDay"></Calendar>
-        </div>
-    </section>
+    <section class="menu-page">
+        <div class="menu-shell mx-auto px-3 px-md-4 px-lg-5 py-4">
+            <header class="page-header mb-4">
+                <h1 class="page-title mb-2">Menütervező</h1>
+                <p class="page-subtitle mb-0">
+                    Tervezd meg az étkezéseidet, kövesd nyomon a hiányzó alapanyagokat, és
+                    érezd magad otthonosabban a konyhában.
+                </p>
+            </header>
 
+            <div class="row g-4">
+                <aside class="col-12 col-lg-4 order-lg-1 order-2">
+                    <MenuSidebar
+                        @jump="handleJump"
+                        @day-click="handleJump"
+                        @empty-click="openAddModal"
+                        @open-month="openMonthModal"
+                    />
+                </aside>
 
+                <section class="col-12 col-lg-8 order-lg-2 order-1">
+                    <MenuCalendar
+                        ref="calendarRef"
+                        @empty-click="openAddModal"
+                        @menu-click="handleMenuClick"
+                        @overflow-click="openDayDetail"
+                    />
+                </section>
+            </div>
+        </div>
+
+        <MenuRecipeAddModal ref="addModalRef" />
+        <MenuMonthMenusModal ref="monthModalRef" @jump="handleJump" />
+        <MenuDayDetailPopover ref="dayDetailRef" @add-recipe="openAddModal" />
+    </section>
 </template>
 
 <style scoped>
-.description {
-    width: 40%
+.menu-page {
+    min-height: 100%;
+    background: var(--bs-body-bg);
 }
 
-.statistics {
-    border-top: none !important;
-    -webkit-box-shadow: 1px 10px 22px 4px rgba(179,179,179,0.76); 
-    box-shadow: 1px 10px 22px 1px rgba(179,179,179,0.76);
+.menu-shell {
+    width: min(100%, 1320px);
+}
+
+.page-title {
+    font-family: "Caveat Brush", cursive;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    text-transform: uppercase;
+    color: var(--bs-emphasis-color);
+}
+
+.page-subtitle {
+    color: var(--bs-secondary-color);
+    max-width: 60ch;
+}
+
+@media (max-width: 991px) {
+    .page-subtitle {
+        font-size: var(--small-text);
+    }
 }
 </style>
