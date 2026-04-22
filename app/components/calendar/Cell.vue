@@ -9,23 +9,11 @@ const props = defineProps<{
     missingCount?: number;
 }>();
 
-<<<<<<< Updated upstream
-const props = withDefaults(defineProps<{
-    active?: boolean,
-    day?: number,
-    weekday: number,
-    overflow?: boolean,
-    recipes?: Recipe[]
-}>(),{
-    active: false,
-})
-=======
 const emit = defineEmits<{
     (e: "empty-click", dateKey: string): void;
     (e: "menu-click", menuId: number): void;
     (e: "overflow-click", dateKey: string): void;
 }>();
->>>>>>> Stashed changes
 
 const VISIBLE_LIMIT = 3;
 
@@ -43,11 +31,6 @@ const onOverflowClick = () => emit("overflow-click", props.cell.dateKey);
 </script>
 
 <template>
-<<<<<<< Updated upstream
-    <div class="cell border" :class="{'weekend': isWeekend, 'overflow': overflow}">
-        <div class="d-flex justify-content-end">
-            <p :class="[active ? 'active' : 'inactive']" class="m-2 p-1 day text-left">{{ day }}</p>
-=======
     <div
         class="cell"
         :class="{
@@ -94,7 +77,6 @@ const onOverflowClick = () => emit("overflow-click", props.cell.dateKey);
             <div v-if="!menus.length && cell.isCurrentMonth" class="empty-hint">
                 <i class="bi bi-plus-lg"></i>
             </div>
->>>>>>> Stashed changes
         </div>
     </div>
 </template>
