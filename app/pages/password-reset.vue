@@ -6,6 +6,7 @@ definePageMeta({
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
+const route = useRoute();
 const { validatePasswordReset } = useAuthValidation();
 
 const authStore = useAuthStore();
@@ -14,6 +15,7 @@ const supabase = useSupabaseClient();
 const password = ref('');
 const repassword = ref('');
 const recoveryReady = ref(false);
+const verifyingRecovery = ref(true);
 const submitAttempted = ref(false);
 const formRef = ref(null);
 
@@ -22,10 +24,26 @@ const passwordsMatch = computed(() => password.value === repassword.value);
 
 let authListener = null;
 
-const setCustomInputValidity = () => {
-    if (!formRef.value) {
-        return;
+const RECOVERY_FLAG = 'menuplanr_password_recovery_verified';
+
+const markRecoveryReady = () => {
+    recoveryReady.value = true;
+
+    if (process.client) {
+        sessionStorage.setItem(RECOVERY_FLAG, '1');
     }
+};
+
+const clearRecoveryReady = () => {
+    recoveryReady.value = false;
+
+    if (process.client) {
+        sessionStorage.removeItem(RECOVERY_FLAG);
+    }
+};
+
+const setCustomInputValidity = () => {
+    if (!formRef.value) return;
 
     const inputs = formRef.value.querySelectorAll("input.form-control");
     const passwordInput = inputs[0];
@@ -46,15 +64,83 @@ const setCustomInputValidity = () => {
 
 watch([password, repassword], setCustomInputValidity);
 
-onMounted(async () => {
+const prepareRecoverySession = async () => {
     authStore.clearMessages();
+    verifyingRecovery.value = true;
 
-    const { data } = await supabase.auth.getSession();
-    recoveryReady.value = !!data.session;
+    const code = typeof route.query.code === 'string' ? route.query.code : '';
+    const tokenHash = typeof route.query.token_hash === 'string' ? route.query.token_hash : '';
+    const type = typeof route.query.type === 'string' ? route.query.type : '';
+
+    try {
+        // Ha ugyanebben a tabban már sikeresen ellenőriztük a recovery linket,
+        // és még van session, maradjon használható az oldal.
+        if (process.client && sessionStorage.getItem(RECOVERY_FLAG) === '1') {
+            const { data: sessionData } = await supabase.auth.getSession();
+
+            if (sessionData.session) {
+                recoveryReady.value = true;
+                return;
+            }
+
+            sessionStorage.removeItem(RECOVERY_FLAG);
+        }
+
+        // token_hash alapú recovery
+        if (tokenHash && type === 'recovery') {
+            const { error } = await supabase.auth.verifyOtp({
+                token_hash: tokenHash,
+                type: 'recovery'
+            });
+
+            if (error) {
+                clearRecoveryReady();
+                authStore.errorMessage = 'A jelszó-visszaállító link lejárt vagy érvénytelen. Kérj új emailt.';
+                return;
+            }
+
+            markRecoveryReady();
+
+            if (process.client) {
+                window.history.replaceState({}, document.title, '/password-reset');
+            }
+
+            return;
+        }
+
+        // PKCE code fallback
+        if (code) {
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+            if (error) {
+                clearRecoveryReady();
+                authStore.errorMessage = 'A jelszó-visszaállító link lejárt vagy érvénytelen. Kérj új emailt.';
+                return;
+            }
+
+            markRecoveryReady();
+
+            if (process.client) {
+                window.history.replaceState({}, document.title, '/password-reset');
+            }
+
+            return;
+        }
+
+        clearRecoveryReady();
+        authStore.errorMessage = 'A jelszó-visszaállító link hiányzik vagy már nem érvényes. Kérj új emailt.';
+    } finally {
+        verifyingRecovery.value = false;
+    }
+};
+
+onMounted(async () => {
+    await prepareRecoverySession();
 
     const listener = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-            recoveryReady.value = true;
+        // FONTOS: csak recovery esemény oldja fel az oldalt
+        if (event === 'PASSWORD_RECOVERY') {
+            markRecoveryReady();
         }
     });
 
@@ -73,7 +159,7 @@ const onSubmit = async () => {
     setCustomInputValidity();
 
     if (!recoveryReady.value) {
-        authStore.clearMessages();
+        authStore.errorMessage = 'A jelszó-visszaállító link nem aktív vagy lejárt. Kérj új emailt.';
         return;
     }
 
@@ -88,9 +174,19 @@ const onSubmit = async () => {
         return;
     }
 
+    // Mentés előtt ténylegesen nézzük meg, hogy van-e session
+    const { data: sessionData } = await supabase.auth.getSession();
+
+    if (!sessionData.session) {
+        clearRecoveryReady();
+        authStore.errorMessage = 'A jelszó-visszaállító munkamenet megszűnt. Kérj új emailt.';
+        return;
+    }
+
     const success = await authStore.completePasswordReset(password.value);
 
     if (success) {
+        clearRecoveryReady();
         password.value = '';
         repassword.value = '';
         submitAttempted.value = false;
@@ -99,7 +195,7 @@ const onSubmit = async () => {
             formRef.value.reset();
         }
     }
-}
+};
 </script>
 
 <template>
@@ -110,8 +206,12 @@ const onSubmit = async () => {
                     <h1 class="fs-1">Új jelszó beállítása</h1>
                 </div>
 
-                <div v-if="!recoveryReady" class="alert alert-warning">
-                    A jelszó-visszaállító link megnyitása után itt tudod beállítani az új jelszavad.
+                <div v-if="verifyingRecovery" class="alert alert-info">
+                    A jelszó-visszaállító link ellenőrzése folyamatban...
+                </div>
+
+                <div v-else-if="!recoveryReady" class="alert alert-warning">
+                    A jelszó-visszaállító link nem aktív vagy lejárt. Kérj új emailt.
                 </div>
 
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
