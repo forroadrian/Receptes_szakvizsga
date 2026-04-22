@@ -20,7 +20,7 @@ export default defineNuxtConfig({
         '~/assets/css/auth.css',
         '~/assets/css/profile.css'
     ],
-    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt', 'nuxt-vitalizer', '@nuxt/fonts'],
+    modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt', 'nuxt-vitalizer', '@nuxt/fonts', '@nuxtjs/i18n'],
     vitalizer: {
         // disableStylesheets: 'entry'
     },
@@ -44,5 +44,19 @@ export default defineNuxtConfig({
             exclude: ['/', '/login', '/register'],
             saveRedirectToCookie: true,
         },
-    }
+    },
+    i18n: {
+        defaultLocale: 'hu',
+        strategy: 'no_prefix',          
+        locales: [
+            { code: 'hu', name: 'Magyar',  language: 'hu-HU', file: 'hu.json' },
+            { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
+        ],                    
+        detectBrowserLanguage: {
+            useCookie: true,
+            cookieKey: 'i18n_redirected',
+            redirectOn: 'no prefix',
+            fallbackLocale: 'hu',
+        },
+    },
 })
