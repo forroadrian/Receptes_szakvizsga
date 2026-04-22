@@ -1,0 +1,131 @@
+.profile-page .settings-options {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid var(--profile-settings-panel-border);
+    border-radius: 24px;
+    background: var(--profile-settings-panel-bg);
+}
+
+.profile-page .settings-option {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    overflow: hidden;
+    padding: 18px;
+    border: 1px solid var(--profile-settings-card-border);
+    border-radius: 20px;
+    background: var(--profile-settings-card-bg);
+    box-shadow: var(--profile-settings-card-shadow);
+    text-align: left;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.profile-page .settings-option::before {
+    content: "";
+    position: absolute;
+    top: -35px;
+    right: -35px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(214, 188, 142, 0.18), transparent 65%);
+    pointer-events: none;
+}
+
+.profile-page .settings-option::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    opacity: 0;
+    transform: translateX(-130%);
+    background: var(--profile-shine);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    pointer-events: none;
+}
+
+.profile-page .settings-option:hover {
+    transform: translateY(-3px);
+    border-color: var(--profile-settings-card-hover-border);
+    background: var(--profile-settings-card-hover-bg);
+    box-shadow: var(--profile-settings-card-hover-shadow);
+}
+
+.profile-page .settings-option:active {
+    transform: translateY(0);
+}
+
+.profile-page .settings-option-left,
+.profile-page .mobile-menu-card-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.profile-page .settings-option-left {
+    position: relative;
+    z-index: 1;
+    gap: 16px;
+}
+
+.profile-page .settings-option-text,
+.profile-page .mobile-menu-card-text {
+    min-width: 0;
+}
+
+.profile-page .settings-option-icon,
+.profile-page .settings-option-arrow,
+.profile-page .mobile-menu-card-icon,
+.profile-page .mobile-menu-card-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-page .settings-option-icon {
+    width: 54px;
+    min-width: 54px;
+    height: 54px;
+    border: 1px solid var(--profile-settings-icon-border);
+    border-radius: 18px;
+    background: var(--profile-settings-icon-bg);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-page .settings-option-left i {
+    color: var(--profile-settings-icon-color);
+    font-size: 1.35rem;
+}
+
+.profile-page .settings-option h5 {
+    margin-bottom: 4px;
+    color: var(--bs-emphasis-color);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.profile-page .settings-option-arrow {
+    position: relative;
+    z-index: 1;
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    border: 1px solid var(--profile-settings-arrow-border);
+    border-radius: 14px;
+    background: var(--profile-settings-arrow-bg);
+    color: var(--profile-settings-arrow-color);
+    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.profile-page .settings-option:hover .settings-option-arrow {
+    transform: translateX(3px);
+    border-color: var(--profile-settings-arrow-hover-border);
+    background: var(--profile-settings-arrow-hover-bg);
+    color: var(--profile-settings-arrow-hover-color);
+}

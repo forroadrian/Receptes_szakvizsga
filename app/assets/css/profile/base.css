@@ -1,0 +1,9 @@
+html {
+    scrollbar-gutter: stable;
+}
+
+html,
+body {
+    overflow-x: clip;
+    background: var(--bs-body-bg);
+}
