@@ -1,0 +1,25 @@
+.hero-title {
+    font-family: "Caveat Brush", cursive;
+    font-size: 3rem;
+    line-height: 1.05;
+    color: #f3f0ed;
+    -webkit-text-stroke: 1px #000000b9;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+}
+
+.hero-sub {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+    color: #594238;
+    opacity: 0.9;
+}
+
+
+[data-bs-theme="dark"] .hero-title {
+    color: #ffe9e2;
+}
+
+[data-bs-theme="dark"] .hero-sub {
+    color: #d4a890;
+}

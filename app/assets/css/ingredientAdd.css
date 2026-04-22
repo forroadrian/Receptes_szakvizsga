@@ -1,3 +1,4 @@
+@import url("./IngredientDefault.css");
 .page {
     width: 100vw;
     margin-left: calc(-50vw + 50%);
@@ -31,22 +32,6 @@
     bottom: 2rem;
     left: 2rem;
     right: 2rem;
-}
-
-.hero-title {
-    font-family: "Caveat Brush", cursive;
-    font-size: 3rem;
-    line-height: 1.05;
-    color: #251913;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-}
-
-.hero-sub {
-    font-family: "Poppins", sans-serif;
-    font-size: 0.9rem;
-    color: #594238;
-    opacity: 0.8;
 }
 
 .form-area {
@@ -631,14 +616,6 @@
 
 [data-bs-theme="dark"] .hero-overlay {
     background: linear-gradient(to top, #1a1412 0%, transparent 50%);
-}
-
-[data-bs-theme="dark"] .hero-title {
-    color: #ffe9e2;
-}
-
-[data-bs-theme="dark"] .hero-sub {
-    color: #d4a890;
 }
 
 [data-bs-theme="dark"] .field-input,
