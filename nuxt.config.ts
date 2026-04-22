@@ -24,6 +24,20 @@ export default defineNuxtConfig({
     vitalizer: {
         // disableStylesheets: 'entry'
     },
+    fonts: {
+        families: [
+            { name: 'Poppins', weights: [400, 500, 600, 700, 800], styles: ['normal'] },
+            { name: 'Caveat', weights: [600, 700], styles: ['normal'] },
+            { name: 'Caveat Brush', weights: [400], styles: ['normal'] },
+        ],
+        defaults: {
+            subsets: ['latin', 'latin-ext'],
+            fallbacks: {
+                'sans-serif': ['Segoe UI', 'Arial'],
+                cursive: ['Segoe Script', 'Brush Script MT'],
+            },
+        },
+    },
     colorMode: {
         preference: 'light',
         fallback: 'light',
