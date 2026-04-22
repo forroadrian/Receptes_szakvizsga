@@ -31,3 +31,4 @@ logs
 .claude
 *.json
 *.sql
+.playwright*

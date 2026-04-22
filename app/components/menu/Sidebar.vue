@@ -18,15 +18,14 @@ const emit = defineEmits<{
             @empty-click="(k) => emit('empty-click', k)"
         />
 
-        <Button
-            outline
-            icon="bi bi-grid-3x3-gap"
-            icon-position="left"
+        <button
+            type="button"
             class="month-btn w-100"
             @click="emit('open-month')"
         >
+            <i class="bi bi-grid-3x3-gap me-2"></i>
             Havi menük
-        </Button>
+        </button>
     </aside>
 </template>
 
@@ -43,8 +42,23 @@ const emit = defineEmits<{
     justify-content: center;
     padding: 0.65rem 1rem;
     border-radius: var(--radius-sm);
-    text-decoration: none;
     font-weight: 600;
+    cursor: pointer;
+    background: var(--bs-body-bg);
+    color: var(--bs-emphasis-color);
+    border: 2px solid transparent;
+    background:
+        linear-gradient(var(--bs-body-bg), var(--bs-body-bg)) padding-box,
+        var(--grad-orange) border-box;
+    transition: color 0.15s ease-in;
+}
+
+.month-btn:hover {
+    color: var(--orange);
+}
+
+.month-btn i {
+    font-size: 1.1rem;
 }
 
 @media (max-width: 991px) {

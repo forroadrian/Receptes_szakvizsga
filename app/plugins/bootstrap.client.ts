@@ -1,2 +1,5 @@
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-export default defineNuxtPlugin(() => { })
+import * as bootstrap from "bootstrap";
+
+export default defineNuxtPlugin(() => {
+    (window as any).bootstrap = bootstrap;
+});
