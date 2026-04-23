@@ -29,7 +29,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const selectedAllergyIds = ref<number[]>([]);
     const savedRecipeIds = ref<number[]>([]);
     const triedRecipeIds = ref<number[]>([]);
-    const triedLoaded = ref(false);
+    const userRecipeLoaded = ref(false);
     const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
     const durationCategories = computed(() => getDurationCategories());
@@ -90,14 +90,31 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     };
 
     const loadUserRecipeIds = async () => {
-        if (process.server || !user.value || triedLoaded.value) return;
+        if (process.server || !user.value || userRecipeLoaded.value) return;
         try {
-            triedRecipeIds.value = await $fetch<number[]>("/api/recipe/tried", {
-                method: "GET"
-            });
-            triedLoaded.value = true;
+            const [saved, tried] = await Promise.all([
+                $fetch<number[]>("/api/recipe/saved", { method: "GET" }),
+                $fetch<number[]>("/api/recipe/tried", { method: "GET" })
+            ]);
+            savedRecipeIds.value = saved;
+            triedRecipeIds.value = tried;
+            userRecipeLoaded.value = true;
         } catch (error) {
-            console.error("Nem sikerült betölteni a kipróbált recepteket.", error);
+            console.error("Nem sikerült betölteni a recept állapotokat.", error);
+        }
+    };
+
+    const toggleSaved = async (recipeId: number) => {
+        try {
+            const { saved } = await $fetch<{ saved: boolean }>("/api/recipe/saved", {
+                method: "POST",
+                body: { recipe_id: recipeId }
+            });
+            savedRecipeIds.value = saved
+                ? [...savedRecipeIds.value, recipeId]
+                : savedRecipeIds.value.filter((id) => id !== recipeId);
+        } catch (error) {
+            console.error("Nem sikerült menteni a receptet.", error);
         }
     };
 
@@ -114,8 +131,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
             console.error("Nem sikerült menteni a kipróbált státuszt.", error);
         }
     };
-
-    const toggleSaved = async (_recipeId: number) => {};
 
     const removeSelectedAllergy = (allergyId: number) => {
         selectedAllergyIds.value = selectedAllergyIds.value.filter((id) => id !== allergyId);
@@ -137,7 +152,7 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
             userDislikedIngredientIds.value = [];
             savedRecipeIds.value = [];
             triedRecipeIds.value = [];
-            triedLoaded.value = false;
+            userRecipeLoaded.value = false;
         }
     });
 

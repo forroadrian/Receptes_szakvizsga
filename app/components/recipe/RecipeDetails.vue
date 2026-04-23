@@ -19,11 +19,21 @@ const currentRecipe = computed(() =>
     recipeStore.getRecipeById(recipeId.value)
 );
 
+const isSaved = computed(() =>
+    currentRecipe.value ? filterStore.savedRecipeIds.includes(currentRecipe.value.id) : false
+);
+
 const isTried = computed(() =>
     currentRecipe.value ? filterStore.triedRecipeIds.includes(currentRecipe.value.id) : false
 );
 
 const addRecipeToMenu = computed(() => user.value ? "/menu" : "/login");
+
+const handleToggleSaved = async () => {
+    if (!user.value) { navigateTo('/login'); return; }
+    if (!currentRecipe.value) return;
+    await filterStore.toggleSaved(currentRecipe.value.id);
+};
 
 const handleToggleTried = async () => {
     if (!user.value) { navigateTo('/login'); return; }
