@@ -69,8 +69,7 @@ export default defineNuxtConfig({
     },
     i18n: {
         defaultLocale: 'hu',
-        strategy: 'no_prefix',   
-        lazy: true,       
+        strategy: 'no_prefix',         
         locales: [
             { code: 'hu', name: 'Magyar',  language: 'hu-HU', files: filesFor("hu") },
             { code: 'en', name: 'English', language: 'en-US', files: filesFor("en") },

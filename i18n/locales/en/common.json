@@ -29,6 +29,12 @@
     },
     "errors": {
       "invalidData": "Invalid data."
+    },
+    "pages": {
+        "index": "Home",
+        "recipes": "Recipes",
+        "ingredients": "Pantry",
+        "menuPlanner": "Menu planner"
     }
   }
 }

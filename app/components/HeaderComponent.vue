@@ -26,7 +26,6 @@ watch(
     }
 )
 
-const ingredientsNavTo = computed(() => {
 const displayProfileImage = computed(() => {
     return authStore.profileUrl || '/icons/profile.png'
 })
@@ -86,16 +85,16 @@ const handleSignOut = async () => {
                 <div id="mainNav" class="collapse navbar-collapse p-0">
                     <ul class="navbar-nav mx-lg-auto nav-links">
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/">{{ $t('header.nav.index') }}</NuxtLink>
+                            <NuxtLink class="nav-link" to="/">{{ $t('common.pages.index') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/recipes">{{ $t('header.nav.recipes') }}</NuxtLink>
+                            <NuxtLink class="nav-link" to="/recipes">{{ $t('common.pages.recipes') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/ingredients">{{ $t('header.nav.ingredients') }}</NuxtLink>
+                            <NuxtLink class="nav-link" to="/ingredients">{{ $t('common.pages.ingredients') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/menu">{{ $t('header.nav.menuPlanner') }}</NuxtLink>
+                            <NuxtLink class="nav-link" to="/menu">{{ $t('common.pages.menuPlanner') }}</NuxtLink>
                         </li>
                     </ul>
 

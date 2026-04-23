@@ -1,10 +1,6 @@
 {
     "header": {
       "nav": {
-        "index": "Home",
-        "recipes": "Recipes",
-        "ingredients": "Pantry",
-        "menuPlanner": "Menu planner",
         "profile": {
           "image": {
             "title": "Profile picture",

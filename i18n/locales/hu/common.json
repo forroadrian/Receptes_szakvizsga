@@ -29,6 +29,12 @@
     },
     "errors": {
       "invalidData": "Helytelen adat."
+    },
+    "pages": {
+        "index": "Kezdőlap",
+        "recipes": "Receptek",
+        "ingredients": "Alapanyagok",
+        "menuPlanner": "Menütervező"
     }
   }
 }

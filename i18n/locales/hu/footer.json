@@ -1,0 +1,18 @@
+{
+    "footer": {
+        "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit!",
+        "links" : {
+            "title": "Gyors linkek"
+        },
+        "contact": {
+            "title": "Elérhetőségek",
+            "time": "H-P"
+        },
+        "rights": "Minden jog fenntartva!" ,
+        "anchor": {
+            "aria" : {
+                "label": "Ugrás a tetejére"
+            }
+        }
+    }
+}

@@ -12,7 +12,7 @@ const scrollTop = () => {
                 <div class="col-lg-5 col-md-12 col-sm-12">
                     <NuxtImg src="/logo.png" alt="Menu Planr" :width="180" :height="128" format="webp" loading="lazy" densities="x1 x2" class="footer-logo mb-3" />
                     <p class="footer-desc mx-auto mx-lg-0">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit!
+                        {{ $t('footer.title')}}
                     </p>
 
                     <div class="footer-social d-flex justify-content-center justify-content-lg-start gap-2 mt-3">
@@ -23,29 +23,29 @@ const scrollTop = () => {
                 </div>
 
                 <div class="col-lg-3 col-md-12 col-sm-12">
-                    <h5 class="footer-title mt-3">Gyors Linkek</h5>
+                    <h5 class="footer-title mt-3">{{ $t('footer.links.title') }}</h5>
                     <ul
                         class="footer-links list-unstyled m-0 d-grid gap-2 justify-content-center justify-content-lg-start">
                         <li>
                             <NuxtLink to="/" class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-house-door"></i> Kezdőlap
+                                <i class="bi bi-house-door"></i> {{ $t('common.pages.index') }}
                             </NuxtLink>
                         </li>
                         <li>
                             <NuxtLink to="/recipes" class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-journal-text"></i> Receptek
+                                <i class="bi bi-journal-text"></i> {{ $t('common.pages.recipes') }}
                             </NuxtLink>
                         </li>
                         <li>
                             <NuxtLink to="/ingredients"
                                 class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-basket"></i> Alapanyagok
+                                <i class="bi bi-basket"></i> {{ $t('common.pages.ingredients') }}
                             </NuxtLink>
                         </li>
                         <li>
                             <NuxtLink to="/menu"
                                 class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-calendar2-week"></i> Menütervező
+                                <i class="bi bi-calendar2-week"></i> {{ $t('common.pages.menuPlanner') }}
                             </NuxtLink>
                         </li>
                     </ul>
@@ -53,7 +53,7 @@ const scrollTop = () => {
 
                 <div class="col-lg-4  col-md-12 col-sm-12">
                     <div class="contact-panel">
-                        <h5 class="footer-title mb-3">Elérhetőségek</h5>
+                        <h5 class="footer-title mb-3">{{ $t('footer.contact.title') }}</h5>
 
                         <ul class="footer-contact list-unstyled m-0 p-0 d-grid gap-2">
                             <li class="footer-contact-item justify-content-center justify-content-lg-start">
@@ -66,23 +66,23 @@ const scrollTop = () => {
                             </li>
                             <li class="footer-contact-item justify-content-center justify-content-lg-start">
                                 <i class="bi bi-globe me-2"></i>
-                                <span>loremipsum.com</span>
+                                <span>www.menuplanr.hu</span>
                             </li>
                         </ul>
 
                         <div class="mini-badge mt-3 mx-auto mx-lg-0">
                             <i class="bi bi-clock"></i>
-                            <span>H–P: 08:00–16:00</span>
+                            <span>{{ $t('footer.contact.time') }}: 08:00–16:00</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="text-center border-top mt-4 pt-3">
-                <p> &copy; 2026 Bánki Tatabánya | Minden jog fenntartva!</p>
+                <p> &copy; 2026 Bánki Tatabánya | {{ $t('footer.rights') }}</p>
             </div>
         </div>
-        <button class="scroll-top" @click="scrollTop" aria-label="Ugrás a tetejére">↑</button>
+        <button class="scroll-top" @click="scrollTop" :aria-label="$t('footer.anchor.aria.label')">↑</button>
     </footer>
 </template>
 
