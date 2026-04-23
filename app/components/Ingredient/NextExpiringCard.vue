@@ -10,7 +10,7 @@ const emit = defineEmits<{
 const store = useIngredientStore();
 
 const nextExpiring = computed(() => {
-    const nonExpired = store.ingredients.filter((i) => i.tag !== "Lejárt");
+    const nonExpired = store.ingredients.filter((i) => i.tag !== "expired");
     if (!nonExpired.length) return null;
     return [...nonExpired].sort(
         (a, b) => a.expiry.value.getTime() - b.expiry.value.getTime()
@@ -21,9 +21,9 @@ const relativeLabel = computed(() => {
     const i = nextExpiring.value;
     if (!i) return "";
     const days = daysFromToday(i.expiry.toStamp());
-    if (days <= 0) return "Ma lejár";
-    if (days === 1) return "Holnap lejár";
-    if (days < 7) return `${days} nap múlva`;
+    if (days <= 0) return $t('pantry.nextExpiring.relative.today');
+    if (days === 1) return $t('pantry.nextExpiring.relative.tomorrow');
+    if (days < 7) return $t('pantry.nextExpiring.relative.inDays', {count: days});
     return new Intl.DateTimeFormat("hu-HU", {
         timeZone: "Europe/Budapest",
         month: "long",
@@ -40,12 +40,12 @@ const onJump = () => {
     <section class="next-expiring" :class="{ 'is-empty': !nextExpiring }">
         <p class="label mb-2">
             <i class="bi bi-hourglass-split me-2"></i>
-            Hamarosan lejár
+            {{$t('pantry.nextExpiring.label')}}
         </p>
 
         <template v-if="nextExpiring">
             <button type="button" class="title-btn text-start w-100" @click="onJump">
-                <span class="title">{{ nextExpiring.name }}</span>
+                <span class="title">{{$t('ingredient.' + nextExpiring.id)}}</span>
                 <span class="relative">{{ relativeLabel }}</span>
             </button>
 
@@ -56,7 +56,7 @@ const onJump = () => {
         </template>
 
         <template v-else>
-            <p class="empty mb-0">Minden alapanyag friss.</p>
+            <p class="empty mb-0">{{$t('pantry.nextExpiring.empty')}}</p>
         </template>
     </section>
 </template>

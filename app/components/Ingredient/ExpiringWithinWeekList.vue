@@ -55,7 +55,7 @@ const onItemClick = (id: number) => emit("jump", id);
         <header class="d-flex align-items-center justify-content-between mb-3">
             <p class="card-title mb-0">
                 <i class="bi bi-calendar-week me-2"></i>
-                Közelgő 7 nap
+                {{$t('pantry.upcoming.title')}}
             </p>
         </header>
 
@@ -80,10 +80,10 @@ const onItemClick = (id: number) => emit("jump", id);
                             class="item-link text-truncate"
                             @click="onItemClick(item.id)"
                         >
-                            {{ item.name }}
+                            {{ $t('ingredient.' + item.id) }}
                         </button>
                     </template>
-                    <span v-else class="empty-label">Nincs lejáró</span>
+                    <span v-else class="empty-label">{{ $t('pantry.upcoming.empty') }}</span>
                 </div>
             </li>
         </ul>

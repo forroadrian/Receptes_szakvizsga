@@ -33,7 +33,8 @@ const filteredNames = computed(() => {
     if (!q) return store.availableIngredients.slice(0, 10);
     const results: { id: number; name: string }[] = [];
     for (const item of store.availableIngredients) {
-        if (item.name.toLowerCase().includes(q)) results.push(item);
+        const localized = $t('ingredient.' + item.id)
+        if (localized.toLowerCase().includes(q)) results.push(item);
         if (results.length >= 10) break;
     }
     return results;
@@ -50,14 +51,27 @@ const canSubmit = computed(
 
 const selectIngredient = (item: { id: number; name: string }) => {
     ingredientId.value = item.id;
-    name.value = item.name;
+    name.value = $t('ingredient.' + item.id);
     dropdownOpen.value = false;
 };
 
 const selectByName = (ingredientName: string) => {
-    const found = store.availableIngredients.find((i) => i.name === ingredientName);
+    console.log(ingredientName);
+    
+    const found = store.availableIngredients.find((i) => {
+        
+        return i.name === ingredientName
+    });
     if (found) selectIngredient(found);
 };
+
+const selectById = (ingredientId: number) => {
+    const found = store.availableIngredients.find((i) => {
+        
+        return i.id === ingredientId
+    });
+    if (found) selectIngredient(found);
+}
 
 const onNameBlur = () => {
     dropdownOpen.value = false;
@@ -154,7 +168,7 @@ const handleSave = async () => {
         reset();
     } catch (err: any) {
         errorMessage.value =
-            err?.data?.message ?? err?.message ?? "Nem sikerült menteni az alapanyagot.";
+            err?.data?.message ?? err?.message ?? $t('pantry.addModal.fields.errors.saveFailed');
     } finally {
         saving.value = false;
     }
@@ -162,7 +176,7 @@ const handleSave = async () => {
 
 const handleDelete = async () => {
     if (!isEdit.value || originalId.value === null || deleting.value) return;
-    if (!confirm("Biztosan törlöd ezt az alapanyagot?")) return;
+    if (!confirm($t('pantry.addModal.fields.deleteConfirm'))) return;
     deleting.value = true;
     errorMessage.value = "";
     try {
@@ -171,7 +185,7 @@ const handleDelete = async () => {
         reset();
     } catch (err: any) {
         errorMessage.value =
-            err?.data?.message ?? err?.message ?? "Nem sikerült törölni az alapanyagot.";
+            err?.data?.message ?? err?.message ?? $t('pantry.addModal.fields.errors.deleteFailed');
     } finally {
         deleting.value = false;
     }
@@ -198,10 +212,10 @@ defineExpose({ open, openForEdit });
                 <div class="modal-header">
                     <div class="d-flex flex-column">
                         <h2 id="ingredientAddModalLabel" class="modal-title fs-4 mb-1">
-                            {{ isEdit ? "Alapanyag szerkesztése" : "Új alapanyag" }}
+                            {{ isEdit ? $t('pantry.addModal.title.edit') : $t('pantry.addModal.title.create') }}
                         </h2>
                         <p class="mb-0 text-muted small">
-                            {{ isEdit ? "Módosítsd az adatokat, vagy töröld a kamrádból." : "Töltsd ki az alapanyag adatait" }}
+                            {{ isEdit ? $t('pantry.addModal.subtitle.edit') : $t('pantry.addModal.subtitle.create') }}
                         </p>
                     </div>
                     <button
@@ -216,7 +230,7 @@ defineExpose({ open, openForEdit });
                     <form @submit.prevent="handleSave" class="form">
                         <div class="field">
                             <label class="form-label small fw-semibold" for="addName">
-                                Alapanyag neve
+                                {{ $t('pantry.addModal.fields.name') }}
                             </label>
                             <div class="position-relative">
                                 <div
@@ -225,7 +239,7 @@ defineExpose({ open, openForEdit });
                                     :class="{ placeholder: !name }"
                                     @click="openDropdown"
                                 >
-                                    {{ name || "Pl. Paradicsom" }}
+                                    {{ name || $t('pantry.addModal.fields.namePlaceholder') }}
                                     <i class="bi bi-chevron-down ms-auto"></i>
                                 </div>
                                 <input
@@ -234,7 +248,7 @@ defineExpose({ open, openForEdit });
                                     v-model="name"
                                     type="text"
                                     class="form-control"
-                                    placeholder="Pl. Paradicsom"
+                                    :placeholder="$t('pantry.addModal.fields.namePlaceholder')"
                                     autocomplete="off"
                                     @blur="onNameBlur"
                                 />
@@ -247,7 +261,7 @@ defineExpose({ open, openForEdit });
                                         :key="item.id"
                                         @mousedown.prevent="selectIngredient(item)"
                                     >
-                                        {{ item.name }}
+                                        {{ $t('ingredient.' + item.id) }}
                                     </li>
                                 </ul>
                             </div>
@@ -256,7 +270,7 @@ defineExpose({ open, openForEdit });
                         <div class="row g-3 field-row">
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold" for="addExpiry">
-                                    Lejárati dátum
+                                    {{ $t('pantry.addModal.fields.expiry') }}
                                 </label>
                                 <input
                                     id="addExpiry"
@@ -267,7 +281,7 @@ defineExpose({ open, openForEdit });
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold">
-                                    Mennyiség / Egység
+                                    {{ $t('pantry.addModal.fields.quantityUnit') }}
                                 </label>
                                 <div class="input-group">
                                     <input
@@ -279,7 +293,7 @@ defineExpose({ open, openForEdit });
                                         step="any"
                                     />
                                     <select v-model="unit" class="form-select unit-select">
-                                        <option value="" disabled>Egység</option>
+                                        <option value="" disabled>{{ $t('pantry.addModal.fields.unitPlaceholder') }}</option>
                                         <option v-for="u in store.units" :key="u" :value="u">
                                             {{ u }}
                                         </option>
@@ -292,9 +306,9 @@ defineExpose({ open, openForEdit });
                             <header class="suggestions-head">
                                 <p class="suggestions-title mb-0">
                                     <i class="bi bi-stars me-2"></i>
-                                    Népszerű receptalapanyagok
+                                    {{ $t('pantry.addModal.suggestions.title') }}
                                 </p>
-                                <span class="suggestions-hint">Kattints a gyors kitöltéshez</span>
+                                <span class="suggestions-hint">{{ $t('pantry.addModal.suggestions.hint') }}</span>
                             </header>
                             <div class="suggestion-pills">
                                 <button
@@ -303,10 +317,10 @@ defineExpose({ open, openForEdit });
                                     type="button"
                                     class="suggestion-pill"
                                     :class="{ active: name === item.name }"
-                                    @click="selectByName(item.name)"
-                                >
+                                    @click="selectById(item.ingredient_id)"
+                                > <!--Stale data, don't mind it, it runs correctly :)-->
                                     <i class="bi bi-plus-circle me-1"></i>
-                                    {{ item.name }}
+                                    {{ $t('ingredient.' + item.ingredient_id) }}
                                 </button>
                             </div>
                         </section>
@@ -326,7 +340,7 @@ defineExpose({ open, openForEdit });
                             @click="handleDelete"
                         >
                             <i class="bi bi-trash3 me-1"></i>
-                            {{ deleting ? "Törlés..." : "Törlés" }}
+                            {{ deleting ? $t('common.actions.deleting') : $t('common.actions.delete') }}
                         </button>
                         <div v-else></div>
 
@@ -336,14 +350,14 @@ defineExpose({ open, openForEdit });
                                 class="btn btn-outline-secondary"
                                 data-bs-dismiss="modal"
                             >
-                                Mégse
+                                {{ $t('common.actions.cancel') }}
                             </button>
                             <Button
                                 color="orange"
                                 :disabled="!canSubmit || saving || deleting"
                                 @click="handleSave"
                             >
-                                {{ saving ? "Mentés..." : "Mentés" }}
+                                {{ saving ? $t('common.actions.saving') : $t('common.actions.save') }}
                             </Button>
                         </div>
                     </div>

@@ -5,7 +5,7 @@ import { useIngredientStore } from "~/stores/ingredients";
 const store = useIngredientStore();
 
 const freshCount = computed(
-    () => store.ingredients.filter((i) => i.tag === "Friss").length
+    () => store.ingredients.filter((i) => i.tag === "fresh").length
 );
 const totalCount = computed(() => store.ingredients.length);
 </script>
@@ -15,8 +15,8 @@ const totalCount = computed(() => store.ingredients.length);
         <div class="card-main">
             <span class="count">{{ freshCount }}</span>
             <div class="meta">
-                <span class="title">Friss</span>
-                <span class="subtitle">alapanyag</span>
+                <span class="title">{{ $t('pantry.freshness.title') }}</span>
+                <span class="subtitle">{{$t('pantry.freshness.subtitle')}}</span>
             </div>
             <i class="bi bi-leaf icon"></i>
         </div>
@@ -25,7 +25,7 @@ const totalCount = computed(() => store.ingredients.length);
             <i class="bi bi-basket3 me-2"></i>
             <span>
                 <strong>{{ totalCount }}</strong>
-                összesen a kamrádban
+                {{$t('pantry.freshness.total')}}
             </span>
         </div>
     </section>

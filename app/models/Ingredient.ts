@@ -1,7 +1,7 @@
 
 import type { FreshnessVariants } from "~/interfaces/cardInterfaces/CardGenericInterfaces";
 import type Identifiable from "~/interfaces/Identifiable";
-import type { IngredientTag, IngredientTagOptions } from "~/interfaces/ModelInterfaces/Tags";
+import type { IngredientTag } from "~/interfaces/ModelInterfaces/Tags";
 import ExpiryDate from "./ExpiryDate";
 
 export default class Ingredient implements IngredientTag, Identifiable{
@@ -18,7 +18,7 @@ export default class Ingredient implements IngredientTag, Identifiable{
         this._quantity = quantity;
         this._unit = unit;
         this._expiry = expiry ?? new ExpiryDate(new Date("2006-01-01"))
-        this._tag = tag ?? "Friss";
+        this._tag = tag ?? "fresh";
     }
 
 

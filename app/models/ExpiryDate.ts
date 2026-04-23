@@ -25,8 +25,8 @@ export default class ExpiryDate {
         const threeDays = 3 * 24 * 60 * 60 * 1000;
 
         return saved <= today
-            ? "Lejárt" : saved <= today + threeDays
-            ? "Hamarosan" : "Friss";
+            ? "expired" : saved <= today + threeDays
+            ? "soon" : "fresh";
     }
 
     get value() {

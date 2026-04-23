@@ -64,10 +64,10 @@ defineExpose({ open });
                 <div class="modal-header">
                     <div class="d-flex flex-column">
                         <h2 id="ingredientMissingModalLabel" class="modal-title fs-4 mb-1">
-                            Hiányzó alapanyagok
+                            {{$t('pantry.missingModal.title')}}
                         </h2>
                         <p class="mb-0 text-muted small">
-                            A receptjeidben gyakran előforduló alapanyagok, amelyek még nincsenek a kamrádban.
+                            {{$t('pantry.missingModal.subtitle')}}
                         </p>
                     </div>
                     <button
@@ -79,11 +79,11 @@ defineExpose({ open });
                 </div>
 
                 <div class="modal-body">
-                    <p v-if="isLoading" class="text-muted small mb-0">Betöltés...</p>
+                    <p v-if="isLoading" class="text-muted small mb-0">{{$t('common.actions.loading')}}</p>
 
                     <div v-else-if="!missing.length" class="empty">
                         <i class="bi bi-check2-circle fs-2 mb-2 d-block"></i>
-                        <p class="mb-0">Nincs hiányzó ajánlás.</p>
+                        <p class="mb-0">{{$t('pantry.middingModal.empty')}}</p>
                     </div>
 
                     <ul v-else class="missing-list list-unstyled m-0">
@@ -99,10 +99,10 @@ defineExpose({ open });
                                 <span class="appears-chip">
                                     {{ item.appears }}&times;
                                 </span>
-                                <span class="item-name">{{ item.name }}</span>
+                                <span class="item-name">{{item.name}}</span>
                                 <span class="add-hint">
                                     <i class="bi bi-plus-lg me-1"></i>
-                                    Hozzáadás
+                                    {{$t('pantry.missingModal.actions.add')}}
                                 </span>
                             </button>
                         </li>
@@ -115,7 +115,7 @@ defineExpose({ open });
                         class="btn btn-outline-secondary"
                         data-bs-dismiss="modal"
                     >
-                        Bezárás
+                    {{$t('common.actions.close')}}
                     </button>
                 </div>
             </div>

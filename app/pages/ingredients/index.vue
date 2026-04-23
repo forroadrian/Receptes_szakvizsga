@@ -11,7 +11,7 @@ const addModalRef = ref<any>(null);
 const missingModalRef = ref<any>(null);
 
 const search = ref("");
-const activeTab = ref<"all" | "Friss" | "Hamarosan" | "Lejárt">("all");
+const activeTab = ref<"all" | "fresh" | "soon" | "expired">("all");
 
 const highlightedId = ref<number | null>(null);
 const rowContainers = ref<Record<number, HTMLElement | null>>({});
@@ -19,9 +19,9 @@ const rowContainers = ref<Record<number, HTMLElement | null>>({});
 const loading = ref(false);
 const errorAlert = ref(false);
 
-const freshCount = computed(() => store.ingredients.filter((i) => i.tag === "Friss").length);
-const warningCount = computed(() => store.ingredients.filter((i) => i.tag === "Hamarosan").length);
-const expiredCount = computed(() => store.ingredients.filter((i) => i.tag === "Lejárt").length);
+const freshCount = computed(() => store.ingredients.filter((i) => i.tag === "fresh").length);
+const warningCount = computed(() => store.ingredients.filter((i) => i.tag === "soon").length);
+const expiredCount = computed(() => store.ingredients.filter((i) => i.tag === "expired").length);
 
 const filtered = computed(() => {
     const q = search.value.trim().toLowerCase();
@@ -82,9 +82,9 @@ onMounted(async () => {
     <section class="ingredients-page">
         <div class="ingredients-shell mx-auto px-3 px-md-4 px-lg-5 py-4">
             <header class="page-header mb-4">
-                <h1 class="page-title mb-2">Kamrám</h1>
+                <h1 class="page-title mb-2">{{$t('pantry.page.title')}}</h1>
                 <p class="page-subtitle mb-0">
-                    Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van.
+                    {{ $t('pantry.page.subtitle') }}
                 </p>
             </header>
 
@@ -96,7 +96,7 @@ onMounted(async () => {
                 <section class="col-12 col-lg-8 order-lg-2 order-1">
                     <div class="row align-items-center mb-3 gy-2">
                         <div class="col-12">
-                            <SearchBar v-model="search" placeholder="Keress alapanyag nevére..." class="w-100" />
+                            <SearchBar v-model="search" :placeholder="$t('pantry.list.searchPlaceholder')" class="w-100" />
                         </div>
                     </div>
 
@@ -107,34 +107,34 @@ onMounted(async () => {
                             :class="{ active: activeTab === 'all' }"
                             @click="activeTab = 'all'"
                         >
-                            Összes
+                            {{ $t('pantry.statCards.filters.all') }}
                             <span class="tab-count">{{ store.ingredients.length }}</span>
                         </button>
                         <button
                             type="button"
                             class="tab"
-                            :class="{ active: activeTab === 'Friss' }"
-                            @click="activeTab = 'Friss'"
+                            :class="{ active: activeTab === 'fresh' }"
+                            @click="activeTab = 'fresh'"
                         >
-                            Friss
+                            {{ $t('pantry.statCards.filters.fresh') }}
                             <span class="tab-count">{{ freshCount }}</span>
                         </button>
                         <button
                             type="button"
                             class="tab"
-                            :class="{ active: activeTab === 'Hamarosan' }"
-                            @click="activeTab = 'Hamarosan'"
+                            :class="{ active: activeTab === 'soon' }"
+                            @click="activeTab = 'soon'"
                         >
-                            Hamarosan
+                            {{ $t('pantry.statCards.filters.soon') }}
                             <span class="tab-count">{{ warningCount }}</span>
                         </button>
                         <button
                             type="button"
                             class="tab"
-                            :class="{ active: activeTab === 'Lejárt' }"
-                            @click="activeTab = 'Lejárt'"
+                            :class="{ active: activeTab === 'expired' }"
+                            @click="activeTab = 'expired'"
                         >
-                            Lejárt
+                            {{ $t('pantry.statCards.filters.expired') }}
                             <span class="tab-count">{{ expiredCount }}</span>
                         </button>
                     </nav>
@@ -146,19 +146,19 @@ onMounted(async () => {
                             @click="openAddModal()"
                         >
                             <span class="plus">+</span>
-                            <span>Új alapanyag hozzáadása</span>
+                            <span>{{$t('pantry.list.addIngredient')}}</span>
                         </button>
 
                         <p v-if="loading" class="loading-note text-muted small mb-0 py-2 text-center">
-                            Betöltés...
+                            {{$t('common.actions.loading')}}
                         </p>
 
                         <div v-else-if="!filtered.length" class="empty-list">
                             <i class="bi bi-basket2 fs-2 mb-2 d-block"></i>
                             <p class="mb-0">
-                                <template v-if="search">Nincs találat a keresésre.</template>
-                                <template v-else-if="activeTab === 'all'">Még nincs alapanyag a kamrádban.</template>
-                                <template v-else>Nincs ilyen állapotú alapanyag.</template>
+                                <template v-if="search">{{ $t('pantry.list.empty.noResults') }}</template>
+                                <template v-else-if="activeTab === 'all'">{{ $t('pantry.list.empty.noIngredients') }}</template>
+                                <template v-else>{{ $t('pantry.list.empty.noStatus') }}</template>
                             </p>
                         </div>
 
@@ -184,7 +184,7 @@ onMounted(async () => {
         <IngredientAddModal ref="addModalRef" />
         <IngredientMissingSuggestionsModal ref="missingModalRef" @pick="handleMissingPick" />
 
-        <Alert message="Helytelen adat." :show="errorAlert" type="error" @close="errorAlert = false" />
+        <Alert :message="$t('common.errors.invalidData')" :show="errorAlert" type="error" @close="errorAlert = false" />
     </section>
 </template>
 

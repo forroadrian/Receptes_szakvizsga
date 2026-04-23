@@ -559,10 +559,27 @@ export type Database = {
           required_unit: Database["public"]["Enums"]["unit"]
         }[]
       }
-      get_recommended_ingredients: {
-        Args: { p_user_id: string }
+      get_recommended_ingredients:
+        | {
+            Args: { p_limit?: number }
+            Returns: {
+              appears: number
+              ingredient_id: number
+              name: string
+            }[]
+          }
+        | {
+            Args: { p_user_id: string }
+            Returns: {
+              appears: number
+              name: string
+            }[]
+          }
+      recommend_ingredients: {
+        Args: { p_limit?: number }
         Returns: {
           appears: number
+          ingredient_id: number
           name: string
         }[]
       }

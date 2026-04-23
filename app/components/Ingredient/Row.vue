@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { MatcherPatternQueryParam } from "vue-router/dist/experimental/index.mjs";
 import type Ingredient from "~/models/Ingredient";
 import { daysFromToday } from "~/utils/budapestDate";
 
@@ -17,12 +18,12 @@ const confirmingDelete = ref(false);
 
 const freshnessConfig = computed(() => {
     switch (props.ingredient.tag) {
-        case "Friss":
-            return { icon: "bi bi-leaf", cls: "fresh" };
-        case "Hamarosan":
-            return { icon: "bi bi-clock-history", cls: "warning" };
+        case "fresh":
+            return { icon: "bi bi-leaf", class: "fresh" };
+        case "soon":
+            return { icon: "bi bi-clock-history", class: "warning" };
         default:
-            return { icon: "bi bi-exclamation-triangle-fill", cls: "expired" };
+            return { icon: "bi bi-exclamation-triangle-fill", class: "expired" };
     }
 });
 
@@ -47,17 +48,17 @@ const confirmDelete = () => {
 </script>
 
 <template>
-    <div class="row-item" :class="[freshnessConfig.cls, { highlight }]">
-        <span class="accent-bar" :class="freshnessConfig.cls"></span>
+    <div class="row-item" :class="[freshnessConfig.class, { highlight }]">
+        <span class="accent-bar" :class="freshnessConfig.class"></span>
 
-        <div class="icon-box" :class="freshnessConfig.cls">
+        <div class="icon-box" :class="freshnessConfig.class">
             <i :class="freshnessConfig.icon"></i>
         </div>
 
         <div class="main">
             <div class="top-line">
-                <span class="name">{{ ingredient.name }}</span>
-                <span class="tag" :class="freshnessConfig.cls">{{ ingredient.tag }}</span>
+                <span class="name">{{ $t('ingredient.' + ingredient.id.toString()) }}</span>
+                <span class="tag" :class="freshnessConfig.class">{{ $t('common.tags.' + ingredient.tag) }}</span>
             </div>
             <div class="sub-line">
                 <span class="qty">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
@@ -94,7 +95,7 @@ const confirmDelete = () => {
                 title="Megerősítés"
                 @click="confirmDelete"
             >
-                Biztos?
+                {{ $t('common.actions.confirmShort') }}
             </button>
         </div>
     </div>

@@ -9,9 +9,9 @@ const emit = defineEmits<{
     <aside class="ingredient-sidebar">
         <IngredientFreshnessCard />
 
-        <IngredientNextExpiringCard @jump="(id) => emit('jump', id)" />
+        <IngredientNextExpiringCard @jump="(id: number) => emit('jump', id)" />
 
-        <IngredientExpiringWithinWeekList @jump="(id) => emit('jump', id)" />
+        <IngredientExpiringWithinWeekList @jump="(id: number) => emit('jump', id)" />
 
         <button
             type="button"
@@ -19,7 +19,7 @@ const emit = defineEmits<{
             @click="emit('open-missing')"
         >
             <i class="bi bi-stars me-2"></i>
-            Hiányzó alapanyagok
+            {{ $t('pantry.sidebar.missingBtn') }}
         </button>
     </aside>
 </template>
