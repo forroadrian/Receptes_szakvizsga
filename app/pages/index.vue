@@ -226,7 +226,7 @@ const cards = ref([
                             {{ $t('home.about.p1', {strong: 'home.about.p1Strong'}) }}
                         </p>
                         <p class="about-text">
-                            {{ $t('home.about.p2'), {strong: 'home.about.p2Strong'} }}
+                            {{ $t('home.about.p2', {strong: 'home.about.p2Strong'}) }}
                         </p>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { watch } from "vue";
-import { HUNGARIAN_WEEKDAYS_SHORT, useCalendarGrid } from "~/composables/useCalendarGrid";
+import { computed, watch } from "vue";
+import { useCalendarGrid } from "~/composables/useCalendarGrid";
 import { useMenuStore } from "~/stores/menu";
 import { useMissingIngredients } from "~/composables/useMissingIngredients";
 
@@ -14,6 +14,20 @@ const menuStore = useMenuStore();
 const missing = useMissingIngredients();
 const user = useSupabaseUser();
 const { year, month, cells, prevMonth, nextMonth, goToToday } = useCalendarGrid();
+const { locale } = useI18n();
+
+const weekdayLabels = computed(() => {
+    const formatter = new Intl.DateTimeFormat(locale.value === "hu" ? "hu-HU" : "en-US", {
+        weekday: "short",
+    });
+    // ISO: Monday = 1 ... Sunday = 7. Reference Monday: 2024-01-01 was a Monday.
+    const monday = new Date(2024, 0, 1);
+    return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return formatter.format(d);
+    });
+});
 
 const menusForCell = (dateKey: string) => menuStore.getMenusForDate(dateKey);
 
@@ -47,7 +61,7 @@ defineExpose({ goToDate });
         />
 
         <div class="weekday-row">
-            <div v-for="day in HUNGARIAN_WEEKDAYS_SHORT" :key="day" class="weekday-label">
+            <div v-for="day in weekdayLabels" :key="day" class="weekday-label">
                 {{ day }}
             </div>
         </div>

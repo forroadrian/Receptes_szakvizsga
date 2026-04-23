@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore, type MenuItem } from "~/stores/menu";
 import { toBudapestDateKey } from "~/utils/budapestDate";
 
@@ -9,6 +8,7 @@ const emit = defineEmits<{
 }>();
 
 const menuStore = useMenuStore();
+const { t, locale } = useI18n();
 
 const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
@@ -16,13 +16,12 @@ let modalInstance: any = null;
 const year = ref<number>(new Date().getFullYear());
 const month = ref<number>(new Date().getMonth());
 
-const HUNGARIAN_MONTHS = [
-    "Január", "Február", "Március", "Április",
-    "Május", "Június", "Július", "Augusztus",
-    "Szeptember", "Október", "November", "December",
-];
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
-const monthLabel = computed(() => `${year.value}. ${HUNGARIAN_MONTHS[month.value]}`);
+const monthLabel = computed(() =>
+    new Intl.DateTimeFormat(intlLocale.value, { year: "numeric", month: "long" })
+        .format(new Date(year.value, month.value, 1))
+);
 
 type WeekGroup = {
     weekKey: string;
@@ -55,16 +54,20 @@ const weekGroups = computed<WeekGroup[]>(() => {
         const weekKey = `${date.getFullYear()}-W${week}`;
         const weekdayIndex = (date.getDay() + 6) % 7;
 
+        const weekdayFormatter = new Intl.DateTimeFormat(intlLocale.value, {
+            weekday: "long",
+        });
+
         const decorated = {
             ...menu,
             dateKey: toBudapestDateKey(menu.planned_date),
-            weekday: HUNGARIAN_WEEKDAYS_LONG[weekdayIndex] ?? "",
+            weekday: weekdayFormatter.format(date),
         };
 
         if (!groupsMap.has(weekKey)) {
             groupsMap.set(weekKey, {
                 weekKey,
-                weekRange: `${week}. hét`,
+                weekRange: t("menu.monthModal.weekLabel", { n: week }),
                 menus: [],
             });
         }
@@ -79,14 +82,14 @@ const totalCount = computed(() =>
 );
 
 const formatDate = (dateIso: string) =>
-    new Intl.DateTimeFormat("hu-HU", {
+    new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         month: "long",
         day: "numeric",
     }).format(new Date(dateIso));
 
 const formatTime = (dateIso: string) =>
-    new Intl.DateTimeFormat("hu-HU", {
+    new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         hour: "2-digit",
         minute: "2-digit",
@@ -98,11 +101,11 @@ const onJump = (dateKey: string) => {
 };
 
 const onDelete = async (menuId: number) => {
-    if (!confirm("Biztosan törlöd ezt a menüt?")) return;
+    if (!confirm(t("menu.monthModal.confirmDelete"))) return;
     try {
         await menuStore.deleteMenu(menuId);
     } catch (err) {
-        alert("Nem sikerült törölni a menüt.");
+        alert(t("menu.monthModal.deleteError"));
     }
 };
 
@@ -142,10 +145,10 @@ defineExpose({ open });
                     <div class="modal-header">
                         <div class="d-flex flex-column">
                             <h2 id="monthMenusModalLabel" class="modal-title fs-4 mb-1">
-                                Havi menük
+                                {{ $t('menu.monthModal.title') }}
                             </h2>
                             <p class="mb-0 text-muted small">
-                                {{ monthLabel }} — {{ totalCount }} menü
+                                {{ monthLabel }} — {{ $t('menu.monthModal.menuCount', { n: totalCount }, totalCount) }}
                             </p>
                         </div>
                         <button
@@ -159,7 +162,7 @@ defineExpose({ open });
                     <div class="modal-body">
                         <div v-if="!weekGroups.length" class="empty">
                             <i class="bi bi-calendar-x fs-2 mb-2 d-block"></i>
-                            <p class="mb-0">Nincs menü ebben a hónapban.</p>
+                            <p class="mb-0">{{ $t('menu.monthModal.empty') }}</p>
                         </div>
 
                         <div v-else class="weeks">
@@ -171,7 +174,7 @@ defineExpose({ open });
                                 <header class="week-header">
                                     <span class="week-name">{{ group.weekRange }}</span>
                                     <span class="week-count">
-                                        {{ group.menus.length }} menü
+                                        {{ $t('menu.monthModal.menuCount', { n: group.menus.length }, group.menus.length) }}
                                     </span>
                                 </header>
 
@@ -197,14 +200,14 @@ defineExpose({ open });
 
                                             <div class="menu-meta">
                                                 <span class="menu-name">
-                                                    {{ menu.name || "Névtelen menü" }}
+                                                    {{ menu.name || $t('menu.untitled') }}
                                                 </span>
                                                 <span class="menu-sub">
                                                     <i class="bi bi-clock me-1"></i>
                                                     {{ formatTime(menu.planned_date) }}
                                                     <span class="dot">·</span>
                                                     <i class="bi bi-bag-check me-1"></i>
-                                                    {{ menu.recipes.length }} recept
+                                                    {{ menu.recipes.length }} {{ $t('menu.monthModal.recipeCount', menu.recipes.length) }}
                                                 </span>
                                             </div>
                                         </button>
@@ -213,8 +216,8 @@ defineExpose({ open });
                                             <button
                                                 type="button"
                                                 class="icon-btn"
-                                                aria-label="Megnyitás"
-                                                title="Ugrás a naptárban"
+                                                :aria-label="$t('menu.monthModal.openAria')"
+                                                :title="$t('menu.monthModal.openTitle')"
                                                 @click="onJump(menu.dateKey)"
                                             >
                                                 <i class="bi bi-box-arrow-up-right"></i>
@@ -222,8 +225,8 @@ defineExpose({ open });
                                             <button
                                                 type="button"
                                                 class="icon-btn danger"
-                                                aria-label="Törlés"
-                                                title="Menü törlése"
+                                                :aria-label="$t('menu.monthModal.deleteAria')"
+                                                :title="$t('menu.monthModal.deleteTitle')"
                                                 @click="onDelete(menu.id)"
                                             >
                                                 <i class="bi bi-trash"></i>
@@ -241,7 +244,7 @@ defineExpose({ open });
                             class="btn btn-outline-secondary"
                             data-bs-dismiss="modal"
                         >
-                            Bezárás
+                            {{ $t('menu.monthModal.close') }}
                         </button>
                     </div>
                 </div>

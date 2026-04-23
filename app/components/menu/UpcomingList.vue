@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore } from "~/stores/menu";
 import { toBudapestDateKey, todayBudapestKey } from "~/utils/budapestDate";
 
@@ -10,6 +9,9 @@ const emit = defineEmits<{
 }>();
 
 const menuStore = useMenuStore();
+const { t, locale } = useI18n();
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 type Row = {
     dateKey: string;
@@ -23,21 +25,24 @@ type Row = {
 const rows = computed<Row[]>(() => {
     const today = new Date();
     const todayKey = todayBudapestKey();
+    const weekdayFormatter = new Intl.DateTimeFormat(intlLocale.value, {
+        timeZone: "Europe/Budapest",
+        weekday: "short",
+    });
     const result: Row[] = [];
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
         const dateKey = toBudapestDateKey(d);
-        const weekdayIndex = (d.getDay() + 6) % 7;
         const menus = menuStore.getMenusForDate(dateKey);
 
         result.push({
             dateKey,
             date: d,
             dayNumber: d.getDate(),
-            weekdayLabel: HUNGARIAN_WEEKDAYS_LONG[weekdayIndex] ?? "",
+            weekdayLabel: weekdayFormatter.format(d),
             isToday: dateKey === todayKey,
-            menuNames: menus.map((m) => m.name || "Névtelen menü"),
+            menuNames: menus.map((m) => m.name || t("menu.untitled")),
         });
     }
     return result;
@@ -54,7 +59,7 @@ const onRowClick = (row: Row) => {
         <header class="d-flex align-items-center justify-content-between mb-3">
             <p class="card-title mb-0">
                 <i class="bi bi-calendar-week me-2"></i>
-                Közelgő 7 nap
+                {{ $t('menu.upcoming.title') }}
             </p>
         </header>
 
@@ -81,7 +86,7 @@ const onRowClick = (row: Row) => {
                             {{ name }}
                         </span>
                     </template>
-                    <span v-else class="empty-label">Nincs terv — <u>hozzáadás</u></span>
+                    <span v-else class="empty-label">{{ $t('menu.upcoming.empty') }} <u>{{ $t('menu.upcoming.emptyAction') }}</u></span>
                 </div>
             </li>
         </ul>
