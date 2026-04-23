@@ -1,0 +1,17 @@
+{
+  "login": {
+    "heading": "Login",
+    "fields": {
+      "identifier": "Email or username",
+      "identifierPlaceholder": "Enter your email or username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password"
+    },
+    "rememberMe": "Keep me signed in",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Login",
+    "submitting": "Signing in...",
+    "noAccount": "Don't have an account yet?",
+    "registerLink": "Register"
+  }
+}

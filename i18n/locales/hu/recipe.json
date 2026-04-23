@@ -17,8 +17,10 @@
       "add": "Új, saját recept felvétele"
     },
     "addRecipeModal": {
-      "title": "Recept létrehozása",
-      "subtitle": "Add meg a recept adatait lépésről lépésre.",
+      "title": "Recept hozzáadása",
+      "subtitle": "Adj meg egy új, saját receptet!",
+      "titleEdit": "Recept módosítás",
+      "subtitleEdit": "Módosítsd a saját recepted kedved szerint!",
       "stepCount": "{current} / {total} lépés",
       "stepLabel": "Lépés {step}",
       "steps": {
@@ -46,6 +48,7 @@
         "type": "Típus",
         "ingredient": "Hozzávaló",
         "ingredientPlaceholder": "Termék név...",
+        "ingredientSearchPlaceholder": "Alapanyag keresése...",
         "quantity": "Mennyiség",
         "unit": "Egység",
         "noResults": "Nincs találat.",
@@ -61,7 +64,9 @@
         "back": "Vissza",
         "next": "Tovább",
         "save": "Mentés",
-        "saving": "Mentés..."
+        "saving": "Mentés...",
+        "create": "Létrehozás",
+        "edit": "Módosítás"
       }
     },
     "card": {

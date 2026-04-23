@@ -30,22 +30,21 @@ const emit = defineEmits(["close", "resend"]);
         <Transition name="confirm-fade">
             <div v-if="show" class="confirm-overlay">
                 <div class="confirm-modal">
-                    <button type="button" class="confirm-close" @click="emit('close')">×</button>
+                    <button type="button" class="confirm-close" :aria-label="$t('common.actions.close')" @click="emit('close')">×</button>
 
                     <div class="confirm-icon-wrap">
-                        <img src="../../assets/images/authentication.png" alt="Authentication" title="Authentication">
+                        <img src="../../assets/images/authentication.png" :alt="$t('register.confirmModal.iconAlt')" :title="$t('register.confirmModal.iconAlt')">
                     </div>
 
-                    <h2 class="confirm-title">Email megerősítés</h2>
+                    <h2 class="confirm-title">{{ $t('register.confirmModal.title') }}</h2>
 
                     <p class="confirm-text">
-                        Küldtünk egy megerősítő emailt erre a címre:
+                        {{ $t('register.confirmModal.intro') }}
                         <span class="confirm-email">{{ email }}</span>
                     </p>
 
                     <p class="confirm-text mb-0">
-                        Kérjük, nyissa meg az emailjeit, és kattintson a levélben található linkre a regisztráció
-                        befejezéséhez.
+                        {{ $t('register.confirmModal.instructions') }}
                     </p>
 
                     <div v-if="resendMessage" class="alert alert-success mt-4 mb-2">
@@ -57,10 +56,10 @@ const emit = defineEmits(["close", "resend"]);
                     </div>
 
                     <div class="confirm-resend">
-                        <span>Nem kaptad meg az emailt?</span>
+                        <span>{{ $t('register.confirmModal.notReceived') }}</span>
                         <button type="button" class="confirm-resend-link" :disabled="resendLoading"
                             @click="emit('resend')">
-                            {{ resendLoading ? 'Újraküldés...' : 'Újraküldés' }}
+                            {{ resendLoading ? $t('register.confirmModal.resending') : $t('register.confirmModal.resend') }}
                         </button>
                     </div>
                 </div>

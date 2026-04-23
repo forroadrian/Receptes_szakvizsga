@@ -1,0 +1,47 @@
+{
+  "register": {
+    "heading": "Register",
+    "fields": {
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "repassword": "Password again",
+      "repasswordPlaceholder": "Enter your password again"
+    },
+    "validation": {
+      "usernameTooShort": "The username must be at least 4 characters.",
+      "passwordTooShort": "The password must be at least 6 characters.",
+      "passwordMismatch": "The two passwords don't match.",
+      "termsRequired": "You must accept the terms to continue."
+    },
+    "terms": "I accept the terms of service",
+    "submit": "Sign up",
+    "submitting": "Signing up...",
+    "alreadyRegistered": "Already have an account?",
+    "loginLink": "Login",
+    "alerts": {
+      "emailCheckFailed": "Could not verify the email address.",
+      "emailTaken": "This email address is already registered.",
+      "usernameCheckFailed": "Could not verify the username.",
+      "usernameTaken": "This username is already taken.",
+      "success": "Registration successful!",
+      "unexpectedError": "An unexpected error occurred during registration.",
+      "noEmailForResend": "No email address found to resend.",
+      "resendSuccess": "The confirmation email has been re-sent.",
+      "resendFailed": "Could not resend the confirmation email."
+    },
+    "confirmModal": {
+      "title": "Confirm your email",
+      "iconAlt": "Authentication",
+      "intro": "We've sent a confirmation email to:",
+      "instructions": "Please open your inbox and click the link in the email to complete registration.",
+      "notReceived": "Didn't get the email?",
+      "resend": "Resend",
+      "resending": "Resending...",
+      "close": "Close"
+    }
+  }
+}

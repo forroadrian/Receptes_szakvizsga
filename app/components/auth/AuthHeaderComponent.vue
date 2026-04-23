@@ -16,34 +16,36 @@ const toggleTheme = () => {
 <template>
     <header class="auth-topbar">
         <div class="auth-topbar-inner">
-            <NuxtLink to="/" class="auth-brand" aria-label="Vissza a kezdőlapra">
-                <NuxtImg src="/logo.png" alt="Receptes logó" title="Receptes logó" 
-                :width="180" 
-                :height="128" 
-                format="webp" 
-                loading="lazy" 
+            <NuxtLink to="/" class="auth-brand" :aria-label="$t('auth.brand.aria')">
+                <NuxtImg src="/logo.png" :alt="$t('auth.brand.alt')" :title="$t('auth.brand.imgTitle')"
+                :width="180"
+                :height="128"
+                format="webp"
+                loading="lazy"
                 densities="x1 x2"
                 class="auth-brand-logo" />
 
                 <div class="auth-brand-copy">
-                    <span class="auth-brand-title">Menuplanr</span>
-                    <span class="auth-brand-subtitle">Receptek, tervezés, személyre szabva</span>
+                    <span class="auth-brand-title">{{ $t('auth.brand.title') }}</span>
+                    <span class="auth-brand-subtitle">{{ $t('auth.brand.subtitle') }}</span>
                 </div>
             </NuxtLink>
 
             <div class="auth-topbar-actions">
+                <LanguageSwitcher />
+
                 <button type="button" class="auth-theme-button" @click="toggleTheme"
-                    :aria-label="isReady && colorMode.value === 'dark' ? 'Váltás világos témára' : 'Váltás sötét témára'">
+                    :aria-label="isReady && colorMode.value === 'dark' ? $t('auth.theme.toggleToLight') : $t('auth.theme.toggleToDark')">
                     <span class="auth-theme-icon">
                         {{ isReady && colorMode.value === 'dark' ? '🌙' : '☀️' }}
                     </span>
                     <span>
-                        {{ isReady && colorMode.value === 'dark' ? 'Sötét téma' : 'Világos téma' }}
+                        {{ isReady && colorMode.value === 'dark' ? $t('auth.theme.dark') : $t('auth.theme.light') }}
                     </span>
                 </button>
 
                 <NuxtLink to="/" class="grad orange auth-home-link">
-                    Vissza a főoldalra
+                    {{ $t('auth.home') }}
                 </NuxtLink>
             </div>
         </div>

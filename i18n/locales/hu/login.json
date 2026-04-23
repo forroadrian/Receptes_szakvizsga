@@ -1,0 +1,17 @@
+{
+  "login": {
+    "heading": "Bejelentkezés",
+    "fields": {
+      "identifier": "Email cím vagy felhasználónév",
+      "identifierPlaceholder": "Add meg az emailed vagy a felhasználóneved",
+      "password": "Jelszó",
+      "passwordPlaceholder": "Add meg a jelszavad"
+    },
+    "rememberMe": "Maradjak bejelentkezve",
+    "forgotPassword": "Elfelejtette a jelszavát?",
+    "submit": "Bejelentkezés",
+    "submitting": "Bejelentkezés...",
+    "noAccount": "Nincs még fiókod?",
+    "registerLink": "Regisztráció"
+  }
+}

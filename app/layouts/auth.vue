@@ -2,40 +2,22 @@
 import { computed } from 'vue';
 
 const route = useRoute();
+const { t } = useI18n();
 
 const isLoginPage = computed(() => route.path === '/login');
 
-const authPanelContent = computed(() => {
-    if (route.path === '/register') {
-        return {
-            badge: 'Új fiók',
-            title: 'Kezdjük együtt!',
-            text: 'Hozz létre fiókot, mentsd el kedvenc receptjeidet, és tedd személyesebbé az élményt már az első pillanattól.'
-        };
-    }
-
-    if (route.path === '/forgot-password') {
-        return {
-            badge: 'Segítség',
-            title: 'Visszajutás a fiókodba',
-            text: 'Néhány egyszerű lépésben új jelszót kérhetsz, hogy gyorsan és biztonságosan folytathasd az oldalon.'
-        };
-    }
-
-    if (route.path === '/password-reset') {
-        return {
-            badge: 'Új jelszó',
-            title: 'Már majdnem kész',
-            text: 'Állíts be egy új jelszót, és máris folytathatod a böngészést, mentést és tervezést.'
-        };
-    }
-
-    return {
-        badge: 'Bejelentkezés',
-        title: 'Üdv újra!',
-        text: 'Lépj be, és folytasd ott, ahol abbahagytad: kedvencek, menütervezés és személyes beállítások egy helyen.'
-    };
+const authPanelKey = computed(() => {
+    if (route.path === '/register') return 'register';
+    if (route.path === '/forgot-password') return 'forgot';
+    if (route.path === '/password-reset') return 'reset';
+    return 'login';
 });
+
+const authPanelContent = computed(() => ({
+    badge: t(`auth.panel.${authPanelKey.value}.badge`),
+    title: t(`auth.panel.${authPanelKey.value}.title`),
+    text: t(`auth.panel.${authPanelKey.value}.text`),
+}));
 </script>
 
 <template>

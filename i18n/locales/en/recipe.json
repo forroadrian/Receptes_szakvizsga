@@ -19,6 +19,8 @@
     "addRecipeModal": {
       "title": "Create new recipe",
       "subtitle": "Add the recipe details step by step.",
+      "titleEdit": "Edit recipe",
+      "subtitleEdit": "Modify your own recipe as you like!",
       "stepCount": "{current} / {total} steps",
       "stepLabel": "Step {step}",
       "steps": {
@@ -46,6 +48,7 @@
         "type": "Type",
         "ingredient": "Ingredient",
         "ingredientPlaceholder": "Product name...",
+        "ingredientSearchPlaceholder": "Search ingredient...",
         "quantity": "Quantity",
         "unit": "Unit",
         "noResults": "No results.",
@@ -61,7 +64,9 @@
         "back": "Back",
         "next": "Next",
         "save": "Save",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "create": "Create",
+        "edit": "Save changes"
       }
     },
     "card": {

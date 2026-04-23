@@ -66,9 +66,9 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                     <div class="w-100 d-flex align-items-start justify-content-between gap-3 flex-wrap">
                         <div>
                             <h2 id="openAddRecipeModalLabel" class="modal-title fs-3 mb-1">
-                                {{ recipeModal.isEditMode ? $t('Recept módosítás') : $t('Recept hozzáadása') }}
+                                {{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.titleEdit') : $t('recipe.addRecipeModal.title') }}
                             </h2>
-                            <p>{{ recipeModal.isEditMode ? $t('Módosítsd a saját recepted kedved szerint!') : $t('Adj meg egy új, saját receptet!') }}</p>
+                            <p>{{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.subtitleEdit') : $t('recipe.addRecipeModal.subtitle') }}</p>
                         </div>
 
                         <div class="recipe-progress-meta text-end">
@@ -79,7 +79,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                         </div>
                     </div>
 
-                    <button ref="closeBtn" type="button" class="btn-close ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button ref="closeBtn" type="button" class="btn-close ms-3" data-bs-dismiss="modal" :aria-label="$t('common.actions.close')"></button>
                 </div>
 
                 <div class="modal-body p-0">
@@ -181,7 +181,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="col-12">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.ingredient') }}</label>
                                                 <input v-model="recipeModal.ingredientSearch" type="text" class="form-control"
-                                                    :placeholder="$t('Frissítés')"
+                                                    :placeholder="$t('recipe.addRecipeModal.form.ingredientSearchPlaceholder')"
                                                     @focus="recipeModal.onIngredientSearchFocus"
                                                     @input="recipeModal.onIngredientSearchInput">
                                             </div>
@@ -199,8 +199,9 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="col-12">
                                                 <div v-if="recipeModal.showIngredientResults" class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
                                                     <Button v-for="ingredient in recipeModal.filteredIngredients" type="button"
-                                                        class="rounded-pill recipe-pill ingredient-result-pill" @click="recipeModal.selectIngredient(ingredient.id, ingredient.name)">
-                                                        {{ ingredient.name }}
+                                                        class="rounded-pill recipe-pill ingredient-result-pill"
+                                                        @click="recipeModal.selectIngredient(ingredient.id, $t('ingredient.' + ingredient.id))">
+                                                        {{ $t('ingredient.' + ingredient.id) }}
                                                     </Button>
                                                     <div v-if="recipeModal.filteredIngredients.length === 0" class="ingredient-search-empty">
                                                         {{ $t('recipe.addRecipeModal.form.noResults') }}
@@ -224,7 +225,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 </div>
                                                 <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
                                                     class="ingredient-item d-flex align-items-center justify-content-between gap-3">
-                                                    <span>{{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                                                    <span>{{ $t('ingredient.' + ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ ingredient.unit }}</span>
                                                     <div class="d-flex gap-2">
                                                         <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
                                                             @click="recipeModal.editIngredient(index)"></Button>
@@ -293,7 +294,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                     </Button>
 
                     <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving" @click="recipeModal.saveRecipe">
-                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('Módosítás') : $t('Létrehozás')) }}
+                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.edit') : $t('recipe.addRecipeModal.footer.create')) }}
                     </Button>
                 </div>
             </div>

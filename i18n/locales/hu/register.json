@@ -1,0 +1,47 @@
+{
+  "register": {
+    "heading": "Regisztráció",
+    "fields": {
+      "email": "Email cím",
+      "emailPlaceholder": "Add meg az email címed",
+      "username": "Felhasználónév",
+      "usernamePlaceholder": "Add meg a felhasználóneved",
+      "password": "Jelszó",
+      "passwordPlaceholder": "Add meg a jelszavad",
+      "repassword": "Jelszó újra",
+      "repasswordPlaceholder": "Add meg újra a jelszavad"
+    },
+    "validation": {
+      "usernameTooShort": "A felhasználónév legalább 4 karakter legyen.",
+      "passwordTooShort": "A jelszó legalább 6 karakter legyen.",
+      "passwordMismatch": "A két jelszó nem egyezik.",
+      "termsRequired": "A továbblépéshez el kell fogadnod a felhasználói feltételeket."
+    },
+    "terms": "Elfogadom a felhasználói feltételeket",
+    "submit": "Regisztrálás",
+    "submitting": "Regisztráció...",
+    "alreadyRegistered": "Van már fiókod?",
+    "loginLink": "Bejelentkezés",
+    "alerts": {
+      "emailCheckFailed": "Nem sikerült ellenőrizni az email címet.",
+      "emailTaken": "Ezzel az email címmel már regisztráltak.",
+      "usernameCheckFailed": "Nem sikerült ellenőrizni a felhasználónevet.",
+      "usernameTaken": "Ez a felhasználónév már foglalt.",
+      "success": "Sikeres regisztráció!",
+      "unexpectedError": "Váratlan hiba történt a regisztráció során.",
+      "noEmailForResend": "Nem található email cím az újraküldéshez.",
+      "resendSuccess": "A megerősítő email újra elküldve.",
+      "resendFailed": "Nem sikerült újraküldeni a megerősítő emailt."
+    },
+    "confirmModal": {
+      "title": "Email megerősítés",
+      "iconAlt": "Authentication",
+      "intro": "Küldtünk egy megerősítő emailt erre a címre:",
+      "instructions": "Kérjük, nyissa meg az emailjeit, és kattintson a levélben található linkre a regisztráció befejezéséhez.",
+      "notReceived": "Nem kaptad meg az emailt?",
+      "resend": "Újraküldés",
+      "resending": "Újraküldés...",
+      "close": "Close"
+    }
+  }
+}

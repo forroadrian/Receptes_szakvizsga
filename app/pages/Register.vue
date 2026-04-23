@@ -8,6 +8,7 @@ import { ref, computed, watch } from 'vue';
 import EmailConfirmationModal from '~/components/auth/EmailConfirmationModal.vue';
 
 const supabase = useSupabaseClient();
+const { t } = useI18n();
 
 const email = ref("");
 const username = ref("");
@@ -43,19 +44,19 @@ const setCustomInputValidity = () => {
 
     if (usernameInput) {
         usernameInput.setCustomValidity(
-            usernameOk.value ? "" : "A felhasználónév legalább 4 karakter legyen."
+            usernameOk.value ? "" : t('register.validation.usernameTooShort')
         );
     }
 
     if (passwordInput) {
         passwordInput.setCustomValidity(
-            passwordOk.value ? "" : "A jelszó legalább 6 karakter legyen."
+            passwordOk.value ? "" : t('register.validation.passwordTooShort')
         );
     }
 
     if (repasswordInput) {
         repasswordInput.setCustomValidity(
-            passwordsMatch.value ? "" : "A két jelszó nem egyezik."
+            passwordsMatch.value ? "" : t('register.validation.passwordMismatch')
         );
     }
 };
@@ -87,12 +88,12 @@ const onSubmit = async () => {
             .maybeSingle();
 
         if (emailCheckError) {
-            authError.value = 'Nem sikerült ellenőrizni az email címet.';
+            authError.value = t('register.alerts.emailCheckFailed');
             return;
         }
 
         if (existingEmailUser) {
-            authError.value = 'Ezzel az email címmel már regisztráltak.';
+            authError.value = t('register.alerts.emailTaken');
             return;
         }
 
@@ -103,12 +104,12 @@ const onSubmit = async () => {
             .maybeSingle();
 
         if (usernameCheckError) {
-            authError.value = 'Nem sikerült ellenőrizni a felhasználónevet.';
+            authError.value = t('register.alerts.usernameCheckFailed');
             return;
         }
 
         if (existingUsernameUser) {
-            authError.value = 'Ez a felhasználónév már foglalt.';
+            authError.value = t('register.alerts.usernameTaken');
             return;
         }
 
@@ -128,7 +129,7 @@ const onSubmit = async () => {
         }
 
         confirmationEmail.value = trimmedEmail;
-        authSuccess.value = "Sikeres regisztráció!";
+        authSuccess.value = t('register.alerts.success');
         showConfirmationModal.value = true;
 
         email.value = "";
@@ -142,7 +143,7 @@ const onSubmit = async () => {
             formRef.value.reset();
         }
     } catch (error) {
-        authError.value = "Váratlan hiba történt a regisztráció során.";
+        authError.value = t('register.alerts.unexpectedError');
     } finally {
         signupLoading.value = false;
     }
@@ -153,7 +154,7 @@ const resendConfirmationEmail = async () => {
     resendError.value = "";
 
     if (!confirmationEmail.value) {
-        resendError.value = "Nem található email cím az újraküldéshez.";
+        resendError.value = t('register.alerts.noEmailForResend');
         return;
     }
 
@@ -174,9 +175,9 @@ const resendConfirmationEmail = async () => {
             return;
         }
 
-        resendMessage.value = "A megerősítő email újra elküldve.";
+        resendMessage.value = t('register.alerts.resendSuccess');
     } catch (error) {
-        resendError.value = "Nem sikerült újraküldeni a megerősítő emailt.";
+        resendError.value = t('register.alerts.resendFailed');
     } finally {
         resendLoading.value = false;
     }
@@ -194,39 +195,39 @@ const closeConfirmationModal = () => {
         <div class="auth-form-shell">
             <div class="auth-form-side d-flex flex-column justify-content-center">
                 <div class="text-center mb-2">
-                    <h1 class="fs-1">Regisztráció</h1>
+                    <h1 class="fs-1">{{ $t('register.heading') }}</h1>
                 </div>
 
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                     @submit.prevent="onSubmit">
-                    <FormInput v-model="email" label="Email cím" type="email" placeholder="Add meg az email címed"
-                        required />
+                    <FormInput v-model="email" :label="$t('register.fields.email')" type="email"
+                        :placeholder="$t('register.fields.emailPlaceholder')" required />
 
-                    <FormInput v-model="username" label="Felhasználónév" type="text"
-                        placeholder="Add meg a felhasználóneved" required />
+                    <FormInput v-model="username" :label="$t('register.fields.username')" type="text"
+                        :placeholder="$t('register.fields.usernamePlaceholder')" required />
                     <div v-if="submitAttempted && !usernameOk" class="invalid-feedback d-block mb-2">
-                        A felhasználónév legalább 4 karakter legyen.
+                        {{ $t('register.validation.usernameTooShort') }}
                     </div>
 
-                    <FormInput v-model="password" label="Jelszó" type="password" placeholder="Add meg a jelszavad"
-                        required />
+                    <FormInput v-model="password" :label="$t('register.fields.password')" type="password"
+                        :placeholder="$t('register.fields.passwordPlaceholder')" required />
                     <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
-                        A jelszó legalább 6 karakter legyen.
+                        {{ $t('register.validation.passwordTooShort') }}
                     </div>
 
-                    <FormInput v-model="repassword" label="Jelszó újra" type="password"
-                        placeholder="Add meg újra a jelszavad" required />
+                    <FormInput v-model="repassword" :label="$t('register.fields.repassword')" type="password"
+                        :placeholder="$t('register.fields.repasswordPlaceholder')" required />
                     <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
-                        A két jelszó nem egyezik.
+                        {{ $t('register.validation.passwordMismatch') }}
                     </div>
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" v-model="acceptTerms" required />
                         <label class="form-check-label">
-                            Elfogadom a felhasználói feltételeket
+                            {{ $t('register.terms') }}
                         </label>
                         <div class="invalid-feedback">
-                            A továbblépéshez el kell fogadnod a felhasználói feltételeket.
+                            {{ $t('register.validation.termsRequired') }}
                         </div>
                     </div>
 
@@ -239,12 +240,12 @@ const closeConfirmationModal = () => {
                     </div>
 
                     <Button type="submit" color="orange" class="w-100 py-2" :disabled="signupLoading">
-                        {{ signupLoading ? 'Regisztráció...' : 'Regisztrálás' }}
+                        {{ signupLoading ? $t('register.submitting') : $t('register.submit') }}
                     </Button>
 
                     <div class="mt-3 d-flex justify-content-center">
-                        <p class="pe-3">Van már fiókod?</p>
-                        <NuxtLink to="/login">Bejelentkezés</NuxtLink>
+                        <p class="pe-3">{{ $t('register.alreadyRegistered') }}</p>
+                        <NuxtLink to="/login">{{ $t('register.loginLink') }}</NuxtLink>
                     </div>
                 </form>
             </div>
