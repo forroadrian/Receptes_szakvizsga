@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore } from "~/stores/menu";
 import { todayBudapestKey } from "~/utils/budapestDate";
 
 const menuStore = useMenuStore();
+const { locale } = useI18n();
 
 const now = new Date();
 const dayNumber = now.getDate();
-const monthLabel = new Intl.DateTimeFormat("hu-HU", {
-    timeZone: "Europe/Budapest",
-    month: "long",
-}).format(now);
-const weekdayIndex = (now.getDay() + 6) % 7;
-const weekdayLabel = HUNGARIAN_WEEKDAYS_LONG[weekdayIndex];
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
+
+const monthLabel = computed(() =>
+    new Intl.DateTimeFormat(intlLocale.value, {
+        timeZone: "Europe/Budapest",
+        month: "long",
+    }).format(now)
+);
+
+const weekdayLabel = computed(() =>
+    new Intl.DateTimeFormat(intlLocale.value, {
+        timeZone: "Europe/Budapest",
+        weekday: "long",
+    }).format(now)
+);
 
 const todayMenus = computed(() => menuStore.getMenusForDate(todayBudapestKey()));
 </script>
@@ -33,12 +43,12 @@ const todayMenus = computed(() => menuStore.getMenusForDate(todayBudapestKey()))
                 <i class="bi bi-check2-circle me-2"></i>
                 <span>
                     <strong>{{ todayMenus.length }}</strong>
-                    mai menü
+                    {{ $t('menu.today.count', todayMenus.length) }}
                 </span>
             </template>
             <template v-else>
                 <i class="bi bi-calendar-plus me-2"></i>
-                <span>Nincs mai menü</span>
+                <span>{{ $t('menu.today.empty') }}</span>
             </template>
         </div>
     </section>

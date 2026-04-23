@@ -24,7 +24,7 @@ const emit = defineEmits<{
             @click="emit('open-month')"
         >
             <i class="bi bi-grid-3x3-gap me-2"></i>
-            Havi menük
+            {{ $t('menu.sidebar.monthlyMenus') }}
         </button>
     </aside>
 </template>
