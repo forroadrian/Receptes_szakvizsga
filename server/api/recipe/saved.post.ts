@@ -1,152 +1,44 @@
-import { serverSupabaseServiceRole, serverSupabaseUser } from "#supabase/server";
-
-type SavedBody = {
-    recipeId: number;
-    saved: boolean;
-};
-
-type UserRecipeRow = {
-    recipe_id: number;
-    user_id: string;
-    saved: boolean | null;
-    tried: boolean | null;
-};
+import { serverSupabaseServiceRole } from "#supabase/server";
+import { Database } from "~/types/database.types";
+import { requireUser } from "~~/server/utils/requireUser";
 
 export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event);
+    const admin = await serverSupabaseServiceRole<Database>(event);
+    const user = await requireUser(event);
 
-    if (!user?.id) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: "Nincs bejelentkezett user."
-        });
-    }
+    const body = await readBody(event);
+    const { recipe_id } = body;
 
-    const body = await readBody<SavedBody>(event);
-    const supabase = serverSupabaseServiceRole(event);
+    if (!recipe_id) throw createError({ statusCode: 400, message: "recipe_id is required" });
 
-    const { data: existingRow, error: fetchError } = await supabase
+    const { data: existing, error: existingError } = await admin
         .from("user_recipe")
-        .select("recipe_id, user_id, saved, tried")
-        .eq("user_id", user.id)
-        .eq("recipe_id", body.recipeId)
-        .maybeSingle<UserRecipeRow>();
+        .select("saved")
+        .eq("user_id", user.sub)
+        .eq("recipe_id", recipe_id)
+        .maybeSingle();
 
-    if (fetchError) {
-        throw createError({
-            statusCode: 500,
-            statusMessage: fetchError.message
-        });
-    }
+    if (existingError) throw createError({ statusCode: 500, message: existingError.message });
 
-    if (!body.saved) {
-        const { error: deleteError } = await supabase
-            .from("user_recipe")
-            .delete()
-            .eq("user_id", user.id)
-            .eq("recipe_id", body.recipeId);
+    const newSaved = !existing?.saved;
 
-        if (deleteError) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: deleteError.message
-            });
-        }
+    const { error: rowError } = existing
+        ? await admin.from("user_recipe").update({ saved: newSaved }).eq("user_id", user.sub).eq("recipe_id", recipe_id)
+        : await admin.from("user_recipe").insert({ user_id: user.sub, recipe_id, saved: true });
 
-        const { data: recipeRow, error: recipeFetchError } = await supabase
-            .from("recipe")
-            .select("saves")
-            .eq("id", body.recipeId)
-            .single<{ saves: number }>();
+    if (rowError) throw createError({ statusCode: 500, message: rowError.message });
 
-        if (recipeFetchError) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: recipeFetchError.message
-            });
-        }
+    const { data: recipe, error: fetchError } = await admin
+        .from("recipe").select("likes").eq("id", recipe_id).single();
 
-        const { error: recipeUpdateError } = await supabase
-            .from("recipe")
-            .update({
-                saves: Math.max((recipeRow?.saves ?? 1) - 1, 0)
-            })
-            .eq("id", body.recipeId);
+    if (fetchError) throw createError({ statusCode: 500, message: fetchError.message });
 
-        if (recipeUpdateError) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: recipeUpdateError.message
-            });
-        }
-
-        return { success: true };
-    }
-
-    if (existingRow) {
-        if (existingRow.saved) {
-            return { success: true };
-        }
-
-        const { error: updateError } = await supabase
-            .from("user_recipe")
-            .update({
-                saved: true,
-                tried: existingRow.tried ?? false
-            })
-            .eq("user_id", user.id)
-            .eq("recipe_id", body.recipeId);
-
-        if (updateError) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: updateError.message
-            });
-        }
-    } else {
-        const { error: insertError } = await supabase
-            .from("user_recipe")
-            .insert({
-                user_id: user.id,
-                recipe_id: body.recipeId,
-                saved: true,
-                tried: false
-            });
-
-        if (insertError) {
-            throw createError({
-                statusCode: 500,
-                statusMessage: insertError.message
-            });
-        }
-    }
-
-    const { data: recipeRow, error: recipeFetchError } = await supabase
+    const { error: likesError } = await admin
         .from("recipe")
-        .select("saves")
-        .eq("id", body.recipeId)
-        .single<{ saves: number }>();
+        .update({ likes: Math.max(0, recipe.likes + (newSaved ? 1 : -1)) })
+        .eq("id", recipe_id);
 
-    if (recipeFetchError) {
-        throw createError({
-            statusCode: 500,
-            statusMessage: recipeFetchError.message
-        });
-    }
+    if (likesError) throw createError({ statusCode: 500, message: likesError.message });
 
-    const { error: recipeUpdateError } = await supabase
-        .from("recipe")
-        .update({
-            saves: (recipeRow?.saves ?? 0) + 1
-        })
-        .eq("id", body.recipeId);
-
-    if (recipeUpdateError) {
-        throw createError({
-            statusCode: 500,
-            statusMessage: recipeUpdateError.message
-        });
-    }
-
-    return { success: true };
+    return { saved: newSaved };
 });
