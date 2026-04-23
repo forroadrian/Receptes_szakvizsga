@@ -1,140 +1,312 @@
 <script setup lang="ts">
-definePageMeta({
-    middleware: "auth-only",
-});
-import { storeToRefs } from "pinia";
-import type SearchParams from "~/interfaces/SearchParams";
-import Ingredient from "~/models/Ingredient";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useIngredientStore } from "~/stores/ingredients";
+import type Ingredient from "~/models/Ingredient";
+
+definePageMeta({ middleware: "auth-only" });
 
 const store = useIngredientStore();
 
-const { ingredients } = storeToRefs(store)
-const { loadIngredients, loadAvailableIngredients, removeIngredient } = store
+const addModalRef = ref<any>(null);
+const missingModalRef = ref<any>(null);
 
-const alert = ref(false);
+const search = ref("");
+const activeTab = ref<"all" | "Friss" | "Hamarosan" | "Lejárt">("all");
+
+const highlightedId = ref<number | null>(null);
+const rowContainers = ref<Record<number, HTMLElement | null>>({});
+
 const loading = ref(false);
+const errorAlert = ref(false);
 
-const hasItems = computed(() => ingredients.value.length > 0)
+const freshCount = computed(() => store.ingredients.filter((i) => i.tag === "Friss").length);
+const warningCount = computed(() => store.ingredients.filter((i) => i.tag === "Hamarosan").length);
+const expiredCount = computed(() => store.ingredients.filter((i) => i.tag === "Lejárt").length);
 
-const description = computed(() => {
-    if (loading.value) return "Az adatok betöltése folyamatban van";
-    if (!hasItems.value) return "Még nem adtál hozzá semmit";
-    if (results.value.length == 0) return "Sajnos nem találtunk ilyen alapanyagot :(";
-    return "Ismeretlen hiba";
-})
+const filtered = computed(() => {
+    const q = search.value.trim().toLowerCase();
+    return store.ingredients.filter((i) => {
+        if (activeTab.value !== "all" && i.tag !== activeTab.value) return false;
+        if (q && !i.name.toLowerCase().includes(q)) return false;
+        return true;
+    });
+});
 
-const fresh = computed(() => ingredients.value.filter(v => v.tag === "Friss").length)
-const expiring = computed(() => ingredients.value.filter(v => v.tag === "Hamarosan").length)
-const expired = computed(() => ingredients.value.filter(v => v.tag === "Lejárt").length)
-const query = ref<string[]>([])
+const openAddModal = (prefillName?: string) => addModalRef.value?.open(prefillName);
+const openMissing = () => missingModalRef.value?.open();
 
-const params = computed<SearchParams<Ingredient>>(() => ({
-    haystack: ingredients.value as Ingredient[],
-    searchFor: ["name", "tag"],
-    showAllByDefault: true,
-    query: query.value
-}));
+const handleMissingPick = (name: string) => {
+    activeTab.value = "all";
+    openAddModal(name);
+};
 
-const results = useSearch(params);
+const handleJump = async (id: number) => {
+    activeTab.value = "all";
+    search.value = "";
+    highlightedId.value = id;
+    await nextTick();
+    rowContainers.value[id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+        if (highlightedId.value === id) highlightedId.value = null;
+    }, 1300);
+};
 
-const addToQuery = (tag: string) => {
-    query.value[1] = tag === "Összes" ? "" : tag;
-}
-
-const onDelete = async (ingredient: Ingredient) => {
+const handleDelete = async (ingredient: Ingredient) => {
     try {
-        removeIngredient(ingredient.id);
+        await store.removeIngredient(ingredient.id);
     } catch {
-        alert.value = true;
+        errorAlert.value = true;
     }
 };
 
+const handleEdit = (ingredient: Ingredient) => {
+    addModalRef.value?.openForEdit(ingredient);
+};
+
 onMounted(async () => {
+    const tasks: Promise<unknown>[] = [];
+    if (!store.ingredients.length) tasks.push(store.loadIngredients());
+    if (!store.availableIngredients.length) tasks.push(store.loadAvailableIngredients());
+    if (!tasks.length) return;
+
     loading.value = true;
     try {
-        await Promise.all([loadIngredients(), loadAvailableIngredients()])
-        addToQuery("Összes")
+        await Promise.all(tasks);
     } finally {
         loading.value = false;
     }
-})
+});
 </script>
 
 <template>
-    <div class="page">
-        <div class="layout">
+    <section class="ingredients-page">
+        <div class="ingredients-shell mx-auto px-3 px-md-4 px-lg-5 py-4">
+            <header class="page-header mb-4">
+                <h1 class="page-title mb-2">Kamrám</h1>
+                <p class="page-subtitle mb-0">
+                    Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van.
+                </p>
+            </header>
 
-            <section class="sidebar my-4">
-                <div class="d-flex flex-column h-100">
-                    <div class="hero-wrap d-none d-lg-block position-relative overflow-hidden">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSLN9jlsLxNa9URKbO2qra2TdszoSHF40m1iZ4-wleCqrlPDTZF5fly-No8zHGvm27CwIm1YPGnadC2OOTmr9t9eZt3Og_UePN1KtlkN1qIaCIw_2__B6Lcxfhc82McJfnVOU-hW6kPd4O5RW5TpBiDt8N6nAEG1T_5_KoVuOSVuWlh3vTKffb03SuuOmxPW02m7FZ26AfZTzyygW3geWL--ncrAyIr9Y-ZMRlySDQRkxhnmO-2QhU8wsrITA85nSBOKhc7os7X-Y"
-                            alt="Friss zöldségek és hozzávalók"
-                            class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" />
-                        <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
-                        <div class="hero-text position-absolute z-1">
-                            <h1 class="hero-title text-uppercase">A te<br>kamrád</h1>
-                            <p class="hero-sub m-0 fw-semibold">{{ ingredients.length }} alapanyag nyilvántartva</p>
+            <div class="row g-4">
+                <aside class="col-12 col-lg-4 order-lg-1 order-2">
+                    <IngredientSidebar @jump="handleJump" @open-missing="openMissing" />
+                </aside>
+
+                <section class="col-12 col-lg-8 order-lg-2 order-1">
+                    <div class="row align-items-center mb-3 gy-2">
+                        <div class="col-12">
+                            <SearchBar v-model="search" placeholder="Keress alapanyag nevére..." class="w-100" />
                         </div>
                     </div>
 
-                    <div class="summary flex-grow-1">
-                        <div class="mb-3">
-                            <h3 class="summary-title m-0 fw-bold text-uppercase">Összefoglaló</h3>
+                    <nav class="tabs mb-3">
+                        <button
+                            type="button"
+                            class="tab"
+                            :class="{ active: activeTab === 'all' }"
+                            @click="activeTab = 'all'"
+                        >
+                            Összes
+                            <span class="tab-count">{{ store.ingredients.length }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            :class="{ active: activeTab === 'Friss' }"
+                            @click="activeTab = 'Friss'"
+                        >
+                            Friss
+                            <span class="tab-count">{{ freshCount }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            :class="{ active: activeTab === 'Hamarosan' }"
+                            @click="activeTab = 'Hamarosan'"
+                        >
+                            Hamarosan
+                            <span class="tab-count">{{ warningCount }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            :class="{ active: activeTab === 'Lejárt' }"
+                            @click="activeTab = 'Lejárt'"
+                        >
+                            Lejárt
+                            <span class="tab-count">{{ expiredCount }}</span>
+                        </button>
+                    </nav>
+
+                    <div class="list-area">
+                        <button
+                            type="button"
+                            class="add-tile"
+                            @click="openAddModal()"
+                        >
+                            <span class="plus">+</span>
+                            <span>Új alapanyag hozzáadása</span>
+                        </button>
+
+                        <p v-if="loading" class="loading-note text-muted small mb-0 py-2 text-center">
+                            Betöltés...
+                        </p>
+
+                        <div v-else-if="!filtered.length" class="empty-list">
+                            <i class="bi bi-basket2 fs-2 mb-2 d-block"></i>
+                            <p class="mb-0">
+                                <template v-if="search">Nincs találat a keresésre.</template>
+                                <template v-else-if="activeTab === 'all'">Még nincs alapanyag a kamrádban.</template>
+                                <template v-else>Nincs ilyen állapotú alapanyag.</template>
+                            </p>
                         </div>
-                        <div class="stats d-flex flex-column">
-                            <div class="stat stat-fresh d-flex align-items-baseline">
-                                <span class="stat-num lh-1">{{ fresh }}</span>
-                                <span class="stat-text fw-medium">Friss</span>
-                            </div>
-                            <div class="stat stat-warning d-flex align-items-baseline">
-                                <span class="stat-num lh-1">{{ expiring }}</span>
-                                <span class="stat-text fw-medium">Hamarosan lejár</span>
-                            </div>
-                            <div class="stat stat-expired d-flex align-items-baseline">
-                                <span class="stat-num lh-1">{{ expired }}</span>
-                                <span class="stat-text fw-medium">Lejárt</span>
+
+                        <div v-else class="rows">
+                            <div
+                                v-for="ingredient in filtered"
+                                :key="ingredient.id"
+                                :ref="(el) => (rowContainers[ingredient.id] = el as HTMLElement)"
+                            >
+                                <IngredientRow
+                                    :ingredient="ingredient as Ingredient"
+                                    :highlight="highlightedId === ingredient.id"
+                                    @delete="handleDelete"
+                                    @edit="handleEdit"
+                                />
                             </div>
                         </div>
                     </div>
-
-                    <NuxtLink to="/ingredients/add"
-                        class="add-link d-flex align-items-center justify-content-between text-decoration-none overflow-hidden position-relative">
-                        <div class="position-relative z-1">
-                            <p class="add-label fw-bold">Hiányzik valami?</p>
-                            <h3 class="add-title m-0">Új alapanyag hozzáadása</h3>
-                        </div>
-                    </NuxtLink>
-                </div>
-            </section>
-
-            <section class="main">
-                <div class="main-inner w-100">
-                    <header class="main-head">
-                        <h2 class="main-title fw-bold">Alapanyagaim</h2>
-                        <p class="main-desc m-0 text-secondary">Böngészd és szűrd a kamrádban lévő hozzávalókat.</p>
-                    </header>
-
-                    <SearchBar v-model="query[0]" placeholder="Keress alapanyag nevére..." />
-                    <IngredientStatCards :all="ingredients.length" :fresh="fresh" :almostExpired="expiring"
-                        :expired="expired" @filter="addToQuery" />
-                    <IngredientList :results="results" @delete="onDelete" @edit="" :loading="loading"
-                        :description="description" :hasIngredients="hasItems" />
-                </div>
-            </section>
-
+                </section>
+            </div>
         </div>
-    </div>
 
-    <Alert message="Helytelen adat." :show="alert" type="error" @close="alert = false" />
+        <IngredientAddModal ref="addModalRef" />
+        <IngredientMissingSuggestionsModal ref="missingModalRef" @pick="handleMissingPick" />
+
+        <Alert message="Helytelen adat." :show="errorAlert" type="error" @close="errorAlert = false" />
+    </section>
 </template>
 
-<style>
-.card--base {
-    padding: 0;
-}
-</style>
-
 <style scoped>
-@import '~/assets/css/ingredientIndex.css';
+.ingredients-page {
+    min-height: 100%;
+    background: var(--bs-body-bg);
+}
+
+.ingredients-shell {
+    width: min(100%, 1320px);
+}
+
+.page-title {
+    font-family: "Caveat Brush", cursive;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    text-transform: uppercase;
+    color: var(--bs-emphasis-color);
+}
+
+.page-subtitle {
+    color: var(--bs-secondary-color);
+    max-width: 60ch;
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.tab:hover {
+    color: var(--bs-emphasis-color);
+}
+
+.tab.active {
+    color: var(--bs-emphasis-color);
+    border-bottom-color: var(--orange);
+    font-weight: 600;
+}
+
+.tab-count {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: var(--radius-rounded);
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-secondary-color);
+}
+
+.list-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.add-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    border: 2px dashed var(--bs-border-color);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--bs-secondary-color);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s ease-in;
+}
+
+.add-tile:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: var(--accent-soft);
+}
+
+[data-bs-theme="dark"] .add-tile:hover {
+    background: rgba(255, 114, 49, 0.08);
+}
+
+.add-tile .plus {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.empty-list {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--bs-secondary-color);
+}
+
+@media (max-width: 991px) {
+    .page-subtitle {
+        font-size: var(--small-text);
+    }
+}
+
+@media (max-width: 576px) {
+    .tabs {
+        gap: 0.85rem;
+    }
+}
 </style>

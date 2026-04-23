@@ -94,6 +94,23 @@ export const useIngredientStore = defineStore("ingredients", () => {
         return data;
     }
 
+    const updateIngredient = async (prevId: number, updated: Ingredient) => {
+        await $fetch('/api/ingredient', {
+            method: 'PUT',
+            body: {
+                prev: prevId,
+                ingredient_id: updated.id,
+                unit: updated.unit,
+                quantity: updated.quantity,
+                expiry: updated.expiry.value,
+            }
+        })
+        const index = ingredients.value.findIndex((v) => v.id === prevId)
+        if (index !== -1) {
+            ingredients.value.splice(index, 1, updated)
+        }
+    }
+
     return {
         openIngredientModal,
         closeIngredientModal,
@@ -103,6 +120,7 @@ export const useIngredientStore = defineStore("ingredients", () => {
         loadAvailableIngredients,
         removeIngredient,
         postIngredient,
+        updateIngredient,
         getMissing,
         showIngredientModal,
         units,
