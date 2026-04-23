@@ -18,6 +18,9 @@
             "label": "Open collapse"
           }
         },
+        "aria": {
+          "main": "Main navigation"
+        },
         "register": "Register",
         "login": "Login"
       }

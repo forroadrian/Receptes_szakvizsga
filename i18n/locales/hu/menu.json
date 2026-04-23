@@ -1,0 +1,98 @@
+{
+  "menu": {
+    "title": "Menütervező",
+    "subtitle": "Tervezd meg az étkezéseidet, kövesd nyomon a hiányzó alapanyagokat, és érezd magad otthonosabban a konyhában.",
+    "untitled": "Névtelen menü",
+    "sidebar": {
+      "monthlyMenus": "Havi menük"
+    },
+    "today": {
+      "count": "mai menü",
+      "empty": "Nincs mai menü"
+    },
+    "nextUp": {
+      "label": "Következő menü",
+      "untitled": "Névtelen menü",
+      "soon": "Hamarosan",
+      "today": "Ma",
+      "todayAt": "Ma {time} — {hours} óra múlva",
+      "tomorrow": "Holnap {time}",
+      "inDays": "{n} nap múlva",
+      "recipeCount": "recept",
+      "empty": "Nincs közelgő menü. Kattints egy napra a naptárban új menü hozzáadásához."
+    },
+    "upcoming": {
+      "title": "Közelgő 7 nap",
+      "empty": "Nincs terv —",
+      "emptyAction": "hozzáadás"
+    },
+    "calendar": {
+      "prevMonth": "Előző hónap",
+      "nextMonth": "Következő hónap",
+      "today": "Ma",
+      "overflow": "+ további {n}",
+      "missingBadgeTitle": "{n} hiányzó alapanyag"
+    },
+    "addModal": {
+      "title": "Recept hozzáadása",
+      "pinned": "Kiválasztva:",
+      "removeAria": "Eltávolítás",
+      "modeNew": "Új menü",
+      "modeExisting": "Meglévő menühöz",
+      "menuName": "Menü neve",
+      "chooseMenu": "Válaszd ki, melyik menühöz adod",
+      "existingOption": "{name} ({count} recept)",
+      "tabOwn": "Sajátjaim",
+      "tabPublic": "Receptek közül",
+      "searchPlaceholder": "Keresés név vagy leírás alapján...",
+      "emptyOwn": "Még nincs saját recepted.",
+      "createRecipe": "Új recept létrehozása",
+      "emptySearch": "Nincs a keresésnek megfelelő recept.",
+      "detailsLink": "Részletek",
+      "selectedCount": "{n} recept kiválasztva",
+      "cancel": "Mégse",
+      "save": "Mentés",
+      "saving": "Mentés...",
+      "error": "Nem sikerült hozzáadni a recepteket.",
+      "defaultName": "{weekday} menü",
+      "defaultFallback": "Menü",
+      "minutes": "perc",
+      "people": "fő"
+    },
+    "monthModal": {
+      "title": "Havi menük",
+      "menuCount": "{n} menü",
+      "empty": "Nincs menü ebben a hónapban.",
+      "weekLabel": "{n}. hét",
+      "openAria": "Megnyitás",
+      "openTitle": "Ugrás a naptárban",
+      "deleteAria": "Törlés",
+      "deleteTitle": "Menü törlése",
+      "confirmDelete": "Biztosan törlöd ezt a menüt?",
+      "deleteError": "Nem sikerült törölni a menüt.",
+      "close": "Bezárás",
+      "recipeCount": "recept"
+    },
+    "dayDetail": {
+      "title": "Nap részletei",
+      "deleteMenuAria": "Menü törlése",
+      "removeRecipeAria": "Recept eltávolítása",
+      "removeRecipeTitle": "Recept eltávolítása a menüből",
+      "noRecipes": "Nincs recept ebben a menüben.",
+      "empty": "Nincs menü erre a napra.",
+      "missingTitle": "Hiányzó alapanyagok",
+      "checking": "Ellenőrzés...",
+      "allPresent": "Minden alapanyag megvan.",
+      "expiredFlag": "lejárt",
+      "expiredTitle": "Van belőle otthon, de lejárt",
+      "close": "Bezárás",
+      "addRecipe": "Recept hozzáadása",
+      "confirmRemoveRecipe": "Biztosan eltávolítod a receptet a menüből?",
+      "removeRecipeError": "Nem sikerült eltávolítani a receptet.",
+      "confirmDeleteMenu": "Biztosan törlöd ezt a menüt?",
+      "deleteMenuError": "Nem sikerült törölni a menüt.",
+      "minutes": "perc",
+      "people": "fő"
+    }
+  }
+}

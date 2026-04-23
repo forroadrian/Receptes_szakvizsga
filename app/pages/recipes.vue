@@ -237,11 +237,11 @@ const handleTabClick = (tab: any) => {
                                 <div class="row justify-content-center mb-3 py-2">
                                     <div class="col-auto">
                                         <i class="bi bi-clock me-1"></i>
-                                        {{ recipe.time }} {{ $t('recipe.card.metadata.time') }}
+                                        {{ recipe.time }} {{ $t('recipe.card.metadata.time', recipe.time) }}
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-people me-1"></i>
-                                        {{ recipe.servings }} {{ $t('recipe.card.metadata.people') }}
+                                        {{ recipe.servings }} {{ $t('recipe.card.metadata.people', recipe.servings) }}
                                     </div>
                                 </div>
 
@@ -285,7 +285,7 @@ const handleTabClick = (tab: any) => {
                             ({{ activeFilterCount }} {{ $t('recipe.sidebar.active') }})
                         </span>
                     </p>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" :aria-label="$t('common.actions.close')"></button>
                 </div>
 
                 <div class="offcanvas-body">

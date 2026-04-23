@@ -57,10 +57,9 @@ const handleJump = (dateKey: string) => {
     <section class="menu-page">
         <div class="menu-shell mx-auto px-3 px-md-4 px-lg-5 py-4">
             <header class="page-header mb-4">
-                <h1 class="page-title mb-2">Menütervező</h1>
+                <h1 class="page-title mb-2">{{ $t('menu.title') }}</h1>
                 <p class="page-subtitle mb-0">
-                    Tervezd meg az étkezéseidet, kövesd nyomon a hiányzó alapanyagokat, és
-                    érezd magad otthonosabban a konyhában.
+                    {{ $t('menu.subtitle') }}
                 </p>
             </header>
 

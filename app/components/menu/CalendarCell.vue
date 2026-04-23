@@ -46,7 +46,7 @@ const onOverflowClick = () => emit("overflow-click", props.cell.dateKey);
             <span
                 v-if="missingCount && missingCount > 0"
                 class="missing-badge"
-                :title="`${missingCount} hiányzó alapanyag`"
+                :title="$t('menu.calendar.missingBadgeTitle', { n: missingCount }, missingCount)"
             >
                 <i class="bi bi-exclamation-triangle-fill"></i>
                 {{ missingCount }}
@@ -62,7 +62,7 @@ const onOverflowClick = () => emit("overflow-click", props.cell.dateKey);
                 :title="menu.name ?? ''"
                 @click.stop="onMenuClick(menu.id)"
             >
-                {{ menu.name || "Névtelen menü" }}
+                {{ menu.name || $t('menu.untitled') }}
             </button>
 
             <button
@@ -71,7 +71,7 @@ const onOverflowClick = () => emit("overflow-click", props.cell.dateKey);
                 class="overflow-pill"
                 @click.stop="onOverflowClick"
             >
-                + további {{ overflowCount }}
+                {{ $t('menu.calendar.overflow', { n: overflowCount }) }}
             </button>
 
             <div v-if="!menus.length && cell.isCurrentMonth" class="empty-hint">

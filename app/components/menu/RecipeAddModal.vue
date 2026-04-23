@@ -2,11 +2,13 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useMenuStore } from "~/stores/menu";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 
 const menuStore = useMenuStore();
 const recipeStore = useRecipeStore();
 const user = useSupabaseUser();
+const { t, locale } = useI18n();
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
@@ -25,21 +27,20 @@ const targetDateLabel = computed(() => {
     if (!targetDate.value) return "";
     const [y, m, d] = targetDate.value.split("-").map(Number);
     const date = new Date(y!, (m ?? 1) - 1, d);
-    const weekdayIndex = (date.getDay() + 6) % 7;
-    const weekday = HUNGARIAN_WEEKDAYS_LONG[weekdayIndex];
-    const formatted = new Intl.DateTimeFormat("hu-HU", {
+    const formatted = new Intl.DateTimeFormat(intlLocale.value, {
         month: "long",
         day: "numeric",
     }).format(date);
-    return `${formatted}, ${weekday?.toLowerCase()}`;
+    const weekday = new Intl.DateTimeFormat(intlLocale.value, { weekday: "long" }).format(date);
+    return `${formatted}, ${weekday.toLowerCase()}`;
 });
 
 const defaultMenuName = computed(() => {
-    if (!targetDate.value) return "Menü";
+    if (!targetDate.value) return t("menu.addModal.defaultFallback");
     const [y, m, d] = targetDate.value.split("-").map(Number);
     const date = new Date(y!, (m ?? 1) - 1, d);
-    const weekdayIndex = (date.getDay() + 6) % 7;
-    return `${HUNGARIAN_WEEKDAYS_LONG[weekdayIndex]} menü`;
+    const weekday = new Intl.DateTimeFormat(intlLocale.value, { weekday: "long" }).format(date);
+    return t("menu.addModal.defaultName", { weekday });
 });
 
 const existingMenusForDate = computed(() =>
@@ -142,7 +143,7 @@ const handleSave = async () => {
         close();
     } catch (err: any) {
         errorMessage.value =
-            err?.data?.message ?? err?.message ?? "Nem sikerült hozzáadni a recepteket.";
+            err?.data?.message ?? err?.message ?? t("menu.addModal.error");
     } finally {
         isSaving.value = false;
     }
@@ -175,7 +176,7 @@ defineExpose({ openFor });
                     <div class="modal-header">
                         <div class="d-flex flex-column">
                             <h2 id="recipeAddModalLabel" class="modal-title fs-4 mb-1">
-                                Recept hozzáadása
+                                {{ $t('menu.addModal.title') }}
                             </h2>
                             <p class="mb-0 text-muted small">{{ targetDateLabel }}</p>
                         </div>
@@ -183,13 +184,13 @@ defineExpose({ openFor });
                             type="button"
                             class="btn-close ms-3"
                             data-bs-dismiss="modal"
-                            aria-label="Close"
+                            :aria-label="$t('common.actions.close')"
                         ></button>
                     </div>
 
                     <div class="modal-body">
                         <div v-if="pinnedRecipes.length" class="pinned-bar">
-                            <span class="pinned-label">Kiválasztva:</span>
+                            <span class="pinned-label">{{ $t('menu.addModal.pinned') }}</span>
                             <span
                                 v-for="recipe in pinnedRecipes"
                                 :key="recipe.id"
@@ -199,7 +200,7 @@ defineExpose({ openFor });
                                 <button
                                     type="button"
                                     class="chip-remove"
-                                    aria-label="Eltávolítás"
+                                    :aria-label="$t('menu.addModal.removeAria')"
                                     @click="togglePin(recipe.id)"
                                 >
                                     <i class="bi bi-x"></i>
@@ -210,17 +211,17 @@ defineExpose({ openFor });
                         <div v-if="hasExistingMenus" class="mode-toggle mb-3">
                             <label class="mode-option" :class="{ active: mode === 'new' }">
                                 <input v-model="mode" type="radio" value="new" class="visually-hidden" />
-                                Új menü
+                                {{ $t('menu.addModal.modeNew') }}
                             </label>
                             <label class="mode-option" :class="{ active: mode === 'existing' }">
                                 <input v-model="mode" type="radio" value="existing" class="visually-hidden" />
-                                Meglévő menühöz
+                                {{ $t('menu.addModal.modeExisting') }}
                             </label>
                         </div>
 
                         <div v-if="mode === 'new'" class="mb-3">
                             <label class="form-label small fw-semibold" for="newMenuName">
-                                Menü neve
+                                {{ $t('menu.addModal.menuName') }}
                             </label>
                             <input
                                 id="newMenuName"
@@ -233,7 +234,7 @@ defineExpose({ openFor });
 
                         <div v-else class="mb-3">
                             <label class="form-label small fw-semibold" for="existingMenuSelect">
-                                Válaszd ki, melyik menühöz adod
+                                {{ $t('menu.addModal.chooseMenu') }}
                             </label>
                             <select
                                 id="existingMenuSelect"
@@ -245,8 +246,7 @@ defineExpose({ openFor });
                                     :key="menu.id"
                                     :value="menu.id"
                                 >
-                                    {{ menu.name || "Névtelen menü" }}
-                                    ({{ menu.recipes.length }} recept)
+                                    {{ $t('menu.addModal.existingOption', { name: menu.name || $t('menu.untitled'), count: menu.recipes.length }) }}
                                 </option>
                             </select>
                         </div>
@@ -258,7 +258,7 @@ defineExpose({ openFor });
                                 :class="{ active: activeTab === 'own' }"
                                 @click="activeTab = 'own'"
                             >
-                                Sajátjaim
+                                {{ $t('menu.addModal.tabOwn') }}
                                 <span class="tab-count">{{ ownRecipes.length }}</span>
                             </button>
                             <button
@@ -267,27 +267,27 @@ defineExpose({ openFor });
                                 :class="{ active: activeTab === 'public' }"
                                 @click="activeTab = 'public'"
                             >
-                                Receptek közül
+                                {{ $t('menu.addModal.tabPublic') }}
                                 <span class="tab-count">{{ publicRecipes.length }}</span>
                             </button>
                         </div>
 
                         <SearchBar
                             v-model="search"
-                            placeholder="Keresés név vagy leírás alapján..."
+                            :placeholder="$t('menu.addModal.searchPlaceholder')"
                             class="mb-3"
                         />
 
                         <div v-if="!filteredRecipes.length && activeTab === 'own'" class="empty">
-                            <p class="mb-2">Még nincs saját recepted.</p>
+                            <p class="mb-2">{{ $t('menu.addModal.emptyOwn') }}</p>
                             <NuxtLink to="/recipes" class="empty-link" @click="close">
-                                Új recept létrehozása
+                                {{ $t('menu.addModal.createRecipe') }}
                                 <i class="bi bi-arrow-right ms-1"></i>
                             </NuxtLink>
                         </div>
 
                         <div v-else-if="!filteredRecipes.length" class="empty">
-                            <p class="mb-0">Nincs a keresésnek megfelelő recept.</p>
+                            <p class="mb-0">{{ $t('menu.addModal.emptySearch') }}</p>
                         </div>
 
                         <div v-else class="recipe-grid">
@@ -308,8 +308,8 @@ defineExpose({ openFor });
                                     {{ recipe.description }}
                                 </p>
                                 <div class="card-meta small">
-                                    <span><i class="bi bi-clock me-1"></i>{{ recipe.time }} perc</span>
-                                    <span><i class="bi bi-people me-1"></i>{{ recipe.servings }} fő</span>
+                                    <span><i class="bi bi-clock me-1"></i>{{ recipe.time }} {{ $t('menu.addModal.minutes') }}</span>
+                                    <span><i class="bi bi-people me-1"></i>{{ recipe.servings }} {{ $t('menu.addModal.people') }}</span>
                                 </div>
                                 <NuxtLink
                                     v-if="activeTab === 'public'"
@@ -317,7 +317,7 @@ defineExpose({ openFor });
                                     class="card-link"
                                     @click.stop="close"
                                 >
-                                    Részletek
+                                    {{ $t('menu.addModal.detailsLink') }}
                                     <i class="bi bi-arrow-right ms-1"></i>
                                 </NuxtLink>
                             </button>
@@ -330,7 +330,7 @@ defineExpose({ openFor });
                         </p>
                         <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
                             <span class="text-muted small">
-                                {{ pinnedRecipes.length }} recept kiválasztva
+                                {{ $t('menu.addModal.selectedCount', { n: pinnedRecipes.length }, pinnedRecipes.length) }}
                             </span>
                             <div class="d-flex gap-2">
                                 <button
@@ -338,14 +338,14 @@ defineExpose({ openFor });
                                     class="btn btn-outline-secondary"
                                     data-bs-dismiss="modal"
                                 >
-                                    Mégse
+                                    {{ $t('menu.addModal.cancel') }}
                                 </button>
                                 <Button
                                     color="orange"
                                     :disabled="!canSubmit || isSaving"
                                     @click="handleSave"
                                 >
-                                    {{ isSaving ? "Mentés..." : "Mentés" }}
+                                    {{ isSaving ? $t('menu.addModal.saving') : $t('menu.addModal.save') }}
                                 </Button>
                             </div>
                         </div>

@@ -1,53 +1,117 @@
 {
   "recipe": {
     "title": "Receptek",
-
     "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
     "searchBar": {
-      "placeholder": "Keresés - pl: Brownie"
+      "placeholder": "Keresés - pl: Brownie",
+      "active": "Allergének keresése..."
     },
     "filter": {
       "title": "Szűrők",
-        "default": "Alapértelmezett",
-        "own": "Saját",
-        "liked": "Kedvelt",
-        "tried": "Kipróbált",
-        "ai": "AI ajánlás",
-        "notFound": "Nincs a szűrésnek megfelelő recept!",
-        "add": "Új, saját recept felvétele"
+      "default": "Alapértelmezett",
+      "own": "Saját",
+      "liked": "Kedvelt",
+      "tried": "Kipróbált",
+      "ai": "AI ajánlás",
+      "notFound": "Nincs a szűrésnek megfelelő recept!",
+      "add": "Új, saját recept felvétele"
     },
     "addRecipeModal": {
-        "title": "Új recept hozzáadása"
-    },
-    "card": {
-        "metadata": {
-            "time": "perc",
-            "people": "fő"
-        },
-        "footer": {
-            "warning": "Figyelem! Allergént tartalmaz: {allergens}"
-        }
-    },
-    "sidebar": {
-        "active": "aktív",
-        "clearBtn": "Kijelölések törlése",
-        "time": "Időtartam",
+      "title": "Recept létrehozása",
+      "subtitle": "Add meg a recept adatait lépésről lépésre.",
+      "stepCount": "{current} / {total} lépés",
+      "stepLabel": "Lépés {step}",
+      "steps": {
+        "description": "Recept leírása",
+        "type": "Recept típusa",
+        "ingredients": "Hozzávalók",
+        "instructions": "Elkészítési lépések"
+      },
+      "summary": {
+        "name": "Név",
+        "meal": "Étkezés",
+        "ingredient": "Alapanyag",
+        "step": "Lépés",
+        "count": "{n} db",
+        "empty": "—"
+      },
+      "form": {
+        "name": "Recept neve",
+        "namePlaceholder": "Pl. Palacsinta",
+        "description": "Recept leírása",
+        "descriptionPlaceholder": "Rövid leírás",
+        "prepTime": "Elkészítési idő (perc)",
+        "servings": "Adag",
         "meal": "Étkezés",
         "type": "Típus",
-        "disliked": {
-            "title": "Nem kedvelt alapanyagok",
-            "counts": "Számít",
-            "not": {
-                "counts": "Nem számít"
-            } 
-        },
-        "allergy": {
-            "title":"Allergén, ételérzékenység",
-            "searchBar": "Allergének keresése...",
-            "chosen": "Kiválasztott allergiák:",
-            "available": "Elérhető allergiák:",
-            "empty": "Nincsenek allergiák"
+        "ingredient": "Hozzávaló",
+        "ingredientPlaceholder": "Termék név...",
+        "quantity": "Mennyiség",
+        "unit": "Egység",
+        "noResults": "Nincs találat.",
+        "saveEdit": "Módosítás mentése",
+        "add": "Hozzáadás",
+        "cancel": "Mégse",
+        "noIngredients": "Még nincs hozzáadott hozzávaló.",
+        "instructionPlaceholder": "Pl. Keverd össze az alapanyagokat",
+        "addInstruction": "Hozzáadás",
+        "noInstructions": "Még nincs hozzáadott elkészítési lépés."
+      },
+      "footer": {
+        "back": "Vissza",
+        "next": "Tovább",
+        "save": "Mentés",
+        "saving": "Mentés..."
+      }
+    },
+    "card": {
+      "metadata": {
+        "time": "perc",
+        "people": "fő"
+      },
+      "footer": {
+        "warning": "Figyelem! Allergént tartalmaz: {allergens}"
+      }
+    },
+    "details": {
+      "back": "Vissza",
+      "minutes": "perc",
+      "people": "fő",
+      "addToMenu": "Hozzáadás menühöz...",
+      "tried": "Kipróbált",
+      "tryIt": "Kipróbálom",
+      "liked": "Kedvelt",
+      "like": "Kedvelem",
+      "ingredients": "Hozzávalók",
+      "preparation": "Elkészítés",
+      "similar": "Ehhez hasonló receptek",
+      "imageAlt": "Recept képe"
+    },
+    "similar": {
+      "details": "Részletek",
+      "empty": "Nincs hasonló kategóriájú recept.",
+      "imageAlt": "Recept képe"
+    },
+    "sidebar": {
+      "title": "Szűrők",
+      "active": "aktív",
+      "clearBtn": "Kijelölések törlése",
+      "time": "Időtartam",
+      "meal": "Étkezés",
+      "type": "Típus",
+      "disliked": {
+        "title": "Nem kedvelt alapanyagok",
+        "counts": "Számít",
+        "not": {
+          "counts": "Nem számít"
         }
+      },
+      "allergy": {
+        "title": "Allergén, ételérzékenység",
+        "chosen": "Kiválasztott allergiák:",
+        "available": "Elérhető allergiák:",
+        "empty": "Nincsenek allergiák"
+      }
     }
   }
 }

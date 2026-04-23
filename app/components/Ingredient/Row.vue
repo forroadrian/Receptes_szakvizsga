@@ -14,6 +14,7 @@ const emit = defineEmits<{
     (e: "edit", ingredient: Ingredient): void;
 }>();
 
+const { t } = useI18n();
 const confirmingDelete = ref(false);
 
 const freshnessConfig = computed(() => {
@@ -29,10 +30,13 @@ const freshnessConfig = computed(() => {
 
 const relativeExpiry = computed(() => {
     const d = daysFromToday(props.ingredient.expiry.toStamp());
-    if (d < 0) return `${Math.abs(d)} napja lejárt`;
-    if (d === 0) return "Ma lejár";
-    if (d === 1) return "Holnap lejár";
-    if (d < 7) return `${d} nap múlva`;
+    if (d < 0) {
+        const n = Math.abs(d);
+        return t("pantry.row.relativeExpiry.expired", { count: n }, n);
+    }
+    if (d === 0) return t("pantry.row.relativeExpiry.today");
+    if (d === 1) return t("pantry.row.relativeExpiry.tomorrow");
+    if (d < 7) return t("pantry.row.relativeExpiry.inDays", { count: d }, d);
     return props.ingredient.expiry.toShort();
 });
 
@@ -74,7 +78,7 @@ const confirmDelete = () => {
             <button
                 type="button"
                 class="action-btn action-edit"
-                title="Szerkesztés"
+                :title="$t('pantry.row.actions.edit')"
                 @click="emit('edit', ingredient)"
             >
                 <i class="bi bi-pencil"></i>
@@ -83,7 +87,7 @@ const confirmDelete = () => {
                 v-if="!confirmingDelete"
                 type="button"
                 class="action-btn"
-                title="Törlés"
+                :title="$t('pantry.row.actions.delete')"
                 @click="requestDelete"
             >
                 <i class="bi bi-trash3"></i>
@@ -92,7 +96,7 @@ const confirmDelete = () => {
                 v-else
                 type="button"
                 class="action-btn confirm"
-                title="Megerősítés"
+                :title="$t('pantry.row.actions.confirm')"
                 @click="confirmDelete"
             >
                 {{ $t('common.actions.confirmShort') }}

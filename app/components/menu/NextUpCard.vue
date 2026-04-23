@@ -8,7 +8,10 @@ const emit = defineEmits<{
 }>();
 
 const menuStore = useMenuStore();
+const { t, locale } = useI18n();
 const next = computed(() => menuStore.nextUpcoming);
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 const relativeLabel = computed(() => {
     const menu = next.value;
@@ -18,7 +21,7 @@ const relativeLabel = computed(() => {
     const todayKey = todayBudapestKey();
     const dayDiff = daysFromToday(menu.planned_date);
 
-    const timeLabel = new Intl.DateTimeFormat("hu-HU", {
+    const timeLabel = new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         hour: "2-digit",
         minute: "2-digit",
@@ -26,13 +29,16 @@ const relativeLabel = computed(() => {
 
     if (dateKey === todayKey) {
         const hours = hoursFromNow(menu.planned_date);
-        if (hours < 1 && hours >= 0) return "Hamarosan";
-        if (hours >= 0) return `Ma ${timeLabel} — ${Math.round(hours)} óra múlva`;
-        return "Ma";
+        if (hours < 1 && hours >= 0) return t("menu.nextUp.soon");
+        if (hours >= 0) {
+            const rounded = Math.round(hours);
+            return t("menu.nextUp.todayAt", { time: timeLabel, hours: rounded }, rounded);
+        }
+        return t("menu.nextUp.today");
     }
-    if (dayDiff === 1) return `Holnap ${timeLabel}`;
-    if (dayDiff > 1 && dayDiff < 7) return `${dayDiff} nap múlva`;
-    return new Intl.DateTimeFormat("hu-HU", {
+    if (dayDiff === 1) return t("menu.nextUp.tomorrow", { time: timeLabel });
+    if (dayDiff > 1 && dayDiff < 7) return t("menu.nextUp.inDays", { n: dayDiff }, dayDiff);
+    return new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         month: "long",
         day: "numeric",
@@ -48,23 +54,23 @@ const onJump = () => {
     <section class="next-up-card" :class="{ 'is-empty': !next }">
         <p class="label mb-2">
             <i class="bi bi-hourglass-split me-2"></i>
-            Következő menü
+            {{ $t('menu.nextUp.label') }}
         </p>
 
         <template v-if="next">
             <button type="button" class="title-btn text-start w-100" @click="onJump">
-                <span class="title">{{ next.name || "Névtelen menü" }}</span>
+                <span class="title">{{ next.name || $t('menu.nextUp.untitled') }}</span>
                 <span class="relative">{{ relativeLabel }}</span>
             </button>
 
             <div class="meta">
                 <i class="bi bi-bag-check me-1"></i>
-                {{ next.recipes.length }} recept
+                {{ next.recipes.length }} {{ $t('menu.nextUp.recipeCount', next.recipes.length) }}
             </div>
         </template>
 
         <template v-else>
-            <p class="empty mb-0">Nincs közelgő menü. Kattints egy napra a naptárban új menü hozzáadásához.</p>
+            <p class="empty mb-0">{{ $t('menu.nextUp.empty') }}</p>
         </template>
     </section>
 </template>

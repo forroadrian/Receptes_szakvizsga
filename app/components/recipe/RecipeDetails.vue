@@ -8,7 +8,6 @@ import { useRecipeStore } from "~/stores/recipe";
 const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
 const user = useSupabaseUser();
-
 defineProps<{
     recipe: Recipe
 }>();
@@ -49,7 +48,7 @@ onMounted(async () => {
 <template>
     <div class="container py-5">
         <NuxtLink to="/recipes" class="mb-5 back-link">
-            <p><i class="bi bi-arrow-left"></i> Vissza</p>
+            <p><i class="bi bi-arrow-left"></i> {{ $t('recipe.details.back') }}</p>
         </NuxtLink>
 
         <div class="recipe-layout">
@@ -63,7 +62,7 @@ onMounted(async () => {
                                 <span><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
-                        <img src="/images/background.webp" class="img-fluid rounded w-100" alt="Recept képe" />
+                        <img src="/images/background.webp" class="img-fluid rounded w-100" :alt="$t('recipe.details.imageAlt')" />
                     </div>
                 </div>
 
@@ -74,8 +73,8 @@ onMounted(async () => {
                         <p>{{ recipe.description }}</p>
 
                         <div class="d-flex gap-5 recipe-meta-data">
-                            <span><i class="bi bi-clock me-1"></i> {{ recipe.time }} perc</span>
-                            <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} fő</span>
+                            <span><i class="bi bi-clock me-1"></i> {{ recipe.time }} {{ $t('recipe.details.minutes') }}</span>
+                            <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} {{ $t('recipe.details.people') }}</span>
                         </div>
                     </div>
                 </section>
@@ -85,18 +84,18 @@ onMounted(async () => {
                     <ClientOnly>
                         <div class="d-flex flex-column gap-3 my-3">
                             <Button :to="addRecipeToMenu" color="green" icon="bi bi-plus-circle" iconPosition="left">
-                                Hozzáadás menühöz...
+                                {{ $t('recipe.details.addToMenu') }}
                             </Button>
 
                             <div class="d-flex gap-3">
                                 <Button v-if="currentRecipe" class="w-100" color="yellow" :outline="!isTried"
                                 :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="handleToggleTried">
-                                    {{ isTried ? 'Kipróbált' : 'Kipróbálom' }}
+                                    {{ isTried ? $t('recipe.details.tried') : $t('recipe.details.tryIt') }}
                                 </Button>
 
                                 <Button v-if="currentRecipe" class="w-100" color="orange" :outline="!isSaved" :icon="isSaved ? 'bi bi-star-fill' : 'bi bi-star'"
-                                @click="handleToggleSaved">
-                                    {{ isSaved ? 'Kedvelt' : 'Kedvelem' }}
+                                @click="requireAuth() && filterStore.toggleSaved(currentRecipe.id)">
+                                    {{ isSaved ? $t('recipe.details.liked') : $t('recipe.details.like') }}
                                 </Button>
                             </div>
                         </div>
@@ -104,7 +103,7 @@ onMounted(async () => {
                 </div>
 
                 <div class="ingredient-list p-3" v-if="recipe">
-                    <h3 class="text-center mt-3">Hozzávalók</h3>
+                    <h3 class="text-center mt-3">{{ $t('recipe.details.ingredients') }}</h3>
                     <ul class="p-0">
                         <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
@@ -114,7 +113,7 @@ onMounted(async () => {
                 </div>
             </aside>
             <section class="steps">
-                <h3 class="my-lg-4">Elkészítés</h3>
+                <h3 class="my-lg-4">{{ $t('recipe.details.preparation') }}</h3>
                 <div v-for="(step, index) in recipe.steps"
                     class="step d-flex flex-column flex-lg-row align-items-center mb-3">
                     <p class="circle flex-shrink-0">
@@ -124,7 +123,7 @@ onMounted(async () => {
                 </div>
             </section>
             <section class="similar-recipes">
-                <h3 class="text-center">Ehhez hasonló receptek</h3>
+                <h3 class="text-center">{{ $t('recipe.details.similar') }}</h3>
                 <div class="similar-list">
                     <SimilarRecipes />
                 </div>

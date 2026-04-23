@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useMenuStore, type MenuItem } from "~/stores/menu";
 import {
     useMissingIngredients,
@@ -13,6 +12,7 @@ const emit = defineEmits<{
 
 const menuStore = useMenuStore();
 const missing = useMissingIngredients();
+const { t, locale } = useI18n();
 
 const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
@@ -20,6 +20,8 @@ let modalInstance: any = null;
 const dateKey = ref<string>("");
 const missingList = ref<MissingIngredient[]>([]);
 const isLoadingMissing = ref(false);
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 const menusForDay = computed<MenuItem[]>(() =>
     dateKey.value ? menuStore.getMenusForDate(dateKey.value) : []
@@ -29,16 +31,18 @@ const dateLabel = computed(() => {
     if (!dateKey.value) return "";
     const [y, m, d] = dateKey.value.split("-").map(Number);
     const date = new Date(y!, (m ?? 1) - 1, d);
-    const weekdayIndex = (date.getDay() + 6) % 7;
-    const formatted = new Intl.DateTimeFormat("hu-HU", {
+    const formatted = new Intl.DateTimeFormat(intlLocale.value, {
         month: "long",
         day: "numeric",
     }).format(date);
-    return `${formatted} — ${HUNGARIAN_WEEKDAYS_LONG[weekdayIndex]}`;
+    const weekday = new Intl.DateTimeFormat(intlLocale.value, {
+        weekday: "long",
+    }).format(date);
+    return `${formatted} — ${weekday}`;
 });
 
 const formatTime = (iso: string) =>
-    new Intl.DateTimeFormat("hu-HU", {
+    new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         hour: "2-digit",
         minute: "2-digit",
@@ -71,23 +75,23 @@ const open = async (targetDateKey: string) => {
 const close = () => modalInstance?.hide();
 
 const handleRemoveRecipe = async (menuId: number, recipeId: number) => {
-    if (!confirm("Biztosan eltávolítod a receptet a menüből?")) return;
+    if (!confirm(t("menu.dayDetail.confirmRemoveRecipe"))) return;
     try {
         await menuStore.removeRecipeFromMenu(menuId, recipeId);
         missing.invalidate();
     } catch {
-        alert("Nem sikerült eltávolítani a receptet.");
+        alert(t("menu.dayDetail.removeRecipeError"));
     }
 };
 
 const handleDeleteMenu = async (menuId: number) => {
-    if (!confirm("Biztosan törlöd ezt a menüt?")) return;
+    if (!confirm(t("menu.dayDetail.confirmDeleteMenu"))) return;
     try {
         await menuStore.deleteMenu(menuId);
         missing.invalidate();
         if (!menusForDay.value.length) close();
     } catch {
-        alert("Nem sikerült törölni a menüt.");
+        alert(t("menu.dayDetail.deleteMenuError"));
     }
 };
 
@@ -117,7 +121,7 @@ defineExpose({ open });
                     <div class="modal-header">
                         <div class="d-flex flex-column">
                             <h2 id="dayDetailModalLabel" class="modal-title fs-4 mb-1">
-                                Nap részletei
+                                {{ $t('menu.dayDetail.title') }}
                             </h2>
                             <p class="mb-0 text-muted small">{{ dateLabel }}</p>
                         </div>
@@ -125,7 +129,7 @@ defineExpose({ open });
                             type="button"
                             class="btn-close ms-3"
                             data-bs-dismiss="modal"
-                            aria-label="Close"
+                            :aria-label="$t('common.actions.close')"
                         ></button>
                     </div>
 
@@ -139,7 +143,7 @@ defineExpose({ open });
                                 <header class="menu-block-head">
                                     <div>
                                         <span class="menu-name">
-                                            {{ menu.name || "Névtelen menü" }}
+                                            {{ menu.name || $t('menu.untitled') }}
                                         </span>
                                         <span class="menu-time ms-2">
                                             <i class="bi bi-clock me-1"></i>
@@ -149,7 +153,7 @@ defineExpose({ open });
                                     <button
                                         type="button"
                                         class="icon-btn danger"
-                                        aria-label="Menü törlése"
+                                        :aria-label="$t('menu.dayDetail.deleteMenuAria')"
                                         @click="handleDeleteMenu(menu.id)"
                                     >
                                         <i class="bi bi-trash"></i>
@@ -170,17 +174,17 @@ defineExpose({ open });
                                             <span class="recipe-name">{{ recipe.name }}</span>
                                             <span class="recipe-meta small">
                                                 <i class="bi bi-clock me-1"></i>
-                                                {{ recipe.time }} perc
+                                                {{ recipe.time }} {{ $t('menu.dayDetail.minutes') }}
                                                 <span class="dot">·</span>
                                                 <i class="bi bi-people me-1"></i>
-                                                {{ recipe.servings }} fő
+                                                {{ recipe.servings }} {{ $t('menu.dayDetail.people') }}
                                             </span>
                                         </NuxtLink>
                                         <button
                                             type="button"
                                             class="icon-btn small"
-                                            aria-label="Recept eltávolítása"
-                                            title="Recept eltávolítása a menüből"
+                                            :aria-label="$t('menu.dayDetail.removeRecipeAria')"
+                                            :title="$t('menu.dayDetail.removeRecipeTitle')"
                                             @click="handleRemoveRecipe(menu.id, recipe.recipe_id)"
                                         >
                                             <i class="bi bi-x-lg"></i>
@@ -189,21 +193,21 @@ defineExpose({ open });
                                 </ul>
 
                                 <p v-else class="text-muted small mb-0">
-                                    Nincs recept ebben a menüben.
+                                    {{ $t('menu.dayDetail.noRecipes') }}
                                 </p>
                             </div>
                         </section>
 
                         <section v-else class="empty-menus">
                             <i class="bi bi-calendar-plus fs-2 mb-2 d-block"></i>
-                            <p class="mb-3">Nincs menü erre a napra.</p>
+                            <p class="mb-3">{{ $t('menu.dayDetail.empty') }}</p>
                         </section>
 
                         <section v-if="menusForDay.length" class="missing-section mt-4">
                             <header class="section-head">
                                 <span class="section-title">
                                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    Hiányzó alapanyagok
+                                    {{ $t('menu.dayDetail.missingTitle') }}
                                 </span>
                                 <span
                                     v-if="missingList.length"
@@ -214,7 +218,7 @@ defineExpose({ open });
                             </header>
 
                             <p v-if="isLoadingMissing" class="text-muted small mb-0">
-                                Ellenőrzés...
+                                {{ $t('menu.dayDetail.checking') }}
                             </p>
 
                             <p
@@ -222,7 +226,7 @@ defineExpose({ open });
                                 class="success-note mb-0"
                             >
                                 <i class="bi bi-check2-circle me-2"></i>
-                                Minden alapanyag megvan.
+                                {{ $t('menu.dayDetail.allPresent') }}
                             </p>
 
                             <ul v-else class="missing-list list-unstyled m-0">
@@ -238,9 +242,9 @@ defineExpose({ open });
                                     <span
                                         v-if="item.has_expired_stock"
                                         class="expired-flag"
-                                        title="Van belőle otthon, de lejárt"
+                                        :title="$t('menu.dayDetail.expiredTitle')"
                                     >
-                                        lejárt
+                                        {{ $t('menu.dayDetail.expiredFlag') }}
                                     </span>
                                 </li>
                             </ul>
@@ -253,7 +257,7 @@ defineExpose({ open });
                             class="btn btn-outline-secondary"
                             data-bs-dismiss="modal"
                         >
-                            Bezárás
+                            {{ $t('menu.dayDetail.close') }}
                         </button>
                         <Button
                             color="orange"
@@ -261,7 +265,7 @@ defineExpose({ open });
                             icon-position="left"
                             @click="handleAdd"
                         >
-                            Recept hozzáadása
+                            {{ $t('menu.dayDetail.addRecipe') }}
                         </Button>
                     </div>
                 </div>

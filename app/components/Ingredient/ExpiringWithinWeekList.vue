@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { HUNGARIAN_WEEKDAYS_LONG } from "~/composables/useCalendarGrid";
 import { useIngredientStore } from "~/stores/ingredients";
 import { toBudapestDateKey, todayBudapestKey } from "~/utils/budapestDate";
 
@@ -9,6 +8,9 @@ const emit = defineEmits<{
 }>();
 
 const store = useIngredientStore();
+const { locale } = useI18n();
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 type Row = {
     dateKey: string;
@@ -23,6 +25,10 @@ const rows = computed<Row[]>(() => {
     const todayKey = todayBudapestKey();
     const result: Row[] = [];
 
+    const weekdayFormatter = new Intl.DateTimeFormat(intlLocale.value, {
+        weekday: "short",
+    });
+
     const byDate = new Map<string, { id: number; name: string }[]>();
     for (const ingredient of store.ingredients) {
         const key = toBudapestDateKey(ingredient.expiry.value.toISOString());
@@ -34,12 +40,11 @@ const rows = computed<Row[]>(() => {
     for (let i = 0; i < 7; i++) {
         const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
         const dateKey = toBudapestDateKey(d);
-        const weekdayIndex = (d.getDay() + 6) % 7;
 
         result.push({
             dateKey,
             dayNumber: d.getDate(),
-            weekdayLabel: HUNGARIAN_WEEKDAYS_LONG[weekdayIndex] ?? "",
+            weekdayLabel: weekdayFormatter.format(d),
             isToday: dateKey === todayKey,
             items: byDate.get(dateKey) ?? [],
         });
@@ -67,7 +72,7 @@ const onItemClick = (id: number) => emit("jump", id);
                 :class="{ 'is-today': row.isToday, 'is-empty': !row.items.length }"
             >
                 <div class="date-chip">
-                    <span class="weekday">{{ row.weekdayLabel.slice(0, 3) }}</span>
+                    <span class="weekday">{{ row.weekdayLabel }}</span>
                     <span class="day">{{ row.dayNumber }}</span>
                 </div>
 

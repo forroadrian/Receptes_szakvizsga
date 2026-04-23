@@ -1,18 +1,5 @@
 <script setup lang="ts">
-const HUNGARIAN_MONTHS = [
-    "Január",
-    "Február",
-    "Március",
-    "Április",
-    "Május",
-    "Június",
-    "Július",
-    "Augusztus",
-    "Szeptember",
-    "Október",
-    "November",
-    "December",
-];
+import { computed } from "vue";
 
 const props = withDefaults(
     defineProps<{
@@ -28,18 +15,29 @@ const emit = defineEmits<{
     (e: "next"): void;
     (e: "today"): void;
 }>();
+
+const { locale } = useI18n();
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
+
+const monthLabel = computed(() => {
+    const date = new Date(props.year, props.month, 1);
+    return new Intl.DateTimeFormat(intlLocale.value, {
+        year: "numeric",
+        month: "long",
+    }).format(date);
+});
 </script>
 
 <template>
     <component :is="is" class="month-picker d-flex align-items-center justify-content-center gap-3 mb-3">
-        <button type="button" class="nav-btn" aria-label="Előző hónap" @click="emit('prev')">
+        <button type="button" class="nav-btn" :aria-label="$t('menu.calendar.prevMonth')" @click="emit('prev')">
             <i class="bi bi-arrow-left"></i>
         </button>
-        <span class="month text-truncate">{{ year }}. {{ HUNGARIAN_MONTHS[month] }}</span>
-        <button type="button" class="nav-btn" aria-label="Következő hónap" @click="emit('next')">
+        <span class="month text-truncate">{{ monthLabel }}</span>
+        <button type="button" class="nav-btn" :aria-label="$t('menu.calendar.nextMonth')" @click="emit('next')">
             <i class="bi bi-arrow-right"></i>
         </button>
-        <button type="button" class="today-btn ms-2" @click="emit('today')">Ma</button>
+        <button type="button" class="today-btn ms-2" @click="emit('today')">{{ $t('menu.calendar.today') }}</button>
     </component>
 </template>
 
