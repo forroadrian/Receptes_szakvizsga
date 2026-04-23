@@ -35,6 +35,19 @@
     color: var(--link-color);
     font-size: 15px;
     text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-form-page a:hover {
+    color: var(--orange);
+}
+
+[data-bs-theme="dark"] .auth-form-page a {
+    color: var(--yellow);
+}
+
+[data-bs-theme="dark"] .auth-form-page a:hover {
+    color: var(--orange);
 }
 
 @media (min-width: 768px) {
@@ -83,7 +96,7 @@
         margin-right: auto;
     }
 
-    .auth-login-options > a {
+    .auth-login-options>a {
         margin-left: auto;
         text-align: right;
     }
