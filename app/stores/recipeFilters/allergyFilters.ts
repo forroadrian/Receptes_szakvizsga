@@ -9,6 +9,7 @@ export const createAllergyFilters = (
     selectedAllergyIds: Ref<number[]>,
     allergenSearch: Ref<string>
 ) => {
+    const {t} = useI18n()
     const selectedAllergyPills = computed(() => {
         return allAllergies.value
             .filter(allergy => selectedAllergyIds.value.includes(allergy.id))
@@ -23,9 +24,9 @@ export const createAllergyFilters = (
         if (!searchTerm) return [];
         return allAllergies.value
             .filter(allergy => !selectedAllergyIds.value.includes(allergy.id) && 
-                              allergy.name.toLowerCase().includes(searchTerm))
+                        t('allergies.' + allergy.id).toLowerCase().includes(searchTerm))
             .map(allergy => ({
-                name: allergy.name,
+                name: t('allergies.' + allergy.id),
                 identifier: allergy.id
             }));
     });

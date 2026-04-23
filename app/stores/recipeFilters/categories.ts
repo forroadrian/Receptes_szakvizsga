@@ -14,12 +14,13 @@ export const hasCategory = (categories: Category[], categoryId: number | null) =
             return true;
         }
     }
-
     return false;
 };
 
 export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>, typeOptions: Ref<Category[]>) => {
     try {
+        const {$i18n} = useNuxtApp()
+        const t = $i18n.t
         const data = await $fetch("/api/category", {
             method: "GET"
         });
@@ -37,11 +38,13 @@ export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>, t
             const groupType = normalizedCategory.group_type.toLowerCase();
 
             if (groupType === "meal") {
-                mealOptions.value.push(category);
+                normalizedCategory.name = t('categories.' + category.id)
+                mealOptions.value.push(normalizedCategory);
             }
 
             if (groupType === "type") {
-                typeOptions.value.push(category);
+                normalizedCategory.name = t('categories.' + category.id)
+                typeOptions.value.push(normalizedCategory);
             }
         }
     } catch (error) {

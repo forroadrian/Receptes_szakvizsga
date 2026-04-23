@@ -1,0 +1,16 @@
+{
+  "categories": {
+    "2": "Breakfast",
+    "3": "Dinner",
+    "4": "Supper",
+    "5": "Snack",
+    "6": "Main course",
+    "7": "Appetizer",
+    "8": "Dessert",
+    "9": "Savory",
+    "10": "Sweet",
+    "11": "Quick",
+    "12": "Time-consuming",
+    "13": "Spicy"
+  }
+}

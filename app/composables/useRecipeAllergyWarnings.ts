@@ -1,9 +1,11 @@
+
 import { ref } from "vue";
 
 const userAllergyIds = ref<number[]>([]);
 const allergyWarningsReady = ref(false);
 
 export const useRecipeAllergyWarnings = () => {
+    const {t} = useI18n()
     const user = useSupabaseUser();
 
     const loadUserAllergies = async () => {
@@ -48,7 +50,7 @@ export const useRecipeAllergyWarnings = () => {
 
     const getMatchingAllergyNames = (recipe: any) => {
         return getMatchingAllergies(recipe)
-            .map((allergy: any) => allergy.name)
+            .map((allergy: {name: string, id: number}) => t('allergies.' + allergy.id))
             .join(", ");
     };
 

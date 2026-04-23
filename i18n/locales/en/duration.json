@@ -1,0 +1,8 @@
+{
+  "duration": {
+    "1": "Under 15 minutes",
+    "2": "Under 30 minutes",
+    "3": "In an hour",
+    "4": "Over an hour"
+  }
+}

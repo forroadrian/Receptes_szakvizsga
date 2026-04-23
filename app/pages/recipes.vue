@@ -75,6 +75,16 @@ watch(() => [filterStore.selectedMealId,filterStore.selectedTypeId, filterStore.
 
 const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 
+const getLocalizedPill = (recipe: any) => {
+    const translatedCategories = recipe.categories.map((v: any) => {
+        return {
+            name: $t('categories.' + v.id),
+            identifier: v.id
+        }
+    })
+    return dataToPillTag(translatedCategories, BASIC_CONVERSION)
+}
+
 const needsLoginForTab = computed(() => {
     return !user.value && filterStore.activeTab !== "default";
 });
@@ -218,7 +228,7 @@ const handleTabClick = (tab: any) => {
 
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                          <Pills :pills="dataToPillTag(recipe.categories, BASIC_CONVERSION)"
+                                          <Pills :pills="getLocalizedPill(recipe)"
                                             class="d-flex justify-content-center" />
                                     </div>
                                 </div>
@@ -294,7 +304,7 @@ const handleTabClick = (tab: any) => {
 
                         <div class="filter-item">
                             <p class="filter-title mb-3">{{ $t('recipe.sidebar.allergy.title') }}</p>
-                            <FormInput v-model="filterStore.allergenSearch" placeholder="Allergia keresése..." />
+                            <FormInput v-model="filterStore.allergenSearch" :placeholder="$t('recipe.searchBar.active')" />
 
                             <div v-if="filterStore.selectedAllergyPills.length" class="mt-3">
                                 <p class="small text-muted mb-2">{{ $t('recipe.sidebar.allergy.chosen') }}</p>

@@ -43,6 +43,7 @@
         },
         "allergy": {
             "title":"Allergén, ételérzékenység",
+            "searchBar": "Allergének keresése...",
             "chosen": "Kiválasztott allergiák:",
             "available": "Elérhető allergiák:",
             "empty": "Nincsenek allergiák"

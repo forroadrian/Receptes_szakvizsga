@@ -4,7 +4,8 @@
 
     "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
     "searchBar": {
-      "placeholder": "E.g Brownie"
+      "placeholder": "E.g Brownie",
+      "active": "Searching for allergen..."
     },
     "filter": {
       "title": "Filter",
