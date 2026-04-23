@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 
 const recipeModal = useRecipeModal();
 const { t } = useI18n();
+const closeBtn = ref<HTMLButtonElement | null>(null);
 
 const steps = computed(() => [
     { id: 1, title: t('recipe.addRecipeModal.steps.description') },
@@ -12,6 +13,21 @@ const steps = computed(() => [
     { id: 4, title: t('recipe.addRecipeModal.steps.instructions') }
 ]);
 
+onMounted(() => {
+    recipeModal.init();
+    recipeModal.closeButton = closeBtn.value;
+});
+
+watch(closeBtn, (btn) => {
+    recipeModal.closeButton = btn;
+});
+
+watch(() => recipeModal.isSaving, (saving, wasSaving) => {
+    if (wasSaving && !saving && !recipeModal.errorMessage) {
+        closeBtn.value?.click();
+    }
+});
+
 const currentStep = ref(1);
 const draggedInstructionIndex = ref<number | null>(null);
 
@@ -19,61 +35,40 @@ const progress = computed(() => `${(currentStep.value / steps.value.length) * 10
 const canGoBack = computed(() => currentStep.value > 1);
 const canGoNext = computed(() => currentStep.value < steps.value.length);
 
-function nextStep() {
-    if (canGoNext.value) currentStep.value++;
-}
+function nextStep() { if (canGoNext.value) currentStep.value++; }
+function prevStep() { if (canGoBack.value) currentStep.value--; }
+function goToStep(id: number) { currentStep.value = id; }
 
-function prevStep() {
-    if (canGoBack.value) currentStep.value--;
-}
-
-function goToStep(id: number) {
-    currentStep.value = id;
-}
-
-function onInstructionDragStart(index: number) {
-    draggedInstructionIndex.value = index;
-}
+function onInstructionDragStart(index: number) { draggedInstructionIndex.value = index; }
 
 function onInstructionDrop(targetIndex: number) {
-    if (
-        draggedInstructionIndex.value === null ||
-        draggedInstructionIndex.value === targetIndex
-    ) {
+    if (draggedInstructionIndex.value === null || draggedInstructionIndex.value === targetIndex) {
         draggedInstructionIndex.value = null;
         return;
     }
-
     const instructions = recipeModal.recipe.instructions;
-    const movedInstruction = instructions[draggedInstructionIndex.value];
-
-    if (!movedInstruction) {
-        draggedInstructionIndex.value = null;
-        return;
-    }
-
+    const moved = instructions[draggedInstructionIndex.value];
+    if (!moved) { draggedInstructionIndex.value = null; return; }
     instructions.splice(draggedInstructionIndex.value, 1);
-    instructions.splice(targetIndex, 0, movedInstruction);
-
+    instructions.splice(targetIndex, 0, moved);
     draggedInstructionIndex.value = null;
 }
 
-function onInstructionDragEnd() {
-    draggedInstructionIndex.value = null;
-}
+function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 </script>
 
 <template>
     <ClientOnly>
-    <div id="openAddRecipeModal" class="modal fade" tabindex="-1" aria-labelledby="openAddRecipeModalLabel"
-        aria-hidden="true">
+    <div id="openAddRecipeModal" class="modal fade" tabindex="-1" aria-labelledby="openAddRecipeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl recipe-dialog">
             <div class="modal-content recipe-modal">
                 <div class="modal-header recipe-modal-header">
                     <div class="w-100 d-flex align-items-start justify-content-between gap-3 flex-wrap">
                         <div>
-                            <h2 id="openAddRecipeModalLabel" class="modal-title fs-3 mb-1">{{ $t('recipe.addRecipeModal.title') }}</h2>
-                            <p>{{ $t('recipe.addRecipeModal.subtitle') }}</p>
+                            <h2 id="openAddRecipeModalLabel" class="modal-title fs-3 mb-1">
+                                {{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.editTitle') : $t('recipe.addRecipeModal.title') }}
+                            </h2>
+                            <p>{{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.editSubtitle') : $t('recipe.addRecipeModal.subtitle') }}</p>
                         </div>
 
                         <div class="recipe-progress-meta text-end">
@@ -84,9 +79,7 @@ function onInstructionDragEnd() {
                         </div>
                     </div>
 
-                    <button ref="recipeModal.closeButton" type="button" class="btn-close ms-3"
-                        data-bs-dismiss="modal" aria-label="Close">
-                    </button>
+                    <button ref="closeBtn" type="button" class="btn-close ms-3" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body p-0">
@@ -135,37 +128,32 @@ function onInstructionDragEnd() {
 
                             <div class="col-lg-6 col-md-7">
                                 <div class="recipe-content">
-                                    <div v-if="currentStep === 1"
-                                        class="recipe-card recipe-panel d-flex flex-column gap-4">
+                                    <div v-if="currentStep === 1" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.name') }}</label>
-                                            <input v-model="recipeModal.recipe.name" type="text"
-                                                class="form-control" :placeholder="$t('recipe.addRecipeModal.form.namePlaceholder')">
+                                            <input v-model="recipeModal.recipe.name" type="text" class="form-control"
+                                                :placeholder="$t('recipe.addRecipeModal.form.namePlaceholder')">
                                         </div>
 
                                         <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.description') }}</label>
-                                            <textarea v-model="recipeModal.recipe.description" rows="5"
-                                                class="form-control" :placeholder="$t('recipe.addRecipeModal.form.descriptionPlaceholder')"></textarea>
+                                            <textarea v-model="recipeModal.recipe.description" rows="5" class="form-control"
+                                                :placeholder="$t('recipe.addRecipeModal.form.descriptionPlaceholder')"></textarea>
                                         </div>
 
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.prepTime') }}</label>
-                                                <input v-model="recipeModal.recipe.prepTime" type="number" min="1"
-                                                    class="form-control">
+                                                <input v-model="recipeModal.recipe.prepTime" type="number" min="1" class="form-control">
                                             </div>
-
                                             <div class="col-md-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.servings') }}</label>
-                                                <input v-model="recipeModal.recipe.servings" type="number" min="1"
-                                                    class="form-control">
+                                                <input v-model="recipeModal.recipe.servings" type="number" min="1" class="form-control">
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div v-else-if="currentStep === 2"
-                                        class="recipe-card recipe-panel d-flex flex-column gap-4">
+                                    <div v-else-if="currentStep === 2" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div>
                                             <label class="form-label d-block">{{ $t('recipe.addRecipeModal.form.meal') }}</label>
                                             <div class="d-flex flex-wrap gap-2">
@@ -179,8 +167,7 @@ function onInstructionDragEnd() {
                                         <div>
                                             <label class="form-label d-block">{{ $t('recipe.addRecipeModal.form.type') }}</label>
                                             <div class="d-flex flex-wrap gap-2">
-                                                <Button v-for="tag in recipeModal.tags" type="button"
-                                                    class="rounded-pill recipe-pill"
+                                                <Button v-for="tag in recipeModal.tags" type="button" class="rounded-pill recipe-pill"
                                                     :color="recipeModal.recipe.tags.includes(tag.id) ? 'yellow' : undefined"
                                                     @click="recipeModal.toggleTag(tag.id)">
                                                     {{ $t('categories.' + tag.id) }}
@@ -189,56 +176,43 @@ function onInstructionDragEnd() {
                                         </div>
                                     </div>
 
-                                    <div v-else-if="currentStep === 3"
-                                        class="recipe-card recipe-panel d-flex flex-column gap-4">
+                                    <div v-else-if="currentStep === 3" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div class="row g-3">
                                             <div class="col-12">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.ingredient') }}</label>
-                                                <input v-model="recipeModal.ingredientSearch" type="text"
-                                                    class="form-control" :placeholder="$t('recipe.addRecipeModal.form.ingredientPlaceholder')"
+                                                <input v-model="recipeModal.ingredientSearch" type="text" class="form-control"
+                                                    :placeholder="$t('recipe.addRecipeModal.form.ingredientPlaceholder')"
                                                     @focus="recipeModal.onIngredientSearchFocus"
                                                     @input="recipeModal.onIngredientSearchInput">
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.quantity') }}</label>
-                                                <input v-model="recipeModal.selectedIngredientQuantity"
-                                                    type="number" min="1" class="form-control">
+                                                <input v-model="recipeModal.selectedIngredientQuantity" type="number" min="1" class="form-control">
                                             </div>
-
                                             <div class="col-lg-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.unit') }}</label>
-                                                <select v-model="recipeModal.selectedIngredientUnit"
-                                                    class="form-select">
-                                                    <option v-for="unit in recipeModal.availableUnits" :value="unit">
-                                                        {{ unit }}
-                                                    </option>
+                                                <select v-model="recipeModal.selectedIngredientUnit" class="form-select">
+                                                    <option v-for="unit in recipeModal.availableUnits" :value="unit">{{ unit }}</option>
                                                 </select>
                                             </div>
                                             <div class="col-12">
-                                                <div v-if="recipeModal.showIngredientResults"
-                                                    class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
+                                                <div v-if="recipeModal.showIngredientResults" class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
                                                     <Button v-for="ingredient in recipeModal.filteredIngredients" type="button"
-                                                        class="rounded-pill recipe-pill ingredient-result-pill"
-                                                        @click="recipeModal.selectIngredient(ingredient.id, $t('ingredient.' + ingredient.id))">
-                                                        {{ $t('ingredient.' + ingredient.id) }}
+                                                        class="rounded-pill recipe-pill ingredient-result-pill" @click="recipeModal.selectIngredient(ingredient.id, ingredient.name)">
+                                                        {{ ingredient.name }}
                                                     </Button>
-
-                                                    <div v-if="recipeModal.filteredIngredients.length === 0"
-                                                        class="ingredient-search-empty">
+                                                    <div v-if="recipeModal.filteredIngredients.length === 0" class="ingredient-search-empty">
                                                         {{ $t('recipe.addRecipeModal.form.noResults') }}
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="col-md-12 d-flex align-items-end gap-2">
-                                                <Button v-if="recipeModal.hasSelectedIngredient"
-                                                    type="button" color="green" class="recipe-action-btn w-100" @click="recipeModal.addOrUpdateIngredient">
+                                                <Button v-if="recipeModal.hasSelectedIngredient" type="button" color="green" class="recipe-action-btn w-100" @click="recipeModal.addOrUpdateIngredient">
                                                     {{ recipeModal.isEditingIngredient ? $t('recipe.addRecipeModal.form.saveEdit') : $t('recipe.addRecipeModal.form.add') }}
                                                 </Button>
-
-                                                <Button v-if="recipeModal.isEditingIngredient" type="button" outline
-                                                    class="w-100" @click="recipeModal.cancelIngredientEdit">{{ $t('recipe.addRecipeModal.form.cancel') }}
+                                                <Button v-if="recipeModal.isEditingIngredient" type="button" outline class="w-100" @click="recipeModal.cancelIngredientEdit">
+                                                    {{ $t('recipe.addRecipeModal.form.cancel') }}
                                                 </Button>
                                             </div>
                                         </div>
@@ -248,44 +222,36 @@ function onInstructionDragEnd() {
                                                 <div v-if="recipeModal.recipe.ingredients.length === 0" class="empty-state">
                                                     {{ $t('recipe.addRecipeModal.form.noIngredients') }}
                                                 </div>
-
                                                 <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
                                                     class="ingredient-item d-flex align-items-center justify-content-between gap-3">
-                                                    <span>{{ $t('ingredient.' + ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ingredient.unit }}</span>
-
+                                                    <span>{{ ingredient.name }} - {{ ingredient.quantity }} {{ ingredient.unit }}</span>
                                                     <div class="d-flex gap-2">
                                                         <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
-                                                            @click="recipeModal.editIngredient(index)">
-                                                        </Button>
-                                                        <Button type="button" color="orange" icon="bi bi-trash"
-                                                            icon-only @click="recipeModal.removeIngredient(index)">
-                                                        </Button>
+                                                            @click="recipeModal.editIngredient(index)"></Button>
+                                                        <Button type="button" color="orange" icon="bi bi-trash" icon-only
+                                                            @click="recipeModal.removeIngredient(index)"></Button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div v-else-if="currentStep === 4"
-                                        class="recipe-card recipe-panel d-flex flex-column gap-4">
+                                    <div v-else-if="currentStep === 4" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div class="row g-2">
                                             <div class="col-12 col-md">
-                                                <input v-model="recipeModal.instructionInput" type="text"
-                                                    class="form-control h-100"
+                                                <input v-model="recipeModal.instructionInput" type="text" class="form-control h-100"
                                                     :placeholder="$t('recipe.addRecipeModal.form.instructionPlaceholder')">
                                             </div>
 
                                             <div class="col-12 col-md-auto">
-                                                <Button type="button" color="green" class="w-100"
-                                                    @click="recipeModal.addOrUpdateInstruction">
+                                                <Button type="button" color="green" class="w-100" @click="recipeModal.addOrUpdateInstruction">
                                                     {{ $t('recipe.addRecipeModal.form.addInstruction') }}
                                                 </Button>
                                             </div>
                                         </div>
 
                                         <div class="instruction-list d-flex flex-column gap-2">
-                                            <div v-if="recipeModal.recipe.instructions.length === 0"
-                                                class="empty-state">
+                                            <div v-if="recipeModal.recipe.instructions.length === 0" class="empty-state">
                                                 {{ $t('recipe.addRecipeModal.form.noInstructions') }}
                                             </div>
 
@@ -299,12 +265,10 @@ function onInstructionDragEnd() {
                                                     <span>{{ instruction }}</span>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-3">
-                                                     <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
-                                                            @click="recipeModal.editInstruction(index)">
-                                                    </Button>
-                                                    <Button type="button" color="orange" icon="bi bi-trash"
-                                                            icon-only @click="recipeModal.removeInstruction(index)">
-                                                    </Button>
+                                                    <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
+                                                        @click="recipeModal.editInstruction(index)"></Button>
+                                                    <Button type="button" color="orange" icon="bi bi-trash" icon-only
+                                                        @click="recipeModal.removeInstruction(index)"></Button>
                                                 </div>
                                             </div>
                                         </div>
@@ -329,7 +293,7 @@ function onInstructionDragEnd() {
                     </Button>
 
                     <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving" @click="recipeModal.saveRecipe">
-                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : $t('recipe.addRecipeModal.footer.save') }}
+                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.update') : $t('recipe.addRecipeModal.footer.save')) }}
                     </Button>
                 </div>
             </div>
