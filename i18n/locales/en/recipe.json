@@ -1,0 +1,53 @@
+{
+  "recipe": {
+    "title": "Recipes",
+
+    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "searchBar": {
+      "placeholder": "E.g Brownie"
+    },
+    "filter": {
+      "title": "Filter",
+      "default": "All",
+      "own": "Own",
+      "liked": "Liked",
+      "tried": "Tried",
+      "ai": "AI suggestion",
+      "notFound": "Theres no recipe that matches this criteria!",
+      "add": "Create new recipe."
+    },
+    "addRecipeModal": {
+      "title": "Create new recipe"
+    },
+    "card": {
+      "metadata": {
+        "time": "minute | minutes",
+        "people": "person | people"
+      },
+      "footer": {
+        "warning": "Caution! Contains Allergen(s): {allergens}"
+      }
+    },
+    "sidebar": {
+        "title": "Filter",
+      "active": "active",
+      "clearBtn": "Clear selection",
+      "time": "Time",
+      "meal": "Meal",
+      "type": "Type",
+      "disliked": {
+        "title": "Disliked ingredients",
+        "counts": "Counts",
+        "not": {
+          "counts": "Doesn't count"
+        }
+      },
+      "allergy": {
+        "title": "Allergy, food intolerance",
+        "chosen": "Chosen allergies:",
+        "available": "Available allergies:",
+        "empty": "No allergies"
+      }
+    }
+  }
+}

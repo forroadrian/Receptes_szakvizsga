@@ -88,21 +88,21 @@ const handleTabClick = (tab: any) => {
 
     <section class="recipes-page">
         <div class="recipes-shell mx-auto p-5">
-            <h1 class="recipes-title mb-2">Receptek</h1>
+            <h1 class="recipes-title mb-2">{{ $t('recipe.title') }}</h1>
             <p class="recipes-subtitle mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus
+                {{ $t('recipe.subtitle') }}
             </p>
 
             <div class="row align-items-center justify-content-between">
                 <div class="col-lg-9 col-md-8 search-wrap my-3">
-                    <SearchBar v-model="filterStore.search" placeholder="Keress keresési szó vagy recept alapján..."
+                    <SearchBar v-model="filterStore.search" :placeholder="$t('recipe.searchBar.placeholder')"
                         class="recipes-search w-100" />
                 </div>
 
                 <div class="filter-button col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
                     <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
                         data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
-                        Szűrők
+                        {{ $t('recipe.filter.title') }}
                         <span v-if="isHydrated && activeFilterCount" class="filter-count d-inline-flex me-3">
                             {{ activeFilterCount }}
                         </span>
@@ -115,51 +115,51 @@ const handleTabClick = (tab: any) => {
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'default' }"
                             @click="handleTabClick('default')">
-                            Alapértelmezett
+                            {{ $t('recipe.filter.default') }}
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'own' }"
                             @click="handleTabClick('own')">
-                            Saját
+                            {{ $t('recipe.filter.own') }}
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'saved' }"
                             @click="handleTabClick('saved')">
-                            Kedvelt
+                            {{ $t('recipe.filter.liked') }}
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'tried' }"
                             @click="handleTabClick('tried')">
-                            Kipróbált
+                            {{ $t('recipe.filter.tried') }}
                         </button>
                     </li>
                     <li>
                         <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'ai' }"
                             @click="handleTabClick('ai')">
-                            AI ajánlás
+                            {{ $t('recipe.filter.ai') }}
                         </button>
                     </li>
                 </ul>
             </nav>
 
             <div v-if="needsLoginForTab" class="text-center py-4">
-                <p class="fw-bold">Ehhez a funkcióhoz be kell jelentkezned!</p>
+                <p class="fw-bold">{{ $t('common.auth.notLoggedIn') }}</p>
                 <Button @click="navigateTo('/login')" color="orange" class="mx-auto" icon="bi bi-box-arrow-in-right"
                     icon-position="right">
-                    Tovább a belépéshez
+                    {{ $t('common.auth.toLogin') }}
                 </Button>
             </div>
 
             <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length" class="text-center py-5">
                 <p class="mb-0 fw-bold py-3">
-                    Nincs a szűrésnek megfelelő recept!
+                    {{ $t('recipe.filter.notFound') }}
                 </p>
                 <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
                 :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                    Új, saját recept felvétele
+                {{ $t('recipe.filter.add') }}
                 </Button>
             </div>
 
@@ -168,7 +168,7 @@ const handleTabClick = (tab: any) => {
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
                     <div class="row text-center py-4">
                         <span class="plus-icon">+</span>
-                        <p>Új recept hozzáadása</p>
+                        <p>{{ $t('recipe.addRecipeModal.title') }}</p>
                     </div>
                 </div>
                 <div v-for="recipe in filterStore.filteredRecipes"
@@ -208,11 +208,11 @@ const handleTabClick = (tab: any) => {
                                 <div class="row justify-content-center mb-3 py-2">
                                     <div class="col-auto">
                                         <i class="bi bi-clock me-1"></i>
-                                        {{ recipe.time }} perc
+                                        {{ recipe.time }} {{ $t('recipe.card.metadata.time') }}
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-people me-1"></i>
-                                        {{ recipe.servings }} fő
+                                        {{ recipe.servings }} {{ $t('recipe.card.metadata.people') }}
                                     </div>
                                 </div>
 
@@ -230,8 +230,7 @@ const handleTabClick = (tab: any) => {
                                         <template
                                             v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
                                             <strong>
-                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> Figyelem! Allergént
-                                                tartalmaz:
+                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> {{ $t('recipe.card.footer.warning') }}
                                             </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
                                         </template>
                                     </div>
@@ -246,9 +245,9 @@ const handleTabClick = (tab: any) => {
                 aria-labelledby="recipeFiltersOffcanvasLabel">
                 <div class="offcanvas-header">
                     <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">
-                        Szűrők
+                        {{ $t('recipe.sidebar.title') }}
                         <span v-if="isHydrated && activeFilterCount" class="ms-2 text-muted">
-                            ({{ activeFilterCount }} aktív)
+                            ({{ activeFilterCount }} {{ $t('recipe.sidebar.active') }})
                         </span>
                     </p>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Bezárás"></button>
@@ -257,58 +256,58 @@ const handleTabClick = (tab: any) => {
                 <div class="offcanvas-body">
                     <Button :outline="true" type="button" class="deleteAll grad m-auto w-75"
                         @click="filterStore.clearFilters">
-                        Kijelölések törlése
+                        {{ $t('recipe.sidebar.clearBtn') }}
                     </Button>
                     <div class="filters-panel offcanvas-filters">
                         <div class="filter-item">
-                            <p class="filter-title">Időtartam</p>
+                            <p class="filter-title">{{ $t('recipe.sidebar.time') }}</p>
                             <Pills :pills="dataToPillTag(filterStore.durationCategories as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedDurationId" />
                         </div>
 
                         <div class="filter-item">
-                            <p class="filter-title">Étkezés</p>
+                            <p class="filter-title">{{ $t('recipe.sidebar.meal') }}</p>
                             <Pills :pills="dataToPillTag(filterStore.mealOptions as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedMealId" />
                         </div>
 
                         <div class="filter-item">
-                            <p class="filter-title">Típus</p>
+                            <p class="filter-title">{{ $t('recipe.sidebar.type') }}</p>
                             <Pills :pills="dataToPillTag(filterStore.typeOptions as any, BASIC_CONVERSION)" interactive
                                 v-model="filterStore.selectedTypeId" />
                         </div>
                         <div class="filter-item" v-if="user">
                             <div class="d-flex mb-2">
-                                <p class="filter-title mb-0">Nem kedvelt alapanyagok</p>
+                                <p class="filter-title mb-0">{{ $t('recipe.sidebar.disliked.title') }}</p>
                             </div>
                             <div class="form-check mb-2">
                                 <input id="ondisliked" v-model="filterStore.respectDislikedIngredients"
                                     class="form-check-input" name="isdisliked" type="radio" :value="true">
-                                <label class="form-check-label" for="ondisliked">Számít</label>
+                                <label class="form-check-label" for="ondisliked">{{ $t('recipe.sidebar.disliked.counts') }}</label>
                             </div>
                             <div class="form-check">
                                 <input id="offdisliked" v-model="filterStore.respectDislikedIngredients"
                                     class="form-check-input" name="isdisliked" type="radio" :value="false">
-                                <label class="form-check-label" for="offdisliked">Nem számít</label>
+                                <label class="form-check-label" for="offdisliked">{{ $t('recipe.sidebar.disliked.not.counts') }}</label>
                             </div>
                         </div>
 
                         <div class="filter-item">
-                            <p class="filter-title mb-3">Allergén, ételérzékenység</p>
+                            <p class="filter-title mb-3">{{ $t('recipe.sidebar.allergy.title') }}</p>
                             <FormInput v-model="filterStore.allergenSearch" placeholder="Allergia keresése..." />
 
                             <div v-if="filterStore.selectedAllergyPills.length" class="mt-3">
-                                <p class="small text-muted mb-2">Kiválasztott allergiák:</p>
+                                <p class="small text-muted mb-2">{{ $t('recipe.sidebar.allergy.chosen') }}</p>
                                 <Pills :pills="filterStore.selectedAllergyPills" removable @remove="filterStore.removeSelectedAllergy" />
                             </div>
 
                             <div v-if="filterStore.filteredAllergyPills.length" class="mt-3">
-                                <p class="small text-muted mb-2">Elérhető allergiák:</p>
+                                <p class="small text-muted mb-2">{{ $t('recipe.sidebar.allergy.available') }}</p>
                                 <Pills :pills="filterStore.filteredAllergyPills" interactive @chose="filterStore.addSelectedAllergy" />
                             </div>
 
                             <div v-if="!filterStore.selectedAllergyPills.length && !filterStore.filteredAllergyPills.length" class="mt-3">
-                                <p class="small text-muted">Nincsenek allergiák.</p>
+                                <p class="small text-muted">{{ $t('recipe.sidebar.allergy.empty') }}</p>
                             </div>
                         </div>
                     </div>

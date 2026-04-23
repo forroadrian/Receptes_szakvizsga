@@ -35,6 +35,10 @@
         "recipes": "Receptek",
         "ingredients": "Alapanyagok",
         "menuPlanner": "Menütervező"
+    },
+    "auth": {
+        "notLoggedIn": "Ehhez a funkcióhoz be kell jelentkezned",
+        "toLogin": "Tovább a belépéshez"
     }
   }
 }

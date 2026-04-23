@@ -1,0 +1,52 @@
+{
+  "recipe": {
+    "title": "Receptek",
+
+    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "searchBar": {
+      "placeholder": "Keresés - pl: Brownie"
+    },
+    "filter": {
+      "title": "Szűrők",
+        "default": "Alapértelmezett",
+        "own": "Saját",
+        "liked": "Kedvelt",
+        "tried": "Kipróbált",
+        "ai": "AI ajánlás",
+        "notFound": "Nincs a szűrésnek megfelelő recept!",
+        "add": "Új, saját recept felvétele"
+    },
+    "addRecipeModal": {
+        "title": "Új recept hozzáadása"
+    },
+    "card": {
+        "metadata": {
+            "time": "perc",
+            "people": "fő"
+        },
+        "footer": {
+            "warning": "Figyelem! Allergént tartalmaz: {allergens}"
+        }
+    },
+    "sidebar": {
+        "active": "aktív",
+        "clearBtn": "Kijelölések törlése",
+        "time": "Időtartam",
+        "meal": "Étkezés",
+        "type": "Típus",
+        "disliked": {
+            "title": "Nem kedvelt alapanyagok",
+            "counts": "Számít",
+            "not": {
+                "counts": "Nem számít"
+            } 
+        },
+        "allergy": {
+            "title":"Allergén, ételérzékenység",
+            "chosen": "Kiválasztott allergiák:",
+            "available": "Elérhető allergiák:",
+            "empty": "Nincsenek allergiák"
+        }
+    }
+  }
+}
