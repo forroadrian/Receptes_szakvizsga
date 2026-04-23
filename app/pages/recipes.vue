@@ -14,6 +14,8 @@ const filterStore = useRecipeFilterStore();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const isHydrated = ref(false);
+const INITIAL_RECIPE_COUNT = 10;
+const visibleRecipeCount = ref(INITIAL_RECIPE_COUNT);
 
 onMounted(async() => {
     isHydrated.value = true;
@@ -87,6 +89,22 @@ const getLocalizedPill = (recipe: any) => {
 
 const needsLoginForTab = computed(() => {
     return !user.value && filterStore.activeTab !== "default";
+});
+
+const visibleRecipes = computed(() => {
+    return filterStore.filteredRecipes.slice(0, visibleRecipeCount.value);
+});
+
+const hasMoreRecipes = computed(() => {
+    return filterStore.filteredRecipes.length > visibleRecipeCount.value;
+});
+
+const loadMoreRecipes = () => {
+    visibleRecipeCount.value += INITIAL_RECIPE_COUNT;
+};
+
+watch(() => filterStore.filteredRecipes, () => {
+    visibleRecipeCount.value = INITIAL_RECIPE_COUNT;
 });
 
 const handleTabClick = (tab: any) => {
@@ -181,7 +199,7 @@ const handleTabClick = (tab: any) => {
                         <p>{{ $t('recipe.addRecipeModal.title') }}</p>
                     </div>
                 </div>
-                <div v-for="recipe in filterStore.filteredRecipes"
+                <div v-for="recipe in visibleRecipes"
                     class="recipe-cards col-12 col-md-6 col-lg-4 my-sm-4 ">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
@@ -249,6 +267,12 @@ const handleTabClick = (tab: any) => {
                         </CardBase>
                     </NuxtLink>
                 </div>
+            </div>
+
+            <div v-if="!needsLoginForTab && hasMoreRecipes" class="d-flex justify-content-center mt-2 mb-4">
+                <Button color="orange" @click="loadMoreRecipes">
+                    További receptek
+                </Button>
             </div>
 
             <div id="recipeFiltersOffcanvas" class="offcanvas offcanvas-end" tabindex="-1"
