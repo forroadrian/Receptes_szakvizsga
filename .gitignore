@@ -29,6 +29,5 @@ logs
 
 *.md
 .claude
-*.json
 *.sql
 .playwright*

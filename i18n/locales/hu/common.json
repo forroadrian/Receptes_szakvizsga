@@ -1,0 +1,34 @@
+{
+  "common": {
+    "badges": {
+      "tried": "Kipróbált",
+      "planned": "Tervezett"
+    },
+    "allergens": {
+      "wheat": "Búzafélék",
+      "dairy": "Tej",
+      "eggs": "Tojás"
+    },
+    "loading": "Betöltés...",
+    "actions": {
+      "save": "Mentés",
+      "saving": "Mentés...",
+      "cancel": "Mégse",
+      "close": "Bezárás",
+      "delete": "Törlés",
+      "deleting": "Törlés...",
+      "edit": "Szerkesztés",
+      "add": "Hozzáadás",
+      "confirm": "Megerősítés",
+      "confirmShort": "Biztos?"
+    },
+    "tags": {
+      "fresh": "Friss",
+      "soon": "Hamarosan",
+      "expired": "Lejárt"
+    },
+    "errors": {
+      "invalidData": "Helytelen adat."
+    }
+  }
+}

@@ -27,13 +27,6 @@ watch(
 )
 
 const ingredientsNavTo = computed(() => {
-    return user.value ? "/ingredients" : "/login"
-});
-
-const menuPlannerNavTo = computed(() => {
-    return user.value ? "/menu" : "/login"
-});
-
 const displayProfileImage = computed(() => {
     return authStore.profileUrl || '/icons/profile.png'
 })
@@ -86,23 +79,23 @@ const handleSignOut = async () => {
                 </NuxtLink>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Menü megnyitása">
+                    aria-controls="mainNav" aria-expanded="false" :aria-label="$t('header.nav.collapse.aria.label')">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div id="mainNav" class="collapse navbar-collapse p-0">
                     <ul class="navbar-nav mx-lg-auto nav-links">
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/">Kezdőlap</NuxtLink>
+                            <NuxtLink class="nav-link" to="/">{{ $t('header.nav.index') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" to="/recipes">Receptek</NuxtLink>
+                            <NuxtLink class="nav-link" to="/recipes">{{ $t('header.nav.recipes') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" :to="ingredientsNavTo">Alapanyagok</NuxtLink>
+                            <NuxtLink class="nav-link" to="/ingredients">{{ $t('header.nav.ingredients') }}</NuxtLink>
                         </li>
                         <li class="nav-item">
-                            <NuxtLink class="nav-link" :to="menuPlannerNavTo">Menütervező</NuxtLink>
+                            <NuxtLink class="nav-link" to="/menu">{{ $t('header.nav.menuPlanner') }}</NuxtLink>
                         </li>
                     </ul>
 
@@ -110,15 +103,15 @@ const handleSignOut = async () => {
                         <p @click="toggleTheme" class="baseMode d-flex m-0  justify-content-center pe-lg-4">
                             {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
                             <span class="my-auto ms-1">
-                                {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
+                                {{ isReady && colorMode.value === "dark" ?  $t('header.nav.profile.theme.dark')  : $t('header.nav.profile.theme.light') }}
                             </span>
                         </p>
                         <Button to="/register" color="orange" :outline="true" class="w-lg-auto me-1">
-                            Regisztráció
+                            {{ $t('header.nav.register') }}
                         </Button>
 
                         <Button to="/login" color="orange" class="w-lg-auto">
-                            Belépés
+                            {{ $t('header.nav.login') }}
                         </Button>
                     </div>
 
@@ -158,7 +151,7 @@ const handleSignOut = async () => {
                                             <span class="badge">
                                                 {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
                                             </span>
-                                            {{ isReady && colorMode.value === "dark" ? "Sötét téma" : "Világos téma" }}
+                                            {{ isReady && colorMode.value === "dark" ? $t('header.nav.profile.theme.dark')  : $t('header.nav.profile.theme.light') }}
                                         </div>
                                         <div class="form-check form-switch">
                                             <input class="form-check-input border-0 ms-auto" type="checkbox"
@@ -170,7 +163,7 @@ const handleSignOut = async () => {
 
                                 <li class="mt-2">
                                     <NuxtLink to="/profile" class="dropdown-item d-flex align-items-center gap-2 py-2 ">
-                                        <p><span class="badge">👤</span>Profil beállítások</p>
+                                        <p><span class="badge">👤</span>{{ $t('header.nav.profile.settings') }}</p>
                                     </NuxtLink>
                                 </li>
 
@@ -178,7 +171,7 @@ const handleSignOut = async () => {
                                     <button class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 "
                                         type="button" @click="handleSignOut">
                                         <span class="fw-semibold text-orange"><i class="bi bi-box-arrow-right"></i>
-                                            Kijelentkezés</span>
+                                            {{ $t('header.nav.profile.logout') }}</span>
                                     </button>
                                 </li>
                             </ul>

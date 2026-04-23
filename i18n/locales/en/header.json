@@ -1,0 +1,30 @@
+{
+    "header": {
+      "nav": {
+        "index": "Home",
+        "recipes": "Recipes",
+        "ingredients": "Pantry",
+        "menuPlanner": "Menu planner",
+        "profile": {
+          "image": {
+            "title": "Profile picture",
+            "alt": "Profile picture"
+          },
+          "theme": {
+            "dark": "Dark Theme",
+            "light": "Light Theme"
+          },
+          "settings": "Settings",
+          "logout": "Logout"
+        },
+        "collapse": {
+          "aria": {
+            "label": "Open collapse"
+          }
+        },
+        "register": "Register",
+        "login": "Login"
+      }
+    }
+  }
+  

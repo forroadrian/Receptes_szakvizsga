@@ -1,0 +1,29 @@
+{
+  "header": {
+    "nav": {
+      "index": "Kezdőlap",
+      "recipes": "Receptek",
+      "ingredients": "Alapanyagok",
+      "menuPlanner": "Menütervező",
+      "profile": {
+        "image": {
+          "title": "Profilkép",
+          "alt": "Profilkép"
+        },
+        "theme": {
+          "dark": "Sötét téma",
+          "light": "Világos téma"
+        },
+        "settings": "Profil beállítások",
+        "logout": "Kijelentkezés"
+      },
+      "collapse": {
+        "aria": {
+          "label": "Menű megnyitása"
+        }
+      },
+      "register": "Regisztráció",
+      "login": "Belépés"
+    }
+  }
+}

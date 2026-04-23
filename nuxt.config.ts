@@ -1,5 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const isDev = process.env.NODE_ENV === 'development'
+import { readdirSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+const localesDir = resolve(__dirname, 'i18n/locales')
+
+const filesFor = (locale: string) =>
+  readdirSync(resolve(localesDir, locale))
+    .filter(f => f.endsWith('.json'))
+    .map(f => `${locale}/${f}`)
 
 export default defineNuxtConfig({
     vite: {
@@ -61,10 +69,11 @@ export default defineNuxtConfig({
     },
     i18n: {
         defaultLocale: 'hu',
-        strategy: 'no_prefix',          
+        strategy: 'no_prefix',   
+        lazy: true,       
         locales: [
-            { code: 'hu', name: 'Magyar',  language: 'hu-HU', file: 'hu.json' },
-            { code: 'en', name: 'English', language: 'en-US', file: 'en.json' },
+            { code: 'hu', name: 'Magyar',  language: 'hu-HU', files: filesFor("hu") },
+            { code: 'en', name: 'English', language: 'en-US', files: filesFor("en") },
         ],                    
         detectBrowserLanguage: {
             useCookie: true,

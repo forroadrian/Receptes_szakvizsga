@@ -1,0 +1,124 @@
+{
+  "pantry": {
+    "page": {
+      "title": "My Pantry",
+      "subtitle": "Keep track of what's in your pantry, watch expiry dates, and find what you need."
+    },
+    "list": {
+      "searchPlaceholder": "Search ingredients by name...",
+      "tabs": {
+        "all": "All"
+      },
+      "addIngredient": "Add a new ingredient",
+      "empty": {
+        "noResults": "No results for your search.",
+        "noIngredients": "Your pantry is empty for now.",
+        "noStatus": "No ingredients with this status.",
+        "firstHint": "Add your first ingredient with the button above."
+      }
+    },
+    "row": {
+      "relativeExpiry": {
+        "expired": "expired {count} day ago | expired {count} days ago",
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow",
+        "inDays": "in {count} day | in {count} days"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm"
+      }
+    },
+    "card": {
+      "actions": {
+        "edit": "Edit",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "confirm": "Confirm"
+      },
+      "fields": {
+        "ingredient": "Ingredient",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "expiry": "Expiry"
+      },
+      "searchPlaceholder": "Search…",
+      "footer": {
+        "expires": "Expires: {date}"
+      }
+    },
+    "addModal": {
+      "title": {
+        "create": "New ingredient",
+        "edit": "Edit ingredient"
+      },
+      "subtitle": {
+        "create": "Fill in the ingredient details",
+        "edit": "Update the details or remove it from your pantry."
+      },
+      "fields": {
+        "name": "Ingredient name",
+        "namePlaceholder": "e.g. Tomato",
+        "quantityUnit": "Quantity / Unit",
+        "unitPlaceholder": "Unit",
+        "expiry": "Expiry date"
+      },
+      "suggestions": {
+        "title": "Popular recipe ingredients",
+        "hint": "Click to quick-fill"
+      },
+      "deleteConfirm": "Are you sure you want to delete this ingredient?",
+      "errors": {
+        "saveFailed": "Could not save the ingredient.",
+        "deleteFailed": "Could not delete the ingredient."
+      }
+    },
+    "modal": {
+      "label": "Ingredients",
+      "title": "New ingredient",
+      "fieldCombined": "Ingredient name, quantity, unit",
+      "namePlaceholder": "e.g. Milk",
+      "unitPlaceholder": "Unit",
+      "expiryDate": "Expiry date",
+      "unitPicker": "Choose a unit"
+    },
+    "missingModal": {
+      "title": "Missing ingredients",
+      "subtitle": "Ingredients that appear often in your recipes but aren't in your pantry yet.",
+      "empty": "No missing ingredients.",
+      "actions": {
+        "add": "Add"
+      }
+    },
+    "sidebar": {
+      "missingBtn": "Missing ingredients"
+    },
+    "freshness": {
+      "title": "Fresh",
+      "subtitle": "ingredient | ingredients",
+      "total": "{count} in your pantry total"
+    },
+    "nextExpiring": {
+      "label": "Expiring soon",
+      "relative": {
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow",
+        "inDays": "in {count} day | in {count} days"
+      },
+      "empty": "Everything is fresh."
+    },
+    "upcoming": {
+      "title": "Next 7 days",
+      "empty": "Nothing expiring"
+    },
+    "statCards": {
+      "filters": {
+        "all": "All",
+        "fresh": "Fresh",
+        "soon": "Soon",
+        "expired": "Expired"
+      }
+    }
+  }
+}

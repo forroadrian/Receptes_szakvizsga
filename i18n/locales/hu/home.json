@@ -1,0 +1,86 @@
+{
+  "home": {
+    "hero": {
+      "badge": "✨ Tudatos étkezés, könnyedén",
+      "title": "Tervezd meg az étrendedet!",
+      "lead": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "browseRecipes": "Receptek megtekintése",
+      "myPantry": "Alapanyagaim"
+    },
+    "meals": {
+      "title": "Étkezések",
+      "lead": "Válassz étkezéstípus szerint, és fedezz fel hozzád illő recepteket, amelyek támogatják a céljaidat a rohanós hétköznapoktól a nyugodtabb közös étkezésekig.",
+      "categories": {
+        "all": {
+          "name": "Összes",
+          "description": "Böngészd át egy helyen az összes inspiráló receptötletet."
+        },
+        "breakfast": {
+          "name": "Reggeli",
+          "description": "Indítsd jól a napot tartalmas, lendületes reggelikkel."
+        },
+        "lunch": {
+          "name": "Ebéd",
+          "description": "Laktató és kiegyensúlyozott fogások a nap közepére."
+        },
+        "dinner": {
+          "name": "Vacsora",
+          "description": "Könnyű vagy kiadós ötletek az esti közös étkezésekhez."
+        },
+        "snack": {
+          "name": "Snack",
+          "description": "Gyors harapnivalók két étkezés között vagy útközben."
+        }
+      }
+    },
+    "features": {
+      "title": "Miért válassz minket?",
+      "easyRecipes": {
+        "title": "Könnyű receptek",
+        "strong": "Pár lépésből elkészíthető ételek",
+        "body": "{strong}, amelyek egyszerűbbé teszik a mindennapokat."
+      },
+      "saveTime": {
+        "title": "Időspórolás",
+        "strong": "több időd marad",
+        "body": "Nem kell azon aggódnod, hogy mit főzz és mikor, így {strong} az igazán fontos dolgokra."
+      },
+      "menuPlanning": {
+        "title": "Menütervezés",
+        "strong": "Tervezd meg az étkezéseidet",
+        "body": "{strong} néhány kattintással, hogy teljesen átláthatóak legyenek számodra."
+      },
+      "pantryManagement": {
+        "title": "Alapanyagok kezelése",
+        "strong": "meglévő alapanyagok",
+        "body": "A {strong} megadásával fedezz fel recepteket, amelyeket már most elkészíthetsz."
+      },
+      "varietyMeals": {
+        "title": "Változatos étkezések",
+        "strong": "reggelire, ebédre és vacsorára",
+        "body": "Inspiráló receptek {strong}, hogy minden nap új ízek kerülhessenek az asztalra."
+      },
+      "personalization": {
+        "title": "Személyre szabhatóság",
+        "strong": "Allergia? Ételérzékenység?",
+        "body": "{strong} – Nálunk megtalálod azokat a recepteket, amelyek megfelelnek az igényeidnek."
+      }
+    },
+    "topRecipes": {
+      "subhead": "Ajánlatunk",
+      "title": "Legfelkapottabb receptek",
+      "containsAllergen": "Allergént tartalmaz: {allergen}",
+      "ctaMore": "Keress további recepteket"
+    },
+    "about": {
+      "quote": "„Mit főzzek a hétvégére?”",
+      "title": "A projekt célja",
+      "imageAlt": "Alapanyagok tányéron",
+      "imageTitle": "Alapanyagok egy tányéron",
+      "p1Strong": "gondolkodás nélkül, gyorsan és egyszerűen",
+      "p1": "Fontos számunkra, hogy felhasználóink akár már az otthon megtalálható alapanyagokból is {strong} tudjanak ételeket készíteni.",
+      "p2Strong": "kereshetnek, tervezhetnek",
+      "p2": "Számtalan receptből válogathatnak, saját ízlésüknek megfelelően: {strong} szabadon."
+    }
+  }
+}

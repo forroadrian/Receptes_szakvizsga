@@ -1,0 +1,86 @@
+{
+  "home": {
+    "hero": {
+      "badge": "✨ Mindful eating, made easy",
+      "title": "Plan your meals!",
+      "lead": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "browseRecipes": "Browse recipes",
+      "myPantry": "My pantry"
+    },
+    "meals": {
+      "title": "Meals",
+      "lead": "Choose by meal type and discover recipes that suit your life — from busy weekdays to relaxed shared meals.",
+      "categories": {
+        "all": {
+          "name": "All",
+          "description": "Browse all our inspiring recipe ideas in one place."
+        },
+        "breakfast": {
+          "name": "Breakfast",
+          "description": "Start your day right with hearty, energising breakfasts."
+        },
+        "lunch": {
+          "name": "Lunch",
+          "description": "Filling, balanced dishes for the middle of the day."
+        },
+        "dinner": {
+          "name": "Dinner",
+          "description": "Light or hearty ideas for shared evening meals."
+        },
+        "snack": {
+          "name": "Snack",
+          "description": "Quick bites between meals or on the go."
+        }
+      }
+    },
+    "features": {
+      "title": "Why choose us?",
+      "easyRecipes": {
+        "title": "Simple recipes",
+        "strong": "Just a few steps",
+        "body": "{strong} to dishes that make everyday life easier."
+      },
+      "saveTime": {
+        "title": "Save time",
+        "strong": "more time",
+        "body": "Stop worrying about what to cook and when — leaving you {strong} for what really matters."
+      },
+      "menuPlanning": {
+        "title": "Menu planning",
+        "strong": "Plan your meals",
+        "body": "{strong} in a few clicks, so your week stays fully under control."
+      },
+      "pantryManagement": {
+        "title": "Pantry management",
+        "strong": "ingredients you already have",
+        "body": "Enter the {strong} and discover recipes you can cook right now."
+      },
+      "varietyMeals": {
+        "title": "Varied meals",
+        "strong": "breakfast, lunch and dinner",
+        "body": "Inspiring recipes for {strong}, so new flavours hit the table every day."
+      },
+      "personalization": {
+        "title": "Personalisation",
+        "strong": "Allergies? Food sensitivities?",
+        "body": "{strong} – we've got the recipes that fit your needs."
+      }
+    },
+    "topRecipes": {
+      "subhead": "Our pick",
+      "title": "Most popular recipes",
+      "containsAllergen": "Contains allergen: {allergen}",
+      "ctaMore": "Find more recipes"
+    },
+    "about": {
+      "quote": "“What should I cook this weekend?”",
+      "title": "About the project",
+      "imageAlt": "Ingredients on a plate",
+      "imageTitle": "Ingredients on a plate",
+      "p1Strong": "quickly, simply and without overthinking",
+      "p1": "It matters to us that our users can cook {strong}, even from what's already in their pantry.",
+      "p2Strong": "search and plan",
+      "p2": "Pick from countless recipes that match your taste — {strong} freely."
+    }
+  }
+}

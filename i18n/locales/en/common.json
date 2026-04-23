@@ -1,0 +1,34 @@
+{
+  "common": {
+    "badges": {
+      "tried": "Tried & tested",
+      "planned": "Planned"
+    },
+    "allergens": {
+      "wheat": "Wheat",
+      "dairy": "Dairy",
+      "eggs": "Eggs"
+    },
+    "loading": "Loading...",
+    "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "close": "Close",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "edit": "Edit",
+      "add": "Add",
+      "confirm": "Confirm",
+      "confirmShort": "Sure?"
+    },
+    "tags": {
+      "fresh": "Fresh",
+      "soon": "Soon",
+      "expired": "Expired"
+    },
+    "errors": {
+      "invalidData": "Invalid data."
+    }
+  }
+}
