@@ -66,9 +66,9 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                     <div class="w-100 d-flex align-items-start justify-content-between gap-3 flex-wrap">
                         <div>
                             <h2 id="openAddRecipeModalLabel" class="modal-title fs-3 mb-1">
-                                {{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.editTitle') : $t('recipe.addRecipeModal.title') }}
+                                {{ recipeModal.isEditMode ? $t('Recept módosítás') : $t('Recept hozzáadása') }}
                             </h2>
-                            <p>{{ recipeModal.isEditMode ? $t('recipe.addRecipeModal.editSubtitle') : $t('recipe.addRecipeModal.subtitle') }}</p>
+                            <p>{{ recipeModal.isEditMode ? $t('Módosítsd a saját recepted kedved szerint!') : $t('Adj meg egy új, saját receptet!') }}</p>
                         </div>
 
                         <div class="recipe-progress-meta text-end">
@@ -181,7 +181,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="col-12">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.ingredient') }}</label>
                                                 <input v-model="recipeModal.ingredientSearch" type="text" class="form-control"
-                                                    :placeholder="$t('recipe.addRecipeModal.form.ingredientPlaceholder')"
+                                                    :placeholder="$t('Frissítés')"
                                                     @focus="recipeModal.onIngredientSearchFocus"
                                                     @input="recipeModal.onIngredientSearchInput">
                                             </div>
@@ -293,7 +293,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                     </Button>
 
                     <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving" @click="recipeModal.saveRecipe">
-                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.update') : $t('recipe.addRecipeModal.footer.save')) }}
+                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('Módosítás') : $t('Létrehozás')) }}
                     </Button>
                 </div>
             </div>
