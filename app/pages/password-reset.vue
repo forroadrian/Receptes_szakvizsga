@@ -73,8 +73,6 @@ const prepareRecoverySession = async () => {
     const type = typeof route.query.type === 'string' ? route.query.type : '';
 
     try {
-        // Ha ugyanebben a tabban már sikeresen ellenőriztük a recovery linket,
-        // és még van session, maradjon használható az oldal.
         if (process.client && sessionStorage.getItem(RECOVERY_FLAG) === '1') {
             const { data: sessionData } = await supabase.auth.getSession();
 
@@ -86,7 +84,6 @@ const prepareRecoverySession = async () => {
             sessionStorage.removeItem(RECOVERY_FLAG);
         }
 
-        // token_hash alapú recovery
         if (tokenHash && type === 'recovery') {
             const { error } = await supabase.auth.verifyOtp({
                 token_hash: tokenHash,
@@ -138,7 +135,6 @@ onMounted(async () => {
     await prepareRecoverySession();
 
     const listener = supabase.auth.onAuthStateChange((event) => {
-        // FONTOS: csak recovery esemény oldja fel az oldalt
         if (event === 'PASSWORD_RECOVERY') {
             markRecoveryReady();
         }
@@ -174,7 +170,6 @@ const onSubmit = async () => {
         return;
     }
 
-    // Mentés előtt ténylegesen nézzük meg, hogy van-e session
     const { data: sessionData } = await supabase.auth.getSession();
 
     if (!sessionData.session) {
