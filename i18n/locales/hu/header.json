@@ -22,6 +22,9 @@
           "label": "Menű megnyitása"
         }
       },
+      "aria": {
+        "main": "Fő navigáció"
+      },
       "register": "Regisztráció",
       "login": "Belépés"
     }

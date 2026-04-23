@@ -129,7 +129,7 @@ defineExpose({ open });
                             type="button"
                             class="btn-close ms-3"
                             data-bs-dismiss="modal"
-                            aria-label="Close"
+                            :aria-label="$t('common.actions.close')"
                         ></button>
                     </div>
 

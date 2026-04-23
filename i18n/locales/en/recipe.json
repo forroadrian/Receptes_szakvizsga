@@ -84,11 +84,13 @@
       "like": "Like",
       "ingredients": "Ingredients",
       "preparation": "Preparation",
-      "similar": "Similar recipes"
+      "similar": "Similar recipes",
+      "imageAlt": "Recipe image"
     },
     "similar": {
       "details": "Details",
-      "empty": "No recipes with similar categories."
+      "empty": "No recipes with similar categories.",
+      "imageAlt": "Recipe image"
     },
     "sidebar": {
       "title": "Filter",

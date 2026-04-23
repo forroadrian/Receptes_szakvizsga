@@ -8,6 +8,9 @@ const emit = defineEmits<{
 }>();
 
 const store = useIngredientStore();
+const { t, locale } = useI18n();
+
+const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 const nextExpiring = computed(() => {
     const nonExpired = store.ingredients.filter((i) => i.tag !== "expired");
@@ -21,10 +24,10 @@ const relativeLabel = computed(() => {
     const i = nextExpiring.value;
     if (!i) return "";
     const days = daysFromToday(i.expiry.toStamp());
-    if (days <= 0) return $t('pantry.nextExpiring.relative.today');
-    if (days === 1) return $t('pantry.nextExpiring.relative.tomorrow');
-    if (days < 7) return $t('pantry.nextExpiring.relative.inDays', {count: days});
-    return new Intl.DateTimeFormat("hu-HU", {
+    if (days <= 0) return t("pantry.nextExpiring.relative.today");
+    if (days === 1) return t("pantry.nextExpiring.relative.tomorrow");
+    if (days < 7) return t("pantry.nextExpiring.relative.inDays", { count: days }, days);
+    return new Intl.DateTimeFormat(intlLocale.value, {
         timeZone: "Europe/Budapest",
         month: "long",
         day: "numeric",

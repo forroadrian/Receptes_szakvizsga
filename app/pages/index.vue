@@ -223,10 +223,10 @@ const cards = ref([
                     <h2 class="about-title mb-3">{{ $t('home.about.title') }}</h2>
                     <div>
                         <p class="about-text">
-                            {{ $t('home.about.p1', {strong: 'home.about.p1Strong'}) }}
+                            {{ $t('home.about.p1', { strong: $t('home.about.p1Strong') }) }}
                         </p>
                         <p class="about-text">
-                            {{ $t('home.about.p2', {strong: 'home.about.p2Strong'}) }}
+                            {{ $t('home.about.p2', { strong: $t('home.about.p2Strong') }) }}
                         </p>
                     </div>
                 </div>

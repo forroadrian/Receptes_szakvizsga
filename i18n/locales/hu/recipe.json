@@ -84,11 +84,13 @@
       "like": "Kedvelem",
       "ingredients": "Hozzávalók",
       "preparation": "Elkészítés",
-      "similar": "Ehhez hasonló receptek"
+      "similar": "Ehhez hasonló receptek",
+      "imageAlt": "Recept képe"
     },
     "similar": {
       "details": "Részletek",
-      "empty": "Nincs hasonló kategóriájú recept."
+      "empty": "Nincs hasonló kategóriájú recept.",
+      "imageAlt": "Recept képe"
     },
     "sidebar": {
       "title": "Szűrők",

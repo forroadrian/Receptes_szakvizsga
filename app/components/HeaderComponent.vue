@@ -65,9 +65,9 @@ const handleSignOut = async () => {
 
 <template>
     <header class="site-header">
-        <nav class="navbar navbar-expand-lg" aria-label="Fő navigáció">
+        <nav class="navbar navbar-expand-lg" :aria-label="$t('header.nav.aria.main')">
             <div class="container d-flex align-items-center">
-                <NuxtLink class="navbar-brand m-0" to="/" aria-label="Kezdőlap">
+                <NuxtLink class="navbar-brand m-0" to="/" :aria-label="$t('common.pages.index')">
                     <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" 
                         :width="180" 
                         :height="128" 
@@ -121,7 +121,7 @@ const handleSignOut = async () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <p><img :src="displayProfileImage" alt="Profilkép" title="Profilkép" /></p>
+                                <p><img :src="displayProfileImage" :alt="$t('header.nav.profile.image.alt')" :title="$t('header.nav.profile.image.title')" /></p>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">{{ displayUsername }}</p>
@@ -131,7 +131,7 @@ const handleSignOut = async () => {
                             <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img :src="displayProfileImage" alt="Profilkép" title="Profilkép" />
+                                        <img :src="displayProfileImage" :alt="$t('header.nav.profile.image.alt')" :title="$t('header.nav.profile.image.title')" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">

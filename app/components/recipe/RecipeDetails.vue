@@ -52,7 +52,7 @@ onMounted(async () => {
                                 <span><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
-                        <img src="/images/background.webp" class="img-fluid rounded w-100" alt="Recept képe" />
+                        <img src="/images/background.webp" class="img-fluid rounded w-100" :alt="$t('recipe.details.imageAlt')" />
                     </div>
                 </div>
 
@@ -80,8 +80,6 @@ onMounted(async () => {
                             <div class="d-flex gap-3">
                                 <Button v-if="currentRecipe" class="w-100" color="yellow" :outline="!isTried"
                                 :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="handleToggleTried">
-                                    {{ isTried ? 'Kipróbált' : 'Kipróbálom' }}
-                                :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="requireAuth() && filterStore.toggleTried(currentRecipe.id)">
                                     {{ isTried ? $t('recipe.details.tried') : $t('recipe.details.tryIt') }}
                                 </Button>
 
