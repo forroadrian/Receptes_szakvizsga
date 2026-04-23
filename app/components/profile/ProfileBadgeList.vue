@@ -9,6 +9,8 @@ import {
     watch,
 } from 'vue';
 
+const { t } = useI18n();
+
 const emit = defineEmits(['remove']);
 
 const props = defineProps({
@@ -34,7 +36,11 @@ const props = defineProps({
     },
     overflowLabel: {
         type: String,
-        default: 'További elemek',
+        default: '',
+    },
+    translationPrefix: {
+        type: String,
+        default: '',
     },
 });
 
@@ -51,6 +57,10 @@ let resizeObserver = null;
 const shouldCollapseOnWrap = computed(() => Boolean(props.title));
 
 const getItemLabel = (item) => {
+    if (props.translationPrefix && item && item.id != null) {
+        return t(`${props.translationPrefix}${item.id}`);
+    }
+
     return typeof item === 'string' ? item : item?.[props.displayKey] || '';
 };
 
@@ -63,11 +73,13 @@ const getItemKey = (item, index) => {
 };
 
 const effectiveOverflowLabel = computed(() => {
-    if (props.overflowLabel !== 'További elemek') {
+    if (props.overflowLabel) {
         return props.overflowLabel;
     }
 
-    return props.title ? `További ${props.title.toLowerCase()}` : props.overflowLabel;
+    return props.title
+        ? t('profile.badges.overflowTitled', { title: props.title.toLowerCase() })
+        : t('profile.badges.overflow');
 });
 
 const visibleItemCount = computed(() => {
@@ -257,7 +269,7 @@ watch(hiddenCount, (count) => {
                 <div v-if="hiddenCount" class="profile-chip-overflow position-relative">
                     <button ref="overflowTriggerRef" type="button"
                         class="badge rounded-pill profile-chip profile-chip-overflow-trigger px-3 py-2 d-inline-flex align-items-center gap-2"
-                        :aria-expanded="overflowOpen" :aria-label="`${hiddenCount} további elem megjelenítése`"
+                        :aria-expanded="overflowOpen" :aria-label="$t('profile.badges.overflowAria', { count: hiddenCount }, hiddenCount)"
                         @click="toggleOverflow">
                         <span class="profile-chip-overflow-count">+{{ hiddenCount }}</span>
                         <span aria-hidden="true">...</span>
@@ -267,7 +279,7 @@ watch(hiddenCount, (count) => {
                         role="dialog" :aria-label="effectiveOverflowLabel">
                         <div class="profile-chip-overflow-header">
                             <span>{{ effectiveOverflowLabel }}</span>
-                            <span class="profile-chip-overflow-summary">{{ hiddenCount }} db</span>
+                            <span class="profile-chip-overflow-summary">{{ $t('profile.badges.count', { count: hiddenCount }, hiddenCount) }}</span>
                         </div>
 
                         <div class="profile-chip-overflow-list">

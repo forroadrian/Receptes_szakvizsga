@@ -8,6 +8,7 @@ const auth = useAuthStore();
 const preferences = usePreferencesStore();
 const route = useRoute();
 const { showAlert } = useAlert();
+const { t } = useI18n();
 const {
     validateUsernameChange,
     validateEmailChange,
@@ -57,39 +58,39 @@ const hasTypedDislikedIngredient = computed(() => dislikedIngredientInput.value.
 const isProfileSettingsActive = computed(() => ['menu', 'username', 'password', 'email'].includes(activeSection.value));
 const displayProfileImage = computed(() => auth.profileUrl || '/icons/profile.png');
 
-const sidebarItems = [
+const sidebarItems = computed(() => [
     {
         key: 'allergen',
         icon: 'bi-shield-plus',
-        label: 'Allergének',
+        label: t('profile.sidebar.allergens'),
     },
     {
         key: 'dislikedIngredient',
         icon: 'bi-slash-circle',
-        label: 'Nem kedvelt alapanyagok',
+        label: t('profile.sidebar.dislikedIngredients'),
     },
-];
+]);
 
-const preferenceOptions = [
+const preferenceOptions = computed(() => [
     {
         key: 'allergen',
         icon: 'bi-shield-plus',
-        title: 'Allergének',
+        title: t('profile.sidebar.allergens'),
     },
     {
         key: 'dislikedIngredient',
         icon: 'bi-slash-circle',
-        title: 'Nem kedvelt alapanyagok',
+        title: t('profile.sidebar.dislikedIngredients'),
     },
-];
+]);
 
 const expandedMobileGroup = ref(null);
 
 const settingsSectionKeys = ['username', 'password', 'email'];
-const preferenceSectionKeys = preferenceOptions.map((option) => option.key);
+const preferenceSectionKeys = ['allergen', 'dislikedIngredient'];
 
-const settingsCardDescription = 'Felhasználónév, jelszó és email kezelése';
-const preferencesCardDescription = 'Allergének és nem kedvelt alapanyagok hozzáadása';
+const settingsCardDescription = computed(() => t('profile.mobile.settingsDescription'));
+const preferencesCardDescription = computed(() => t('profile.mobile.preferencesDescription'));
 
 const isSettingsSection = (section) => settingsSectionKeys.includes(section);
 const isPreferenceSection = (section) => preferenceSectionKeys.includes(section);
@@ -98,23 +99,23 @@ const toggleMobileGroup = (group) => {
     expandedMobileGroup.value = expandedMobileGroup.value === group ? null : group;
 };
 
-const settingsOptions = [
+const settingsOptions = computed(() => [
     {
         key: 'username',
         icon: 'bi-person',
-        title: 'Felhasználónév módosítás',
+        title: t('profile.settings.username'),
     },
     {
         key: 'password',
         icon: 'bi-lock',
-        title: 'Jelszó módosítás',
+        title: t('profile.settings.password'),
     },
     {
         key: 'email',
         icon: 'bi-envelope',
-        title: 'Email módosítás',
+        title: t('profile.settings.email'),
     },
-];
+]);
 
 const sectionResetters = {
     username() {
@@ -216,7 +217,7 @@ const syncProfileData = async (newUser) => {
     const loadPreferenceDataSuccess = await preferences.loadPreferenceData(userId);
 
     if (!loadPreferenceDataSuccess) {
-        showAlert('danger', preferences.errorMessage || 'Nem sikerült betölteni a preferenciákat.');
+        showAlert('danger', preferences.errorMessage || t('profile.alerts.preferencesLoadFailed'));
     }
 };
 
@@ -241,7 +242,7 @@ const selectAllergy = (allergy) => {
     const added = preferences.addSelectedAllergy(allergy);
 
     if (!added) {
-        showError('Ez az allergén már szerepel a listában.');
+        showError(t('profile.alerts.allergyAlreadyAdded'));
         return;
     }
 
@@ -256,7 +257,7 @@ const selectDislikedIngredient = (ingredient) => {
     const added = preferences.addSelectedDislikedIngredient(ingredient);
 
     if (!added) {
-        showError('Ez az alapanyag már szerepel a listában.');
+        showError(t('profile.alerts.ingredientAlreadyAdded'));
         return;
     }
 
@@ -271,21 +272,21 @@ const removeAllergen = async (allergy) => {
     const success = await preferences.deleteUserAllergy(allergy.id, currentAuthUserId.value);
 
     if (!success) {
-        showError(preferences.errorMessage || 'Az allergén törlése nem sikerült.');
+        showError(preferences.errorMessage || t('profile.alerts.allergenRemoveFailed'));
         return;
     }
 
-    showAlert('success', 'Allergén sikeresen törölve.');
+    showAlert('success', t('profile.alerts.allergenRemoved'));
 };
 
 const removeDislikedIngredient = async (ingredient) => {
     const success = await preferences.deleteUserDislikedIngredient(ingredient.id, currentAuthUserId.value);
 
     if (!success) {
-        showError(preferences.errorMessage || 'A nem kedvelt alapanyag törlése nem sikerült.');
+        showError(preferences.errorMessage || t('profile.alerts.ingredientRemoveFailed'));
         return;
     }
-    showAlert('success', 'A nem kedvelt alapanyag sikeresen törölve.');
+    showAlert('success', t('profile.alerts.ingredientRemoved'));
 };
 
 const openProfileImagePicker = () => {
@@ -300,13 +301,13 @@ const handleProfileImageChange = async (event) => {
     }
 
     if (!file.type.startsWith('image/')) {
-        showError('Csak képfájlt választhatsz ki.');
+        showError(t('profile.alerts.imageOnly'));
         event.target.value = '';
         return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-        showError('A kép mérete legfeljebb 2 MB lehet.');
+        showError(t('profile.alerts.imageTooLarge'));
         event.target.value = '';
         return;
     }
@@ -314,12 +315,12 @@ const handleProfileImageChange = async (event) => {
     const success = await auth.updateProfileImage(file);
 
     if (!success) {
-        showError(auth.errorMessage || 'Nem sikerült módosítani a profilképet.');
+        showError(auth.errorMessage || t('profile.alerts.imageUpdateFailed'));
         event.target.value = '';
         return;
     }
 
-    showAlert('success', 'Sikeres profilkép módosítás.');
+    showAlert('success', t('profile.alerts.imageUpdated'));
     event.target.value = '';
 };
 
@@ -335,13 +336,13 @@ const saveUsername = async () => {
     const success = await auth.updateUsername(trimmedUsername);
 
     if (!success) {
-        showError(auth.errorMessage || 'Hiba történt mentéskor.');
+        showError(auth.errorMessage || t('common.errors.saveFailed'));
         return;
     }
 
     displayedUsername.value = trimmedUsername;
     usernameInput.value = trimmedUsername;
-    showAlert('success', 'Sikeres módosítás.');
+    showAlert('success', t('profile.alerts.usernameUpdated'));
     await resetToMenu();
 };
 
@@ -359,11 +360,11 @@ const saveEmail = async () => {
     );
 
     if (!success) {
-        showError(auth.errorMessage || 'Hiba történt mentéskor.');
+        showError(auth.errorMessage || t('common.errors.saveFailed'));
         return;
     }
 
-    showAlert('success', 'Megerősítő email elküldve. Nézd meg az új és a régi email címedet is. Az email címed a jóváhagyás után frissül.');
+    showAlert('success', t('profile.alerts.emailConfirmation'));
     await resetToMenu();
 };
 
@@ -382,7 +383,7 @@ const savePassword = async () => {
     const success = await auth.updatePassword(currentPasswordInput.value, newPasswordInput.value);
 
     if (!success) {
-        showError(auth.errorMessage || 'Hiba történt mentéskor.');
+        showError(auth.errorMessage || t('common.errors.saveFailed'));
         return;
     }
 
@@ -390,7 +391,7 @@ const savePassword = async () => {
         const signOutSuccess = await auth.signOut();
 
         if (!signOutSuccess) {
-            showError(auth.errorMessage || 'A kijelentkeztetés nem sikerült.');
+            showError(auth.errorMessage || t('profile.alerts.signOutFailed'));
             return;
         }
 
@@ -398,7 +399,7 @@ const savePassword = async () => {
         return;
     }
 
-    showAlert('success', 'Sikeres módosítás.');
+    showAlert('success', t('profile.alerts.passwordUpdated'));
     await resetToMenu();
 };
 
@@ -413,11 +414,11 @@ const saveAllergies = async () => {
     const success = await preferences.saveSelectedAllergies(currentAuthUserId.value);
 
     if (!success) {
-        showError(preferences.errorMessage || 'Hiba történt mentéskor.');
+        showError(preferences.errorMessage || t('common.errors.saveFailed'));
         return;
     }
 
-    showAlert('success', 'Allergén(ek) sikeresen hozzáadva.');
+    showAlert('success', t('profile.alerts.allergyAdded'));
     await resetToMenu();
 };
 
@@ -448,17 +449,17 @@ const saveDislikedIngredient = async () => {
     const selectedValidationMessage = validateSelectedDislikedIngredients(selectedDislikedIngredients.value);
 
     if (selectedValidationMessage) {
-        showError('Válassz ki legalább egy alapanyagot a listából.');
+        showError(t('profile.alerts.mustPickIngredient'));
         return;
     }
 
     const success = await preferences.saveSelectedDislikedIngredients(currentAuthUserId.value);
 
     if (!success) {
-        showError(preferences.errorMessage || 'Hiba történt mentéskor.');
+        showError(preferences.errorMessage || t('common.errors.saveFailed'));
         return;
     }
-    showAlert('success', 'A nem kedvelt alapanyag sikeresen hozzáadva.');
+    showAlert('success', t('profile.alerts.ingredientAdded'));
     await resetToMenu();
 };
 
@@ -489,7 +490,7 @@ const handleSave = async () => {
                             <div class="text-center mb-4">
                                 <div class="avatar-wrap mx-auto mb-3 position-relative">
                                     <div class="avatar-circle d-flex align-items-center justify-content-center">
-                                        <img :src="displayProfileImage" alt="Profile" title="Profile picture">
+                                        <img :src="displayProfileImage" :alt="$t('profile.image.alt')" :title="$t('profile.image.title')">
                                     </div>
                                     <button class="avatar-camera" type="button" @click="openProfileImagePicker">
                                         <i class="bi bi-camera-fill"></i>
@@ -500,12 +501,13 @@ const handleSave = async () => {
                                 <h5 class="mb-0">{{ displayedUsername }}</h5>
                             </div>
 
-                            <ProfileBadgeList class="mb-4" title="Nem kedvelt alapanyagok"
-                                :items="userDislikedIngredients" empty-text="Még nincs hozzáadott alapanyag."
-                                @remove="removeDislikedIngredient" />
+                            <ProfileBadgeList class="mb-4" :title="$t('profile.sidebar.dislikedIngredients')"
+                                :items="userDislikedIngredients" :empty-text="$t('profile.sidebar.noDislikedIngredients')"
+                                translation-prefix="ingredient." @remove="removeDislikedIngredient" />
 
-                            <ProfileBadgeList title="Allergének" :items="userAllergies" display-key="name"
-                                empty-text="Még nincs hozzáadott allergén." @remove="removeAllergen" />
+                            <ProfileBadgeList :title="$t('profile.sidebar.allergens')" :items="userAllergies" display-key="name"
+                                :empty-text="$t('profile.sidebar.noAllergens')" translation-prefix="allergies."
+                                @remove="removeAllergen" />
                         </div>
                     </div>
 
@@ -515,7 +517,7 @@ const handleSave = async () => {
                                 class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                 :class="{ active: isProfileSettingsActive }" @click="resetToMenu">
                                 <i class="bi bi-person-lines-fill"></i>
-                                <span>Profil beállítások</span>
+                                <span>{{ $t('profile.sidebar.settings') }}</span>
                             </button>
 
                             <button v-for="item in sidebarItems" :key="item.key" type="button"
@@ -540,7 +542,7 @@ const handleSave = async () => {
                                             </div>
 
                                             <div class="mobile-menu-card-text">
-                                                <h6 class="mb-1">Profil beállítások</h6>
+                                                <h6 class="mb-1">{{ $t('profile.sidebar.settings') }}</h6>
                                                 <p class="mb-0">{{ settingsCardDescription }}</p>
                                             </div>
                                         </div>
@@ -568,7 +570,7 @@ const handleSave = async () => {
                                             </div>
 
                                             <div class="mobile-menu-card-text">
-                                                <h6 class="mb-1">Ételpreferenciák</h6>
+                                                <h6 class="mb-1">{{ $t('profile.mobile.preferences') }}</h6>
                                                 <p class="mb-0">{{ preferencesCardDescription }}</p>
                                             </div>
                                         </div>
@@ -591,38 +593,38 @@ const handleSave = async () => {
                                 class="card custshadow rounded-3 w-100 right-card mobile-section-card mt-3">
                                 <div class="card-body p-4 h-100 d-flex flex-column">
                                     <ProfileSectionCard v-if="activeSection === 'username'"
-                                        title="Felhasználónév módosítása">
+                                        :title="$t('profile.sections.username')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4">
-                                                <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
+                                                <FormInput v-model="usernameInput" :label="$t('profile.fields.username')" type="text" />
                                             </div>
 
                                             <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
                                         </form>
                                     </ProfileSectionCard>
 
-                                    <ProfileSectionCard v-if="activeSection === 'password'" title="Jelszó módosítása">
+                                    <ProfileSectionCard v-if="activeSection === 'password'" :title="$t('profile.sections.password')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
-                                                <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                <FormInput v-model="currentPasswordInput" :label="$t('profile.fields.currentPassword')"
                                                     type="password" />
                                             </div>
 
                                             <div class="mb-3">
-                                                <FormInput v-model="newPasswordInput" label="Új jelszó"
+                                                <FormInput v-model="newPasswordInput" :label="$t('profile.fields.newPassword')"
                                                     type="password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="confirmPasswordInput"
-                                                    label="Add meg újra a jelszavad" type="password" />
+                                                    :label="$t('profile.fields.confirmPassword')" type="password" />
                                             </div>
 
                                             <div class="form-check mb-4">
                                                 <input id="signOutEverywhereMobile" v-model="signOutEverywhere"
                                                     class="form-check-input" type="checkbox">
                                                 <label class="form-check-label" for="signOutEverywhereMobile">
-                                                    Jelentkeztess ki mindenhonnan
+                                                    {{ $t('profile.signOutEverywhere') }}
                                                 </label>
                                             </div>
 
@@ -630,27 +632,28 @@ const handleSave = async () => {
                                         </form>
                                     </ProfileSectionCard>
 
-                                    <ProfileSectionCard v-if="activeSection === 'email'" title="Email módosítása">
+                                    <ProfileSectionCard v-if="activeSection === 'email'" :title="$t('profile.sections.email')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
-                                                <FormInput v-model="emailInput" label="Email" type="email" />
+                                                <FormInput v-model="emailInput" :label="$t('profile.fields.email')" type="email" />
                                             </div>
 
                                             <div class="mb-4">
-                                                <FormInput v-model="newEmailInput" label="Új email" type="email" />
+                                                <FormInput v-model="newEmailInput" :label="$t('profile.fields.newEmail')" type="email" />
                                             </div>
 
                                             <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
                                         </form>
                                     </ProfileSectionCard>
 
-                                    <ProfileSectionCard v-if="activeSection === 'allergen'" title="Allergén hozzáadása">
+                                    <ProfileSectionCard v-if="activeSection === 'allergen'" :title="$t('profile.sections.allergen')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4 position-relative">
-                                                <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
+                                                <FormInput v-model="allergenInput" :label="$t('profile.fields.allergenName')" type="text" />
 
                                                 <ProfileBadgeList v-if="selectedAllergies.length" class="mb-3"
                                                     :items="selectedAllergies" display-key="name"
+                                                    translation-prefix="allergies."
                                                     @remove="removeSelectedAllergen" />
 
                                                 <div v-if="hasTypedAllergen"
@@ -659,32 +662,33 @@ const handleSave = async () => {
                                                         type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectAllergy(allergy)">
-                                                        {{ allergy.name }}
+                                                        {{ $t('allergies.' + allergy.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredAllergies.length"
                                                         class="list-group-item text-muted small">
-                                                        Nincs ilyen allergén a listában.
+                                                        {{ $t('profile.suggestions.noAllergen') }}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <ProfileSectionActions
-                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-text="preferencesSaving ? $t('common.actions.saving') : $t('common.actions.add')"
                                                 :save-disabled="preferencesSaving" @cancel="resetToMenu"
                                                 @save="handleSave" />
                                         </form>
                                     </ProfileSectionCard>
 
                                     <ProfileSectionCard v-if="activeSection === 'dislikedIngredient'"
-                                        title="Nem kedvelt alapanyagok hozzáadása">
+                                        :title="$t('profile.sections.dislikedIngredient')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4 position-relative">
                                                 <FormInput v-model="dislikedIngredientInput"
-                                                    label="Nem kedvelt alapanyag neve" type="text" />
+                                                    :label="$t('profile.fields.dislikedIngredientName')" type="text" />
 
                                                 <ProfileBadgeList v-if="selectedDislikedIngredients.length" class="mb-3"
                                                     :items="selectedDislikedIngredients" display-key="name"
+                                                    translation-prefix="ingredient."
                                                     @remove="removeSelectedDislikedIngredient" />
 
                                                 <div v-if="hasTypedDislikedIngredient"
@@ -693,18 +697,18 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ ingredient.name }}
+                                                        {{ $t('ingredient.' + ingredient.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"
                                                         class="list-group-item text-muted small">
-                                                        Nincs ilyen alapanyag a listában.
+                                                        {{ $t('profile.suggestions.noIngredient') }}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <ProfileSectionActions
-                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-text="preferencesSaving ? $t('common.actions.saving') : $t('common.actions.add')"
                                                 :save-disabled="preferencesSaving" @cancel="resetToMenu"
                                                 @save="handleSave" />
                                         </form>
@@ -720,7 +724,7 @@ const handleSave = async () => {
                         <div class="card-body p-4 p-md-5 h-100 d-flex flex-column">
                             <Transition name="desktop-panel-switch" mode="out-in">
                                 <div :key="activeSection" class="desktop-panel-stage h-100 d-flex flex-column">
-                                    <ProfileSectionCard v-if="activeSection === 'menu'" title="Profil beállítások">
+                                    <ProfileSectionCard v-if="activeSection === 'menu'" :title="$t('profile.sidebar.settings')">
                                         <div class="settings-options">
                                             <ProfileSettingsOption v-for="option in settingsOptions" :key="option.key"
                                                 :icon="option.icon" :title="option.title"
@@ -729,10 +733,10 @@ const handleSave = async () => {
                                     </ProfileSectionCard>
 
                                     <ProfileSectionCard v-else-if="activeSection === 'username'"
-                                        title="Felhasználónév módosítása">
+                                        :title="$t('profile.sections.username')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4">
-                                                <FormInput v-model="usernameInput" label="Felhasználónév" type="text" />
+                                                <FormInput v-model="usernameInput" :label="$t('profile.fields.username')" type="text" />
                                             </div>
 
                                             <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
@@ -740,28 +744,28 @@ const handleSave = async () => {
                                     </ProfileSectionCard>
 
                                     <ProfileSectionCard v-else-if="activeSection === 'password'"
-                                        title="Jelszó módosítása">
+                                        :title="$t('profile.sections.password')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
-                                                <FormInput v-model="currentPasswordInput" label="Aktuális jelszó"
+                                                <FormInput v-model="currentPasswordInput" :label="$t('profile.fields.currentPassword')"
                                                     type="password" />
                                             </div>
 
                                             <div class="mb-3">
-                                                <FormInput v-model="newPasswordInput" label="Új jelszó"
+                                                <FormInput v-model="newPasswordInput" :label="$t('profile.fields.newPassword')"
                                                     type="password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="confirmPasswordInput"
-                                                    label="Add meg újra a jelszavad" type="password" />
+                                                    :label="$t('profile.fields.confirmPassword')" type="password" />
                                             </div>
 
                                             <div class="form-check mb-4">
                                                 <input id="signOutEverywhere" v-model="signOutEverywhere"
                                                     class="form-check-input" type="checkbox">
                                                 <label class="form-check-label" for="signOutEverywhere">
-                                                    Jelentkeztess ki mindenhonnan
+                                                    {{ $t('profile.signOutEverywhere') }}
                                                 </label>
                                             </div>
 
@@ -769,14 +773,14 @@ const handleSave = async () => {
                                         </form>
                                     </ProfileSectionCard>
 
-                                    <ProfileSectionCard v-else-if="activeSection === 'email'" title="Email módosítása">
+                                    <ProfileSectionCard v-else-if="activeSection === 'email'" :title="$t('profile.sections.email')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
-                                                <FormInput v-model="emailInput" label="Email" type="email" />
+                                                <FormInput v-model="emailInput" :label="$t('profile.fields.email')" type="email" />
                                             </div>
 
                                             <div class="mb-4">
-                                                <FormInput v-model="newEmailInput" label="Új email" type="email" />
+                                                <FormInput v-model="newEmailInput" :label="$t('profile.fields.newEmail')" type="email" />
                                             </div>
 
                                             <ProfileSectionActions @cancel="resetToMenu" @save="handleSave" />
@@ -784,13 +788,14 @@ const handleSave = async () => {
                                     </ProfileSectionCard>
 
                                     <ProfileSectionCard v-else-if="activeSection === 'allergen'"
-                                        title="Allergén hozzáadása">
+                                        :title="$t('profile.sections.allergen')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4 position-relative">
-                                                <FormInput v-model="allergenInput" label="Allergén neve" type="text" />
+                                                <FormInput v-model="allergenInput" :label="$t('profile.fields.allergenName')" type="text" />
 
                                                 <ProfileBadgeList v-if="selectedAllergies.length" class="mb-3"
                                                     :items="selectedAllergies" display-key="name"
+                                                    translation-prefix="allergies."
                                                     @remove="removeSelectedAllergen" />
 
                                                 <div v-if="hasTypedAllergen"
@@ -799,32 +804,33 @@ const handleSave = async () => {
                                                         type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectAllergy(allergy)">
-                                                        {{ allergy.name }}
+                                                        {{ $t('allergies.' + allergy.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredAllergies.length"
                                                         class="list-group-item text-muted small">
-                                                        Nincs ilyen allergén a listában.
+                                                        {{ $t('profile.suggestions.noAllergen') }}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <ProfileSectionActions
-                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-text="preferencesSaving ? $t('common.actions.saving') : $t('common.actions.add')"
                                                 :save-disabled="preferencesSaving" @cancel="resetToMenu"
                                                 @save="handleSave" />
                                         </form>
                                     </ProfileSectionCard>
 
                                     <ProfileSectionCard v-else-if="activeSection === 'dislikedIngredient'"
-                                        title="Nem kedvelt alapanyagok hozzáadása">
+                                        :title="$t('profile.sections.dislikedIngredient')">
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-4 position-relative">
                                                 <FormInput v-model="dislikedIngredientInput"
-                                                    label="Nem kedvelt alapanyag neve" type="text" />
+                                                    :label="$t('profile.fields.dislikedIngredientName')" type="text" />
 
                                                 <ProfileBadgeList v-if="selectedDislikedIngredients.length" class="mb-3"
                                                     :items="selectedDislikedIngredients" display-key="name"
+                                                    translation-prefix="ingredient."
                                                     @remove="removeSelectedDislikedIngredient" />
 
                                                 <div v-if="hasTypedDislikedIngredient"
@@ -833,18 +839,18 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ ingredient.name }}
+                                                        {{ $t('ingredient.' + ingredient.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"
                                                         class="list-group-item text-muted small">
-                                                        Nincs ilyen alapanyag a listában.
+                                                        {{ $t('profile.suggestions.noIngredient') }}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <ProfileSectionActions
-                                                :save-text="preferencesSaving ? 'Mentés...' : 'Hozzáadás'"
+                                                :save-text="preferencesSaving ? $t('common.actions.saving') : $t('common.actions.add')"
                                                 :save-disabled="preferencesSaving" @cancel="resetToMenu"
                                                 @save="handleSave" />
                                         </form>

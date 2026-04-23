@@ -1,0 +1,73 @@
+{
+  "profile": {
+    "image": {
+      "alt": "Profilkép",
+      "title": "Profilkép"
+    },
+    "sidebar": {
+      "allergens": "Allergének",
+      "dislikedIngredients": "Nem kedvelt alapanyagok",
+      "settings": "Profil beállítások",
+      "noAllergens": "Még nincs hozzáadott allergén.",
+      "noDislikedIngredients": "Még nincs hozzáadott alapanyag."
+    },
+    "mobile": {
+      "settingsDescription": "Felhasználónév, jelszó és email kezelése",
+      "preferencesDescription": "Allergének és nem kedvelt alapanyagok hozzáadása",
+      "preferences": "Ételpreferenciák"
+    },
+    "settings": {
+      "username": "Felhasználónév módosítás",
+      "password": "Jelszó módosítás",
+      "email": "Email módosítás"
+    },
+    "sections": {
+      "username": "Felhasználónév módosítása",
+      "password": "Jelszó módosítása",
+      "email": "Email módosítása",
+      "allergen": "Allergén hozzáadása",
+      "dislikedIngredient": "Nem kedvelt alapanyagok hozzáadása"
+    },
+    "fields": {
+      "username": "Felhasználónév",
+      "currentPassword": "Aktuális jelszó",
+      "newPassword": "Új jelszó",
+      "confirmPassword": "Add meg újra a jelszavad",
+      "email": "Email",
+      "newEmail": "Új email",
+      "allergenName": "Allergén neve",
+      "dislikedIngredientName": "Nem kedvelt alapanyag neve"
+    },
+    "signOutEverywhere": "Jelentkeztess ki mindenhonnan",
+    "suggestions": {
+      "noAllergen": "Nincs ilyen allergén a listában.",
+      "noIngredient": "Nincs ilyen alapanyag a listában."
+    },
+    "badges": {
+      "overflow": "További elemek",
+      "overflowTitled": "További {title}",
+      "overflowAria": "{count} további elem megjelenítése",
+      "count": "{count} db"
+    },
+    "alerts": {
+      "allergyAlreadyAdded": "Ez az allergén már szerepel a listában.",
+      "ingredientAlreadyAdded": "Ez az alapanyag már szerepel a listában.",
+      "allergenRemoved": "Allergén sikeresen törölve.",
+      "allergenRemoveFailed": "Az allergén törlése nem sikerült.",
+      "ingredientRemoved": "A nem kedvelt alapanyag sikeresen törölve.",
+      "ingredientRemoveFailed": "A nem kedvelt alapanyag törlése nem sikerült.",
+      "mustPickIngredient": "Válassz ki legalább egy alapanyagot a listából.",
+      "imageOnly": "Csak képfájlt választhatsz ki.",
+      "imageTooLarge": "A kép mérete legfeljebb 2 MB lehet.",
+      "imageUpdateFailed": "Nem sikerült módosítani a profilképet.",
+      "imageUpdated": "Sikeres profilkép módosítás.",
+      "usernameUpdated": "Sikeres módosítás.",
+      "emailConfirmation": "Megerősítő email elküldve. Nézd meg az új és a régi email címedet is. Az email címed a jóváhagyás után frissül.",
+      "passwordUpdated": "Sikeres módosítás.",
+      "signOutFailed": "A kijelentkeztetés nem sikerült.",
+      "allergyAdded": "Allergén(ek) sikeresen hozzáadva.",
+      "ingredientAdded": "A nem kedvelt alapanyag sikeresen hozzáadva.",
+      "preferencesLoadFailed": "Nem sikerült betölteni a preferenciákat."
+    }
+  }
+}

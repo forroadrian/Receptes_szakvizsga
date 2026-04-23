@@ -1,16 +1,22 @@
 <script setup>
+import { computed } from 'vue';
+
+const { t } = useI18n();
+
 defineEmits(['cancel', 'save']);
 
-defineProps({
+const props = defineProps({
     saveText: {
         type: String,
-        default: 'Mentés',
+        default: '',
     },
     saveDisabled: {
         type: Boolean,
         default: false,
     },
 });
+
+const resolvedSaveText = computed(() => props.saveText || t('common.actions.save'));
 </script>
 
 <template>
@@ -21,7 +27,7 @@ defineProps({
             class="profile-action-button btn-lg px-5 rounded-pill"
             @click="$emit('cancel')"
         >
-            Mégsem
+            {{ $t('common.actions.cancel') }}
         </Button>
 
         <Button
@@ -31,7 +37,7 @@ defineProps({
             :disabled="saveDisabled"
             @click="$emit('save')"
         >
-            {{ saveText }}
+            {{ resolvedSaveText }}
         </Button>
     </div>
 </template>

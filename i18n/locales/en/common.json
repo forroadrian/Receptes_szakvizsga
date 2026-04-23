@@ -28,7 +28,8 @@
       "expired": "Expired"
     },
     "errors": {
-      "invalidData": "Invalid data."
+      "invalidData": "Invalid data.",
+      "saveFailed": "An error occurred while saving."
     },
     "pages": {
         "index": "Home",

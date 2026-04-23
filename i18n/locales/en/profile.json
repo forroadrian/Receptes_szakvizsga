@@ -1,0 +1,73 @@
+{
+  "profile": {
+    "image": {
+      "alt": "Profile",
+      "title": "Profile picture"
+    },
+    "sidebar": {
+      "allergens": "Allergens",
+      "dislikedIngredients": "Disliked ingredients",
+      "settings": "Profile settings",
+      "noAllergens": "No allergens added yet.",
+      "noDislikedIngredients": "No ingredient added yet."
+    },
+    "mobile": {
+      "settingsDescription": "Manage username, password and email",
+      "preferencesDescription": "Add allergens and disliked ingredients",
+      "preferences": "Food preferences"
+    },
+    "settings": {
+      "username": "Change username",
+      "password": "Change password",
+      "email": "Change email"
+    },
+    "sections": {
+      "username": "Edit username",
+      "password": "Edit password",
+      "email": "Edit email",
+      "allergen": "Add allergen",
+      "dislikedIngredient": "Add disliked ingredients"
+    },
+    "fields": {
+      "username": "Username",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm your password",
+      "email": "Email",
+      "newEmail": "New email",
+      "allergenName": "Allergen name",
+      "dislikedIngredientName": "Disliked ingredient name"
+    },
+    "signOutEverywhere": "Sign me out everywhere",
+    "suggestions": {
+      "noAllergen": "No matching allergen in the list.",
+      "noIngredient": "No matching ingredient in the list."
+    },
+    "badges": {
+      "overflow": "More items",
+      "overflowTitled": "More {title}",
+      "overflowAria": "Show {count} more item | Show {count} more items",
+      "count": "{count} pc | {count} pcs"
+    },
+    "alerts": {
+      "allergyAlreadyAdded": "This allergen is already in the list.",
+      "ingredientAlreadyAdded": "This ingredient is already in the list.",
+      "allergenRemoved": "Allergen removed successfully.",
+      "allergenRemoveFailed": "Failed to remove the allergen.",
+      "ingredientRemoved": "Disliked ingredient removed successfully.",
+      "ingredientRemoveFailed": "Failed to remove the disliked ingredient.",
+      "mustPickIngredient": "Pick at least one ingredient from the list.",
+      "imageOnly": "Only image files can be selected.",
+      "imageTooLarge": "The image must be no larger than 2 MB.",
+      "imageUpdateFailed": "Failed to update the profile image.",
+      "imageUpdated": "Profile image updated successfully.",
+      "usernameUpdated": "Updated successfully.",
+      "emailConfirmation": "Confirmation email sent. Check both your old and new addresses. Your email will update after you confirm.",
+      "passwordUpdated": "Updated successfully.",
+      "signOutFailed": "Sign-out failed.",
+      "allergyAdded": "Allergen(s) added successfully.",
+      "ingredientAdded": "Disliked ingredient added successfully.",
+      "preferencesLoadFailed": "Failed to load preferences."
+    }
+  }
+}

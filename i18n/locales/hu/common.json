@@ -28,7 +28,8 @@
       "expired": "Lejárt"
     },
     "errors": {
-      "invalidData": "Helytelen adat."
+      "invalidData": "Helytelen adat.",
+      "saveFailed": "Hiba történt mentéskor."
     },
     "pages": {
         "index": "Kezdőlap",
