@@ -1,7 +1,6 @@
 {
   "recipe": {
     "title": "Recipes",
-
     "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
     "searchBar": {
       "placeholder": "E.g Brownie",
@@ -18,7 +17,52 @@
       "add": "Create new recipe."
     },
     "addRecipeModal": {
-      "title": "Create new recipe"
+      "title": "Create new recipe",
+      "subtitle": "Add the recipe details step by step.",
+      "stepCount": "{current} / {total} steps",
+      "stepLabel": "Step {step}",
+      "steps": {
+        "description": "Recipe description",
+        "type": "Recipe type",
+        "ingredients": "Ingredients",
+        "instructions": "Preparation steps"
+      },
+      "summary": {
+        "name": "Name",
+        "meal": "Meal",
+        "ingredient": "Ingredient",
+        "step": "Step",
+        "count": "{n} items",
+        "empty": "—"
+      },
+      "form": {
+        "name": "Recipe name",
+        "namePlaceholder": "E.g. Pancake",
+        "description": "Recipe description",
+        "descriptionPlaceholder": "Short description",
+        "prepTime": "Preparation time (minutes)",
+        "servings": "Servings",
+        "meal": "Meal",
+        "type": "Type",
+        "ingredient": "Ingredient",
+        "ingredientPlaceholder": "Product name...",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "noResults": "No results.",
+        "saveEdit": "Save changes",
+        "add": "Add",
+        "cancel": "Cancel",
+        "noIngredients": "No ingredients added yet.",
+        "instructionPlaceholder": "E.g. Mix the ingredients together",
+        "addInstruction": "Add",
+        "noInstructions": "No preparation steps added yet."
+      },
+      "footer": {
+        "back": "Back",
+        "next": "Next",
+        "save": "Save",
+        "saving": "Saving..."
+      }
     },
     "card": {
       "metadata": {
@@ -29,8 +73,25 @@
         "warning": "Caution! Contains Allergen(s): {allergens}"
       }
     },
+    "details": {
+      "back": "Back",
+      "minutes": "minutes",
+      "people": "people",
+      "addToMenu": "Add to menu...",
+      "tried": "Tried",
+      "tryIt": "I'll try it",
+      "liked": "Liked",
+      "like": "Like",
+      "ingredients": "Ingredients",
+      "preparation": "Preparation",
+      "similar": "Similar recipes"
+    },
+    "similar": {
+      "details": "Details",
+      "empty": "No recipes with similar categories."
+    },
     "sidebar": {
-        "title": "Filter",
+      "title": "Filter",
       "active": "active",
       "clearBtn": "Clear selection",
       "time": "Time",

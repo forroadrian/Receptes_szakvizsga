@@ -99,6 +99,7 @@ const handleSignOut = async () => {
                     </ul>
 
                     <div v-if="!isLoggedIn" class="auth-area">
+                        <LanguageSwitcher />
                         <p @click="toggleTheme" class="baseMode d-flex m-0  justify-content-center pe-lg-4">
                             {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
                             <span class="my-auto ms-1">

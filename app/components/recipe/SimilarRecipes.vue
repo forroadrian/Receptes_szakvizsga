@@ -10,6 +10,7 @@ import CardTitle from "../CardTitle.vue";
 
 const route = useRoute();
 const recipeStore = useRecipeStore();
+const { t } = useI18n();
 
 const currentRecipeId = computed(() => Number(route.params.id));
 
@@ -34,8 +35,8 @@ const items = computed(() => {
                     id: recipe.id,
                     title: recipe.name,
                     pageLink: `/recipe/${recipe.id}`,
-                    time: `${recipe.time} perc`,
-                    servings: `${recipe.servings} fő`,
+                    time: `${recipe.time} ${t('recipe.details.minutes')}`,
+                    servings: `${recipe.servings} ${t('recipe.details.people')}`,
                     score: matchCount
                 });
             }
@@ -66,7 +67,7 @@ const items = computed(() => {
                             </CardTitle>
 
                             <p class="py-2">
-                                <NuxtLink :to="item.pageLink"> >> Részletek</NuxtLink>
+                                <NuxtLink :to="item.pageLink"> >> {{ $t('recipe.similar.details') }}</NuxtLink>
                             </p>
                         </div>
                     </CardHeader>
@@ -86,7 +87,7 @@ const items = computed(() => {
                 </template>
             </CardBase>
             <p v-if="!items.length" class="text-center mt-3">
-                Nincs hasonló kategóriájú recept.
+                {{ $t('recipe.similar.empty') }}
             </p>
         </div>
     </section>

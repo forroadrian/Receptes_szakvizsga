@@ -35,6 +35,10 @@
         "recipes": "Recipes",
         "ingredients": "Pantry",
         "menuPlanner": "Menu planner"
+    },
+    "auth": {
+        "notLoggedIn": "You need to sign in to do this",
+        "toLogin": "Continue to sign in"
     }
   }
 }
