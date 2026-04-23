@@ -32,6 +32,7 @@ onMounted(async() => {
   if (user.value) {
     await allergyWarnings.loadUserAllergies();
     await filterStore.loadUserDislikedIngredientIds();
+    await filterStore.loadUserRecipeIds();
   }
 
   const mealName = String(route.query.meal ?? "").toLowerCase();

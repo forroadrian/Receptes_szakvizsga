@@ -4,6 +4,7 @@ import Pills from "../Pills.vue";
 import type Recipe from "~/models/Recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeStore } from "~/stores/recipe";
+
 const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
 const user = useSupabaseUser();
@@ -18,23 +19,21 @@ const currentRecipe = computed(() =>
     recipeStore.getRecipeById(recipeId.value)
 );
 
-const isSaved = computed(() =>
-    currentRecipe.value ? filterStore.savedRecipeIds.includes(currentRecipe.value.id) : false
-);
-
 const isTried = computed(() =>
     currentRecipe.value ? filterStore.triedRecipeIds.includes(currentRecipe.value.id) : false
 );
-const addRecipeToMenu = computed(() => {
-    return user.value ? "/menu" : "/login"
-});
 
-const requireAuth = () => {
-if (!user.value) {navigateTo('/login') 
-    return false
-}
-  return true
-}
+const addRecipeToMenu = computed(() => user.value ? "/menu" : "/login");
+
+const handleToggleTried = async () => {
+    if (!user.value) { navigateTo('/login'); return; }
+    if (!currentRecipe.value) return;
+    await filterStore.toggleTried(currentRecipe.value.id);
+};
+
+onMounted(async () => {
+    await filterStore.loadUserRecipeIds();
+});
 </script>
 <template>
     <div class="container py-5">
@@ -80,6 +79,8 @@ if (!user.value) {navigateTo('/login')
 
                             <div class="d-flex gap-3">
                                 <Button v-if="currentRecipe" class="w-100" color="yellow" :outline="!isTried"
+                                :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="handleToggleTried">
+                                    {{ isTried ? 'Kipróbált' : 'Kipróbálom' }}
                                 :icon="isTried ? 'bi bi-check-circle-fill' : 'bi bi-bookmark'" @click="requireAuth() && filterStore.toggleTried(currentRecipe.id)">
                                     {{ isTried ? $t('recipe.details.tried') : $t('recipe.details.tryIt') }}
                                 </Button>
