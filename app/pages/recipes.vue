@@ -208,7 +208,7 @@ const handleTabClick = (tab: any) => {
                             <template #media>
                                 <div class="row pt-4">
                                     <div class="d-flex justify-content-center">
-                                        <img src="/images/background.webp" alt="recipename image" width="90%">
+                                        <img src="/images/bg.webp" alt="recipename image" width="90%">
                                     </div>
                                 </div>
                             </template>

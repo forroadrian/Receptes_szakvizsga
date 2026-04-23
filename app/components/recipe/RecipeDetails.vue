@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import SimilarRecipes from "~/components/recipe/SimilarRecipes.vue";
 import Pills from "../Pills.vue";
-import type Recipe from "~/models/Recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeStore } from "~/stores/recipe";
+import { useRecipeModal } from "~/composables/useRecipeModal";
+import RecipeModal from "~/components/recipe/RecipeModal.vue";
 
+const { t } = useI18n();
 const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
+const recipeModal = useRecipeModal();
 const user = useSupabaseUser();
-defineProps<{
-    recipe: Recipe
-}>();
 
 const route = useRoute();
 const recipeId = computed(() => Number(route.params.id));
@@ -29,6 +29,17 @@ const isTried = computed(() =>
 
 const addRecipeToMenu = computed(() => user.value ? "/menu" : "/login");
 
+const isOwnRecipe = computed(() => {
+    if (!currentRecipe.value?.author_id || !user.value) return false;
+    const userId: string = user.value.id ?? user.value.sub ?? "";
+    return currentRecipe.value.author_id === userId;
+});
+
+const handleEditRecipe = () => {
+    if (!currentRecipe.value || !isOwnRecipe.value) return;
+    recipeModal.openEditRecipe(currentRecipe.value);
+};
+
 const handleToggleSaved = async () => {
     if (!user.value) { navigateTo('/login'); return; }
     if (!currentRecipe.value) return;
@@ -46,6 +57,7 @@ onMounted(async () => {
 });
 </script>
 <template>
+    <RecipeModal />
     <div class="container py-5">
         <NuxtLink to="/recipes" class="mb-5 back-link">
             <p><i class="bi bi-arrow-left"></i> {{ $t('recipe.details.back') }}</p>
@@ -58,8 +70,8 @@ onMounted(async () => {
                         <div class="icons d-flex w-100">
                             <span><i class="bi bi-share"></i></span>
                             <div>
-                                <span><i class="bi bi-pencil-square"></i></span>
-                                <span><i class="bi bi-trash3"></i></span>
+                                <span v-if="isOwnRecipe" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe" style="cursor:pointer"><i class="bi bi-pencil-square"></i></span>
+                                <span v-if="isOwnRecipe"><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
                         <img src="/images/background.webp" class="img-fluid rounded w-100" :alt="$t('recipe.details.imageAlt')" />
@@ -68,13 +80,13 @@ onMounted(async () => {
 
                 <section>
                     <div class="recipe-description mt-5 ps-lg-2">
-                        <h2>{{ recipe.name }}</h2>
-                        <Pills :pills="dataToPillTag(recipe.categories as any, BASIC_CONVERSION)" />
-                        <p>{{ recipe.description }}</p>
+                        <h2>{{ currentRecipe?.name }}</h2>
+                        <Pills :pills="dataToPillTag((currentRecipe?.categories ?? []) as any, BASIC_CONVERSION)" />
+                        <p>{{ currentRecipe?.description }}</p>
 
                         <div class="d-flex gap-5 recipe-meta-data">
-                            <span><i class="bi bi-clock me-1"></i> {{ recipe.time }} {{ $t('recipe.details.minutes') }}</span>
-                            <span><i class="bi bi-people me-2"></i> {{ recipe.servings }} {{ $t('recipe.details.people') }}</span>
+                            <span><i class="bi bi-clock me-1"></i> {{ currentRecipe?.time }} {{ $t('recipe.details.minutes') }}</span>
+                            <span><i class="bi bi-people me-2"></i> {{ currentRecipe?.servings }} {{ $t('recipe.details.people') }}</span>
                         </div>
                     </div>
                 </section>
@@ -94,7 +106,7 @@ onMounted(async () => {
                                 </Button>
 
                                 <Button v-if="currentRecipe" class="w-100" color="orange" :outline="!isSaved" :icon="isSaved ? 'bi bi-star-fill' : 'bi bi-star'"
-                                @click="requireAuth() && filterStore.toggleSaved(currentRecipe.id)">
+                                @click="handleToggleSaved">
                                     {{ isSaved ? $t('recipe.details.liked') : $t('recipe.details.like') }}
                                 </Button>
                             </div>
@@ -102,10 +114,10 @@ onMounted(async () => {
                     </ClientOnly>
                 </div>
 
-                <div class="ingredient-list p-3" v-if="recipe">
+                <div class="ingredient-list p-3" v-if="currentRecipe">
                     <h3 class="text-center mt-3">{{ $t('recipe.details.ingredients') }}</h3>
                     <ul class="p-0">
-                        <li v-for="ingredient in recipe.ingredients" class="border-bottom d-flex">
+                        <li v-for="ingredient in currentRecipe?.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
                             <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
                         </li>
@@ -114,7 +126,7 @@ onMounted(async () => {
             </aside>
             <section class="steps">
                 <h3 class="my-lg-4">{{ $t('recipe.details.preparation') }}</h3>
-                <div v-for="(step, index) in recipe.steps"
+                <div v-for="(step, index) in currentRecipe?.steps"
                     class="step d-flex flex-column flex-lg-row align-items-center mb-3">
                     <p class="circle flex-shrink-0">
                         <span>{{ index + 1 }}</span>
@@ -194,6 +206,7 @@ onMounted(async () => {
 
 .back-link {
     text-decoration: none;
+    cursor: pointer;
 }
 
 li {
@@ -202,10 +215,6 @@ li {
 
 .recipe-image img {
     box-shadow: 0 0 20px 20px -20px rgba(0, 0, 0, 0.8) !important;
-}
-
-.back-link {
-    cursor: pointer;
 }
 
 @media (min-width: 992px) {
@@ -218,22 +227,10 @@ li {
         align-items: start;
     }
 
-    .recipe-main-top {
-        grid-area: main;
-    }
-
-    .recipe-aside {
-        grid-area: aside;
-        width: 360px;
-    }
-
-    .steps {
-        grid-area: steps;
-    }
-
-    .similar-recipes {
-        grid-area: similar;
-    }
+    .recipe-main-top { grid-area: main; }
+    .recipe-aside { grid-area: aside; width: 360px; }
+    .steps { grid-area: steps; }
+    .similar-recipes { grid-area: similar; }
 
     .recipe-main-top,
     .recipe-aside,
