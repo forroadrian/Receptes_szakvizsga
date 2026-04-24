@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
         description?: string;
         time?: number;
         servings?: number;
+        is_public?: boolean;
         category_ids?: number[];
         ingredients?: RecipeIngredient[];
         steps?: string[];
@@ -43,8 +44,9 @@ export default defineEventHandler(async (event) => {
             description: body.description?.trim() ?? "",
             time: Number(body.time),
             servings: Number(body.servings),
+            public: body.is_public ?? false,
             last_edit: new Date().toISOString()
-        })
+        } as any)
         .eq("id", recipeId);
 
     if (updateError) throw createError({ statusCode: 500, message: updateError.message });
@@ -53,9 +55,7 @@ export default defineEventHandler(async (event) => {
 
     const categoryIds = Array.isArray(body.category_ids) ? body.category_ids.filter((v): v is number => typeof v === "number") : [];
     if (categoryIds.length > 0) {
-        const { error } = await admin.from("recipe_categories").insert(categoryIds.map(id => 
-            ({ recipe_id: recipeId, category_id: id })
-        ));
+        const { error } = await admin.from("recipe_categories").insert(categoryIds.map(id => ({ recipe_id: recipeId, category_id: id })));
         if (error) throw createError({ statusCode: 500, message: error.message });
     }
 
@@ -72,14 +72,14 @@ export default defineEventHandler(async (event) => {
     const { data: oldSteps } = await admin.from("recipe_step").select("step_id").eq("recipe_id", recipeId);
     await admin.from("recipe_step").delete().eq("recipe_id", recipeId);
     if (oldSteps?.length) {
-        await admin.from("step").delete().in("step_id", oldSteps.map(steps => steps.step_id));
+        await admin.from("step").delete().in("step_id", oldSteps.map(s => s.step_id));
     }
 
     const steps = Array.isArray(body.steps) ? body.steps.map(s => s.trim()).filter(Boolean) : [];
     if (steps.length > 0) {
         const { data: insertedSteps, error: stepError } = await admin
             .from("step")
-            .insert(steps.map(step => ({ step_description: step })))
+            .insert(steps.map(s => ({ step_description: s })))
             .select("step_id");
 
         if (stepError || !insertedSteps) throw createError({ statusCode: 500, message: stepError?.message ?? "Lépések mentése sikertelen." });

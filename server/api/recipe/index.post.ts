@@ -52,6 +52,7 @@ export default defineEventHandler(async (event) => {
         description?: string;
         time?: number;
         servings?: number;
+        is_public?: boolean;
         category_ids?: number[];
         ingredients?: RecipeIngredient[];
         steps?: string[];
@@ -79,14 +80,15 @@ export default defineEventHandler(async (event) => {
             .filter(Boolean)
         : [];
 
-    const recipeInsert: Database["public"]["Tables"]["recipe"]["Insert"] = {
+    const recipeInsert = {
         author_id: userId as string,
         name: body.name?.trim() ?? "",
         description: body.description?.trim() ?? "",
         time: Number(body.time),
         servings: Number(body.servings),
-        is_ai_generated: false
-    };
+        is_ai_generated: false,
+        public: body.is_public ?? false
+    } as Database["public"]["Tables"]["recipe"]["Insert"];
 
     const { data: recipeData, error: recipeError } = await admin
         .from("recipe")

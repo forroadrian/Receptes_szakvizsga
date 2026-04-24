@@ -3,7 +3,7 @@ import { Database } from "~/types/database.types";
 
 const recipeSelect = `
     id, author_id, name, description, saves, likes, time, servings,
-    created_at, last_edit, is_ai_generated, active, deleted_at,
+    created_at, last_edit, is_ai_generated, active, deleted_at, public,
     recipe_step (
         step_number,
         step (
