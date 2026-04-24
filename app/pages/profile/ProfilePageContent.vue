@@ -56,7 +56,8 @@ const filteredDislikedIngredients = computed(() => preferences.getFilteredDislik
 const hasTypedAllergen = computed(() => allergenInput.value.trim().length > 0);
 const hasTypedDislikedIngredient = computed(() => dislikedIngredientInput.value.trim().length > 0);
 const isProfileSettingsActive = computed(() => ['menu', 'username', 'password', 'email'].includes(activeSection.value));
-const displayProfileImage = computed(() => auth.profileUrl || '/icons/profile.png');
+const displayProfileImage = computed(() => auth.profileUrl || '');
+const hasProfileImage = computed(() => !!auth.profileUrl);
 
 const sidebarItems = computed(() => [
     {
@@ -490,7 +491,10 @@ const handleSave = async () => {
                             <div class="text-center mb-4">
                                 <div class="avatar-wrap mx-auto mb-3 position-relative">
                                     <div class="avatar-circle d-flex align-items-center justify-content-center">
-                                        <img :src="displayProfileImage" :alt="$t('profile.image.alt')" :title="$t('profile.image.title')">
+                                        <img v-if="hasProfileImage" :src="displayProfileImage"
+                                            :alt="$t('profile.image.alt')"
+                                            :title="$t('profile.image.title')">
+                                        <AvatarInitials v-else :name="displayedUsername" size="100%" />
                                     </div>
                                     <button class="avatar-camera" type="button"
                                         :aria-label="$t('profile.image.changePhoto')"

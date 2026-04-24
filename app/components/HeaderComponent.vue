@@ -26,9 +26,8 @@ watch(
     }
 )
 
-const displayProfileImage = computed(() => {
-    return authStore.profileUrl || '/icons/profile.png'
-})
+const displayProfileImage = computed(() => authStore.profileUrl || '')
+const hasProfileImage = computed(() => !!authStore.profileUrl)
 
 const displayUsername = computed(() => {
     if (!user.value) return ""
@@ -121,7 +120,12 @@ const handleSignOut = async () => {
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
                                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <p><img :src="displayProfileImage" :alt="$t('header.nav.profile.image.alt')" :title="$t('header.nav.profile.image.title')" /></p>
+                                <p>
+                                    <img v-if="hasProfileImage" :src="displayProfileImage"
+                                        :alt="$t('header.nav.profile.image.alt')"
+                                        :title="$t('header.nav.profile.image.title')" />
+                                    <AvatarInitials v-else :name="displayUsername" size="30px" />
+                                </p>
 
                                 <div class="d-flex flex-column align-items-start">
                                     <p class="text-truncate usernameToggle">{{ displayUsername }}</p>
@@ -131,7 +135,10 @@ const handleSignOut = async () => {
                             <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img :src="displayProfileImage" :alt="$t('header.nav.profile.image.alt')" :title="$t('header.nav.profile.image.title')" />
+                                        <img v-if="hasProfileImage" :src="displayProfileImage"
+                                            :alt="$t('header.nav.profile.image.alt')"
+                                            :title="$t('header.nav.profile.image.title')" />
+                                        <AvatarInitials v-else :name="displayUsername" size="55px" />
                                         <span class="account-edit" aria-hidden="true">✎</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">

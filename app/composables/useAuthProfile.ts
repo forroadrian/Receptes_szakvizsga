@@ -28,8 +28,14 @@ export const useAuthProfile = ({
     const supabase = useSupabaseClient()
     const PROFILE_BUCKET = 'profile-images'
 
+    const LEGACY_DEFAULT_AVATAR_PATHS = new Set(['/icons/profile.png'])
+
     const resolveProfileImageUrl = (savedProfileUrl?: string | null) => {
         if (!savedProfileUrl || savedProfileUrl.trim() === '') {
+            return ''
+        }
+
+        if (LEGACY_DEFAULT_AVATAR_PATHS.has(savedProfileUrl)) {
             return ''
         }
 
