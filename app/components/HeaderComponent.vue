@@ -1,23 +1,43 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import GradSwitch from "~/components/Switch.vue";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore()
 const user = useSupabaseUser();
+const route = useRoute();
 
 const isLoggedIn = computed(() => !!user.value);
 const colorMode = useColorMode()
 
-
 const isReady = ref(false)
 const dropdownOpen = ref(false)
 
-watch(dropdownOpen, (open) => {
-    if (process.client) {
-        document.body.style.overflow = open ? 'hidden' : ''
-    }
-})
+const lockScroll = () => {
+    if (typeof document === 'undefined') return;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+};
+
+const unlockScroll = () => {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+};
+
+watch(dropdownOpen, (isOpen) => {
+    if (window.innerWidth >= 992) return;
+    isOpen ? lockScroll() : unlockScroll();
+});
+
+
+watch(route, () => {
+    dropdownOpen.value = false;
+    unlockScroll();
+});
+
+onUnmounted(() => unlockScroll());
 
 onMounted(async () => {
     isReady.value = true
@@ -61,22 +81,6 @@ const toggleTheme = () => {
     colorMode.preference =
         colorMode.value === "dark" ? "light" : "dark"
 }
-
-watch(dropdownOpen, (isOpen) => {
-    if (typeof document === 'undefined') return;
-    if (isOpen) {
-        const scrollY = window.scrollY;
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
-    } else {
-        const scrollY = parseInt(document.body.style.top || '0') * -1;
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
-    }
-});
 
 const handleSignOut = async () => {
     dropdownOpen.value = false
@@ -176,8 +180,7 @@ const handleSignOut = async () => {
                                 </li>
 
                                 <li class="px-2">
-                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"
-                                        @click.stop>
+                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border" @click.stop>
                                         <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
                                             :label="isReady && colorMode.value === 'dark' ? $t('header.nav.profile.theme.dark') : $t('header.nav.profile.theme.light')"
                                             :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
@@ -221,7 +224,7 @@ const handleSignOut = async () => {
 
 .backdrop-fade-enter-active,
 .backdrop-fade-leave-active {
-    transition: opacity 0.25s ease, backdrop-filter 0.25s ease;
+    transition: opacity 0.25s ease;
 }
 
 .backdrop-fade-enter-from,
@@ -356,10 +359,6 @@ const handleSignOut = async () => {
     height: 55px;
     margin: 0 auto;
     overflow: visible;
-}
-
-.account-avatar {
-    object-fit: cover;
 }
 
 .account-edit {
