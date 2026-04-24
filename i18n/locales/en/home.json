@@ -69,6 +69,7 @@
     "topRecipes": {
       "subhead": "Our pick",
       "title": "Most popular recipes",
+      "mostPopular": "Most popular",
       "containsAllergen": "Contains allergen: {allergen}",
       "ctaMore": "Find more recipes"
     },
