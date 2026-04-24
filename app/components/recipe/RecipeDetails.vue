@@ -5,6 +5,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 import RecipeModal from "~/components/recipe/RecipeModal.vue";
+import ConfirmModal from "~/components/recipe/ConfirmModal.vue";
 
 const { t } = useI18n();
 const filterStore = useRecipeFilterStore();
@@ -42,16 +43,22 @@ const handleEditRecipe = () => {
 
 const isDeleting = ref(false);
 
-const handleDeleteRecipe = async () => {
-    if (!currentRecipe.value || !isOwnRecipe.value) return;
-    if (!confirm(t('recipe.details.deleteConfirm'))) return;
+const showDeleteModal = ref(false);
 
+const handleDeleteRecipe = () => {
+    if (!currentRecipe.value || !isOwnRecipe.value) return;
+    showDeleteModal.value = true;
+};
+
+const confirmDelete = async () => {
+    if (!currentRecipe.value) return;
     isDeleting.value = true;
     try {
         await recipeStore.deleteRecipe(currentRecipe.value.id);
         navigateTo('/recipes');
     } finally {
         isDeleting.value = false;
+        showDeleteModal.value = false;
     }
 };
 
@@ -85,7 +92,7 @@ onMounted(async () => {
                         <div class="icons d-flex w-100">
                             <span><i class="bi bi-share"></i></span>
                             <div>
-                                <span v-if="isOwnRecipe" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe" style="cursor:pointer"><i class="bi bi-pencil-square"></i></span>
+                                <span v-if="isOwnRecipe" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe"><i class="bi bi-pencil-square"></i></span>
                                 <span v-if="isOwnRecipe" @click="handleDeleteRecipe" :class="{ 'opacity-50': isDeleting }"><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
@@ -157,7 +164,12 @@ onMounted(async () => {
             </section>
         </div>
     </div>
+
+    <ConfirmModal :show="showDeleteModal" :name="currentRecipe?.name ?? ''"
+        :confirm-label="$t('common.actions.delete')" :cancel-label="$t('common.actions.cancel')" :loading="isDeleting" 
+        @confirm="confirmDelete" @cancel="showDeleteModal = false"/>
 </template>
+
 <style scoped>
 .recipe-layout {
     display: grid;
@@ -272,4 +284,5 @@ li {
         padding: 20px 40px;
     }
 }
+
 </style>
