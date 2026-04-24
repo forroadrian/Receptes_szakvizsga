@@ -40,6 +40,7 @@
       "modeNew": "New menu",
       "modeExisting": "To existing menu",
       "menuName": "Menu name",
+      "menuTime": "Time",
       "chooseMenu": "Choose which menu to add to",
       "existingOption": "{name} ({count} recipes)",
       "tabOwn": "My own",
