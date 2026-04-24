@@ -307,6 +307,23 @@
     transition: all .25s ease;
 }
 
+.featured-recipe-card {
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.featured-recipe-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.featured-recipe-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .about-image-wrapper img {
     width: 70%;
 }
@@ -437,6 +454,14 @@
 
     .meal-card {
         padding: 1rem 0.75rem 1.5rem;
+    }
+
+    .meal-card-text {
+        max-width: none;
+    }
+
+    .ourFeatures p {
+        padding: 10px 16px;
     }
 }
 

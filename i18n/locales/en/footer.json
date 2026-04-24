@@ -1,11 +1,14 @@
 {
     "footer": {
-        "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit!",
+        "title": "Recipes, meal plans and pantry — all in one place.",
         "links" : {
             "title": "Navigation"
         },
         "contact": {
             "title": "Contact",
+            "address": "2800. Lorem ipsum, dolor sit amet 22",
+            "phone": "+36 20 1234 5678",
+            "website": "www.menuplanr.hu",
             "time": "M-F"
         },
         "rights": "All rights reserved!" ,

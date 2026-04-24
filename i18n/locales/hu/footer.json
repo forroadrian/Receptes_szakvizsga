@@ -1,11 +1,14 @@
 {
     "footer": {
-        "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit!",
+        "title": "Receptek, étrend és kamra — egy helyen.",
         "links" : {
             "title": "Gyors linkek"
         },
         "contact": {
             "title": "Elérhetőségek",
+            "address": "2800. Lorem ipsum, dolor sit amet 22",
+            "phone": "+36 20 1234 5678",
+            "website": "www.menuplanr.hu",
             "time": "H-P"
         },
         "rights": "Minden jog fenntartva!" ,

@@ -69,6 +69,7 @@
     "topRecipes": {
       "subhead": "Ajánlatunk",
       "title": "Legfelkapottabb receptek",
+      "mostPopular": "Legnépszerűbb",
       "containsAllergen": "Allergént tartalmaz: {allergen}",
       "ctaMore": "Keress további recepteket"
     },

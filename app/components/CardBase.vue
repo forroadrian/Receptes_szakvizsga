@@ -52,6 +52,9 @@ const divider = computed(() => {
             <div class="card--media-wrapper card--media-top position-relative rounded-3"
                 :class="[mediaClass, mediaTopClass]">
                 <slot name="media"></slot>
+                <div v-if="$slots.badge" class="card--badge position-absolute top-0 end-0 m-2">
+                    <slot name="badge"></slot>
+                </div>
             </div>
             <div class="card--content d-flex flex-column flex-grow-1 p-3 justify-content-center align-items-center"
                 :class="tagsClass">

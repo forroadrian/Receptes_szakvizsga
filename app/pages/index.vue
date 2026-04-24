@@ -1,7 +1,17 @@
 <script setup lang="ts">
-import type { CardTagItem } from '~/interfaces/cardInterfaces/CardGenericInterfaces';
 import { ref, computed } from 'vue';
 
+type FeaturedRecipe = {
+    id: number;
+    name: string;
+    description: string;
+    likes: number;
+    saves: number;
+    time: number;
+    servings: number;
+    categories: Array<{ id: number; name: string; group_type: string }>;
+    allergies: Array<{ id: number; name: string }>;
+};
 
 const user = useSupabaseUser();
 const {t, locale, locales, setLocale} = useI18n({
@@ -12,6 +22,11 @@ const ingredientsButtonTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
 })
 
+const { data: featuredRecipes } = await useAsyncData<FeaturedRecipe[]>(
+    'featured-recipes',
+    () => $fetch('/api/recipe/featured'),
+    { default: () => [] }
+)
 
 const goToRecipes = async (mealName: string) => {
     const prev = locale.value
@@ -44,12 +59,6 @@ const categories = [
     },
 ]
 
-const tagsFirstCard: CardTagItem[] = [
-    { label: 'Ebéd', variant: 'active' },
-    { label: 'Sós', variant: 'outline' },
-    { label: 'Tovább...', variant: 'greyed' },
-]
-
 const thingsThatMakeUsStandOut = [
     {
         id: "easyRecipes",
@@ -77,29 +86,6 @@ const thingsThatMakeUsStandOut = [
     }
 ]
 
-const cards = ref([
-    {
-        id: 1,
-        title: 'Lorem ipsum dolor sit',
-        description: 'Accusantium doloremque laudantium, totam rem aperiam eaque.',
-        badge: 'Kipróbált',
-        allergen: 'Búzafélék',
-    },
-    {
-        id: 2,
-        title: 'Lorem ipsum dolor sit amet',
-        description: 'Ez egy másik leírás, teljesen eltérő tartalommal.',
-        badge: 'Kipróbált',
-        allergen: 'Tej',
-    },
-    {
-        id: 3,
-        title: 'Lorem ipsum dolor sit amet',
-        description: 'Itt is egyedi szöveg jelenik meg a kártyán.',
-        badge: 'Tervezett',
-        allergen: 'Tojás',
-    }
-])
 </script>
 
 <template>
@@ -174,44 +160,50 @@ const cards = ref([
         </div>
     </section>
 
-    <section class="topRecipe">
+    <section class="topRecipe" v-if="featuredRecipes && featuredRecipes.length">
         <div class="container">
             <h4 class="text-center grad-text text-orange">{{ $t('home.topRecipes.subhead') }}</h4>
             <h2 class="text-center">{{ $t('home.topRecipes.title') }}</h2>
             <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto" v-for="(card, index) in cards">
-                    <CardBase variant="subtle" media-position="top" tags-position="above"
-                        :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100">
-                        <template #media>
-                            <div class="d-flex align-items-center justify-content-center w-100 h-100">
-                                <span>📷</span>
-                            </div>
-                        </template>
+                <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto"
+                     v-for="(recipe, index) in featuredRecipes" :key="recipe.id">
+                    <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
+                        <CardBase variant="subtle" media-position="top" tags-position="above"
+                            :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100 featured-recipe-card">
+                            <template #media>
+                                <div class="d-flex align-items-center justify-content-center w-100 h-100">
+                                    <span>📷</span>
+                                </div>
+                            </template>
 
-                        <template #badge>
-                            <span class="badge dark rounded-pill px-4 py-2">
-                                {{ card.badge }}
-                            </span>
-                        </template>
+                            <template v-if="index === 0" #badge>
+                                <span class="badge dark rounded-pill px-4 py-2">
+                                    {{ $t('home.topRecipes.mostPopular') }}
+                                </span>
+                            </template>
 
-                        <template #header>
-                            <CardHeader>
-                                <CardTitle :rank="3">{{ card.title }}</CardTitle>
-                            </CardHeader>
-                        </template>
+                            <template #header>
+                                <CardHeader>
+                                    <CardTitle :rank="3">{{ recipe.name }}</CardTitle>
+                                </CardHeader>
+                            </template>
 
-                        <template #body>
-                            <p class="text-center">
-                                {{ card.description }}
-                            </p>
-                        </template>
+                            <template #body>
+                                <p class="text-center featured-recipe-description">
+                                    {{ recipe.description }}
+                                </p>
+                            </template>
 
-                        <template #footer>
-                            <p class="text-center mb-0">
-                                <strong><i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i> {{ $t('home.topRecipes.containsAllergen'), {allergen: card.allergen} }}</strong>
-                            </p>
-                        </template>
-                    </CardBase>
+                            <template v-if="recipe.allergies?.length" #footer>
+                                <p class="text-center mb-0">
+                                    <strong>
+                                        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+                                        {{ $t('home.topRecipes.containsAllergen', { allergen: recipe.allergies[0].name }) }}
+                                    </strong>
+                                </p>
+                            </template>
+                        </CardBase>
+                    </NuxtLink>
                 </div>
                 <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
                     <ClientOnly>

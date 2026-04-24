@@ -58,15 +58,15 @@ const scrollTop = () => {
                         <ul class="footer-contact list-unstyled m-0 p-0 d-grid gap-2">
                             <li class="footer-contact-item justify-content-center justify-content-lg-start">
                                 <i class="bi bi-geo-alt me-2"></i>
-                                <span>2800. Lorem ipsum, dolor sit amet 22</span>
+                                <span>{{ $t('footer.contact.address') }}</span>
                             </li>
                             <li class="footer-contact-item justify-content-center justify-content-lg-start">
                                 <i class="bi bi-telephone me-2"></i>
-                                <span>+36 20 1234 5678</span>
+                                <span>{{ $t('footer.contact.phone') }}</span>
                             </li>
                             <li class="footer-contact-item justify-content-center justify-content-lg-start">
                                 <i class="bi bi-globe me-2"></i>
-                                <span>www.menuplanr.hu</span>
+                                <span>{{ $t('footer.contact.website') }}</span>
                             </li>
                         </ul>
 
