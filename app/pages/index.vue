@@ -17,6 +17,7 @@ const user = useSupabaseUser();
 const {t, locale, locales, setLocale} = useI18n({
     useScope: 'global',
 })
+const { getRecipeImage } = useRecipeImage()
 
 const ingredientsButtonTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
@@ -171,8 +172,8 @@ const thingsThatMakeUsStandOut = [
                         <CardBase variant="subtle" media-position="top" tags-position="above"
                             :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100 featured-recipe-card">
                             <template #media>
-                                <div class="d-flex align-items-center justify-content-center w-100 h-100">
-                                    <span>📷</span>
+                                <div class="d-flex align-items-center justify-content-center featured-recipe-media">
+                                    <img :src="getRecipeImage(recipe)" :alt="recipe.name" />
                                 </div>
                             </template>
 

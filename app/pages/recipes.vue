@@ -13,6 +13,7 @@ const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
+const { getRecipeImage } = useRecipeImage();
 const isHydrated = ref(false);
 const INITIAL_RECIPE_COUNT = 10;
 const visibleRecipeCount = ref(INITIAL_RECIPE_COUNT);
@@ -207,8 +208,8 @@ const handleTabClick = (tab: any) => {
                             metadata-class="w-100" footer-class="w-100" class="h-100">
                             <template #media>
                                 <div class="row pt-4">
-                                    <div class="d-flex justify-content-center">
-                                        <img src="/images/bg.webp" alt="recipename image" width="90%">
+                                    <div class="d-flex justify-content-center card-media">
+                                        <img :src="getRecipeImage(recipe)" :alt="recipe.name" />
                                     </div>
                                 </div>
                             </template>
@@ -355,6 +356,19 @@ const handleTabClick = (tab: any) => {
 <style scoped>
 .search-wrap input {
     height: 50px;
+}
+
+.card-media {
+    height: 180px;
+    overflow: hidden;
+}
+
+.card-media img {
+    max-width: 80%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .addRecipe {

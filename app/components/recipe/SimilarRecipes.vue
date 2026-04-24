@@ -11,6 +11,7 @@ import CardTitle from "../CardTitle.vue";
 const route = useRoute();
 const recipeStore = useRecipeStore();
 const { t } = useI18n();
+const { getRecipeImage } = useRecipeImage();
 
 const currentRecipeId = computed(() => Number(route.params.id));
 
@@ -37,7 +38,8 @@ const items = computed(() => {
                     pageLink: `/recipe/${recipe.id}`,
                     time: `${recipe.time} ${t('recipe.details.minutes')}`,
                     servings: `${recipe.servings} ${t('recipe.details.people')}`,
-                    score: matchCount
+                    score: matchCount,
+                    image: getRecipeImage(recipe)
                 });
             }
         }
@@ -56,7 +58,7 @@ const items = computed(() => {
                 media-left-class="similar-recipes-media" content-class="similar-recipes-content" header-class="w-100">
                 <template #media>
                     <div class="similar-recipes-image">
-                        <img src="/icons/peking-duck.png" :alt="$t('recipe.similar.imageAlt')">
+                        <img :src="item.image" :alt="item.title">
                     </div>
                 </template>
                 <template #header>

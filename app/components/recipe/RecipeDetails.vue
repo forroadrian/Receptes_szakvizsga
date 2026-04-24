@@ -12,6 +12,7 @@ const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
 const recipeModal = useRecipeModal();
 const user = useSupabaseUser();
+const { getRecipeImage } = useRecipeImage();
 
 const route = useRoute();
 const recipeId = computed(() => Number(route.params.id));
@@ -19,6 +20,8 @@ const recipeId = computed(() => Number(route.params.id));
 const currentRecipe = computed(() =>
     recipeStore.getRecipeById(recipeId.value)
 );
+
+const currentRecipeImage = computed(() => getRecipeImage(currentRecipe.value));
 
 const isSaved = computed(() =>
     currentRecipe.value ? filterStore.savedRecipeIds.includes(currentRecipe.value.id) : false
@@ -96,7 +99,7 @@ onMounted(async () => {
                                 <span v-if="isOwnRecipe" @click="handleDeleteRecipe" :class="{ 'opacity-50': isDeleting }"><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
-                        <img src="/images/background.webp" class="img-fluid rounded w-100" :alt="$t('recipe.details.imageAlt')" />
+                        <img :src="currentRecipeImage" class="img-fluid rounded hero-image" :alt="$t('recipe.details.imageAlt')" />
                     </div>
                 </div>
 
@@ -242,6 +245,15 @@ li {
 
 .recipe-image img {
     box-shadow: 0 0 20px 20px -20px rgba(0, 0, 0, 0.8) !important;
+}
+
+.recipe-image img.hero-image {
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 360px;
+    object-fit: contain;
 }
 
 @media (min-width: 992px) {
