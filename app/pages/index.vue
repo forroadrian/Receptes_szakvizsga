@@ -105,7 +105,7 @@ const thingsThatMakeUsStandOut = [
                         {{ $t('home.hero.lead') }}
                     </p>
                     <div class="d-flex flex-wrap gap-2 hero-actions">
-                        <Button to="/recipes" color="dark" icon="bi bi-arrow-right" iconPosition="right">{{$t('home.hero.browseRecipes')}}</Button>
+                        <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right">{{$t('home.hero.browseRecipes')}}</Button>
                         <Button :to="ingredientsButtonTo" color="orange outline" icon="bi bi-basket3"
                             iconPosition="right">{{ $t('home.hero.myPantry') }}</Button>
                     </div>
@@ -199,7 +199,7 @@ const thingsThatMakeUsStandOut = [
                                 <p class="text-center mb-0">
                                     <strong>
                                         <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
-                                        {{ $t('home.topRecipes.containsAllergen', { allergen: recipe.allergies[0].name }) }}
+                                        {{ $t('home.topRecipes.containsAllergen', { allergen: recipe.allergies.map(a => a.name).join(', ') }) }}
                                     </strong>
                                 </p>
                             </template>
@@ -221,7 +221,7 @@ const thingsThatMakeUsStandOut = [
                 <div class="col-12 col-lg-6">
                     <div class="about-image-wrapper d-flex justify-content-center">
                         <NuxtImg src="/images/clock-plate.png" :alt="$t('home.about.imageAlt')" :title="$t('home.about.imageTitle')"
-                            class="about-image" :width="500" :height="500" format="webp" preload loading="eager" fetchpriority="high" densities="x1 x1" />
+                            class="about-image" format="webp" preload loading="eager" fetchpriority="high" densities="x1 x1" />
                     </div>
                 </div>
                 <div class="col-12 col-lg-6 about-content">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from "vue";
+import GradSwitch from "~/components/Switch.vue";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore()
@@ -67,13 +68,8 @@ const handleSignOut = async () => {
         <nav class="navbar navbar-expand-lg" :aria-label="$t('header.nav.aria.main')">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" :aria-label="$t('common.pages.index')">
-                    <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" 
-                        :width="180" 
-                        :height="128" 
-                        format="webp" 
-                        loading="lazy" 
-                        densities="x1 x2" 
-                        class="brand-logo" />
+                    <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" :width="180" :height="128"
+                        format="webp" loading="lazy" densities="x1 x2" class="brand-logo" />
                 </NuxtLink>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
@@ -99,12 +95,9 @@ const handleSignOut = async () => {
 
                     <div v-if="!isLoggedIn" class="auth-area">
                         <LanguageSwitcher />
-                        <p @click="toggleTheme" class="baseMode d-flex m-0  justify-content-center pe-lg-4">
-                            {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
-                            <span class="my-auto ms-1">
-                                {{ isReady && colorMode.value === "dark" ?  $t('header.nav.profile.theme.dark')  : $t('header.nav.profile.theme.light') }}
-                            </span>
-                        </p>
+                        <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
+                            :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
+                             class="pe-lg-4 mx-auto" @update:model-value="toggleTheme" />
                         <Button to="/register" color="orange" :outline="true" class="w-lg-auto me-1">
                             {{ $t('header.nav.register') }}
                         </Button>
@@ -154,17 +147,10 @@ const handleSignOut = async () => {
                                 <li class="px-2">
                                     <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"
                                         @click.stop>
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge">
-                                                {{ isReady && colorMode.value === "dark" ? "🌙" : "☀️" }}
-                                            </span>
-                                            {{ isReady && colorMode.value === "dark" ? $t('header.nav.profile.theme.dark')  : $t('header.nav.profile.theme.light') }}
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input border-0 ms-auto" type="checkbox"
-                                                role="switch" :checked="isReady && colorMode.value === 'dark'"
-                                                @change="toggleTheme" />
-                                        </div>
+                                        <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
+                                            :label="isReady && colorMode.value === 'dark' ? $t('header.nav.profile.theme.dark') : $t('header.nav.profile.theme.light')"
+                                            :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
+                                            @update:model-value="toggleTheme" />
                                     </div>
                                 </li>
 
@@ -192,8 +178,8 @@ const handleSignOut = async () => {
 </template>
 
 <style scoped>
-.dropdown-menu :active{
-    background-color: var(--yellow);
+.dropdown-item:active ,.dropdown-menu li a:active {
+    background-color: var(--yellow) !important;
 }
 .dropdown button,
 .dropdown-menu {
@@ -234,9 +220,8 @@ const handleSignOut = async () => {
     width: 100%;
 }
 
-.nav-link.router-link-exact-active, .dropdown-menu :active{
-    font-weight: 700;
-    color: var(--dark);
+.nav-link.router-link-exact-active {
+    font-weight: 600;
 }
 
 .navbar-brand img {
@@ -245,7 +230,6 @@ const handleSignOut = async () => {
 }
 
 .account-avatar-wrap img {
-    width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
@@ -268,28 +252,6 @@ const handleSignOut = async () => {
 
 .usernameToggle {
     max-width: 190px;
-}
-
-.form-switch .form-check-input {
-    background-color: var(--yellow) !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ffffff'/%3e%3c/svg%3e") !important;
-}
-
-.form-switch .form-check-input:checked {
-    background-color: var(--orange) !important;
-    border-color: transparent !important;
-}
-
-.form-switch .form-check-input:focus {
-    border-color: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-.form-switch .form-check-input:active {
-    box-shadow: none !important;
 }
 
 #userDropdown img,

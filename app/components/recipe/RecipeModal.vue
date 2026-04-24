@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from "vue";
 import { useRecipeModal } from "~/composables/useRecipeModal";
+import AppSwitch from "~/components/Switch.vue";
 
 const recipeModal = useRecipeModal();
 const { t } = useI18n();
@@ -155,20 +156,15 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             </div>
                                         </div>
 
-                                        <div class="visibility-toggle" :class="{ public: recipeModal.recipe.isPublic }"
-                                            @click="recipeModal.recipe.isPublic = !recipeModal.recipe.isPublic">
+                                        <div class="visibility-toggle" :class="{ public: recipeModal.recipe.isPublic }">
                                             <div class="visibility-icon">
                                                 <i :class="recipeModal.recipe.isPublic ? 'bi bi-globe2' : 'bi bi-lock'"></i>
                                             </div>
-                                            <div>
+                                            <div class="flex-grow-1">
                                                 <p class="fw-semibold mb-0">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.public') : $t('recipe.addRecipeModal.form.private') }}</p>
                                                 <small class="text-secondary">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.publicDesc') : $t('recipe.addRecipeModal.form.privateDesc') }}</small>
                                             </div>
-                                            <div class="form-check form-switch ms-auto mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    :checked="recipeModal.recipe.isPublic"
-                                                    @click.stop="recipeModal.recipe.isPublic = !recipeModal.recipe.isPublic">
-                                            </div>
+                                            <AppSwitch v-model="recipeModal.recipe.isPublic" />
                                         </div>
                                     </div>
 
@@ -337,4 +333,40 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 .ingredient-result-pill {
     white-space: nowrap;
 }
+.visibility-toggle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--bs-border-color);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+}
+
+.visibility-toggle:hover {
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+}
+
+.visibility-toggle.public {
+    border-color: var(--green);
+    background: rgba(53, 165, 90, 0.06);
+}
+
+.visibility-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--bs-tertiary-bg);
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.bi-toggle-on { font-size: 26px; }
+.bi-toggle-off { font-size: 26px; color: var(--bs-secondary-color); }
 </style>
