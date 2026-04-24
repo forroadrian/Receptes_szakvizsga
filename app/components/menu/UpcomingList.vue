@@ -13,13 +13,19 @@ const { t, locale } = useI18n();
 
 const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
+type MenuEntry = {
+    name: string;
+    time: string;
+    sortKey: number;
+};
+
 type Row = {
     dateKey: string;
     date: Date;
     dayNumber: number;
     weekdayLabel: string;
     isToday: boolean;
-    menuNames: string[];
+    menuEntries: MenuEntry[];
 };
 
 const rows = computed<Row[]>(() => {
@@ -29,6 +35,11 @@ const rows = computed<Row[]>(() => {
         timeZone: "Europe/Budapest",
         weekday: "short",
     });
+    const timeFormatter = new Intl.DateTimeFormat(intlLocale.value, {
+        timeZone: "Europe/Budapest",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
     const result: Row[] = [];
 
     for (let i = 0; i < 7; i++) {
@@ -36,20 +47,31 @@ const rows = computed<Row[]>(() => {
         const dateKey = toBudapestDateKey(d);
         const menus = menuStore.getMenusForDate(dateKey);
 
+        const menuEntries: MenuEntry[] = menus
+            .map((m) => {
+                const when = new Date(m.planned_date);
+                return {
+                    name: m.name || t("menu.untitled"),
+                    time: timeFormatter.format(when),
+                    sortKey: when.getTime(),
+                };
+            })
+            .sort((a, b) => a.sortKey - b.sortKey);
+
         result.push({
             dateKey,
             date: d,
             dayNumber: d.getDate(),
             weekdayLabel: weekdayFormatter.format(d),
             isToday: dateKey === todayKey,
-            menuNames: menus.map((m) => m.name || t("menu.untitled")),
+            menuEntries,
         });
     }
     return result;
 });
 
 const onRowClick = (row: Row) => {
-    if (row.menuNames.length) emit("day-click", row.dateKey);
+    if (row.menuEntries.length) emit("day-click", row.dateKey);
     else emit("empty-click", row.dateKey);
 };
 </script>
@@ -68,7 +90,7 @@ const onRowClick = (row: Row) => {
                 v-for="row in rows"
                 :key="row.dateKey"
                 class="row-item"
-                :class="{ 'is-today': row.isToday, 'is-empty': !row.menuNames.length }"
+                :class="{ 'is-today': row.isToday, 'is-empty': !row.menuEntries.length }"
                 @click="onRowClick(row)"
             >
                 <div class="date-chip">
@@ -77,13 +99,14 @@ const onRowClick = (row: Row) => {
                 </div>
 
                 <div class="row-body">
-                    <template v-if="row.menuNames.length">
+                    <template v-if="row.menuEntries.length">
                         <span
-                            v-for="(name, i) in row.menuNames"
+                            v-for="(entry, i) in row.menuEntries"
                             :key="i"
-                            class="menu-name text-truncate"
+                            class="menu-entry"
                         >
-                            {{ name }}
+                            <span class="menu-time">{{ entry.time }}</span>
+                            <span class="menu-name text-truncate">{{ entry.name }}</span>
                         </span>
                     </template>
                     <span v-else class="empty-label">{{ $t('menu.upcoming.empty') }} <u>{{ $t('menu.upcoming.emptyAction') }}</u></span>
@@ -180,9 +203,25 @@ const onRowClick = (row: Row) => {
     font-size: var(--small-text);
 }
 
+.menu-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.menu-time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--orange);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
 .menu-name {
     color: var(--bs-body-color);
     font-weight: 500;
+    min-width: 0;
 }
 
 .empty-label {

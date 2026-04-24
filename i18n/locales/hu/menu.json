@@ -40,6 +40,7 @@
       "modeNew": "Új menü",
       "modeExisting": "Meglévő menühöz",
       "menuName": "Menü neve",
+      "menuTime": "Időpont",
       "chooseMenu": "Válaszd ki, melyik menühöz adod",
       "existingOption": "{name} ({count} recept)",
       "tabOwn": "Sajátjaim",

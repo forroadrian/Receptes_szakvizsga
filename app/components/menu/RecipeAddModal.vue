@@ -14,6 +14,7 @@ const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
 
 const targetDate = ref<string>("");
+const targetTime = ref<string>("12:00");
 const activeTab = ref<"own" | "public">("own");
 const search = ref("");
 const pinnedRecipeIds = ref<number[]>([]);
@@ -98,6 +99,7 @@ const canSubmit = computed(() => {
 
 const resetState = (dateKey: string) => {
     targetDate.value = dateKey;
+    targetTime.value = "12:00";
     activeTab.value = "own";
     search.value = "";
     pinnedRecipeIds.value = [];
@@ -132,7 +134,8 @@ const handleSave = async () => {
     isSaving.value = true;
     errorMessage.value = "";
     try {
-        const isoDate = `${targetDate.value}T12:00:00+02:00`;
+        const time = /^\d{2}:\d{2}$/.test(targetTime.value) ? targetTime.value : "12:00";
+        const isoDate = `${targetDate.value}T${time}:00+02:00`;
         if (mode.value === "new") {
             await menuStore.createMenu(isoDate, menuName.value.trim(), [...pinnedRecipeIds.value]);
         } else if (existingMenuId.value !== null) {
@@ -219,17 +222,30 @@ defineExpose({ openFor });
                             </label>
                         </div>
 
-                        <div v-if="mode === 'new'" class="mb-3">
-                            <label class="form-label small fw-semibold" for="newMenuName">
-                                {{ $t('menu.addModal.menuName') }}
-                            </label>
-                            <input
-                                id="newMenuName"
-                                v-model="menuName"
-                                type="text"
-                                class="form-control"
-                                :placeholder="defaultMenuName"
-                            />
+                        <div v-if="mode === 'new'" class="new-menu-fields mb-3">
+                            <div class="name-field">
+                                <label class="form-label small fw-semibold" for="newMenuName">
+                                    {{ $t('menu.addModal.menuName') }}
+                                </label>
+                                <input
+                                    id="newMenuName"
+                                    v-model="menuName"
+                                    type="text"
+                                    class="form-control"
+                                    :placeholder="defaultMenuName"
+                                />
+                            </div>
+                            <div class="time-field">
+                                <label class="form-label small fw-semibold" for="newMenuTime">
+                                    {{ $t('menu.addModal.menuTime') }}
+                                </label>
+                                <input
+                                    id="newMenuTime"
+                                    v-model="targetTime"
+                                    type="time"
+                                    class="form-control"
+                                />
+                            </div>
                         </div>
 
                         <div v-else class="mb-3">
@@ -409,6 +425,19 @@ defineExpose({ openFor });
 
 .chip-remove:hover {
     background: rgba(255, 255, 255, 0.4);
+}
+
+.new-menu-fields {
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 0.75rem;
+    align-items: end;
+}
+
+@media (max-width: 576px) {
+    .new-menu-fields {
+        grid-template-columns: 1fr;
+    }
 }
 
 .mode-toggle {
