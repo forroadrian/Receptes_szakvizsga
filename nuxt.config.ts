@@ -10,6 +10,11 @@ const filesFor = (locale: string) =>
     .map(f => `${locale}/${f}`)
 
 export default defineNuxtConfig({
+    runtimeConfig: {
+        cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+        cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+    },
     vite: {
         optimizeDeps: {
           include: [
@@ -81,4 +86,5 @@ export default defineNuxtConfig({
             fallbackLocale: 'hu',
         },
     },
+    
 })

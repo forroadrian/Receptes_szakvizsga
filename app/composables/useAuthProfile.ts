@@ -101,40 +101,18 @@ export const useAuthProfile = ({
             return false
         }
 
-        const userId = user.value.id || user.value.sub
-        const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'png'
-        const filePath = `${userId}/profile-image.${fileExtension}`
-
         loading.value = true
 
         try {
-            const { error: uploadError } = await supabase
-                .storage
-                .from(PROFILE_BUCKET)
-                .upload(filePath, file, {
-                    upsert: true,
-                    contentType: file.type
-                })
+            const formData = new FormData()
+            formData.append('file', file)
 
-            if (uploadError) {
-                console.error('Storage upload error:', uploadError)
-                errorMessage.value = uploadError.message || 'Nem sikerült feltölteni a profilképet.'
-                return false
-            }
-
-            await $fetch('/api/auth/profile-image', {
+            const { profileUrl: uploadedUrl } = await $fetch<{ profileUrl: string }>('/api/auth/profile-image', {
                 method: 'PUT',
-                body: {
-                    profileUrl: filePath
-                }
+                body: formData
             })
 
-            const { data } = supabase
-                .storage
-                .from(PROFILE_BUCKET)
-                .getPublicUrl(filePath)
-
-            profileUrl.value = `${data.publicUrl}?t=${Date.now()}`
+            profileUrl.value = `${uploadedUrl}?t=${Date.now()}`
             successMessage.value = 'Sikeres profilkép módosítás.'
             return true
         } catch (error: any) {
