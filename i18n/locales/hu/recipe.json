@@ -20,7 +20,9 @@
       "title": "Recept hozzáadása",
       "subtitle": "Adj meg egy új, saját receptet!",
       "titleEdit": "Recept módosítás",
+      "titleDelete": "Recept törlése",
       "subtitleEdit": "Módosítsd a saját recepted kedved szerint!",
+      "subtitleDelete": "Biztosan törölni szeretnéd ezt a receptet: {name}?",
       "stepCount": "{current} / {total} lépés",
       "stepLabel": "Lépés {step}",
       "steps": {

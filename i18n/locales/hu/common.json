@@ -41,6 +41,7 @@
     "auth": {
         "notLoggedIn": "Ehhez a funkcióhoz be kell jelentkezned",
         "toLogin": "Tovább a belépéshez"
-    }
+    },
+    "irreversible": "A művelet nem visszavonható!"
   }
 }

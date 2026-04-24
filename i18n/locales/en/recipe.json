@@ -20,7 +20,9 @@
       "title": "Create new recipe",
       "subtitle": "Add the recipe details step by step.",
       "titleEdit": "Edit recipe",
+      "titleDelete": "Delete recipe",
       "subtitleEdit": "Modify your own recipe as you like!",
+      "subtitleDelete": "Are you sure you want to delete this recipe: {name}?",
       "stepCount": "{current} / {total} steps",
       "stepLabel": "Step {step}",
       "steps": {

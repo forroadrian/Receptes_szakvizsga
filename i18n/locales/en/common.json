@@ -41,6 +41,7 @@
     "auth": {
         "notLoggedIn": "You need to sign in to do this",
         "toLogin": "Continue to sign in"
-    }
+    },
+    "irreversible": "This action is irreversible!"
   }
 }
