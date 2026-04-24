@@ -209,6 +209,11 @@ export const useRecipeStore = defineStore("recipes", () => {
         }
     };
 
+    const deleteRecipe = async (recipeId: number) => {
+        await $fetch(`/api/recipe/${recipeId}`, { method: "DELETE" });
+        recipes.value = recipes.value.filter(r => r.id !== recipeId);
+    };
+
     return {
         getAllRecipes,
         getAvailableCategories,
@@ -220,6 +225,7 @@ export const useRecipeStore = defineStore("recipes", () => {
         loadRecipes,
         loadAvailableCategories,
         createRecipe,
+        deleteRecipe,
         showRecipeModal
     };
 });

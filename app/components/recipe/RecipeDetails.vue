@@ -40,6 +40,21 @@ const handleEditRecipe = () => {
     recipeModal.openEditRecipe(currentRecipe.value);
 };
 
+const isDeleting = ref(false);
+
+const handleDeleteRecipe = async () => {
+    if (!currentRecipe.value || !isOwnRecipe.value) return;
+    if (!confirm(t('recipe.details.deleteConfirm'))) return;
+
+    isDeleting.value = true;
+    try {
+        await recipeStore.deleteRecipe(currentRecipe.value.id);
+        navigateTo('/recipes');
+    } finally {
+        isDeleting.value = false;
+    }
+};
+
 const handleToggleSaved = async () => {
     if (!user.value) { navigateTo('/login'); return; }
     if (!currentRecipe.value) return;
@@ -71,7 +86,7 @@ onMounted(async () => {
                             <span><i class="bi bi-share"></i></span>
                             <div>
                                 <span v-if="isOwnRecipe" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe" style="cursor:pointer"><i class="bi bi-pencil-square"></i></span>
-                                <span v-if="isOwnRecipe"><i class="bi bi-trash3"></i></span>
+                                <span v-if="isOwnRecipe" @click="handleDeleteRecipe" :class="{ 'opacity-50': isDeleting }"><i class="bi bi-trash3"></i></span>
                             </div>
                         </div>
                         <img src="/images/background.webp" class="img-fluid rounded w-100" :alt="$t('recipe.details.imageAlt')" />
