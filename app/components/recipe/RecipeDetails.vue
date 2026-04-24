@@ -93,10 +93,15 @@ onMounted(async () => {
                 <div>
                     <div class="recipe-image">
                         <div class="icons d-flex w-100">
-                            <span><i class="bi bi-share"></i></span>
-                            <div>
-                                <span v-if="isOwnRecipe" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe"><i class="bi bi-pencil-square"></i></span>
-                                <span v-if="isOwnRecipe" @click="handleDeleteRecipe" :class="{ 'opacity-50': isDeleting }"><i class="bi bi-trash3"></i></span>
+                            <Button icon="bi bi-share" color="yellow" iconOnly class="icon-btn"></Button>
+                            <div class="d-flex gap-3">
+                                <Button v-if="isOwnRecipe" color="yellow" icon="bi bi-pencil-square" iconOnly
+                                    class="icon-btn" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe"> 
+                                </Button>
+
+                                <Button v-if="isOwnRecipe" color="yellow" icon="bi bi-trash3" iconOnly class="icon-btn" 
+                                    :disabled="isDeleting" @click="handleDeleteRecipe">
+                                </Button>
                             </div>
                         </div>
                         <img :src="currentRecipeImage" class="img-fluid rounded hero-image" :alt="$t('recipe.details.imageAlt')" />
@@ -153,7 +158,7 @@ onMounted(async () => {
                 <h3 class="my-lg-4">{{ $t('recipe.details.preparation') }}</h3>
                 <div v-for="(step, index) in currentRecipe?.steps"
                     class="step d-flex flex-column flex-lg-row align-items-center mb-3">
-                    <p class="circle flex-shrink-0">
+                    <p class="circle flex-shrink-0 grad yellow">
                         <span>{{ index + 1 }}</span>
                     </p>
                     <p class="ms-lg-3">{{ step }}</p>
@@ -168,9 +173,8 @@ onMounted(async () => {
         </div>
     </div>
 
-    <ConfirmModal :show="showDeleteModal" :name="currentRecipe?.name ?? ''"
-        :confirm-label="$t('common.actions.delete')" :cancel-label="$t('common.actions.cancel')" :loading="isDeleting" 
-        @confirm="confirmDelete" @cancel="showDeleteModal = false"/>
+    <ConfirmModal :show="showDeleteModal" :name="currentRecipe?.name ?? ''" :confirm-label="$t('common.actions.delete')"
+        :cancel-label="$t('common.actions.cancel')" :loading="isDeleting" @confirm="confirmDelete" @cancel="showDeleteModal = false" />
 </template>
 
 <style scoped>
@@ -209,7 +213,7 @@ onMounted(async () => {
 
 .recipe-image .icons {
     top: 20px;
-    left: 0px;
+    padding: 0px 20px 0px 20px;
 }
 
 .recipe-image .icons,
@@ -217,22 +221,6 @@ onMounted(async () => {
     position: absolute;
 }
 
-.recipe-image i {
-    padding: 6px 12px;
-    margin: 10px;
-}
-
-.recipe-image i,
-.step .circle {
-    background: var(--grad-yellow);
-    color: var(--text-dark);
-    font-weight: 600;
-}
-
-.step .circle span {
-    display: flex;
-    justify-content: center;
-}
 
 .back-link {
     text-decoration: none;
@@ -266,10 +254,22 @@ li {
         align-items: start;
     }
 
-    .recipe-main-top { grid-area: main; }
-    .recipe-aside { grid-area: aside; width: 360px; }
-    .steps { grid-area: steps; }
-    .similar-recipes { grid-area: similar; }
+    .recipe-main-top {
+        grid-area: main;
+    }
+
+    .recipe-aside {
+        grid-area: aside;
+        width: 360px;
+    }
+
+    .steps {
+        grid-area: steps;
+    }
+
+    .similar-recipes {
+        grid-area: similar;
+    }
 
     .recipe-main-top,
     .recipe-aside,
@@ -296,5 +296,4 @@ li {
         padding: 20px 40px;
     }
 }
-
 </style>
