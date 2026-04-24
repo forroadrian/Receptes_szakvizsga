@@ -11,6 +11,7 @@ const colorMode = useColorMode()
 
 
 const isReady = ref(false)
+const dropdownOpen = ref(false)
 
 watch(dropdownOpen, (open) => {
     if (process.client) {
