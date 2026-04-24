@@ -211,6 +211,7 @@ export type Database = {
           last_edit: string
           likes: number
           name: string
+          public: boolean  
           saves: number
           servings: number
           time: number
@@ -226,6 +227,7 @@ export type Database = {
           last_edit?: string
           likes?: number
           name: string
+           public: boolean  
           saves?: number
           servings: number
           time: number
@@ -241,6 +243,7 @@ export type Database = {
           last_edit?: string
           likes?: number
           name?: string
+          public: boolean  
           saves?: number
           servings?: number
           time?: number

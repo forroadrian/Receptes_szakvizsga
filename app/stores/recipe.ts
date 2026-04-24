@@ -15,6 +15,7 @@ export type RecipeItem = {
     last_edit: string;
     is_ai_generated: boolean;
     active: boolean;
+    public: boolean;
     deleted_at: string | null;
     steps: string[];
     ingredients: {
@@ -142,6 +143,7 @@ export const useRecipeStore = defineStore("recipes", () => {
                     last_edit: recipeData.last_edit,
                     is_ai_generated: recipeData.is_ai_generated,
                     active: recipeData.active ?? true,
+                    public: recipeData.public ?? false,
                     deleted_at: recipeData.deleted_at ?? null,
                     steps: stepList,
                     ingredients: ingredientList,
@@ -188,6 +190,7 @@ export const useRecipeStore = defineStore("recipes", () => {
         description: string;
         time: number;
         servings: number;
+        is_public?: boolean;
         category_ids: number[];
         ingredients: {
             ingredient_id: number;

@@ -136,7 +136,7 @@ h4 {
 }
 
 .step .circle,
-.icon-btn {
+.icon-btn, .step-index {
     width: var(--large-icon-size);
     height: var(--large-icon-size);
     padding: 5px 0px;

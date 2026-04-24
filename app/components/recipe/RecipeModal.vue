@@ -16,6 +16,9 @@ const steps = computed(() => [
 onMounted(() => {
     recipeModal.init();
     recipeModal.closeButton = closeBtn.value;
+
+    const modalEl = document.getElementById('openAddRecipeModal');
+    modalEl?.addEventListener('hidden.bs.modal', () => recipeModal.onModalHidden());
 });
 
 watch(closeBtn, (btn) => {
@@ -149,6 +152,22 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="col-md-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.servings') }}</label>
                                                 <input v-model="recipeModal.recipe.servings" type="number" min="1" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="visibility-toggle" :class="{ public: recipeModal.recipe.isPublic }"
+                                            @click="recipeModal.recipe.isPublic = !recipeModal.recipe.isPublic">
+                                            <div class="visibility-icon">
+                                                <i :class="recipeModal.recipe.isPublic ? 'bi bi-globe2' : 'bi bi-lock'"></i>
+                                            </div>
+                                            <div>
+                                                <p class="fw-semibold mb-0">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.public') : $t('recipe.addRecipeModal.form.private') }}</p>
+                                                <small class="text-secondary">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.publicDesc') : $t('recipe.addRecipeModal.form.privateDesc') }}</small>
+                                            </div>
+                                            <div class="form-check form-switch ms-auto mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    :checked="recipeModal.recipe.isPublic"
+                                                    @click.stop="recipeModal.recipe.isPublic = !recipeModal.recipe.isPublic">
                                             </div>
                                         </div>
                                     </div>

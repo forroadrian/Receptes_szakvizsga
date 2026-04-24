@@ -9,7 +9,7 @@ export const getTabRecipes = (
 ) => {
     switch (activeTab) {
         case "default":
-            return allRecipes.filter(recipe => recipe.author_id === null);
+            return allRecipes.filter(recipe => recipe.author_id === null || recipe.public === true);
 
         case "own":
             return allRecipes.filter(recipe => recipe.author_id === userId);

@@ -15,6 +15,7 @@ const createInitialRecipeState = () => ({
     description: "",
     prepTime: 60,
     servings: 1,
+    isPublic: false,
     mealType: null as number | null,
     tags: [] as number[],
     ingredients: [] as RecipeIngredientFormItem[],
@@ -39,6 +40,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const editingInstructionIndex = ref<number | null>(null);
     const isSaving = ref(false);
     const errorMessage = ref("");
+    const needsReload = ref(false);
     const closeButton = ref<HTMLButtonElement | null>(null);
 
     const isEditMode = computed(() => editingRecipeId.value !== null);
@@ -89,6 +91,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
             description: recipeItem.description,
             prepTime: recipeItem.time,
             servings: recipeItem.servings,
+            isPublic: recipeItem.public ?? false,
             mealType: mealCategory?.id ?? null,
             tags: recipeItem.categories.filter(c => c.group_type === "type").map(c => c.id),
             ingredients: recipeItem.ingredients.map(i => ({
@@ -251,28 +254,48 @@ export const useRecipeModal = defineStore("recipeModal", () => {
             description: recipe.value.description.trim(),
             time: Number(recipe.value.prepTime),
             servings: Number(recipe.value.servings),
+            is_public: recipe.value.isPublic,
             category_ids: getSelectedCategoryIds(),
             ingredients: recipe.value.ingredients.map(i => ({ ingredient_id: i.ingredient_id, quantity: i.quantity, unit: i.unit })),
             steps: recipe.value.instructions
         };
 
         try {
-            if (isEditMode.value) {
+            const wasEdit = isEditMode.value;
+
+            if (wasEdit) {
                 await $fetch(`/api/recipe/${editingRecipeId.value}`, { method: "PUT", body: payload });
-                await recipeStore.loadRecipes();
+
+                const existing = recipeStore.getAllRecipes().find(r => r.id === editingRecipeId.value);
+                if (existing) {
+                    existing.name = payload.name;
+                    existing.description = payload.description;
+                    existing.time = payload.time;
+                    existing.servings = payload.servings;
+                    existing.public = payload.is_public ?? false;
+                }
             } else {
                 await recipeStore.createRecipe(payload);
             }
 
+            needsReload.value = true;
             resetForm();
             closeButton.value?.click();
-            showAlert("success", isEditMode.value ? "A recept sikeresen frissítve lett." : "A recept sikeresen mentve lett.");
+            showAlert("success", wasEdit ? "A recept sikeresen frissítve lett." : "A recept sikeresen mentve lett.");
         } catch (error: any) {
             errorMessage.value = error?.data?.message ?? error?.message ?? "Nem sikerült menteni a receptet.";
             showAlert("danger", errorMessage.value);
         } finally {
             isSaving.value = false;
         }
+    }
+
+    async function onModalHidden() {
+        if (needsReload.value) {
+            needsReload.value = false;
+            await recipeStore.loadRecipes();
+        }
+        resetForm();
     }
 
     return {
@@ -284,7 +307,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         isSaving, errorMessage, closeButton,
         mealTypes, tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient, canSubmit,
-        init, openEditRecipe, resetForm, saveRecipe,
+        init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
         addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,
         addOrUpdateInstruction, editInstruction, cancelInstructionEdit, removeInstruction,
