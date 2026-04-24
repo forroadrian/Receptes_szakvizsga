@@ -492,8 +492,10 @@ const handleSave = async () => {
                                     <div class="avatar-circle d-flex align-items-center justify-content-center">
                                         <img :src="displayProfileImage" :alt="$t('profile.image.alt')" :title="$t('profile.image.title')">
                                     </div>
-                                    <button class="avatar-camera" type="button" @click="openProfileImagePicker">
-                                        <i class="bi bi-camera-fill"></i>
+                                    <button class="avatar-camera" type="button"
+                                        :aria-label="$t('profile.image.changePhoto')"
+                                        @click="openProfileImagePicker">
+                                        <i class="bi bi-camera-fill" aria-hidden="true"></i>
                                     </button>
                                     <input ref="profileImageInput" type="file" accept="image/*" class="d-none"
                                         @change="handleProfileImageChange">

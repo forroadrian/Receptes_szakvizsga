@@ -31,3 +31,5 @@ logs
 .claude
 *.sql
 .playwright*
+/playwright-report/
+/test-results/

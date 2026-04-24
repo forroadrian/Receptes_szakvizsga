@@ -222,8 +222,8 @@ const closeConfirmationModal = () => {
                     </div>
 
                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" v-model="acceptTerms" required />
-                        <label class="form-check-label">
+                        <input id="acceptTerms" class="form-check-input" type="checkbox" v-model="acceptTerms" required />
+                        <label class="form-check-label" for="acceptTerms">
                             {{ $t('register.terms') }}
                         </label>
                         <div class="invalid-feedback">

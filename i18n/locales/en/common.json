@@ -1,5 +1,6 @@
 {
   "common": {
+    "siteName": "MenuPlanner",
     "badges": {
       "tried": "Tried & tested",
       "planned": "Planned"

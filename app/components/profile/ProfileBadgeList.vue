@@ -261,8 +261,10 @@ watch(hiddenCount, (count) => {
                 <span v-for="(item, index) in visibleItems" :key="getItemKey(item, index)"
                     class="badge rounded-pill profile-chip px-3 py-2 d-inline-flex align-items-center gap-2">
                     {{ getItemLabel(item) }}
-                    <button type="button" class="chip-btn" @click="onRemove(item, index)">
-                        <i class="bi bi-x"></i>
+                    <button type="button" class="chip-btn"
+                        :aria-label="$t('profile.badges.removeAria', { label: getItemLabel(item) })"
+                        @click="onRemove(item, index)">
+                        <i class="bi bi-x" aria-hidden="true"></i>
                     </button>
                 </span>
 
@@ -288,8 +290,9 @@ watch(hiddenCount, (count) => {
                                 class="badge rounded-pill profile-chip px-3 py-2 d-inline-flex align-items-center gap-2">
                                 {{ getItemLabel(item) }}
                                 <button type="button" class="chip-btn"
+                                    :aria-label="$t('profile.badges.removeAria', { label: getItemLabel(item) })"
                                     @click="onRemove(item, visibleItems.length + index)">
-                                    <i class="bi bi-x"></i>
+                                    <i class="bi bi-x" aria-hidden="true"></i>
                                 </button>
                             </span>
                         </div>

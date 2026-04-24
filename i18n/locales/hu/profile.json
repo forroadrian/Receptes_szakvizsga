@@ -2,7 +2,8 @@
   "profile": {
     "image": {
       "alt": "Profilkép",
-      "title": "Profilkép"
+      "title": "Profilkép",
+      "changePhoto": "Profilkép módosítása"
     },
     "sidebar": {
       "allergens": "Allergének",
@@ -47,7 +48,8 @@
       "overflow": "További elemek",
       "overflowTitled": "További {title}",
       "overflowAria": "{count} további elem megjelenítése",
-      "count": "{count} db"
+      "count": "{count} db",
+      "removeAria": "{label} eltávolítása"
     },
     "alerts": {
       "allergyAlreadyAdded": "Ez az allergén már szerepel a listában.",

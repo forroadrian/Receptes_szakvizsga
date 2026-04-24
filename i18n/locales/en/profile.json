@@ -2,7 +2,8 @@
   "profile": {
     "image": {
       "alt": "Profile",
-      "title": "Profile picture"
+      "title": "Profile picture",
+      "changePhoto": "Change profile picture"
     },
     "sidebar": {
       "allergens": "Allergens",
@@ -47,7 +48,8 @@
       "overflow": "More items",
       "overflowTitled": "More {title}",
       "overflowAria": "Show {count} more item | Show {count} more items",
-      "count": "{count} pc | {count} pcs"
+      "count": "{count} pc | {count} pcs",
+      "removeAria": "Remove {label}"
     },
     "alerts": {
       "allergyAlreadyAdded": "This allergen is already in the list.",
