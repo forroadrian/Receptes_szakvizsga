@@ -4,7 +4,9 @@
     "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
     "searchBar": {
       "placeholder": "E.g Brownie",
-      "active": "Searching for allergen..."
+      "active": "Searching for allergen...",
+      "byName": "Recipe name",
+      "byIngredient": "Ingredient"
     },
     "filter": {
       "title": "Filter",
@@ -60,7 +62,11 @@
         "noIngredients": "No ingredients added yet.",
         "instructionPlaceholder": "E.g. Mix the ingredients together",
         "addInstruction": "Add",
-        "noInstructions": "No preparation steps added yet."
+        "noInstructions": "No preparation steps added yet.",
+        "public": "Public",
+        "publicDesc": "Everyone can see this recipe",
+        "private": "Private",
+        "privateDesc": "Only visible to you in your own recipes"
       },
       "footer": {
         "back": "Back",
@@ -68,7 +74,8 @@
         "save": "Save",
         "saving": "Saving...",
         "create": "Create",
-        "edit": "Save changes"
+        "edit": "Save changes",
+        "update": "Update"
       }
     },
     "card": {
@@ -92,7 +99,10 @@
       "ingredients": "Ingredients",
       "preparation": "Preparation",
       "similar": "Similar recipes",
-      "imageAlt": "Recipe image"
+      "imageAlt": "Recipe image",
+      "deleteTitle": "Delete own recipe",
+      "deleteConfirmBtn": "Delete",
+      "deleteCancel": "Cancel"
     },
     "similar": {
       "details": "Details",
