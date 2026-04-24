@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type Recipe from "~/models/Recipe";
 import RecipeDetails from '~/components/recipe/RecipeDetails.vue';
 import { useRecipeStore } from '~/stores/recipe';
 
@@ -12,15 +11,11 @@ if (!recipeStore.getAllRecipes().length) {
     await recipeStore.loadRecipes();
 }
 
-const foundRecipe = recipeStore.getRecipeById(recipeId);
-
-if (!foundRecipe) {
+if (!recipeStore.getRecipeById(recipeId)) {
     await navigateTo('/recipes', { replace: true });
 }
-
-const recipe = foundRecipe as Recipe;
 </script>
 
 <template>
-    <RecipeDetails :recipe="recipe" />
+    <RecipeDetails />
 </template>
