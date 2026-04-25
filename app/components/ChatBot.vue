@@ -328,7 +328,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .chatbot-panel {
-    width: 400px;
+    width: 440px;
     max-width: calc(100vw - 2rem);
     border-radius: 1rem;
     overflow: hidden;
@@ -443,8 +443,8 @@ function onKeydown(e: KeyboardEvent) {
 
 .chatbot-suggestions-row {
     display: flex;
-    gap: 0.35rem;
-    justify-content: flex-end;
+    gap: 0.4rem;
+    justify-content: flex-start;
 }
 
 .chatbot-suggestions-row--duo .chatbot-suggestion-btn {
@@ -478,22 +478,24 @@ function onKeydown(e: KeyboardEvent) {
 
 
 .chatbot-suggestion-btn {
-    background: transparent;
+    background: var(--bs-secondary-bg);
     border: 1px solid var(--bs-border-color);
     border-radius: 999px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 500;
     cursor: pointer;
     color: var(--bs-body-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .chatbot-suggestion-btn:hover {
-    background: var(--bs-secondary-bg);
+    background: var(--bs-tertiary-bg, #e9ecef);
     border-color: var(--bs-secondary-color);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .chatbot-input {
