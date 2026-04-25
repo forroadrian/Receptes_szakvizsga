@@ -1,0 +1,18 @@
+{
+    "chatbot": {
+        "title": "Recept Asszisztens",
+        "placeholder": "Írj egy kérdést...",
+        "send": "Küldés",
+        "openRecipe": "Recept megnyitása",
+        "loading": "Gondolkodik...",
+        "error": "Hiba történt. Kérlek próbáld újra.",
+        "openBtn": "Asszisztens megnyitása",
+        "welcome": "Üdvözöljük a MenuPlanr-en! Miben segíthetek?",
+        "suggestions": {
+            "whatCanIDo": "Mire való a MenuPlanr?",
+            "suggestRecipe": "Ajánlj egy receptet!",
+            "fromPantry": "Mit főzzek a hozzávalóimból?",
+            "quickMeal": "Gyors és egyszerű ételötletek"
+        }
+    }
+}

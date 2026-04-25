@@ -14,12 +14,19 @@ const steps = computed(() => [
     { id: 4, title: t('recipe.addRecipeModal.steps.instructions') }
 ]);
 
-onMounted(() => {
+const aiPendingOpen = useState<boolean>('aiPendingOpen', () => false);
+
+onMounted(async () => {
     recipeModal.init();
     recipeModal.closeButton = closeBtn.value;
 
     const modalEl = document.getElementById('openAddRecipeModal');
     modalEl?.addEventListener('hidden.bs.modal', () => recipeModal.onModalHidden());
+
+    if (aiPendingOpen.value) {
+        aiPendingOpen.value = false;
+        if (modalEl) (window as any).bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
 });
 
 watch(closeBtn, (btn) => {

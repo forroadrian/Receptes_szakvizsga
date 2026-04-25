@@ -12,6 +12,7 @@ const showFooter = computed(() => !route.path.startsWith('/profile'));
         </main>
 
         <FooterComponent v-if="showFooter" />
+        <ChatBot />
     </div>
 </template>
 

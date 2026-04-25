@@ -1,0 +1,18 @@
+{
+    "chatbot": {
+        "title": "Recipe Assistant",
+        "placeholder": "Ask a question...",
+        "send": "Send",
+        "openRecipe": "Open recipe",
+        "loading": "Thinking...",
+        "error": "Something went wrong. Please try again.",
+        "openBtn": "Open assistant",
+        "welcome": "Welcome to MenuPlanr! How can I help you?",
+        "suggestions": {
+            "whatCanIDo": "What is MenuPlanr for?",
+            "suggestRecipe": "Suggest me a recipe!",
+            "fromPantry": "What can I cook from my ingredients?",
+            "quickMeal": "Quick and easy meal ideas"
+        }
+    }
+}
