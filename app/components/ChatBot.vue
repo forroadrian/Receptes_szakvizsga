@@ -189,21 +189,23 @@ function onKeydown(e: KeyboardEvent) {
                         </button>
                     </div>
 
-                    <div v-if="showSuggestions" class="chatbot-suggestions">
-                        <div class="chatbot-suggestions-row">
-                            <div class="chatbot-tip-wrap" :data-tip="suggestions[0]"><button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[0])">{{ suggestions[0] }}</button></div>
-                            <div class="chatbot-tip-wrap" :data-tip="suggestions[1]"><button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[1])">{{ suggestions[1] }}</button></div>
-                        </div>
-                        <div class="chatbot-suggestions-row">
-                            <div class="chatbot-tip-wrap" :data-tip="suggestions[2]"><button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[2])">{{ suggestions[2] }}</button></div>
-                            <div class="chatbot-tip-wrap" :data-tip="suggestions[3]"><button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[3])">{{ suggestions[3] }}</button></div>
-                        </div>
-                    </div>
-
                     <div v-if="isLoading" class="chatbot-message chatbot-message--assistant">
                         <div class="chatbot-bubble chatbot-bubble--loading">
                             <span></span><span></span><span></span>
                         </div>
+                    </div>
+                </div>
+
+                <div v-if="showSuggestions" class="chatbot-suggestions">
+                    <div class="chatbot-suggestions-row chatbot-suggestions-row--duo">
+                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[0])">{{ suggestions[0] }}</button>
+                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[1])">{{ suggestions[1] }}</button>
+                    </div>
+                    <div class="chatbot-suggestions-row">
+                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[2])">{{ suggestions[2] }}</button>
+                    </div>
+                    <div class="chatbot-suggestions-row">
+                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[3])">{{ suggestions[3] }}</button>
                     </div>
                 </div>
 
@@ -258,7 +260,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .chatbot-panel {
-    width: 340px;
+    width: 400px;
     max-width: calc(100vw - 2rem);
     border-radius: 1rem;
     overflow: hidden;
@@ -341,37 +343,18 @@ function onKeydown(e: KeyboardEvent) {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--bs-border-color);
 }
 
 .chatbot-suggestions-row {
     display: flex;
     gap: 0.35rem;
+    justify-content: flex-end;
 }
 
-.chatbot-suggestion-btn {
-    background: transparent;
-    border: 1px solid var(--bs-border-color);
-    border-radius: 999px;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-    color: var(--bs-body-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background 0.15s, border-color 0.15s;
-}
-
-.chatbot-suggestion-btn:hover {
-    background: var(--bs-secondary-bg);
-    border-color: var(--bs-secondary-color);
-}
-
-.chatbot-tip-wrap {
+.chatbot-suggestions-row--duo .chatbot-suggestion-btn {
     flex: 1;
-    position: relative;
-    min-width: 0;
 }
 
 .chatbot-tip-wrap::after {
@@ -399,8 +382,24 @@ function onKeydown(e: KeyboardEvent) {
     opacity: 1;
 }
 
+
 .chatbot-suggestion-btn {
-    width: 100%;
+    background: transparent;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--bs-body-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.chatbot-suggestion-btn:hover {
+    background: var(--bs-secondary-bg);
+    border-color: var(--bs-secondary-color);
 }
 
 .chatbot-input {

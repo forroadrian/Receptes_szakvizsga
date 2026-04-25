@@ -9,10 +9,10 @@
         "openBtn": "Asszisztens megnyitása",
         "welcome": "Üdvözöljük a MenuPlanr-en! Miben segíthetek?",
         "suggestions": {
-            "whatCanIDo": "Mire való a MenuPlanr?",
-            "suggestRecipe": "Ajánlj egy receptet!",
-            "fromPantry": "Mit főzzek a hozzávalóimból?",
-            "quickMeal": "Gyors és egyszerű ételötletek"
+            "whatCanIDo": "Mire való a MenuPlanr? ℹ️",
+            "suggestRecipe": "Ajánlj egy receptet! 🍽️",
+            "fromPantry": "Mit főzzek a hozzávalóimból? 🛒",
+            "quickMeal": "Gyors és egyszerű ételötletek ⚡"
         }
     }
 }
