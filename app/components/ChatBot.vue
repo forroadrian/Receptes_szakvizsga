@@ -15,7 +15,15 @@ type Message = {
     role: 'user' | 'assistant';
     content: string;
     recipe?: any;
+    time: string;
 };
+
+function now(): string {
+    return new Date().toLocaleTimeString(locale.value === 'hu' ? 'hu-HU' : 'en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -36,7 +44,7 @@ const showSuggestions = computed(() =>
 
 function openChat() {
     if (!isOpen.value && messages.value.length === 0) {
-        messages.value.push({ role: 'assistant', content: t('chatbot.welcome') });
+        messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
     }
     isOpen.value = !isOpen.value;
 }
@@ -57,7 +65,7 @@ async function send() {
     const msg = input.value.trim();
     if (!msg || isLoading.value) return;
 
-    messages.value.push({ role: 'user', content: msg });
+    messages.value.push({ role: 'user', content: msg, time: now() });
     input.value = '';
     isLoading.value = true;
     await scrollToBottom();
@@ -86,12 +94,14 @@ async function send() {
         messages.value.push({
             role: 'assistant',
             content: response.message,
-            recipe: response.type === 'recipe' ? response.recipe : undefined
+            recipe: response.type === 'recipe' ? response.recipe : undefined,
+            time: now()
         });
     } catch {
         messages.value.push({
             role: 'assistant',
-            content: t('chatbot.error')
+            content: t('chatbot.error'),
+            time: now()
         });
     } finally {
         isLoading.value = false;
@@ -187,6 +197,7 @@ function onKeydown(e: KeyboardEvent) {
                         >
                             <i class="bi bi-pencil-square me-1"></i>{{ $t('chatbot.openRecipe') }}
                         </button>
+                        <span class="chatbot-time">{{ msg.time }}</span>
                     </div>
 
                     <div v-if="isLoading" class="chatbot-message chatbot-message--assistant">
@@ -314,6 +325,13 @@ function onKeydown(e: KeyboardEvent) {
 .chatbot-message--assistant .chatbot-bubble {
     background: var(--bs-secondary-bg);
     border-bottom-left-radius: 0.2rem;
+}
+
+.chatbot-time {
+    font-size: 0.68rem;
+    color: var(--bs-secondary-color);
+    margin-top: 0.2rem;
+    opacity: 0.7;
 }
 
 .chatbot-bubble--loading {
