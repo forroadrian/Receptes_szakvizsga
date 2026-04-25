@@ -7,6 +7,7 @@
         "loading": "Gondolkodik...",
         "error": "Hiba történt. Kérlek próbáld újra.",
         "openBtn": "Asszisztens megnyitása",
+        "newChat": "Új beszélgetés",
         "welcome": "Üdvözöljük a MenuPlanr-en! Miben segíthetek?",
         "suggestions": {
             "whatCanIDo": "Mire való a MenuPlanr? ℹ️",

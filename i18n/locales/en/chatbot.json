@@ -7,6 +7,7 @@
         "loading": "Thinking...",
         "error": "Something went wrong. Please try again.",
         "openBtn": "Open assistant",
+        "newChat": "New conversation",
         "welcome": "Welcome to MenuPlanr! How can I help you?",
         "suggestions": {
             "whatCanIDo": "What is MenuPlanr for? ℹ️",

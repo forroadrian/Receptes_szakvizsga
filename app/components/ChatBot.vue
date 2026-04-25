@@ -49,6 +49,12 @@ function openChat() {
     isOpen.value = !isOpen.value;
 }
 
+function newChat() {
+    messages.value = [];
+    input.value = '';
+    messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
+}
+
 async function sendSuggestion(text: string) {
     input.value = text;
     await send();
@@ -179,7 +185,12 @@ function onKeydown(e: KeyboardEvent) {
                     <span class="fw-semibold">
                         <i class="bi bi-stars me-2"></i>{{ $t('chatbot.title') }}
                     </span>
-                    <button class="btn-close btn-close-white" @click="isOpen = false" />
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="chatbot-new-btn" :title="$t('chatbot.newChat')" @click="newChat">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn-close btn-close-white" @click="isOpen = false" />
+                    </div>
                 </div>
 
                 <div ref="messagesEl" class="chatbot-messages card-body">
@@ -277,6 +288,25 @@ function onKeydown(e: KeyboardEvent) {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+.chatbot-new-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    color: #fff;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.chatbot-new-btn:hover {
+    background: rgba(255,255,255,0.15);
 }
 
 .chatbot-header {
