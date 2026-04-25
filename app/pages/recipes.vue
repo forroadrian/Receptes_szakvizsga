@@ -112,6 +112,18 @@ watch(() => filterStore.filteredRecipes, () => {
 const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
+
+const tabCounts = computed(() => {
+    const all = recipeStore.getAllRecipes();
+    const userId = user.value?.id ?? user.value?.sub;
+    return {
+        default: all.filter(r => r.author_id === null || r.public === true).length,
+        own: all.filter(r => r.author_id === userId).length,
+        saved: filterStore.savedRecipeIds.length,
+        tried: filterStore.triedRecipeIds.length
+    };
+});
+
 </script>
 <template>
     <RecipeModal />
@@ -141,36 +153,39 @@ const handleTabClick = (tab: any) => {
             </div>
 
             <nav class="recipes-tabs mt-3">
-                <ul class="d-flex flex-wrap list-unstyled gap-4">
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'default' }"
+                <ul class="row list-unstyled g-3 g-md-0 justify-content-lg-evenly pt-3">
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-three-dots" :class="{ active: filterStore.activeTab === 'default' }"
                             @click="handleTabClick('default')">
-                            {{ $t('recipe.filter.default') }}
-                        </button>
+                            {{ $t('recipe.filter.default') }} {{ tabCounts.default ? `(${tabCounts.default})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'own' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-person" :class="{ active: filterStore.activeTab === 'own' }"
                             @click="handleTabClick('own')">
-                            {{ $t('recipe.filter.own') }}
-                        </button>
+                            {{ $t('recipe.filter.own') }} {{ tabCounts.own ? `(${tabCounts.own})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'saved' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-star" :class="{ active: filterStore.activeTab === 'saved' }"
                             @click="handleTabClick('saved')">
-                            {{ $t('recipe.filter.liked') }}
-                        </button>
+                            {{ $t('recipe.filter.liked') }} {{ tabCounts.saved ? `(${tabCounts.saved})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'tried' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-check-circle" :class="{ active: filterStore.activeTab === 'tried' }"
                             @click="handleTabClick('tried')">
-                            {{ $t('recipe.filter.tried') }}
-                        </button>
+                            {{ $t('recipe.filter.tried') }} {{ tabCounts.tried ? `(${tabCounts.tried})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'ai' }"
-                            @click="handleTabClick('ai')">
-                            {{ $t('recipe.filter.ai') }}
-                        </button>
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3" >
+                        <Button type="button" class="tab-btn" icon="bi bi-stars" :class="{ active: filterStore.activeTab === 'ai' }" 
+                            @click="handleTabClick('ai')"> {{ $t('recipe.filter.ai') }}
+                        </Button>
                     </li>
                 </ul>
             </nav>
@@ -194,15 +209,15 @@ const handleTabClick = (tab: any) => {
             </div>
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
-                <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
+                <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                    <div class="row text-center py-4">
+                    <div class="row text-center py-3">
                         <span class="plus-icon">+</span>
                         <p>{{ $t('recipe.addRecipeModal.title') }}</p>
                     </div>
                 </div>
                 <div v-for="recipe in visibleRecipes"
-                    class="recipe-cards col-12 col-md-6 col-lg-4 my-sm-4 ">
+                    class="recipe-cards col-12 col-md-6 col-lg-4 my-3">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
@@ -428,6 +443,8 @@ const handleTabClick = (tab: any) => {
 .tab-btn {
     background: none;
     border: none;
+    margin: auto;
+    padding: 0px;
 }
 
 .addRecipe,
@@ -442,8 +459,13 @@ const handleTabClick = (tab: any) => {
     color: var(--dark);
 }
 
+.tab-btn::after{
+    animation: none!important;
+}
+
 .tab-btn.active {
     border-bottom: 2px solid var(--bs-emphasis-color);
+    border-radius: 0;
     font-weight: 500;
 }
 
