@@ -16,18 +16,23 @@ const steps = computed(() => [
 
 const aiPendingOpen = useState<boolean>('aiPendingOpen', () => false);
 
-onMounted(async () => {
+onMounted(() => {
     recipeModal.init();
     recipeModal.closeButton = closeBtn.value;
 
     const modalEl = document.getElementById('openAddRecipeModal');
     modalEl?.addEventListener('hidden.bs.modal', () => recipeModal.onModalHidden());
-
-    if (aiPendingOpen.value) {
-        aiPendingOpen.value = false;
-        if (modalEl) (window as any).bootstrap.Modal.getOrCreateInstance(modalEl).show();
-    }
 });
+
+watch(aiPendingOpen, async (val) => {
+    if (!val) return;
+    aiPendingOpen.value = false;
+    await nextTick();
+    setTimeout(() => {
+        const modalEl = document.getElementById('openAddRecipeModal');
+        if (modalEl) (window as any).bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }, 150);
+}, { immediate: true });
 
 watch(closeBtn, (btn) => {
     recipeModal.closeButton = btn;
