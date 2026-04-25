@@ -27,9 +27,23 @@ function now(): string {
 
 const isOpen = ref(false);
 const isLoading = ref(false);
+const isExpired = ref(false);
 const input = ref('');
 const messages = ref<Message[]>([]);
 const messagesEl = ref<HTMLElement | null>(null);
+
+const TIMEOUT_MS = 5 * 60 * 1000;
+let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+function resetInactivityTimer() {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (isExpired.value) return;
+    inactivityTimer = setTimeout(() => {
+        isExpired.value = true;
+        messages.value.push({ role: 'assistant', content: t('chatbot.expired'), time: now() });
+        scrollToBottom();
+    }, TIMEOUT_MS);
+}
 
 const suggestions = computed(() => [
     t('chatbot.suggestions.whatCanIDo'),
@@ -50,9 +64,12 @@ function openChat() {
 }
 
 function newChat() {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    isExpired.value = false;
     messages.value = [];
     input.value = '';
     messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
+    resetInactivityTimer();
 }
 
 async function sendSuggestion(text: string) {
@@ -74,6 +91,7 @@ async function send() {
     messages.value.push({ role: 'user', content: msg, time: now() });
     input.value = '';
     isLoading.value = true;
+    resetInactivityTimer();
     await scrollToBottom();
 
     try {
@@ -231,18 +249,19 @@ function onKeydown(e: KeyboardEvent) {
                     </div>
                 </div>
 
-                <div class="chatbot-input card-footer">
+                <div v-if="!isExpired" class="chatbot-input card-footer">
                     <div class="input-group">
                         <textarea
                             v-model="input"
                             class="form-control form-control-sm"
                             rows="1"
                             :placeholder="$t('chatbot.placeholder')"
+                            :disabled="isExpired"
                             @keydown="onKeydown"
                         />
                         <button
                             class="btn btn-dark btn-sm"
-                            :disabled="isLoading || !input.trim()"
+                            :disabled="isLoading || !input.trim() || isExpired"
                             @click="send"
                         >
                             <i class="bi bi-send-fill"></i>

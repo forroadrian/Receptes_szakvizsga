@@ -8,6 +8,7 @@
         "error": "Something went wrong. Please try again.",
         "openBtn": "Open assistant",
         "newChat": "New conversation",
+        "expired": "Looks like you disappeared! 👋 The chat has ended due to 5 minutes of inactivity. Click the pencil icon to start a new chat.",
         "welcome": "Welcome to MenuPlanr! How can I help you?",
         "suggestions": {
             "whatCanIDo": "What is MenuPlanr for? ℹ️",
