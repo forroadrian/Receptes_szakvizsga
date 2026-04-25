@@ -100,7 +100,7 @@ const handleSignOut = async () => {
     </Teleport>
 
     <header class="site-header">
-        <nav class="navbar navbar-expand-lg" :aria-label="$t('header.nav.aria.main')">
+        <nav class="navbar navbar-expand-xl" :aria-label="$t('header.nav.aria.main')">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" :aria-label="$t('common.pages.index')">
                     <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" :width="180" :height="128"
@@ -132,13 +132,16 @@ const handleSignOut = async () => {
                         <LanguageSwitcher />
                         <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
                             :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
-                            class="pe-lg-4 text-center" @update:model-value="toggleTheme" />
-                        <Button to="/register" color="orange" :outline="true" class="w-lg-auto me-1">
+                            class="pe-lg-4 d-flex justify-content-center" @update:model-value="toggleTheme" />
+                        <div class=" d-flex gap-3 auth-buttons">
+                           <Button to="/register" color="orange" :outline="true" class="register w-lg-auto">
                             {{ $t('header.nav.register') }}
                         </Button>
-                        <Button to="/login" color="orange" class="w-lg-auto">
+                        <Button to="/login" color="orange" class="login w-lg-auto">
                             {{ $t('header.nav.login') }}
-                        </Button>
+                        </Button>      
+                        </div>
+                           
                     </div>
 
                     <div v-else class="auth-area">
@@ -180,7 +183,8 @@ const handleSignOut = async () => {
                                 </li>
 
                                 <li class="px-2">
-                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border" @click.stop>
+                                    <div class="d-flex align-items-center justify-content-between rounded-2 px-2 py-2 border"
+                                        @click.stop>
                                         <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
                                             :label="isReady && colorMode.value === 'dark' ? $t('header.nav.profile.theme.dark') : $t('header.nav.profile.theme.light')"
                                             :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
@@ -397,7 +401,7 @@ const handleSignOut = async () => {
     border-color: var(--bs-border-color);
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
     .dropdown-backdrop {
         display: none;
     }
@@ -431,7 +435,18 @@ const handleSignOut = async () => {
     }
 }
 
-@media (max-width: 991.98px) {
+@media (min-width: 768px) {
+    .auth-area .register, .auth-area .login {
+        width: 60%;
+        margin: 0 auto !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .auth-buttons {
+    display: flex;
+    flex-direction: column;
+}
     .navbar-collapse {
         padding-top: 0.75rem;
     }
