@@ -28,6 +28,7 @@ function now(): string {
 const isOpen = ref(false);
 const isLoading = ref(false);
 const isExpired = ref(false);
+const unreadCount = ref(0);
 const input = ref('');
 const messages = ref<Message[]>([]);
 const messagesEl = ref<HTMLElement | null>(null);
@@ -41,6 +42,7 @@ function resetInactivityTimer() {
     inactivityTimer = setTimeout(() => {
         isExpired.value = true;
         messages.value.push({ role: 'assistant', content: t('chatbot.expired'), time: now() });
+        if (!isOpen.value) unreadCount.value++;
         scrollToBottom();
     }, TIMEOUT_MS);
 }
@@ -61,6 +63,7 @@ function openChat() {
         messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
     }
     isOpen.value = !isOpen.value;
+    if (isOpen.value) unreadCount.value = 0;
 }
 
 function newChat() {
@@ -121,12 +124,14 @@ async function send() {
             recipe: response.type === 'recipe' ? response.recipe : undefined,
             time: now()
         });
+        if (!isOpen.value) unreadCount.value++;
     } catch {
         messages.value.push({
             role: 'assistant',
             content: t('chatbot.error'),
             time: now()
         });
+        if (!isOpen.value) unreadCount.value++;
     } finally {
         isLoading.value = false;
         await scrollToBottom();
@@ -277,6 +282,9 @@ function onKeydown(e: KeyboardEvent) {
             @click="openChat"
         >
             <i class="bi" :class="isOpen ? 'bi-x-lg' : 'bi-chat-dots-fill'"></i>
+            <span v-if="!isOpen && unreadCount > 0" class="chatbot-badge">
+                {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
         </button>
     </div>
 </template>
@@ -293,7 +301,26 @@ function onKeydown(e: KeyboardEvent) {
     gap: 0.75rem;
 }
 
+.chatbot-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #dc3545;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.2rem;
+    pointer-events: none;
+}
+
 .chatbot-toggle {
+    position: relative;
     width: 3.25rem;
     height: 3.25rem;
     font-size: 1.25rem;
