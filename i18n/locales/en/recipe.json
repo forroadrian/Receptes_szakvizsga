@@ -18,6 +18,15 @@
       "notFound": "Theres no recipe that matches this criteria!",
       "add": "Create new recipe."
     },
+    "aiRecommendations": {
+      "loading": "Loading AI recommendations...",
+      "loadingSubtitle": "This may take a few seconds",
+      "refresh": "Get new recommendations",
+      "noResults": "Could not load recommendations. Please try again!",
+      "rateLimit": "Too many requests at once. Please wait a minute and try again!",
+      "reasonLabel": "Why we recommend it?",
+      "badge": "AI pick"
+    },
     "addRecipeModal": {
       "title": "Create new recipe",
       "subtitle": "Add the recipe details step by step.",

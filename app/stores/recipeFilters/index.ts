@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import type Category from "~/interfaces/Category";
 import type { Database } from "~/types/database.types";
 import { useRecipeStore } from "~/stores/recipe";
+import { useIngredientStore } from "~/stores/ingredients";
 import { durationOptions, getDurationCategories, getActiveDuration } from "./duration";
 import { loadRecipeFilterCategories } from "./categories";
 import { getTabRecipes } from "./recipeTabs";
@@ -15,6 +16,7 @@ type AllergyRow = Database["public"]["Tables"]["allergy"]["Row"];
 export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const user = useSupabaseUser();
     const recipeStore = useRecipeStore();
+    const ingredientStore = useIngredientStore();
 
     const search = ref("");
     const allergenSearch = ref("");
@@ -32,6 +34,10 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const userRecipeLoaded = ref(false);
     const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
+    const aiRecommendedRecipes = ref<{ id: number; reason: string }[]>([]);
+    const aiLoading = ref(false);
+    const aiLoaded = ref(false);
+
     const durationCategories = computed(() => getDurationCategories());
     const activeDuration = computed(() => getActiveDuration(selectedDurationId.value));
 
@@ -41,8 +47,10 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
     const shouldRespectDislikedIngredients = computed(() => !!user.value && respectDislikedIngredients.value);
 
+    const aiRecommendedIds = computed(() => aiRecommendedRecipes.value.map(r => r.id));
+
     const tabRecipes = computed(() =>
-        getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id ?? user.value?.sub, savedRecipeIds.value, triedRecipeIds.value)
+        getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id ?? user.value?.sub, savedRecipeIds.value, triedRecipeIds.value, aiRecommendedIds.value)
     );
 
     const filteredRecipes = computed(() =>
@@ -132,6 +140,70 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         }
     };
 
+    const aiError = ref<'rate_limit' | 'generic' | null>(null);
+
+    const loadAiRecommendations = async (params: { language: string; userAllergyIds: number[]; force?: boolean }) => {
+        if (aiLoading.value) return;
+        if (aiLoaded.value && !params.force) return;
+        aiLoading.value = true;
+        aiError.value = null;
+
+        const allRecipes = recipeStore.getAllRecipes();
+        const pantry = ingredientStore.ingredients.map(i => ({ name: i.name, quantity: i.quantity, unit: i.unit }));
+
+        const pantryNames = new Set(pantry.map(p => p.name.toLowerCase()));
+
+        const scored = allRecipes
+            .map(r => ({
+                recipe: r,
+                score: r.ingredients.filter((i: any) => pantryNames.has(i.name.toLowerCase())).length
+            }))
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 40);
+
+        const recipePayload = scored.map(({ recipe }) => ({
+            id: recipe.id,
+            name: recipe.name,
+            ingredientNames: recipe.ingredients.map((i: any) => i.name),
+            categoryNames: recipe.categories.map((c: any) => c.name)
+        }));
+
+        const userAllergyNames = allAllergies.value
+            .filter(a => params.userAllergyIds.includes(a.id))
+            .map(a => a.name);
+
+        const dislikedIngredientNames = ingredientStore.availableIngredients
+            .filter(i => userDislikedIngredientIds.value.includes(i.id))
+            .map(i => i.name);
+
+        try {
+            const result = await $fetch<{ id: number; reason: string }[]>('/api/recipe/ai-recommendations', {
+                method: 'POST',
+                body: {
+                    language: params.language,
+                    pantry,
+                    recipes: recipePayload,
+                    userAllergyNames,
+                    dislikedIngredientNames
+                }
+            });
+            aiRecommendedRecipes.value = result ?? [];
+            aiLoaded.value = true;
+        } catch (err: any) {
+            console.error('AI recommendations failed:', err);
+            aiRecommendedRecipes.value = [];
+            aiLoaded.value = true;
+            const status = err?.response?.status ?? err?.statusCode ?? err?.data?.statusCode;
+            aiError.value = status === 429 ? 'rate_limit' : 'generic';
+        } finally {
+            aiLoading.value = false;
+        }
+    };
+
+    const getAiReason = (recipeId: number): string => {
+        return aiRecommendedRecipes.value.find(r => r.id === recipeId)?.reason ?? '';
+    };
+
     const removeSelectedAllergy = (allergyId: number) => {
         selectedAllergyIds.value = selectedAllergyIds.value.filter((id) => id !== allergyId);
     };
@@ -165,6 +237,8 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         allAllergies, selectedAllergyIds, selectedAllergyPills, filteredAllergyPills, loadAllergies,
         removeSelectedAllergy, addSelectedAllergy,
         savedRecipeIds, triedRecipeIds,
-        loadUserRecipeIds, toggleSaved, toggleTried
+        loadUserRecipeIds, toggleSaved, toggleTried,
+        aiRecommendedRecipes, aiLoading, aiLoaded, aiError,
+        loadAiRecommendations, getAiReason
     };
 });

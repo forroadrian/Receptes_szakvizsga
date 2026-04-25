@@ -8,6 +8,7 @@ import Pills from "~/components/Pills.vue";
 
 const route = useRoute();
 const router = useRouter();
+const { locale } = useI18n();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
@@ -113,6 +114,22 @@ const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
 
+const triggerAiRecommendations = (force = false) => {
+    filterStore.loadAiRecommendations({
+        language: locale.value,
+        userAllergyIds: allergyWarnings.userAllergyIds.value,
+        force
+    });
+};
+
+watch(() => filterStore.activeTab, async (tab) => {
+    if (tab !== 'ai') return;
+    if (!recipeStore.getAllRecipes().length) {
+        await recipeStore.loadRecipes();
+    }
+    triggerAiRecommendations();
+});
+
 const tabCounts = computed(() => {
     const all = recipeStore.getAllRecipes();
     const userId = user.value?.id ?? user.value?.sub;
@@ -198,14 +215,38 @@ const tabCounts = computed(() => {
                 </Button>
             </div>
 
-            <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length" class="text-center py-5">
+            <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai' && filterStore.aiLoading" class="ai-loading-state text-center py-5">
+                <div class="ai-loading-spinner mb-3">
+                    <i class="bi bi-stars ai-loading-icon"></i>
+                </div>
+                <p class="fw-semibold mb-1">{{ $t('recipe.aiRecommendations.loading') }}</p>
+                <p class="text-muted small">{{ $t('recipe.aiRecommendations.loadingSubtitle') }}</p>
+            </div>
+
+            <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai' && filterStore.aiLoaded && !filterStore.aiLoading" class="d-flex justify-content-end mb-3">
+                <button class="ai-refresh-btn" @click="triggerAiRecommendations(true)">
+                    <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('recipe.aiRecommendations.refresh') }}
+                </button>
+            </div>
+
+            <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)" class="text-center py-5">
                 <p class="mb-0 fw-bold py-3">
-                    {{ $t('recipe.filter.notFound') }}
+                    <template v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded">
+                        <i v-if="filterStore.aiError === 'rate_limit'" class="bi bi-clock me-1"></i>
+                        <i v-else class="bi bi-exclamation-circle me-1"></i>
+                        {{ filterStore.aiError === 'rate_limit'
+                            ? $t('recipe.aiRecommendations.rateLimit')
+                            : $t('recipe.aiRecommendations.noResults') }}
+                    </template>
+                    <template v-else>{{ $t('recipe.filter.notFound') }}</template>
                 </p>
-                <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
+                <Button v-if="user && filterStore.activeTab !== 'ai'" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
                 :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
                 {{ $t('recipe.filter.add') }}
                 </Button>
+                <button v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded" class="ai-refresh-btn mt-2" @click="triggerAiRecommendations(true)">
+                    <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('recipe.aiRecommendations.refresh') }}
+                </button>
             </div>
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
@@ -245,6 +286,10 @@ const tabCounts = computed(() => {
                                         <p class="text-center mb-3 small">
                                             {{ recipe.description }}
                                         </p>
+                                        <div v-if="filterStore.activeTab === 'ai'" class="ai-reason-badge">
+                                            <i class="bi bi-stars me-1"></i>
+                                            <span>{{ filterStore.getAiReason(recipe.id) }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </template>
@@ -508,5 +553,58 @@ const tabCounts = computed(() => {
         max-height: 150px;
         margin: 30px 0px;
     }
+}
+
+/* AI Recommendations */
+.ai-loading-state {
+    padding: 3rem 0;
+}
+
+.ai-loading-icon {
+    font-size: 2.5rem;
+    color: var(--bs-emphasis-color);
+    animation: ai-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.ai-refresh-btn {
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--bs-body-color);
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.ai-refresh-btn:hover {
+    background: var(--bs-tertiary-bg, #e9ecef);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.ai-reason-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.ai-reason-badge i {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
 }
 </style>

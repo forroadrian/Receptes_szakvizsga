@@ -16,6 +16,15 @@
       "notFound": "Nincs a szűrésnek megfelelő recept!",
       "add": "Új, saját recept felvétele"
     },
+    "aiRecommendations": {
+      "loading": "AI ajánlások betöltése...",
+      "loadingSubtitle": "Ez néhány másodpercet vehet igénybe",
+      "refresh": "Új ajánlások kérése",
+      "noResults": "Nem sikerült ajánlásokat betölteni. Próbáld újra!",
+      "rateLimit": "Túl sok kérés érkezett egyszerre. Várj egy percet, majd próbáld újra!",
+      "reasonLabel": "Miért ajánljuk?",
+      "badge": "AI ajánlás"
+    },
     "addRecipeModal": {
       "title": "Recept hozzáadása",
       "subtitle": "Adj meg egy új, saját receptet!",
