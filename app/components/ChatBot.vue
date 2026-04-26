@@ -255,17 +255,17 @@ function onKeydown(e: KeyboardEvent) {
                 </div>
 
                 <div v-if="!isExpired" class="chatbot-input card-footer">
-                    <div class="input-group">
+                    <div class="chatbot-input-wrap">
                         <textarea
                             v-model="input"
-                            class="form-control form-control-sm"
+                            class="chatbot-textarea"
                             rows="1"
                             :placeholder="$t('chatbot.placeholder')"
                             :disabled="isExpired"
                             @keydown="onKeydown"
                         />
                         <button
-                            class="btn btn-dark btn-sm"
+                            class="chatbot-send-btn"
                             :disabled="isLoading || !input.trim() || isExpired"
                             @click="send"
                         >
@@ -502,9 +502,57 @@ function onKeydown(e: KeyboardEvent) {
     padding: 0.65rem 0.75rem;
 }
 
-.chatbot-input textarea {
+.chatbot-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.chatbot-textarea {
+    width: 100%;
     resize: none;
-    border-radius: 0.5rem 0 0 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.55rem 2.8rem 0.55rem 1.1rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    outline: none;
+    transition: border-color 0.15s;
+    overflow: hidden;
+}
+
+.chatbot-textarea:focus {
+    border-color: var(--bs-emphasis-color);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.chatbot-send-btn {
+    position: absolute;
+    right: 0.45rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--bs-emphasis-color);
+    font-size: 1rem;
+    padding: 0.3rem 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+}
+
+.chatbot-send-btn:hover:not(:disabled) {
+    background: var(--bs-secondary-bg);
+}
+
+.chatbot-send-btn:disabled {
+    color: var(--bs-secondary-color);
+    cursor: default;
+    opacity: 0.45;
 }
 
 .chatbot-slide-enter-active,
