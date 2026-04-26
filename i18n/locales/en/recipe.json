@@ -54,6 +54,7 @@
       "form": {
         "name": "Recipe name",
         "namePlaceholder": "E.g. Pancake",
+        "image":"Recipe image",
         "description": "Recipe description",
         "descriptionPlaceholder": "Short description",
         "prepTime": "Preparation time (minutes)",
