@@ -17,6 +17,7 @@ export type RecipeItem = {
     active: boolean;
     public: boolean;
     deleted_at: string | null;
+    image_url: string | null;
     steps: string[];
     ingredients: {
         id: number;
@@ -145,6 +146,7 @@ export const useRecipeStore = defineStore("recipes", () => {
                     active: recipeData.active ?? true,
                     public: recipeData.public ?? false,
                     deleted_at: recipeData.deleted_at ?? null,
+                    image_url: recipeData.image_url ?? null,
                     steps: stepList,
                     ingredients: ingredientList,
                     categories: categoryList,
