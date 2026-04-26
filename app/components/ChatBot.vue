@@ -68,11 +68,11 @@ function openChat() {
 
 function newChat() {
     if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = null;
     isExpired.value = false;
     messages.value = [];
     input.value = '';
     messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
-    resetInactivityTimer();
 }
 
 async function sendSuggestion(text: string) {
