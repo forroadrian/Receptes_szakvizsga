@@ -5,8 +5,7 @@ export const getTabRecipes = (
     activeTab: RecipeTab,
     userId?: string,
     savedRecipeIds: number[] = [],
-    triedRecipeIds: number[] = [],
-    aiRecommendedIds: number[] = []
+    triedRecipeIds: number[] = []
 ) => {
     switch (activeTab) {
         case "default":
@@ -21,8 +20,9 @@ export const getTabRecipes = (
         case "tried":
             return allRecipes.filter(recipe => triedRecipeIds.includes(recipe.id));
 
+        // "ai" tab is handled directly in the store (AI recipes are not from DB)
         case "ai":
-            return allRecipes.filter(recipe => aiRecommendedIds.includes(recipe.id));
+            return [];
 
         default:
             return [];

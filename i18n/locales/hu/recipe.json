@@ -23,7 +23,8 @@
       "noResults": "Nem sikerült ajánlásokat betölteni. Próbáld újra!",
       "rateLimit": "Túl sok kérés érkezett egyszerre. Várj egy percet, majd próbáld újra!",
       "reasonLabel": "Miért ajánljuk?",
-      "badge": "AI ajánlás"
+      "badge": "AI ajánlás",
+      "saveAsRecipe": "Mentés receptként"
     },
     "addRecipeModal": {
       "title": "Recept hozzáadása",

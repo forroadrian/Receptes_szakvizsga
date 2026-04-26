@@ -34,7 +34,27 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
     const userRecipeLoaded = ref(false);
     const respectDislikedIngredients = useLocalStorage<boolean>("respectDislikedIngredients", true);
 
-    const aiRecommendedRecipes = ref<{ id: number; reason: string }[]>([]);
+    type AiRecipe = {
+        id: string;
+        name: string;
+        description: string;
+        reason: string;
+        prepTime: number;
+        servings: number;
+        mealType: string;
+        tags: string[];
+        ingredients: { name: string; quantity: number; unit: string }[];
+        instructions: string[];
+        // compatibility fields for the recipe card template:
+        time: number;
+        categories: { id: string; name: string; group_type: string }[];
+        allergies: { id: number; name: string }[];
+        author_id: null;
+        public: boolean;
+        isAi: true;
+    };
+
+    const aiRecommendedRecipes = ref<AiRecipe[]>([]);
     const aiLoading = ref(false);
     const aiLoaded = ref(false);
 
@@ -47,21 +67,21 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
     const shouldRespectDislikedIngredients = computed(() => !!user.value && respectDislikedIngredients.value);
 
-    const aiRecommendedIds = computed(() => aiRecommendedRecipes.value.map(r => r.id));
+    const tabRecipes = computed(() => {
+        if (activeTab.value === "ai") return aiRecommendedRecipes.value as any[];
+        return getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id ?? user.value?.sub, savedRecipeIds.value, triedRecipeIds.value);
+    });
 
-    const tabRecipes = computed(() =>
-        getTabRecipes(recipeStore.getAllRecipes(), activeTab.value, user.value?.id ?? user.value?.sub, savedRecipeIds.value, triedRecipeIds.value, aiRecommendedIds.value)
-    );
-
-    const filteredRecipes = computed(() =>
-        getFilteredRecipes(
+    const filteredRecipes = computed(() => {
+        if (activeTab.value === "ai") return aiRecommendedRecipes.value as any[];
+        return getFilteredRecipes(
             tabRecipes.value, search.value,
             activeDuration.value, selectedMealId.value, selectedTypeId.value,
             shouldRespectDislikedIngredients.value,
             userDislikedIngredientIds.value,
             selectedAllergyIds.value
-        )
-    );
+        );
+    });
 
     const hasActiveFilters = computed(() =>
         search.value !== "" ||
@@ -142,52 +162,103 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
     const aiError = ref<'rate_limit' | 'generic' | null>(null);
 
+    const durationToMinutes = (durationId: number | null): { max?: number; min?: number } => {
+        switch (durationId) {
+            case 1: return { max: 15 };
+            case 2: return { max: 30 };
+            case 3: return { max: 60 };
+            case 4: return { min: 60 };
+            default: return {};
+        }
+    };
+
     const loadAiRecommendations = async (params: { language: string; userAllergyIds: number[]; force?: boolean }) => {
         if (aiLoading.value) return;
         if (aiLoaded.value && !params.force) return;
         aiLoading.value = true;
         aiError.value = null;
 
-        const allRecipes = recipeStore.getAllRecipes();
         const pantry = ingredientStore.ingredients.map(i => ({ name: i.name, quantity: i.quantity, unit: i.unit }));
 
-        const pantryNames = new Set(pantry.map(p => p.name.toLowerCase()));
+        // Map filter IDs to names for the AI
+        const mealTypeName = selectedMealId.value
+            ? mealOptions.value.find(m => m.id === selectedMealId.value)?.name
+            : undefined;
+        const tagName = selectedTypeId.value
+            ? typeOptions.value.find(t => t.id === selectedTypeId.value)?.name
+            : undefined;
+        const tagsList = tagName ? [tagName] : [];
 
-        const scored = allRecipes
-            .map(r => ({
-                recipe: r,
-                score: r.ingredients.filter((i: any) => pantryNames.has(i.name.toLowerCase())).length
-            }))
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 40);
-
-        const recipePayload = scored.map(({ recipe }) => ({
-            id: recipe.id,
-            name: recipe.name,
-            ingredientNames: recipe.ingredients.map((i: any) => i.name),
-            categoryNames: recipe.categories.map((c: any) => c.name)
-        }));
+        const duration = durationToMinutes(selectedDurationId.value);
 
         const userAllergyNames = allAllergies.value
             .filter(a => params.userAllergyIds.includes(a.id))
             .map(a => a.name);
 
-        const dislikedIngredientNames = ingredientStore.availableIngredients
-            .filter(i => userDislikedIngredientIds.value.includes(i.id))
-            .map(i => i.name);
+        const filterAllergyNames = allAllergies.value
+            .filter(a => selectedAllergyIds.value.includes(a.id))
+            .map(a => a.name);
+
+        const avoidAllergens = Array.from(new Set([...userAllergyNames, ...filterAllergyNames]));
+
+        const dislikedIngredientNames = shouldRespectDislikedIngredients.value
+            ? ingredientStore.availableIngredients
+                .filter(i => userDislikedIngredientIds.value.includes(i.id))
+                .map(i => i.name)
+            : [];
+
+        const availableMealTypes = mealOptions.value.map(m => m.name);
+        const availableTags = typeOptions.value.map(t => t.name);
+        // Send a limited catalog. Prefer pantry-matched first, then fill up with the rest.
+        const pantryNames = new Set(pantry.map(p => p.name.toLowerCase()));
+        const allIngredientNames = ingredientStore.availableIngredients.map(i => i.name);
+        const pantryIngredientNames = allIngredientNames.filter(n => pantryNames.has(n.toLowerCase()));
+        const otherIngredientNames = allIngredientNames.filter(n => !pantryNames.has(n.toLowerCase()));
+        const availableIngredients = [...pantryIngredientNames, ...otherIngredientNames].slice(0, 150);
 
         try {
-            const result = await $fetch<{ id: number; reason: string }[]>('/api/recipe/ai-recommendations', {
+            const result = await $fetch<any[]>('/api/recipe/ai-recommendations', {
                 method: 'POST',
                 body: {
                     language: params.language,
                     pantry,
-                    recipes: recipePayload,
-                    userAllergyNames,
-                    dislikedIngredientNames
+                    filters: {
+                        mealType: mealTypeName,
+                        tags: tagsList,
+                        maxDuration: duration.max,
+                        minDuration: duration.min,
+                        avoidAllergens,
+                        avoidIngredients: dislikedIngredientNames,
+                        search: search.value || undefined
+                    },
+                    availableMealTypes,
+                    availableTags,
+                    availableIngredients
                 }
             });
-            aiRecommendedRecipes.value = result ?? [];
+
+            aiRecommendedRecipes.value = (result ?? []).map((r: any) => ({
+                id: r.id,
+                name: r.name,
+                description: r.description,
+                reason: r.reason,
+                prepTime: r.prepTime,
+                servings: r.servings,
+                mealType: r.mealType,
+                tags: r.tags,
+                ingredients: r.ingredients,
+                instructions: r.instructions,
+                // template compatibility:
+                time: r.prepTime,
+                categories: [
+                    ...(r.mealType ? [{ id: `ai-meal-${r.mealType}`, name: r.mealType, group_type: 'meal' }] : []),
+                    ...((r.tags ?? []).map((tagName: string) => ({ id: `ai-tag-${tagName}`, name: tagName, group_type: 'type' })))
+                ],
+                allergies: [],
+                author_id: null,
+                public: false,
+                isAi: true as const
+            }));
             aiLoaded.value = true;
         } catch (err: any) {
             console.error('AI recommendations failed:', err);
@@ -200,8 +271,12 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         }
     };
 
-    const getAiReason = (recipeId: number): string => {
-        return aiRecommendedRecipes.value.find(r => r.id === recipeId)?.reason ?? '';
+    const getAiReason = (recipeId: string | number): string => {
+        return aiRecommendedRecipes.value.find(r => r.id === String(recipeId))?.reason ?? '';
+    };
+
+    const getAiRecipe = (recipeId: string | number): AiRecipe | null => {
+        return aiRecommendedRecipes.value.find(r => r.id === String(recipeId)) ?? null;
     };
 
     const removeSelectedAllergy = (allergyId: number) => {
@@ -239,6 +314,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         savedRecipeIds, triedRecipeIds,
         loadUserRecipeIds, toggleSaved, toggleTried,
         aiRecommendedRecipes, aiLoading, aiLoaded, aiError,
-        loadAiRecommendations, getAiReason
+        loadAiRecommendations, getAiReason, getAiRecipe
     };
 });

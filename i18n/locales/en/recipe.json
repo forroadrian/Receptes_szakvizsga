@@ -25,7 +25,8 @@
       "noResults": "Could not load recommendations. Please try again!",
       "rateLimit": "Too many requests at once. Please wait a minute and try again!",
       "reasonLabel": "Why we recommend it?",
-      "badge": "AI pick"
+      "badge": "AI pick",
+      "saveAsRecipe": "Save as my recipe"
     },
     "addRecipeModal": {
       "title": "Create new recipe",

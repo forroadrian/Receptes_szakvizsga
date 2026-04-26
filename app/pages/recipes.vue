@@ -5,15 +5,17 @@ import FormInput from "~/components/FormInput.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeModal } from "~/composables/useRecipeModal";
+import { useIngredientStore } from "~/stores/ingredients";
 import Pills from "~/components/Pills.vue";
 
 const route = useRoute();
 const router = useRouter();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
 const recipeModal = useRecipeModal();
+const ingredientStore = useIngredientStore();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const { getRecipeImage } = useRecipeImage();
@@ -128,12 +130,86 @@ const triggerAiRecommendations = (force = false) => {
     });
 };
 
+const getAiPill = (recipe: any) => {
+    if (!recipe.categories?.length) return [];
+    return dataToPillTag(
+        recipe.categories.map((v: any) => ({ name: v.name, identifier: v.id })),
+        BASIC_CONVERSION
+    );
+};
+
+const openAiRecipeForm = async (recipe: any) => {
+    if (!user.value) {
+        navigateTo('/login');
+        return;
+    }
+
+    await recipeModal.init();
+    recipeModal.resetForm();
+
+    const categories = recipeStore.getAvailableCategories();
+    const mealTypes = categories.filter(c => c.group_type === 'meal');
+    const typeTags = categories.filter(c => c.group_type === 'type');
+
+    const mealMatch = mealTypes.find(
+        m => m.name.toLowerCase() === recipe.mealType?.toLowerCase()
+    );
+    const tagMatches = typeTags
+        .filter(t => recipe.tags?.some(
+            (tag: string) => tag.toLowerCase() === t.name.toLowerCase()
+        ))
+        .map(t => t.id);
+
+    const available = ingredientStore.availableIngredients;
+    const matchedIngredients = (recipe.ingredients ?? [])
+        .map((ing: any) => {
+            const match = available.find(
+                a => a.name.toLowerCase() === ing.name.toLowerCase()
+            );
+            if (!match) return null;
+            return {
+                ingredient_id: match.id,
+                name: match.name,
+                quantity: ing.quantity,
+                unit: ing.unit
+            };
+        })
+        .filter(Boolean);
+
+    recipeModal.recipe.name = recipe.name ?? '';
+    recipeModal.recipe.description = recipe.description ?? '';
+    recipeModal.recipe.prepTime = recipe.prepTime ?? 60;
+    recipeModal.recipe.servings = recipe.servings ?? 4;
+    recipeModal.recipe.mealType = mealMatch?.id ?? null;
+    recipeModal.recipe.tags = tagMatches;
+    recipeModal.recipe.ingredients = matchedIngredients;
+    recipeModal.recipe.instructions = recipe.instructions ?? [];
+
+    if (import.meta.client) {
+        const modalEl = document.getElementById('openAddRecipeModal');
+        if (modalEl) (window as any).bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+};
+
 watch(() => filterStore.activeTab, async (tab) => {
     if (tab !== 'ai') return;
     if (!recipeStore.getAllRecipes().length) {
         await recipeStore.loadRecipes();
     }
     triggerAiRecommendations();
+});
+
+// If filters change while on the AI tab, refresh the recommendations
+watch(() => [
+    filterStore.selectedMealId,
+    filterStore.selectedTypeId,
+    filterStore.selectedDurationId,
+    filterStore.selectedAllergyIds,
+    filterStore.search
+], () => {
+    if (filterStore.activeTab === 'ai') {
+        triggerAiRecommendations(true);
+    }
 });
 
 const tabCounts = computed(() => {
@@ -257,7 +333,7 @@ const tabCounts = computed(() => {
             </div>
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
-                <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
+                <div v-if="user && filterStore.activeTab !== 'ai'" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
                     @click="handleAddRecipeClick">
                     <div class="row text-center py-3">
@@ -267,7 +343,7 @@ const tabCounts = computed(() => {
                 </div>
                 <div v-for="recipe in visibleRecipes"
                     class="recipe-cards col-12 col-md-6 col-lg-4 my-3">
-                    <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
+                    <NuxtLink v-if="!recipe.isAi" :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
                             <template #media>
@@ -291,12 +367,70 @@ const tabCounts = computed(() => {
                             <template #body>
                                 <div class="row justify-content-center">
                                     <div class="col-10 col-lg-8">
-                                        <p class="text-center mb-3 small">
-                                            {{ recipe.description }}
-                                        </p>
-                                        <div v-if="filterStore.activeTab === 'ai'" class="ai-reason-badge">
+                                        <p class="text-center mb-3 small">{{ recipe.description }}</p>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #metadata>
+                                <div class="row justify-content-center mb-3 py-2">
+                                    <div class="col-auto">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ recipe.time }} {{ $t('recipe.card.metadata.time', recipe.time) }}
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-people me-1"></i>
+                                        {{ recipe.servings }} {{ $t('recipe.card.metadata.people', recipe.servings) }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div v-if="recipe.categories?.length">
+                                        <Pills :pills="getLocalizedPill(recipe)" class="d-flex justify-content-center" />
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #footer>
+                                <div class="row pt-2">
+                                    <div class="col-12 text-center small my-auto text-danger">
+                                        <template v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
+                                            <strong>
+                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> {{ $t('recipe.card.footer.warning') }}
+                                            </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </CardBase>
+                    </NuxtLink>
+
+                    <div v-else class="ai-recipe-wrapper text-decoration-none text-reset h-100 d-block">
+                        <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
+                            metadata-class="w-100" footer-class="w-100" class="h-100">
+                            <template #media>
+                                <div class="row pt-4">
+                                    <div class="d-flex justify-content-center card-media">
+                                        <img :src="getRecipeImage(recipe)" :alt="recipe.name" />
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #header>
+                                <CardHeader class="w-100 card-header my-4 pt-5">
+                                    <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
+                                    <template #actions>
+                                        <span title="AI" class="top-0 start-50 translate-middle ai-badge-icon"><i class="bi bi-stars"></i></span>
+                                    </template>
+                                </CardHeader>
+                            </template>
+
+                            <template #body>
+                                <div class="row justify-content-center">
+                                    <div class="col-10 col-lg-8">
+                                        <p class="text-center mb-3 small">{{ recipe.description }}</p>
+                                        <div v-if="recipe.reason" class="ai-reason-badge">
                                             <i class="bi bi-stars me-1"></i>
-                                            <span>{{ filterStore.getAiReason(recipe.id) }}</span>
+                                            <span>{{ recipe.reason }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -313,29 +447,24 @@ const tabCounts = computed(() => {
                                         {{ recipe.servings }} {{ $t('recipe.card.metadata.people', recipe.servings) }}
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                          <Pills :pills="getLocalizedPill(recipe)"
-                                            class="d-flex justify-content-center" />
+                                        <Pills :pills="getAiPill(recipe)" class="d-flex justify-content-center" />
                                     </div>
                                 </div>
                             </template>
 
                             <template #footer>
                                 <div class="row pt-2">
-                                    <div class="col-12 text-center small my-auto text-danger">
-                                        <template
-                                            v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
-                                            <strong>
-                                                <i class="bi bi-exclamation-triangle-fill p-2"></i> {{ $t('recipe.card.footer.warning') }}
-                                            </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
-                                        </template>
+                                    <div class="col-12 text-center">
+                                        <Button color="orange" icon="bi bi-bookmark-plus" class="mx-auto" @click="openAiRecipeForm(recipe)">
+                                            {{ $t('recipe.aiRecommendations.saveAsRecipe') }}
+                                        </Button>
                                     </div>
                                 </div>
                             </template>
                         </CardBase>
-                    </NuxtLink>
+                    </div>
                 </div>
             </div>
 
@@ -614,5 +743,14 @@ const tabCounts = computed(() => {
 .ai-reason-badge i {
     flex-shrink: 0;
     margin-top: 0.1rem;
+}
+
+.ai-recipe-wrapper {
+    cursor: default;
+}
+
+.ai-badge-icon {
+    color: var(--orange);
+    font-size: 1.1rem;
 }
 </style>
