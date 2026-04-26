@@ -51,6 +51,7 @@
       "form": {
         "name": "Recept neve",
         "namePlaceholder": "Pl. Palacsinta",
+        "image":"Recept képe",
         "description": "Recept leírása",
         "descriptionPlaceholder": "Rövid leírás",
         "prepTime": "Elkészítési idő (perc)",
