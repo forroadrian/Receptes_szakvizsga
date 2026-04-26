@@ -26,7 +26,9 @@
       "rateLimit": "Too many requests at once. Please wait a minute and try again!",
       "reasonLabel": "Why we recommend it?",
       "badge": "AI pick",
-      "saveAsRecipe": "Save as my recipe"
+      "saveAsRecipe": "Save as my recipe",
+      "filtersInfo": "Recommendations are based on your active filters.",
+      "filtersInfoNoFilter": "No active filters – recommendations are general."
     },
     "addRecipeModal": {
       "title": "Create new recipe",

@@ -24,7 +24,9 @@
       "rateLimit": "Túl sok kérés érkezett egyszerre. Várj egy percet, majd próbáld újra!",
       "reasonLabel": "Miért ajánljuk?",
       "badge": "AI ajánlás",
-      "saveAsRecipe": "Mentés receptként"
+      "saveAsRecipe": "Mentés receptként",
+      "filtersInfo": "Az ajánlások a beállított szűrőid alapján készülnek.",
+      "filtersInfoNoFilter": "Nincs aktív szűrő – az ajánlások általánosak."
     },
     "addRecipeModal": {
       "title": "Recept hozzáadása",

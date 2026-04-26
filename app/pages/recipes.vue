@@ -212,6 +212,37 @@ watch(() => [
     }
 });
 
+const activeAiFilterSummary = computed(() => {
+    const parts: string[] = [];
+
+    if (filterStore.search) parts.push(`"${filterStore.search}"`);
+
+    if (filterStore.selectedMealId !== null) {
+        const meal = filterStore.mealOptions.find(m => m.id === filterStore.selectedMealId);
+        if (meal) parts.push(meal.name);
+    }
+
+    if (filterStore.selectedTypeId !== null) {
+        const typeOpt = filterStore.typeOptions.find(opt => opt.id === filterStore.selectedTypeId);
+        if (typeOpt) parts.push(typeOpt.name);
+    }
+
+    if (filterStore.selectedDurationId !== null) {
+        const durOpt = filterStore.durationCategories.find((d: any) => d.id === filterStore.selectedDurationId);
+        if (durOpt) parts.push(durOpt.name);
+    }
+
+    filterStore.selectedAllergyPills.forEach((p: any) => {
+        if (p.name) parts.push(p.name);
+    });
+
+    if (filterStore.respectDislikedIngredients && user.value) {
+        parts.push(t('recipe.sidebar.disliked.title'));
+    }
+
+    return parts;
+});
+
 const tabCounts = computed(() => {
     const all = recipeStore.getAllRecipes();
     const userId = user.value?.id ?? user.value?.sub;
@@ -288,6 +319,21 @@ const tabCounts = computed(() => {
                     </li>
                 </ul>
             </nav>
+
+            <Transition name="ai-banner">
+                <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai'" class="ai-filters-banner mt-3 mb-1">
+                    <div class="d-flex align-items-start flex-wrap gap-2">
+                        <i class="bi bi-stars ai-filters-banner-icon mt-1 flex-shrink-0"></i>
+                        <div class="flex-grow-1">
+                            <span class="ai-filters-banner-text">{{ $t('recipe.aiRecommendations.filtersInfo') }}</span>
+                            <div v-if="activeAiFilterSummary.length" class="d-flex flex-wrap gap-1 mt-2">
+                                <span v-for="f in activeAiFilterSummary" :key="f" class="ai-active-filter-badge">{{ f }}</span>
+                            </div>
+                            <span v-else class="ai-filters-no-filter d-block mt-1">{{ $t('recipe.aiRecommendations.filtersInfoNoFilter') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
 
             <div v-if="needsLoginForTab" class="text-center py-4">
                 <p class="fw-bold">{{ $t('common.auth.notLoggedIn') }}</p>
@@ -752,5 +798,57 @@ const tabCounts = computed(() => {
 .ai-badge-icon {
     color: var(--orange);
     font-size: 1.1rem;
+}
+
+/* AI Filters Info Banner */
+.ai-filters-banner {
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-left: 3px solid var(--orange);
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+}
+
+.ai-filters-banner-icon {
+    color: var(--orange);
+    font-size: 1rem;
+}
+
+.ai-filters-banner-text {
+    color: var(--bs-body-color);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.ai-filters-no-filter {
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+}
+
+.ai-active-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bs-tertiary-bg, #f1f3f5);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--bs-body-color);
+}
+
+
+
+/* Banner transition */
+.ai-banner-enter-active,
+.ai-banner-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ai-banner-enter-from,
+.ai-banner-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
 }
 </style>
