@@ -6,12 +6,14 @@ export class RecipeImageUploader {
     private _existingImageUrl = ref<string>("");
     private _uploading = ref(false);
     private _error = ref("");
+    private _wasRemoved = ref(false);
 
     get imageFile() { return this._imageFile; }
     get imagePreview() { return this._imagePreview; }
     get existingImageUrl() { return this._existingImageUrl; }
     get uploading() { return this._uploading; }
     get error() { return this._error; }
+    get wasRemoved() { return this._wasRemoved; }
 
     readonly displayImageUrl = computed(() => {
         if (this._imagePreview.value) return this._imagePreview.value;
@@ -25,6 +27,7 @@ export class RecipeImageUploader {
         this._existingImageUrl.value = url ?? "";
         this._imageFile.value = null;
         this._imagePreview.value = "";
+        this._wasRemoved.value = false;
     }
 
     selectFile(file: File | null) {
@@ -44,6 +47,7 @@ export class RecipeImageUploader {
         }
 
         this._imageFile.value = file;
+        this._wasRemoved.value = false;
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -53,10 +57,14 @@ export class RecipeImageUploader {
     }
 
     removeImage() {
+        const hadExisting = !!this._existingImageUrl.value;
         this._imageFile.value = null;
         this._imagePreview.value = "";
         this._existingImageUrl.value = "";
         this._error.value = "";
+        if (hadExisting) {
+            this._wasRemoved.value = true;
+        }
     }
 
     async upload(recipeId: number): Promise<string | null> {
@@ -77,6 +85,7 @@ export class RecipeImageUploader {
             this._existingImageUrl.value = imageUrl;
             this._imageFile.value = null;
             this._imagePreview.value = "";
+            this._wasRemoved.value = false;
 
             return imageUrl;
         } catch (err: any) {
@@ -87,12 +96,23 @@ export class RecipeImageUploader {
         }
     }
 
+    async deleteImage(recipeId: number): Promise<boolean> {
+        try {
+            await $fetch(`/api/recipe-image/${recipeId}`, { method: "DELETE" });
+            this._wasRemoved.value = false;
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     reset() {
         this._imageFile.value = null;
         this._imagePreview.value = "";
         this._existingImageUrl.value = "";
         this._uploading.value = false;
         this._error.value = "";
+        this._wasRemoved.value = false;
     }
 }
 

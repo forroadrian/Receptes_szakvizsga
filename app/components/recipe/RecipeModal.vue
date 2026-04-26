@@ -107,7 +107,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                         <div v-for="(step, index) in steps"
                                             class="step-btn text-start position-relative"
                                             :class="{ active: currentStep === step.id }" @click="goToStep(step.id)">
-                                            <span class="step-index">{{ step.id }}</span>
+                                            <span class="step-index yellow">{{ step.id }}</span>
 
                                             <span class="step-text">
                                                 <span class="fw-semibold d-block">{{ step.title }}</span>

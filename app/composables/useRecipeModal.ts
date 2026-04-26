@@ -43,6 +43,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const errorMessage = ref("");
     const needsReload = ref(false);
     const closeButton = ref<HTMLButtonElement | null>(null);
+
     const imageUploader = new RecipeImageUploader();
 
     const isEditMode = computed(() => editingRecipeId.value !== null);
@@ -107,19 +108,8 @@ export const useRecipeModal = defineStore("recipeModal", () => {
             instructions: [...recipeItem.steps]
         };
 
-        loadRecipeImage(recipeItem.id);
-    }
-
-    async function loadRecipeImage(recipeId: number) {
-        try {
-            const { imageUrl } = await $fetch<{ imageUrl: string | null }>(
-                `/api/recipe-image/${recipeId}`
-            );
-            if (imageUrl) {
-                imageUploader.setExistingImage(imageUrl);
-            }
-        } catch {
-            alert("Nem sikerült betölteni a képet.");
+        if (recipeItem.image_url) {
+            imageUploader.setExistingImage(recipeItem.image_url);
         }
     }
 
@@ -322,6 +312,12 @@ export const useRecipeModal = defineStore("recipeModal", () => {
                     if (storeRecipe) {
                         storeRecipe.image_url = uploadedUrl;
                     }
+                }
+            } else if (targetRecipeId && imageUploader.wasRemoved.value && !imageUploader.imageFile.value) {
+                await imageUploader.deleteImage(targetRecipeId);
+                const storeRecipe = recipeStore.getAllRecipes().find(r => r.id === targetRecipeId);
+                if (storeRecipe) {
+                    storeRecipe.image_url = null;
                 }
             }
 

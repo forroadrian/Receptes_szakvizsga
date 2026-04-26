@@ -68,15 +68,11 @@
     font-weight: 700;
 }
 
-.step-index {
-    border: 1px solid var(--bs-border-color);
-    background: var(--bs-tertiary-bg);
-}
+
 
 .step-btn.active .step-index {
-    background: var(--accent-grad);
-    border-color: transparent;
-    box-shadow: 0 10px 20px rgba(193, 154, 107, 0.28);
+    background: var(--grad-orange);
+    color: var(--text-light);
 }
 
 .step-text {
