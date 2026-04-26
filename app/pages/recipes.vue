@@ -4,6 +4,7 @@ import Button from "~/components/Button.vue";
 import FormInput from "~/components/FormInput.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
+import { useRecipeModal } from "~/composables/useRecipeModal";
 import Pills from "~/components/Pills.vue";
 
 const route = useRoute();
@@ -12,6 +13,7 @@ const { locale } = useI18n();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
+const recipeModal = useRecipeModal();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const { getRecipeImage } = useRecipeImage();
@@ -112,6 +114,10 @@ watch(() => filterStore.filteredRecipes, () => {
 
 const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
+};
+
+const handleAddRecipeClick = () => {
+    recipeModal.resetForm();
 };
 
 const triggerAiRecommendations = (force = false) => {
@@ -241,7 +247,8 @@ const tabCounts = computed(() => {
                     <template v-else>{{ $t('recipe.filter.notFound') }}</template>
                 </p>
                 <Button v-if="user && filterStore.activeTab !== 'ai'" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
-                :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
+                :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
+                @click="handleAddRecipeClick">
                 {{ $t('recipe.filter.add') }}
                 </Button>
                 <button v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded" class="ai-refresh-btn mt-2" @click="triggerAiRecommendations(true)">
@@ -251,7 +258,8 @@ const tabCounts = computed(() => {
 
             <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
                 <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
-                    :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
+                    :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
+                    @click="handleAddRecipeClick">
                     <div class="row text-center py-3">
                         <span class="plus-icon">+</span>
                         <p>{{ $t('recipe.addRecipeModal.title') }}</p>
@@ -420,14 +428,14 @@ const tabCounts = computed(() => {
 
 .card-media {
     height: 180px;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-media img {
-    max-width: 80%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 

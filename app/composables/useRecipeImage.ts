@@ -1,5 +1,8 @@
 type CategoryLike = { name?: string | null; group_type?: string | null }
-type RecipeLike = { categories?: CategoryLike[] | null }
+type RecipeLike = {
+    categories?: CategoryLike[] | null;
+    image_url?: string | null;
+}
 
 const CATEGORY_IMAGE_MAP: Record<string, string> = {
     'Desszert': '/images/clock-plate.png',
@@ -34,6 +37,10 @@ const pickCategoryImage = (categories: CategoryLike[]): string => {
 
 export const useRecipeImage = () => {
     const getRecipeImage = (recipe: RecipeLike | null | undefined): string => {
+        if (recipe?.image_url && recipe.image_url.trim() !== '') {
+            return recipe.image_url
+        }
+
         const categories = recipe?.categories ?? []
         if (!categories.length) return DEFAULT_RECIPE_IMAGE
         return pickCategoryImage(categories)

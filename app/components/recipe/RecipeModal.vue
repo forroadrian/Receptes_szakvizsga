@@ -119,6 +119,10 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                     </div>
 
                                     <div class="recipe-card recipe-summary-card mt-4">
+                                        <div v-if="recipeModal.imageUploader.displayImageUrl" class="summary-image mb-3 text-center">
+                                            <img :src="recipeModal.imageUploader.displayImageUrl" alt="Recept kép" class= "w-25" />
+                                        </div>
+
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.name') }}</span>
                                             <strong>{{ recipeModal.recipe.name || $t('recipe.addRecipeModal.summary.empty') }}</strong>
@@ -146,6 +150,18 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                 <div class="recipe-content">
                                     <div v-if="currentStep === 1" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div>
+                                            <label class="form-label">{{ $t('recipe.addRecipeModal.form.image') ?? 'Recept kép' }}</label>
+                                            <div v-if="recipeModal.imageUploader.displayImageUrl" class="recipe-image-preview mb-2 text-center">
+                                                <img :src="recipeModal.imageUploader.displayImageUrl" alt="Recept kép" class="recipe-image w-50 mb-3" />
+
+                                                <Button type="button" icon="bi bi-x-lg" color="orange" class="recipe-image-delete w-100"
+                                                    @click="recipeModal.removeImage" :title="$t('common.actions.delete') ?? 'Törlés'"> Aktuális receptkép törlése
+                                                </Button>
+                                            </div>
+                                            <input v-else type="file"  accept="image/*" class="form-control" @change="recipeModal.onImageSelected">
+                                            <small v-if="recipeModal.imageUploader.error" class="text-danger">{{ recipeModal.imageUploader.error }}</small>
+                                        </div>
+                                        <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.name') }}</label>
                                             <input v-model="recipeModal.recipe.name" type="text" class="form-control"
                                                 :placeholder="$t('recipe.addRecipeModal.form.namePlaceholder')">
@@ -166,17 +182,6 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.servings') }}</label>
                                                 <input v-model="recipeModal.recipe.servings" type="number" min="1" class="form-control">
                                             </div>
-                                        </div>
-
-                                        <div class="visibility-toggle" :class="{ public: recipeModal.recipe.isPublic }">
-                                            <div class="visibility-icon">
-                                                <i :class="recipeModal.recipe.isPublic ? 'bi bi-globe2' : 'bi bi-lock'"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <p class="fw-semibold mb-0">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.public') : $t('recipe.addRecipeModal.form.private') }}</p>
-                                                <small class="text-secondary">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.publicDesc') : $t('recipe.addRecipeModal.form.privateDesc') }}</small>
-                                            </div>
-                                            <AppSwitch v-model="recipeModal.recipe.isPublic" />
                                         </div>
                                     </div>
 
@@ -200,6 +205,16 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                     {{ $t('categories.' + tag.id) }}
                                                 </Button>
                                             </div>
+                                        </div>
+                                         <div class="visibility-toggle mt-5 " :class="{ public: recipeModal.recipe.isPublic }">
+                                            <div class="visibility-icon">
+                                                <i :class="recipeModal.recipe.isPublic ? 'bi bi-globe2' : 'bi bi-lock'"></i>
+                                            </div>
+                                            <div class="pb-3">
+                                                <p class="fw-semibold mb-0">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.public') : $t('recipe.addRecipeModal.form.private') }}</p>
+                                                <small class="text-secondary">{{ recipeModal.recipe.isPublic ? $t('recipe.addRecipeModal.form.publicDesc') : $t('recipe.addRecipeModal.form.privateDesc') }}</small>
+                                            </div>
+                                            <AppSwitch v-model="recipeModal.recipe.isPublic" />
                                         </div>
                                     </div>
 
@@ -320,8 +335,8 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                         {{ $t('recipe.addRecipeModal.footer.next') }}
                     </Button>
 
-                    <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving" @click="recipeModal.saveRecipe">
-                        {{ recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.edit') : $t('recipe.addRecipeModal.footer.create')) }}
+                    <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving || recipeModal.imageUploader.uploading" @click="recipeModal.saveRecipe">
+                        {{ recipeModal.imageUploader.uploading ? ($t('recipe.addRecipeModal.footer.uploadingImage') ?? 'Kép feltöltése...') : recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.edit') : $t('recipe.addRecipeModal.footer.create')) }}
                     </Button>
                 </div>
             </div>

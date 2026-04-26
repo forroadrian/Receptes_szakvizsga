@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
 import { useIngredientStore } from "~/stores/ingredients";
+import { RecipeImageUploader } from "#imports"; 
 
 type RecipeIngredientFormItem = {
     ingredient_id: number;
@@ -42,6 +43,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const errorMessage = ref("");
     const needsReload = ref(false);
     const closeButton = ref<HTMLButtonElement | null>(null);
+    const imageUploader = new RecipeImageUploader();
 
     const isEditMode = computed(() => editingRecipeId.value !== null);
 
@@ -84,6 +86,8 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     }
 
     function openEditRecipe(recipeItem: RecipeItem) {
+        resetForm();
+
         editingRecipeId.value = recipeItem.id;
         const mealCategory = recipeItem.categories.find(c => c.group_type === "meal");
         recipe.value = {
@@ -102,6 +106,21 @@ export const useRecipeModal = defineStore("recipeModal", () => {
             })),
             instructions: [...recipeItem.steps]
         };
+
+        loadRecipeImage(recipeItem.id);
+    }
+
+    async function loadRecipeImage(recipeId: number) {
+        try {
+            const { imageUrl } = await $fetch<{ imageUrl: string | null }>(
+                `/api/recipe-image/${recipeId}`
+            );
+            if (imageUrl) {
+                imageUploader.setExistingImage(imageUrl);
+            }
+        } catch {
+            alert("Nem sikerült betölteni a képet.");
+        }
     }
 
     function resetIngredientFields() {
@@ -233,6 +252,17 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         return ids;
     }
 
+    function onImageSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0] ?? null;
+        imageUploader.selectFile(file);
+        if (input) input.value = "";
+    }
+
+    function removeImage() {
+        imageUploader.removeImage();
+    }
+
     function resetForm() {
         recipe.value = createInitialRecipeState();
         editingRecipeId.value = null;
@@ -240,6 +270,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         editingInstructionIndex.value = null;
         resetIngredientFields();
         errorMessage.value = "";
+        imageUploader.reset();
     }
 
     async function saveRecipe() {
@@ -262,11 +293,13 @@ export const useRecipeModal = defineStore("recipeModal", () => {
 
         try {
             const wasEdit = isEditMode.value;
+            let targetRecipeId: number = 0;
 
             if (wasEdit) {
-                await $fetch(`/api/recipe/${editingRecipeId.value}`, { method: "PUT", body: payload });
+                targetRecipeId = editingRecipeId.value!;
+                await $fetch(`/api/recipe/${targetRecipeId}`, { method: "PUT", body: payload });
 
-                const existing = recipeStore.getAllRecipes().find(r => r.id === editingRecipeId.value);
+                const existing = recipeStore.getAllRecipes().find(r => r.id === targetRecipeId);
                 if (existing) {
                     existing.name = payload.name;
                     existing.description = payload.description;
@@ -275,7 +308,21 @@ export const useRecipeModal = defineStore("recipeModal", () => {
                     existing.public = payload.is_public ?? false;
                 }
             } else {
-                await recipeStore.createRecipe(payload);
+                const created = await $fetch<{ id: number }>("/api/recipe", {
+                    method: "POST",
+                    body: payload,
+                });
+                targetRecipeId = created?.id ?? 0;
+            }
+
+            if (targetRecipeId && imageUploader.imageFile.value) {
+                const uploadedUrl = await imageUploader.upload(targetRecipeId);
+                if (uploadedUrl) {
+                    const storeRecipe = recipeStore.getAllRecipes().find(r => r.id === targetRecipeId);
+                    if (storeRecipe) {
+                        storeRecipe.image_url = uploadedUrl;
+                    }
+                }
             }
 
             needsReload.value = true;
@@ -307,10 +354,12 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         isSaving, errorMessage, closeButton,
         mealTypes, tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient, canSubmit,
+        imageUploader,
         init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
         addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,
         addOrUpdateInstruction, editInstruction, cancelInstructionEdit, removeInstruction,
-        moveInstructionUp, moveInstructionDown, toggleTag
+        moveInstructionUp, moveInstructionDown, toggleTag,
+        onImageSelected, removeImage
     };
 });
