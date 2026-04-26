@@ -2,7 +2,7 @@ import { computed, onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
 import { useIngredientStore } from "~/stores/ingredients";
-import { RecipeImageUploader } from "#imports"; 
+import { useRecipeImageUpload } from "#imports";
 
 type RecipeIngredientFormItem = {
     ingredient_id: number;
@@ -44,7 +44,19 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const needsReload = ref(false);
     const closeButton = ref<HTMLButtonElement | null>(null);
 
-    const imageUploader = new RecipeImageUploader();
+    const imageErrorMessage = ref("");
+    const imageUploading = ref(false);
+    const imageUrl = ref("");
+
+    const {
+        imageFile, imagePreview, wasRemoved, displayImageUrl, hasImage,
+        setExistingImage, selectFile, removeImage: removeRecipeImage,
+        uploadImage, deleteImage, resetImage
+    } = useRecipeImageUpload({
+        errorMessage: imageErrorMessage,
+        loading: imageUploading,
+        imageUrl
+    });
 
     const isEditMode = computed(() => editingRecipeId.value !== null);
 
@@ -109,7 +121,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         };
 
         if (recipeItem.image_url) {
-            imageUploader.setExistingImage(recipeItem.image_url);
+            setExistingImage(recipeItem.image_url);
         }
     }
 
@@ -245,12 +257,12 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     function onImageSelected(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0] ?? null;
-        imageUploader.selectFile(file);
+        selectFile(file);
         if (input) input.value = "";
     }
 
     function removeImage() {
-        imageUploader.removeImage();
+        removeRecipeImage();
     }
 
     function resetForm() {
@@ -260,7 +272,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         editingInstructionIndex.value = null;
         resetIngredientFields();
         errorMessage.value = "";
-        imageUploader.reset();
+        resetImage();
     }
 
     async function saveRecipe() {
@@ -305,16 +317,16 @@ export const useRecipeModal = defineStore("recipeModal", () => {
                 targetRecipeId = created?.id ?? 0;
             }
 
-            if (targetRecipeId && imageUploader.imageFile.value) {
-                const uploadedUrl = await imageUploader.upload(targetRecipeId);
+            if (targetRecipeId && imageFile.value) {
+                const uploadedUrl = await uploadImage(targetRecipeId);
                 if (uploadedUrl) {
                     const storeRecipe = recipeStore.getAllRecipes().find(r => r.id === targetRecipeId);
                     if (storeRecipe) {
                         storeRecipe.image_url = uploadedUrl;
                     }
                 }
-            } else if (targetRecipeId && imageUploader.wasRemoved.value && !imageUploader.imageFile.value) {
-                await imageUploader.deleteImage(targetRecipeId);
+            } else if (targetRecipeId && wasRemoved.value && !imageFile.value) {
+                await deleteImage(targetRecipeId);
                 const storeRecipe = recipeStore.getAllRecipes().find(r => r.id === targetRecipeId);
                 if (storeRecipe) {
                     storeRecipe.image_url = null;
@@ -350,7 +362,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         isSaving, errorMessage, closeButton,
         mealTypes, tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient, canSubmit,
-        imageUploader,
+        displayImageUrl, imageErrorMessage, imageUploading,
         init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
         addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,

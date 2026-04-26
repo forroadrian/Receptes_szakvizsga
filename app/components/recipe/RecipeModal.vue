@@ -119,8 +119,8 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                     </div>
 
                                     <div class="recipe-card recipe-summary-card mt-4">
-                                        <div v-if="recipeModal.imageUploader.displayImageUrl" class="summary-image mb-3 text-center">
-                                            <img :src="recipeModal.imageUploader.displayImageUrl" alt="Recept kép" class= "w-25" />
+                                        <div v-if="recipeModal.displayImageUrl" class="summary-image mb-3 text-center">
+                                            <img :src="recipeModal.displayImageUrl" alt="Recept kép" class= "w-25" />
                                         </div>
 
                                         <div class="summary-row">
@@ -151,15 +151,15 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                     <div v-if="currentStep === 1" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.image') ?? 'Recept kép' }}</label>
-                                            <div v-if="recipeModal.imageUploader.displayImageUrl" class="recipe-image-preview mb-2 text-center">
-                                                <img :src="recipeModal.imageUploader.displayImageUrl" alt="Recept kép" class="recipe-image w-50 mb-3" />
+                                            <div v-if="recipeModal.displayImageUrl" class="recipe-image-preview mb-2 text-center">
+                                                <img :src="recipeModal.displayImageUrl" alt="Recept kép" class="recipe-image w-50 mb-3" />
 
                                                 <Button type="button" icon="bi bi-x-lg" color="orange" class="recipe-image-delete w-100"
                                                     @click="recipeModal.removeImage" :title="$t('common.actions.delete') ?? 'Törlés'"> {{$t('recipe.addRecipeModal.form.imageDelete')}}
                                                 </Button>
                                             </div>
                                             <input v-else type="file"  accept="image/*" class="form-control" @change="recipeModal.onImageSelected">
-                                            <small v-if="recipeModal.imageUploader.error" class="text-danger">{{ recipeModal.imageUploader.error }}</small>
+                                            <small v-if="recipeModal.errorMessage" class="text-danger">{{ recipeModal.errorMessage }}</small>
                                         </div>
                                         <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.name') }}</label>
@@ -335,8 +335,8 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                         {{ $t('recipe.addRecipeModal.footer.next') }}
                     </Button>
 
-                    <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving || recipeModal.imageUploader.uploading" @click="recipeModal.saveRecipe">
-                        {{ recipeModal.imageUploader.uploading ? ($t('recipe.addRecipeModal.footer.uploadingImage') ?? 'Kép feltöltése...') : recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.edit') : $t('recipe.addRecipeModal.footer.create')) }}
+                    <Button v-else type="button" color="green" :disabled="!recipeModal.canSubmit || recipeModal.isSaving || recipeModal.imageUploading" @click="recipeModal.saveRecipe">
+                        {{ recipeModal.imageUploading ? ($t('recipe.addRecipeModal.footer.uploadingImage') ?? 'Kép feltöltése...') : recipeModal.isSaving ? $t('recipe.addRecipeModal.footer.saving') : (recipeModal.isEditMode ? $t('recipe.addRecipeModal.footer.edit') : $t('recipe.addRecipeModal.footer.create')) }}
                     </Button>
                 </div>
             </div>
