@@ -1,7 +1,7 @@
 {
   "recipe": {
     "title": "Receptek",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "subtitle": "Keress és szűrj ízlésed szerint, hogy megtaláld a számodra legmegfelelőbb ételeket!",
     "searchBar": {
       "placeholder": "Keresés - pl: Brownie",
       "active": "Allergének keresése..."
@@ -53,6 +53,7 @@
         "name": "Recept neve",
         "namePlaceholder": "Pl. Palacsinta",
         "image":"Recept képe",
+        "imageDelete" : "Receptkép törlése",
         "description": "Recept leírása",
         "descriptionPlaceholder": "Rövid leírás",
         "prepTime": "Elkészítési idő (perc)",

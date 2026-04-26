@@ -155,7 +155,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <img :src="recipeModal.imageUploader.displayImageUrl" alt="Recept kép" class="recipe-image w-50 mb-3" />
 
                                                 <Button type="button" icon="bi bi-x-lg" color="orange" class="recipe-image-delete w-100"
-                                                    @click="recipeModal.removeImage" :title="$t('common.actions.delete') ?? 'Törlés'"> Aktuális receptkép törlése
+                                                    @click="recipeModal.removeImage" :title="$t('common.actions.delete') ?? 'Törlés'"> {{$t('recipe.addRecipeModal.form.imageDelete')}}
                                                 </Button>
                                             </div>
                                             <input v-else type="file"  accept="image/*" class="form-control" @change="recipeModal.onImageSelected">

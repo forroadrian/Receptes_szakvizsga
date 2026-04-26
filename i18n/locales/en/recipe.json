@@ -1,7 +1,7 @@
 {
   "recipe": {
     "title": "Recipes",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "subtitle": "Search and filter by your taste to find the meals that suit you best!",
     "searchBar": {
       "placeholder": "E.g Brownie",
       "active": "Searching for allergen...",
@@ -55,6 +55,7 @@
         "name": "Recipe name",
         "namePlaceholder": "E.g. Pancake",
         "image":"Recipe image",
+        "imageDelete" : "Delete recipe image",
         "description": "Recipe description",
         "descriptionPlaceholder": "Short description",
         "prepTime": "Preparation time (minutes)",
