@@ -30,6 +30,6 @@ logs
 *.md
 .claude
 *.sql
-.playwright*
-/playwright-report/
-/test-results/
+
+# Vitest
+coverage/
