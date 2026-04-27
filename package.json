@@ -8,7 +8,10 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "gen:supabase": "supabase gen types typescript --project-id dlgyajctuldutapmkezz > app/types/database.types.ts"
+    "gen:supabase": "supabase gen types typescript --project-id dlgyajctuldutapmkezz > app/types/database.types.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
@@ -30,9 +33,11 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.2",
-    "@playwright/test": "^1.59.1",
+    "@nuxt/test-utils": "^4.0.2",
+    "@vue/test-utils": "^2.4.8",
+    "happy-dom": "^20.9.0",
     "nuxt-vitalizer": "^2.0.0",
-    "supabase": "^2.83.0"
+    "supabase": "^2.83.0",
+    "vitest": "^4.1.5"
   }
 }
