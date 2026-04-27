@@ -62,7 +62,11 @@ Rules:
 - Each ingredient name MUST be from the available ingredients catalog (use the EXACT spelling)
 - Skip recipes that need ingredients NOT in the catalog
 - Provide 4-8 ingredients and 4-7 instruction steps per recipe
-- The reason should mention pantry use, the active filter, or the dish appeal
+- The "reason" field MUST be unique for every recipe — never use the same sentence structure twice
+- Each reason must highlight something genuinely specific to THAT dish: its cultural origin, a distinctive flavour, a key technique, a seasonal angle, a texture contrast, why it suits the pantry, a health benefit, a comfort or occasion angle — pick a DIFFERENT angle for each recipe
+- Keep it to 1 punchy sentence, no filler words
+- Do NOT use phrases like "gyorsan elkészíthető", "klasszikus fogás", "könnyen elkészíthetünk", "üresjáratban" — these are banned
+- Good reason examples: "A hosszú párolás alatt a hús magába szívja a fűszerek aromáját — igazi mélységes ízvilág.", "A citrom és fokhagyma kombinációja frissességet ad ennek a mediterrán klasszikusnak.", "Vietnámi street food kedvenc: a rizstészta és friss fűszernövények könnyűvé teszik a tálat.", "A karamellizált hagyma édes mélységet ad a húslevesnek — tökéletes hideg estékre."
 
 ACTIVE FILTERS / CONSTRAINTS:
 ${constraints.length ? constraints.join('\n') : '- none (free choice)'}
@@ -80,7 +84,7 @@ Available ingredients catalog (use EXACT names only): ${availableIngredients.joi
             'Content-Type': 'application/json'
         },
         body: {
-            model: 'llama-3.1-8b-instant',
+            model: 'llama-3.3-70b-versatile',
             messages: [
                 { role: 'system', content: systemPrompt },
                 {
