@@ -276,6 +276,13 @@ watch(() => [
     }
 });
 
+// If language changes while on the AI tab, translate existing recipes instead of regenerating
+watch(locale, () => {
+    if (filterStore.activeTab === 'ai' && filterStore.aiRecommendedRecipes.length) {
+        filterStore.translateAiRecipes(locale.value);
+    }
+});
+
 const tabCounts = computed(() => {
     const all = recipeStore.getAllRecipes();
     const userId = user.value?.id ?? user.value?.sub;

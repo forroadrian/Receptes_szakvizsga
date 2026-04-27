@@ -271,6 +271,30 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         }
     };
 
+    const translateAiRecipes = async (targetLanguage: string) => {
+        if (!aiRecommendedRecipes.value.length) return;
+        try {
+            const toTranslate = aiRecommendedRecipes.value.map(r => ({
+                id: r.id,
+                name: r.name,
+                description: r.description,
+                reason: r.reason,
+                instructions: r.instructions
+            }));
+            const result = await $fetch<any[]>('/api/recipe/ai-translate', {
+                method: 'POST',
+                body: { recipes: toTranslate, language: targetLanguage }
+            });
+            aiRecommendedRecipes.value = aiRecommendedRecipes.value.map(r => {
+                const translated = result.find((t: any) => t.id === r.id);
+                if (!translated) return r;
+                return { ...r, name: translated.name, description: translated.description, reason: translated.reason, instructions: translated.instructions };
+            });
+        } catch (err) {
+            console.error('AI translation failed:', err);
+        }
+    };
+
     const getAiReason = (recipeId: string | number): string => {
         return aiRecommendedRecipes.value.find(r => r.id === String(recipeId))?.reason ?? '';
     };
@@ -314,6 +338,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         savedRecipeIds, triedRecipeIds,
         loadUserRecipeIds, toggleSaved, toggleTried,
         aiRecommendedRecipes, aiLoading, aiLoaded, aiError,
-        loadAiRecommendations, getAiReason, getAiRecipe
+        loadAiRecommendations, translateAiRecipes, getAiReason, getAiRecipe
     };
 });
