@@ -16,20 +16,13 @@ export const useSearch = <T extends object>(params: Ref<SearchParams<T>>) => {
                 if (params.value.filter) return params.value.filter(value);
                 const func = funcMap[value] ?? funcMap["default"]
                 if(typeof(params.value.query) === "string"){
-                    console.log("a");
                     return value.toLowerCase().includes(params.value.query.toLowerCase());
                 }
                 else if(typeof(params.value.query) === "object") {
-                    console.log("b");
-                    for (const s of params.value.query) {
-                        if(typeof(s) !== "string"){
-                            console.log("not a string");
-                            continue;
-                        }
-
-                        console.log(value, s);
+                    return (params.value.query as string[]).some((s) => {
+                        if(typeof(s) !== "string") return false;
                         return value.toLowerCase().includes(s.toLowerCase());
-                    }
+                    });
                 }
                 return false;
             });

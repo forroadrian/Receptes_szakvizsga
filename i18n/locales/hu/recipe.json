@@ -3,8 +3,13 @@
     "title": "Receptek",
     "subtitle": "Keress és szűrj ízlésed szerint, hogy megtaláld a számodra legmegfelelőbb ételeket!",
     "searchBar": {
-      "placeholder": "Keresés - pl: Brownie",
-      "active": "Allergének keresése..."
+      "placeholder": "Keresés... (Pl. Brownie)",
+      "active": "Allergének keresése...",
+      "byName": "Recept név alapján",
+      "byIngredient": "Hozzávaló alapján",
+      "ingredientPlaceholder": "Keresés... (Pl. Paradicsom)",
+      "availableIngredients": "Elérhető hozzávalók",
+      "selectedIngredients": "Kiválasztott hozzávaló"
     },
     "filter": {
       "title": "Szűrők",

@@ -3,10 +3,14 @@
     "title": "Recipes",
     "subtitle": "Search and filter by your taste to find the meals that suit you best!",
     "searchBar": {
-      "placeholder": "E.g Brownie",
+      "placeholder": "Search... (E.G Brownie)",
       "active": "Searching for allergen...",
-      "byName": "Recipe name",
-      "byIngredient": "Ingredient"
+      "byName": " By recipe name",
+      "byIngredient": "By ingredient",
+      "ingredientPlaceholder": "Search (E.G Tomato)...",
+      "availableIngredients": "Available ingredients",
+      "selectedIngredients": "Selected ingredients"
+
     },
     "filter": {
       "title": "Filter",

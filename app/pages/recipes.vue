@@ -7,6 +7,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 import { useIngredientStore } from "~/stores/ingredients";
 import Pills from "~/components/Pills.vue";
+import type Pill from "~/interfaces/Pill";
 
 const route = useRoute();
 const router = useRouter();
@@ -22,6 +23,69 @@ const { getRecipeImage } = useRecipeImage();
 const isHydrated = ref(false);
 const INITIAL_RECIPE_COUNT = 10;
 const visibleRecipeCount = ref(INITIAL_RECIPE_COUNT);
+
+const searchMode = ref<'name' | 'ingredient'>('name');
+const selectedIngredientIds = ref<number[]>([]);
+const ingredientSearchText = ref('');
+
+const ingredientPills = computed(() => {
+    if (!ingredientSearchText.value) return [];
+    const all = ingredientStore.availableIngredients ?? [];
+    const selected = selectedIngredientIds.value;
+    const filtered = all.filter((ing: any) =>
+            ing.name.toLowerCase().includes(ingredientSearchText.value.toLowerCase())
+            && !selected.includes(ing.id)).slice(0, 10);
+    return filtered.map((ing: any) => ({
+        name: $t('ingredient.'+ ing.id),
+        identifier: ing.id
+    }));
+});
+
+const selectedIngredientPills = computed(() => {
+    const all = ingredientStore.availableIngredients ?? [];
+    return selectedIngredientIds.value
+        .map((id: number) => {
+            const ing = all.find((i: any) => i.id === id);
+            if (!ing) return null;
+            return { name: $t('ingredient.'+ ing.id), identifier: ing.id };
+        })
+        .filter(Boolean) as { name: string; identifier: number }[];
+});
+
+const recipesFilteredByIngredients = computed(() => {
+    const base = filterStore.filteredRecipes;
+    if (searchMode.value !== 'ingredient' || selectedIngredientIds.value.length === 0) {
+        return base;
+    }
+
+    const selectedNames = selectedIngredientIds.value.map((id: number) => {
+        const ing = (ingredientStore.availableIngredients ?? []).find((i: any) => i.id === id);
+        return ing ? ing.name.toLowerCase() : '';
+    }).filter(Boolean);
+
+    return base.filter((recipe: any) => {
+        const recipeIngredientNames = (recipe.ingredients ?? []).map((i: any) =>
+            (i.name ?? i._name ?? '').toLowerCase()
+        );
+        return selectedNames.some((name: string) =>
+            recipeIngredientNames.some((rName: string) => rName.includes(name))
+        );
+    });
+});
+
+const removeSelectedIngredient = (id: number) => {
+    selectedIngredientIds.value = selectedIngredientIds.value.filter((i: number) => i !== id);
+};
+
+watch(searchMode, (newMode) => {
+    if (newMode === 'name') {
+        selectedIngredientIds.value = [];
+        ingredientSearchText.value = '';
+    } else {
+        filterStore.search = '';
+    }
+    visibleRecipeCount.value = INITIAL_RECIPE_COUNT;
+});
 
 onMounted(async() => {
     isHydrated.value = true;
@@ -99,18 +163,18 @@ const needsLoginForTab = computed(() => {
 });
 
 const visibleRecipes = computed(() => {
-    return filterStore.filteredRecipes.slice(0, visibleRecipeCount.value);
+    return recipesFilteredByIngredients.value.slice(0, visibleRecipeCount.value);
 });
 
 const hasMoreRecipes = computed(() => {
-    return filterStore.filteredRecipes.length > visibleRecipeCount.value;
+    return recipesFilteredByIngredients.value.length > visibleRecipeCount.value;
 });
 
 const loadMoreRecipes = () => {
     visibleRecipeCount.value += INITIAL_RECIPE_COUNT;
 };
 
-watch(() => filterStore.filteredRecipes, () => {
+watch(() => recipesFilteredByIngredients.value, () => {
     visibleRecipeCount.value = INITIAL_RECIPE_COUNT;
 });
 
@@ -212,37 +276,6 @@ watch(() => [
     }
 });
 
-const activeAiFilterSummary = computed(() => {
-    const parts: string[] = [];
-
-    if (filterStore.search) parts.push(`"${filterStore.search}"`);
-
-    if (filterStore.selectedMealId !== null) {
-        const meal = filterStore.mealOptions.find(m => m.id === filterStore.selectedMealId);
-        if (meal) parts.push(meal.name);
-    }
-
-    if (filterStore.selectedTypeId !== null) {
-        const typeOpt = filterStore.typeOptions.find(opt => opt.id === filterStore.selectedTypeId);
-        if (typeOpt) parts.push(typeOpt.name);
-    }
-
-    if (filterStore.selectedDurationId !== null) {
-        const durOpt = filterStore.durationCategories.find((d: any) => d.id === filterStore.selectedDurationId);
-        if (durOpt) parts.push(durOpt.name);
-    }
-
-    filterStore.selectedAllergyPills.forEach((p: any) => {
-        if (p.name) parts.push(p.name);
-    });
-
-    if (filterStore.respectDislikedIngredients && user.value) {
-        parts.push(t('recipe.sidebar.disliked.title'));
-    }
-
-    return parts;
-});
-
 const tabCounts = computed(() => {
     const all = recipeStore.getAllRecipes();
     const userId = user.value?.id ?? user.value?.sub;
@@ -265,14 +298,27 @@ const tabCounts = computed(() => {
                 {{ $t('recipe.subtitle') }}
             </p>
 
-            <div class="row align-items-center justify-content-between">
+            <div class="row align-items-end justify-content-between">
                 <div class="col-lg-9 col-md-8 search-wrap my-3">
-                    <SearchBar v-model="filterStore.search" :placeholder="$t('recipe.searchBar.placeholder')"
-                        class="recipes-search w-100" />
+                    <div class="search-mode-toggle d-flex gap-2 mb-3">
+                        <div class="search-mode-btn" :class="{ active: searchMode === 'name' }" @click="searchMode = 'name'">
+                            <i class="bi bi-fonts me-1"></i>
+                            {{ $t('recipe.searchBar.byName') }}
+                        </div>
+                        <div class="search-mode-btn" :class="{ active: searchMode === 'ingredient' }" @click="searchMode = 'ingredient'">
+                            <i class="bi bi-egg me-1"></i>
+                            {{ $t('recipe.searchBar.byIngredient') }}
+                        </div>
+                    </div>
+                        <SearchBar  v-if="searchMode === 'name'" v-model="filterStore.search"
+                        :placeholder="$t('recipe.searchBar.placeholder')"  class="recipes-search w-100" />
+                    
+                    <div v-if="searchMode === 'ingredient'">
+                        <SearchBar v-model="ingredientSearchText" :placeholder="$t('recipe.searchBar.ingredientPlaceholder')"  class="recipes-search w-100"/>
+                    </div>
                 </div>
-
-                <div class="filter-button col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
-                    <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
+                <div class="filter-button col-lg-3 col-md-4 col-sm-6 mx-sm-auto">
+                    <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap mb-3" data-bs-toggle="offcanvas"
                         data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
                         {{ $t('recipe.filter.title') }}
                         <span v-if="isHydrated && activeFilterCount" class="filter-count d-inline-flex me-3">
@@ -280,7 +326,18 @@ const tabCounts = computed(() => {
                         </span>
                     </Button>
                 </div>
-            </div>
+                <div v-if="searchMode === 'ingredient'">
+                          <div v-if="selectedIngredientPills.length" class="mt-3">
+                            <p class="small text-muted mb-1">{{ $t('recipe.searchBar.selectedIngredients') }}</p>
+                            <Pills :pills="selectedIngredientPills" all-active removable icon="bi-x-circle" @remove="removeSelectedIngredient"/>
+                        </div>
+
+                        <div v-if="ingredientPills.length" class="mt-2 ingredient-pills-container">
+                            <p class="small text-muted mb-1">{{ $t('recipe.searchBar.availableIngredients')  }}</p>
+                            <Pills :pills="ingredientPills" interactive multi v-model="selectedIngredientIds" icon="bi-plus-circle"/>
+                        </div>
+                    </div>
+                </div>
 
             <nav class="recipes-tabs mt-3">
                 <ul class="row list-unstyled g-3 g-md-0 justify-content-lg-evenly pt-3">
@@ -320,21 +377,6 @@ const tabCounts = computed(() => {
                 </ul>
             </nav>
 
-            <Transition name="ai-banner">
-                <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai'" class="ai-filters-banner mt-3 mb-1">
-                    <div class="d-flex align-items-start flex-wrap gap-2">
-                        <i class="bi bi-stars ai-filters-banner-icon mt-1 flex-shrink-0"></i>
-                        <div class="flex-grow-1">
-                            <span class="ai-filters-banner-text">{{ $t('recipe.aiRecommendations.filtersInfo') }}</span>
-                            <div v-if="activeAiFilterSummary.length" class="d-flex flex-wrap gap-1 mt-2">
-                                <span v-for="f in activeAiFilterSummary" :key="f" class="ai-active-filter-badge">{{ f }}</span>
-                            </div>
-                            <span v-else class="ai-filters-no-filter d-block mt-1">{{ $t('recipe.aiRecommendations.filtersInfoNoFilter') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </Transition>
-
             <div v-if="needsLoginForTab" class="text-center py-4">
                 <p class="fw-bold">{{ $t('common.auth.notLoggedIn') }}</p>
                 <Button @click="navigateTo('/login')" color="orange" class="mx-auto" icon="bi bi-box-arrow-in-right"
@@ -357,7 +399,7 @@ const tabCounts = computed(() => {
                 </button>
             </div>
 
-            <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)" class="text-center py-5">
+            <div v-if="!needsLoginForTab && !recipesFilteredByIngredients.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)" class="text-center py-5">
                 <p class="mb-0 fw-bold py-3">
                     <template v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded">
                         <i v-if="filterStore.aiError === 'rate_limit'" class="bi bi-clock me-1"></i>
@@ -378,7 +420,7 @@ const tabCounts = computed(() => {
                 </button>
             </div>
 
-            <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
+            <div v-if="!needsLoginForTab && recipesFilteredByIngredients.length" class="row">
                 <div v-if="user && filterStore.activeTab !== 'ai'" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
                     @click="handleAddRecipeClick">
@@ -601,6 +643,25 @@ const tabCounts = computed(() => {
     height: 50px;
 }
 
+.search-mode-toggle {
+    border: 1.5px solid var(--bs-border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    width: fit-content;
+}
+
+.search-mode-btn {
+    background: var(--bs-body-bg);
+    color: var(--bs-secondary-color);
+    padding: 10px ;
+    font-size: var(--small-text);
+}
+
+.search-mode-btn.active, .search-mode-btn.active {
+    background: var(--bs-emphasis-color);
+    color: var(--bs-body-bg);
+}
+
 .card-media {
     height: 180px;
     display: flex;
@@ -678,7 +739,7 @@ const tabCounts = computed(() => {
 .addRecipe,
 .tab-btn,
 .offcanvas-filters .form-check-label,
-.offcanvas-filters .form-check-input[type="radio"] {
+.offcanvas-filters .form-check-input[type="radio"], .search-mode-btn  {
     cursor: pointer;
 }
 
@@ -702,7 +763,7 @@ const tabCounts = computed(() => {
 }
 
 .filter-title,
-.filter-count {
+.filter-count, .search-mode-btn.active {
     font-weight: 700;
 }
 .filter-count, .card-header{
