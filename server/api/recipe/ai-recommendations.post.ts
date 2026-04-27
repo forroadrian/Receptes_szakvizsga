@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         ? pantry.map((i: any) => `${i.name} (${i.quantity} ${i.unit})`).join(', ')
         : (language === 'hu' ? 'üres' : 'empty')
 
-    const systemPrompt = `You are a creative culinary assistant. Generate 5 diverse, real-world recipe ideas from your culinary knowledge (Hungarian and international cuisine) — NOT from any provided list. Be creative and varied.
+    const systemPrompt = `You are a culinary assistant. Recommend 5 well-known, established recipes from Hungarian and international cuisine — recipes that are widely recognized and can be found in cookbooks or popular cooking websites. Only suggest dishes that genuinely exist and are commonly made; do NOT invent or combine fictional recipes.
 
 Always respond in ${lang} with valid JSON only — no markdown, no extra text.
 
@@ -53,8 +53,9 @@ Response format (always a JSON object with a "recommendations" array of exactly 
 }
 
 Rules:
-- Generate exactly 5 DIFFERENT real recipes
+- Generate exactly 5 DIFFERENT recipes — each must be a well-known dish with a real name
 - Mix global cuisines (Italian, Asian, Mexican, French, etc.) and Hungarian classics
+- If you are not certain a recipe genuinely exists and is commonly made, do not include it
 - prepTime is in minutes (integer), servings is integer
 - mealType MUST be one of the available meal types (use the EXACT spelling)
 - Each tag MUST be from the available tags list (use the EXACT spelling)
@@ -90,7 +91,7 @@ Available ingredients catalog (use EXACT names only): ${availableIngredients.joi
                 }
             ],
             response_format: { type: 'json_object' },
-            temperature: 0.9,
+            temperature: 0.4,
             max_tokens: 4096
         }
     })
