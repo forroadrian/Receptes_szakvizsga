@@ -16,6 +16,28 @@ export default defineEventHandler(async (event) => {
 
     const lang = language === 'hu' ? 'Hungarian' : 'English'
 
+    // Randomly pick 5 distinct cuisine regions each request to force variety
+    const allCuisines = [
+        'Hungarian (e.g. töltött káposzta, halászlé, rakott krumpli, lángos, lecsó, pörkölt)',
+        'Italian (e.g. risotto, osso buco, saltimbocca, ribollita, caponata, arancini)',
+        'Japanese (e.g. tonkatsu, okonomiyaki, gyoza, yakitori, miso ramen)',
+        'Thai (e.g. green curry, massaman curry, pad see ew, som tum)',
+        'Indian (e.g. biryani, palak paneer, chana masala, dal makhani, samosa)',
+        'French (e.g. coq au vin, ratatouille, cassoulet, quiche lorraine, soupe à l\'oignon)',
+        'Mexican (e.g. enchiladas, pozole, mole, chiles rellenos, tamales)',
+        'Spanish (e.g. paella valenciana, gazpacho, patatas bravas, croquetas, tortilla española)',
+        'Greek (e.g. moussaka, spanakopita, kleftiko, gemista, souvlaki)',
+        'Middle Eastern (e.g. shakshuka, kofta, mansaf, musakhan, falafel)',
+        'Vietnamese (e.g. pho, bun bo hue, bánh mì filling, bun cha)',
+        'Korean (e.g. bibimbap, japchae, sundubu jjigae, galbi, doenjang jjigae)',
+        'American (e.g. jambalaya, gumbo, clam chowder, pulled pork, mac and cheese)',
+        'Eastern European (e.g. pierogi, borscht, sarmale, bigós, žemiaková polievka)',
+        'Moroccan (e.g. tagine, harira, bastilla, couscous tfaya)',
+        'Chinese (e.g. mapo tofu, kung pao chicken, hong shao rou, dan dan noodles)',
+    ]
+    const shuffled = allCuisines.sort(() => Math.random() - 0.5)
+    const selectedCuisines = shuffled.slice(0, 5)
+
     const constraints: string[] = []
     if (filters?.mealType) constraints.push(`- Meal type MUST be: ${filters.mealType}`)
     if (filters?.tags?.length) constraints.push(`- Each recipe MUST match these tags: ${filters.tags.join(', ')}`)
@@ -53,8 +75,9 @@ Response format (always a JSON object with a "recommendations" array of exactly 
 }
 
 Rules:
-- Generate exactly 5 DIFFERENT recipes — each must be a well-known dish with a real name
-- Mix global cuisines (Italian, Asian, Mexican, French, etc.) and Hungarian classics
+- Generate exactly 5 DIFFERENT recipes — each must be a genuinely existing, well-known dish with a real name that can be found in cookbooks or on popular cooking websites
+- Each recipe MUST come from a DIFFERENT cuisine from this session's rotation: ${selectedCuisines.join(' | ')}
+- NEVER suggest these overused defaults: Carbonara, Csirke paprikás, Gulyás, Bolognese, Margherita pizza, Chicken tikka masala, Pad Thai — unless explicitly required by filters
 - If you are not certain a recipe genuinely exists and is commonly made, do not include it
 - prepTime is in minutes (integer), servings is integer
 - mealType MUST be one of the available meal types (use the EXACT spelling)
@@ -90,12 +113,12 @@ Available ingredients catalog (use EXACT names only): ${availableIngredients.joi
                 {
                     role: 'user',
                     content: language === 'hu'
-                        ? 'Adj 5 kreatív receptötletet a megadott szűrők alapján!'
-                        : 'Give me 5 creative recipe ideas matching the constraints!'
+                        ? `Adj 5 receptötletet a megadott szűrők alapján! Seed: ${Math.random().toString(36).slice(2, 8)}`
+                        : `Give me 5 recipe ideas matching the constraints! Seed: ${Math.random().toString(36).slice(2, 8)}`
                 }
             ],
             response_format: { type: 'json_object' },
-            temperature: 0.4,
+            temperature: 0.65,
             max_tokens: 4096
         }
     })
