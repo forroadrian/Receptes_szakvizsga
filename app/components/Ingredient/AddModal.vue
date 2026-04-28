@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import ExpiryDate from "~/models/ExpiryDate";
 import IngredientModel from "~/models/Ingredient";
 import type Ingredient from "~/models/Ingredient";
+import type SearchParams from "~/interfaces/SearchParams";
 import { useIngredientStore } from "~/stores/ingredients";
 
 const store = useIngredientStore();
@@ -29,17 +30,25 @@ const missing = ref<{ name: string; appears: number }[]>([]);
 
 const isEdit = computed(() => mode.value === "edit");
 
-const filteredNames = computed(() => {
-    const q = name.value.trim().toLowerCase();
-    if (!q) return store.availableIngredients.slice(0, 10);
-    const results: { id: number; name: string }[] = [];
-    for (const item of store.availableIngredients) {
-        const localized = formatIngredient(item.id)
-        if (localized.toLowerCase().includes(q)) results.push(item);
-        if (results.length >= 10) break;
-    }
-    return results;
-});
+type LocalizedAvailable = { id: number; name: string; localizedName: string };
+
+const localizedAvailable = computed<LocalizedAvailable[]>(() =>
+    store.availableIngredients.map((i) => ({
+        id: i.id,
+        name: i.name,
+        localizedName: formatIngredient(i.id),
+    }))
+);
+
+const searchParams = computed<SearchParams<LocalizedAvailable>>(() => ({
+    haystack: localizedAvailable.value,
+    searchFor: ["localizedName"],
+    query: name.value.trim(),
+    showAllByDefault: true,
+}));
+
+const searchResults = useSearch(searchParams);
+const filteredNames = computed(() => searchResults.value.slice(0, 10));
 
 const canSubmit = computed(
     () =>
