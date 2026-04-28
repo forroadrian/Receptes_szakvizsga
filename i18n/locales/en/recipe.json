@@ -10,7 +10,6 @@
       "ingredientPlaceholder": "Search (E.G Tomato)...",
       "availableIngredients": "Available ingredients",
       "selectedIngredients": "Selected ingredients"
-
     },
     "filter": {
       "title": "Filter",
@@ -60,8 +59,8 @@
       "form": {
         "name": "Recipe name",
         "namePlaceholder": "E.g. Pancake",
-        "image":"Recipe image",
-        "imageDelete" : "Delete recipe image",
+        "image": "Recipe image",
+        "imageDelete": "Delete recipe image",
         "description": "Recipe description",
         "descriptionPlaceholder": "Short description",
         "prepTime": "Preparation time (minutes)",
@@ -94,6 +93,37 @@
         "create": "Create",
         "edit": "Save changes",
         "update": "Update"
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Enter the recipe name.",
+        "invalidChars": "Name can only contain letters, commas, and spaces.",
+        "tooLong": "Name must be at most {nameMax} characters."
+      },
+      "desc": {
+        "required": "Enter the recipe description.",
+        "invalidChars": "Description can only contain letters, numbers, and basic punctuation.",
+        "tooLong": "Description must be at most {descMax} characters."
+      },
+      "time": {
+        "notNumber": "Please enter a whole number.",
+        "range": "Prep time must be between {timeMin}–{timeMax} minutes."
+      },
+      "servings": {
+        "notNumber": "Please enter a whole number.",
+        "range": "Servings must be between {servingsMin}–{servingsMax}."
+      },
+      "ingredients": {
+        "tooFew": "At least {ingredientsMin} ingredients required."
+      },
+      "steps": {
+        "tooFew": "At least {stepsMin} steps required."
+      },
+      "step": {
+        "tooShort": "Minimum {stepMinChars} characters required.",
+        "tooLong": "Maximum {stepMaxChars} characters allowed.",
+        "needsLetter": "Step must contain at least one letter."
       }
     },
     "card": {

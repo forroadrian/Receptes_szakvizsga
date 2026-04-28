@@ -59,8 +59,8 @@
       "form": {
         "name": "Recept neve",
         "namePlaceholder": "Pl. Palacsinta",
-        "image":"Recept képe",
-        "imageDelete" : "Receptkép törlése",
+        "image": "Recept képe",
+        "imageDelete": "Receptkép törlése",
         "description": "Recept leírása",
         "descriptionPlaceholder": "Rövid leírás",
         "prepTime": "Elkészítési idő (perc)",
@@ -93,6 +93,37 @@
         "create": "Létrehozás",
         "edit": "Módosítás",
         "update": "Frissítés"
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Add meg a recept nevét.",
+        "invalidChars": "A név csak betűket, vesszőt és szóközt tartalmazhat.",
+        "tooLong": "A név maximum {nameMax} karakter lehet."
+      },
+      "desc": {
+        "required": "Add meg a recept leírását.",
+        "invalidChars": "A leírás csak betűket, számokat és alapvető írásjeleket tartalmazhat.",
+        "tooLong": "A leírás maximum {descMax} karakter lehet."
+      },
+      "time": {
+        "notNumber": "Csak egész számot adj meg.",
+        "range": "Az elkészítési idő {timeMin}–{timeMax} perc között legyen."
+      },
+      "servings": {
+        "notNumber": "Csak egész számot adj meg.",
+        "range": "Az adagok száma {servingsMin}–{servingsMax} fő között legyen."
+      },
+      "ingredients": {
+        "tooFew": "Legalább {ingredientsMin} alapanyag szükséges."
+      },
+      "steps": {
+        "tooFew": "Legalább {stepsMin} lépés szükséges."
+      },
+      "step": {
+        "tooShort": "Minimum {stepMinChars} karakter szükséges.",
+        "tooLong": "Maximum {stepMaxChars} karakter lehet.",
+        "needsLetter": "A lépésnek tartalmaznia kell betűt."
       }
     },
     "card": {

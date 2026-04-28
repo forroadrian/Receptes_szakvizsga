@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
 import { useIngredientStore } from "~/stores/ingredients";
 import { useRecipeImageUpload } from "#imports";
+import { useRecipeValidation, LIMITS } from "~/composables/useRecipeValidation";
 
 type RecipeIngredientFormItem = {
     ingredient_id: number;
@@ -80,13 +81,19 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const isEditingIngredient = computed(() => editingIngredientIndex.value !== null);
     const isEditingInstruction = computed(() => editingInstructionIndex.value !== null);
 
-    const canSubmit = computed(() =>
-        Boolean(user.value) &&
-        recipe.value.name.trim().length > 0 &&
-        recipe.value.description.trim().length > 0 &&
-        Number(recipe.value.prepTime) > 0 &&
-        Number(recipe.value.servings) > 0
-    );
+    const {
+        validateStepText, isStepValid,
+        nameLength, descLength, ingredientCount, stepCount,
+        nameEmpty, nameTooLong, nameBadChars, descEmpty, descTooLong, 
+        descBadChars, timeBad, servingsBad,
+        tooFewIngredients, tooManyIngredients, tooFewSteps, tooManySteps,
+        isFormValid, firstError 
+    } = useRecipeValidation(recipe);
+
+    const noMealType = computed(() => recipe.value.mealType === null);
+    const canSubmit = computed(() => Boolean(user.value) && isFormValid.value);
+    const canAddStep = computed(() => isStepValid(instructionInput.value));
+    const stepInputErr = computed(() => validateStepText(instructionInput.value));
 
     async function init() {
         await Promise.all([
@@ -148,6 +155,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     function addOrUpdateIngredient() {
         const selected = availableIngredients.value.find(i => i.id === selectedIngredientId.value);
         if (!selected) return;
+        if (editingIngredientIndex.value === null && tooManyIngredients.value) return;
 
         const item: RecipeIngredientFormItem = {
             ingredient_id: selected.id,
@@ -198,7 +206,8 @@ export const useRecipeModal = defineStore("recipeModal", () => {
 
     function addOrUpdateInstruction() {
         const instruction = instructionInput.value.trim();
-        if (!instruction) return;
+        if (!instruction || !isStepValid(instruction)) return;
+        if (editingInstructionIndex.value === null && tooManySteps.value) return;
         if (editingInstructionIndex.value !== null) {
             recipe.value.instructions[editingInstructionIndex.value] = instruction;
         } else {
@@ -277,8 +286,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
 
     async function saveRecipe() {
         errorMessage.value = "";
-        if (!user.value) { errorMessage.value = "A recept mentéséhez be kell jelentkezned."; return; }
-        if (!canSubmit.value) { errorMessage.value = "Töltsd ki a recept nevét, leírását, idejét és az adagok számát."; return; }
+        if (!user.value || firstError.value) return;
 
         isSaving.value = true;
 
@@ -336,6 +344,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
             needsReload.value = true;
             resetForm();
             closeButton.value?.click();
+            await recipeStore.loadRecipes();
             showAlert("success", wasEdit ? "A recept sikeresen frissítve lett." : "A recept sikeresen mentve lett.");
         } catch (error: any) {
             errorMessage.value = error?.data?.message ?? error?.message ?? "Nem sikerült menteni a receptet.";
@@ -361,8 +370,15 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         editingInstructionIndex, isEditingInstruction,
         isSaving, errorMessage, closeButton,
         mealTypes, tags, selectedMealType,
-        availableUnits, filteredIngredients, hasSelectedIngredient, canSubmit,
+        availableUnits, filteredIngredients, hasSelectedIngredient,
         displayImageUrl, imageErrorMessage, imageUploading,
+        nameLength, descLength, ingredientCount, stepCount,
+        nameEmpty, nameBadChars, nameTooLong,
+        descEmpty, descBadChars, descTooLong,
+        timeBad, servingsBad,
+        tooFewIngredients, tooManyIngredients, tooFewSteps, tooManySteps,
+        noMealType, firstError,
+        canSubmit, canAddStep, stepInputErr, LIMITS,
         init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
         addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,
