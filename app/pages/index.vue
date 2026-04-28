@@ -151,7 +151,7 @@ const thingsThatMakeUsStandOut = [
             <div class="row flex flex-wrap text-center py-4">
                 <div class="col-lg-4 col-md-6 col-sm-12 p-4" v-for="(thing, index) in thingsThatMakeUsStandOut" :key="index">
                     <div>
-                        <img :src="thing.img" :alt="$t('home.features.'+thing.id+'.title')">
+                        <NuxtImg loading="lazy" :src="thing.img" :alt="$t('home.features.'+thing.id+'.title')" />
                     </div>
                     <h3>{{ $t('home.features.'+thing.id+'.title') }} </h3>
                     <p><strong>{{ $t('home.features.'+thing.id+'.body', {strong: $t('home.features.'+thing.id+'.strong')}) }}</strong>

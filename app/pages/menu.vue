@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useMenuStore } from "~/stores/menu";
-import { useRecipeStore } from "~/stores/recipe";
 import { toBudapestDateKey } from "~/utils/budapestDate";
 
 definePageMeta({ middleware: "auth-only" });
 
 const menuStore = useMenuStore();
-const recipeStore = useRecipeStore();
 const user = useSupabaseUser();
 
 const calendarRef = ref<any>(null);
@@ -17,10 +15,7 @@ const dayDetailRef = ref<any>(null);
 
 onMounted(async () => {
     if (!user.value) return;
-    const tasks: Promise<unknown>[] = [];
-    if (!menuStore.isLoaded) tasks.push(menuStore.loadMenus());
-    if (!recipeStore.getAllRecipes().length) tasks.push(recipeStore.loadRecipes());
-    await Promise.all(tasks);
+    if (!menuStore.isLoaded) await menuStore.loadMenus();
 });
 
 const openAddModal = (dateKey: string) => {

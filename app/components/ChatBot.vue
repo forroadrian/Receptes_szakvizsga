@@ -95,7 +95,8 @@ async function loadContext() {
     if (!user.value) return;
     await Promise.all([
         ingredientStore.loadIngredients(),
-        preferencesStore.loadUserAllergies()
+        preferencesStore.loadUserAllergies(),
+        preferencesStore.loadUserDislikedIngredients()
     ]).catch(() => {});
 }
 
@@ -223,18 +224,10 @@ async function send() {
     await scrollToBottom();
 
     try {
-        const loaders: Promise<unknown>[] = [
+        await Promise.all([
             ingredientStore.loadAvailableIngredients(),
             recipeStore.loadAvailableCategories()
-        ];
-        if (user.value) {
-            loaders.push(
-                ingredientStore.loadIngredients(),
-                preferencesStore.loadUserAllergies(),
-                preferencesStore.loadUserDislikedIngredients()
-            );
-        }
-        await Promise.all(loaders);
+        ]);
 
         const history = messages.value
             .slice(-11, -1)
