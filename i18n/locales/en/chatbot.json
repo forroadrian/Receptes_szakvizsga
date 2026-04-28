@@ -15,6 +15,14 @@
             "suggestRecipe": "🍽️ Suggest me a recipe!",
             "fromPantry": "🛒 What can I cook from my ingredients?",
             "quickMeal": "⚡ Quick and easy meal ideas"
+        },
+        "context": {
+            "intro": "What I know about you",
+            "pantry": "{count} items",
+            "pantryEmpty": "empty pantry",
+            "expiring": "{count} expiring soon",
+            "allergies": "Allergens",
+            "noAllergies": "no allergens"
         }
     }
 }

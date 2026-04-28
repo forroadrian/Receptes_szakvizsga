@@ -15,6 +15,14 @@
             "suggestRecipe": "🍽️ Ajánlj egy receptet!",
             "fromPantry": "🛒 Mit főzzek a hozzávalóimból?",
             "quickMeal": "⚡ Gyors és egyszerű ételötletek"
+        },
+        "context": {
+            "intro": "Ezt látom rólad",
+            "pantry": "{count} alapanyag",
+            "pantryEmpty": "üres kamra",
+            "expiring": "{count} hamarosan lejár",
+            "allergies": "Allergiák",
+            "noAllergies": "nincs allergia"
         }
     }
 }

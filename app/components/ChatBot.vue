@@ -6,6 +6,7 @@ import { useRecipeModal } from '~/composables/useRecipeModal';
 
 const { t, locale } = useI18n();
 const router = useRouter();
+const user = useSupabaseUser();
 const ingredientStore = useIngredientStore();
 const recipeStore = useRecipeStore();
 const preferencesStore = usePreferencesStore();
@@ -74,20 +75,6 @@ const input = ref('');
 const messages = ref<Message[]>([]);
 const messagesEl = ref<HTMLElement | null>(null);
 
-const TIMEOUT_MS = 5 * 60 * 1000;
-let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
-
-function resetInactivityTimer() {
-    if (inactivityTimer) clearTimeout(inactivityTimer);
-    if (isExpired.value) return;
-    inactivityTimer = setTimeout(() => {
-        isExpired.value = true;
-        messages.value.push({ role: 'assistant', content: t('chatbot.expired'), time: now() });
-        if (!isOpen.value) unreadCount.value++;
-        scrollToBottom();
-    }, TIMEOUT_MS);
-}
-
 const suggestions = computed(() => [
     t('chatbot.suggestions.whatCanIDo'),
     t('chatbot.suggestions.suggestRecipe'),
@@ -99,22 +86,77 @@ const showSuggestions = computed(() =>
     messages.value.length === 1 && messages.value[0]?.role === 'assistant'
 );
 
+async function loadContext() {
+    await Promise.all([
+        ingredientStore.loadIngredients(),
+        preferencesStore.loadUserAllergies()
+    ]).catch(() => {});
+}
+
+const pantryCount = computed(() => ingredientStore.ingredients.length);
+const expiringCount = computed(() =>
+    ingredientStore.ingredients.filter(i => i.tag === 'soon').length
+);
+const allergyNames = computed(() =>
+    preferencesStore.userAllergies.map(a => a.name).join(', ')
+);
+
 function openChat() {
     if (!isOpen.value && messages.value.length === 0) {
         messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
     }
     isOpen.value = !isOpen.value;
-    if (isOpen.value) unreadCount.value = 0;
+    if (isOpen.value) {
+        unreadCount.value = 0;
+        loadContext();
+    }
 }
 
 function newChat() {
-    if (inactivityTimer) clearTimeout(inactivityTimer);
-    inactivityTimer = null;
     isExpired.value = false;
     messages.value = [];
     input.value = '';
     messages.value.push({ role: 'assistant', content: t('chatbot.welcome'), time: now() });
 }
+
+const storageKey = computed(() =>
+    user.value?.id ? `chatbot:${user.value.id}` : null
+);
+
+function loadFromStorage() {
+    if (!import.meta.client || !storageKey.value) return;
+    const raw = localStorage.getItem(storageKey.value);
+    if (!raw) {
+        messages.value = [];
+        isExpired.value = false;
+        unreadCount.value = 0;
+        return;
+    }
+    try {
+        const data = JSON.parse(raw);
+        messages.value = data.messages ?? [];
+        isExpired.value = data.isExpired ?? false;
+        unreadCount.value = data.unreadCount ?? 0;
+    } catch {
+        messages.value = [];
+        isExpired.value = false;
+        unreadCount.value = 0;
+    }
+}
+
+function saveToStorage() {
+    if (!import.meta.client || !storageKey.value) return;
+    try {
+        localStorage.setItem(storageKey.value, JSON.stringify({
+            messages: messages.value,
+            isExpired: isExpired.value,
+            unreadCount: unreadCount.value
+        }));
+    } catch {}
+}
+
+watch(storageKey, loadFromStorage, { immediate: true });
+watch([messages, isExpired, unreadCount], saveToStorage, { deep: true });
 
 async function sendSuggestion(text: string) {
     input.value = text;
@@ -135,7 +177,6 @@ async function send() {
     messages.value.push({ role: 'user', content: msg, time: now() });
     input.value = '';
     isLoading.value = true;
-    resetInactivityTimer();
     await scrollToBottom();
 
     try {
@@ -180,8 +221,6 @@ async function send() {
         if (!isOpen.value) unreadCount.value++;
 
         if (response.closeChat) {
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = null;
             isExpired.value = true;
         }
     } catch {
@@ -260,29 +299,56 @@ function onKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-    <div class="chatbot-wrapper">
-        <Transition name="chatbot-slide">
-            <div v-if="isOpen" class="chatbot-panel card shadow-lg">
-                <div class="chatbot-header card-header d-flex align-items-center justify-content-between">
+    <div class="wrapper">
+        <Transition name="slide">
+            <div v-if="isOpen" class="panel card shadow-lg rounded-4 overflow-hidden">
+                <div class="header card-header bg-dark text-white d-flex align-items-center justify-content-between">
                     <span class="fw-semibold">
                         <i class="bi bi-stars me-2"></i>{{ $t('chatbot.title') }}
                     </span>
                     <div class="d-flex align-items-center gap-2">
-                        <button class="chatbot-new-btn" :title="$t('chatbot.newChat')" @click="newChat">
+                        <button
+                            class="new-btn bg-transparent rounded-circle text-white d-flex align-items-center justify-content-center"
+                            :title="$t('chatbot.newChat')"
+                            @click="newChat"
+                        >
                             <i class="bi bi-pencil-square"></i>
                         </button>
                         <button class="btn-close btn-close-white" @click="isOpen = false" />
                     </div>
                 </div>
 
-                <div ref="messagesEl" class="chatbot-messages card-body">
+                <div class="context d-flex flex-wrap align-items-center border-bottom bg-body-tertiary">
+                    <span class="text-body-secondary fw-medium me-1">{{ $t('chatbot.context.intro') }}:</span>
+                    <span class="chip d-inline-flex align-items-center bg-body border rounded-pill text-body overflow-hidden text-nowrap" :title="$t('common.pages.ingredients')">
+                        <i class="bi bi-basket3"></i>
+                        {{ pantryCount > 0
+                            ? $t('chatbot.context.pantry', { count: pantryCount })
+                            : $t('chatbot.context.pantryEmpty') }}
+                    </span>
+                    <span v-if="expiringCount > 0" class="chip warn d-inline-flex align-items-center border rounded-pill overflow-hidden text-nowrap">
+                        <i class="bi bi-clock-history"></i>
+                        {{ $t('chatbot.context.expiring', { count: expiringCount }) }}
+                    </span>
+                    <span class="chip d-inline-flex align-items-center bg-body border rounded-pill text-body overflow-hidden text-nowrap" :title="$t('chatbot.context.allergies')">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ allergyNames || $t('chatbot.context.noAllergies') }}
+                    </span>
+                </div>
+
+                <div ref="messagesEl" class="messages card-body d-flex flex-column overflow-y-auto">
                     <div
                         v-for="(msg, i) in messages"
                         :key="i"
-                        class="chatbot-message"
-                        :class="msg.role === 'user' ? 'chatbot-message--user' : 'chatbot-message--assistant'"
+                        class="d-flex flex-column"
+                        :class="msg.role"
                     >
-                        <div class="chatbot-bubble" v-html="sanitizeMessage(msg.content)" @click="onBubbleClick"></div>
+                        <div
+                            class="bubble rounded-4 text-break"
+                            :class="msg.role === 'user' ? 'bg-dark text-white' : 'bg-body-secondary'"
+                            v-html="sanitizeMessage(msg.content)"
+                            @click="onBubbleClick"
+                        ></div>
                         <button
                             v-if="msg.recipe"
                             class="btn btn-sm btn-dark mt-2"
@@ -290,41 +356,41 @@ function onKeydown(e: KeyboardEvent) {
                         >
                             <i class="bi bi-pencil-square me-1"></i>{{ $t('chatbot.openRecipe') }}
                         </button>
-                        <span class="chatbot-time">{{ msg.time }}</span>
+                        <span class="time text-body-secondary mt-1 opacity-75">{{ msg.time }}</span>
                     </div>
 
-                    <div v-if="isLoading" class="chatbot-message chatbot-message--assistant">
-                        <div class="chatbot-bubble chatbot-bubble--loading">
+                    <div v-if="isLoading" class="d-flex flex-column assistant">
+                        <div class="bubble loading bg-body-secondary rounded-4 d-flex align-items-center">
                             <span></span><span></span><span></span>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="showSuggestions" class="chatbot-suggestions">
-                    <div class="chatbot-suggestions-row chatbot-suggestions-row--duo">
-                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[0])">{{ suggestions[0] }}</button>
-                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[1])">{{ suggestions[1] }}</button>
+                <div v-if="showSuggestions" class="suggestions d-flex flex-column border-top">
+                    <div class="line duo d-flex">
+                        <button class="suggestion bg-body-secondary border rounded-pill fw-medium text-body text-nowrap overflow-hidden" @click="sendSuggestion(suggestions[0])">{{ suggestions[0] }}</button>
+                        <button class="suggestion bg-body-secondary border rounded-pill fw-medium text-body text-nowrap overflow-hidden" @click="sendSuggestion(suggestions[1])">{{ suggestions[1] }}</button>
                     </div>
-                    <div class="chatbot-suggestions-row">
-                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[2])">{{ suggestions[2] }}</button>
+                    <div class="line d-flex">
+                        <button class="suggestion bg-body-secondary border rounded-pill fw-medium text-body text-nowrap overflow-hidden" @click="sendSuggestion(suggestions[2])">{{ suggestions[2] }}</button>
                     </div>
-                    <div class="chatbot-suggestions-row">
-                        <button class="chatbot-suggestion-btn" @click="sendSuggestion(suggestions[3])">{{ suggestions[3] }}</button>
+                    <div class="line d-flex">
+                        <button class="suggestion bg-body-secondary border rounded-pill fw-medium text-body text-nowrap overflow-hidden" @click="sendSuggestion(suggestions[3])">{{ suggestions[3] }}</button>
                     </div>
                 </div>
 
-                <div class="chatbot-input card-footer">
-                    <div class="chatbot-input-wrap">
+                <div class="bar card-footer">
+                    <div class="position-relative d-flex align-items-center">
                         <textarea
                             v-model="input"
-                            class="chatbot-textarea"
+                            class="textarea w-100 border rounded-pill bg-body text-body overflow-hidden"
                             rows="1"
                             :placeholder="$t('chatbot.placeholder')"
                             :disabled="isExpired"
                             @keydown="onKeydown"
                         />
                         <button
-                            class="chatbot-send-btn"
+                            class="send position-absolute bg-transparent border-0 text-body-emphasis d-flex align-items-center justify-content-center rounded-circle lh-1"
                             :disabled="isLoading || !input.trim() || isExpired"
                             @click="send"
                         >
@@ -336,12 +402,12 @@ function onKeydown(e: KeyboardEvent) {
         </Transition>
 
         <button
-            class="chatbot-toggle btn btn-dark rounded-circle shadow"
+            class="toggle btn btn-dark rounded-circle shadow position-relative fs-5 flex-shrink-0"
             :title="$t('chatbot.openBtn')"
             @click="openChat"
         >
             <i class="bi" :class="isOpen ? 'bi-x-lg' : 'bi-chat-dots-fill'"></i>
-            <span v-if="!isOpen && unreadCount > 0" class="chatbot-badge">
+            <span v-if="!isOpen && unreadCount > 0" class="unread position-absolute bg-danger text-white fw-bold rounded-pill d-flex align-items-center justify-content-center pe-none">
                 {{ unreadCount > 9 ? '9+' : unreadCount }}
             </span>
         </button>
@@ -349,7 +415,7 @@ function onKeydown(e: KeyboardEvent) {
 </template>
 
 <style scoped>
-.chatbot-wrapper {
+.wrapper {
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
@@ -360,98 +426,95 @@ function onKeydown(e: KeyboardEvent) {
     gap: 0.75rem;
 }
 
-.chatbot-badge {
-    position: absolute;
+.unread {
     top: -4px;
     right: -4px;
-    background: #dc3545;
-    color: #fff;
     font-size: 0.65rem;
-    font-weight: 700;
     min-width: 1.1rem;
     height: 1.1rem;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 0 0.2rem;
-    pointer-events: none;
 }
 
-.chatbot-toggle {
-    position: relative;
+.toggle {
     width: 3.25rem;
     height: 3.25rem;
-    font-size: 1.25rem;
-    flex-shrink: 0;
 }
 
-.chatbot-panel {
+.panel {
     width: 440px;
     max-width: calc(100vw - 2rem);
-    border-radius: 1rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
-.chatbot-new-btn {
-    background: transparent;
+.new-btn {
     border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 50%;
-    color: #fff;
     width: 1.6rem;
     height: 1.6rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 0.9rem;
     cursor: pointer;
     transition: background 0.15s;
 }
 
-.chatbot-new-btn:hover {
+.new-btn:hover {
     background: rgba(255,255,255,0.15);
 }
 
-.chatbot-header {
-    background: var(--bs-dark);
-    color: #fff;
+.header {
     padding: 0.65rem 1rem;
 }
 
-.chatbot-messages {
+.context {
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
+
+.chip {
+    gap: 0.3rem;
+    padding: 0.15rem 0.55rem;
+    max-width: 14rem;
+    text-overflow: ellipsis;
+}
+
+.chip i {
+    font-size: 0.78rem;
+    opacity: 0.75;
+    flex-shrink: 0;
+}
+
+.chip.warn {
+    color: #b54708;
+    border-color: #fec84b;
+    background: #fffaeb;
+}
+
+[data-bs-theme="dark"] .chip.warn {
+    color: #fdb022;
+    border-color: rgba(253, 176, 34, 0.4);
+    background: rgba(253, 176, 34, 0.08);
+}
+
+.messages {
     height: 360px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
     gap: 0.6rem;
-    padding: 1rem;
 }
 
-.chatbot-message {
-    display: flex;
-    flex-direction: column;
-}
-
-.chatbot-message--user {
+.user {
     align-items: flex-end;
 }
 
-.chatbot-message--assistant {
+.assistant {
     align-items: flex-start;
 }
 
-.chatbot-bubble {
+.bubble {
     max-width: 85%;
     padding: 0.5rem 0.75rem;
-    border-radius: 1rem;
     font-size: 0.9rem;
     white-space: pre-wrap;
-    word-break: break-word;
 }
 
-.chatbot-bubble :deep(.chat-nav) {
+.bubble :deep(.chat-nav) {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -468,189 +531,121 @@ function onKeydown(e: KeyboardEvent) {
     transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
 
-.chatbot-bubble :deep(.chat-nav)::before {
+.bubble :deep(.chat-nav)::before {
     content: "\F285";
     font-family: "bootstrap-icons";
     font-size: 0.85rem;
     line-height: 1;
 }
 
-.chatbot-bubble :deep(.chat-nav):hover {
+.bubble :deep(.chat-nav):hover {
     background: var(--bs-secondary-bg);
     border-color: var(--bs-secondary-color);
     transform: translateY(-1px);
 }
 
-.chatbot-message--user .chatbot-bubble {
-    background: var(--bs-dark);
-    color: #fff;
+.user .bubble {
     border-bottom-right-radius: 0.2rem;
 }
 
-.chatbot-message--assistant .chatbot-bubble {
-    background: var(--bs-secondary-bg);
+.assistant .bubble {
     border-bottom-left-radius: 0.2rem;
 }
 
-.chatbot-time {
+.time {
     font-size: 0.68rem;
-    color: var(--bs-secondary-color);
-    margin-top: 0.2rem;
-    opacity: 0.7;
 }
 
-.chatbot-bubble--loading {
-    display: flex;
+.bubble.loading {
     gap: 4px;
-    align-items: center;
     padding: 0.6rem 0.9rem;
 }
 
-.chatbot-bubble--loading span {
+.bubble.loading span {
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: var(--bs-secondary-color);
-    animation: chatbot-dot 1.2s infinite;
+    animation: dot 1.2s infinite;
 }
 
-.chatbot-bubble--loading span:nth-child(2) { animation-delay: 0.2s; }
-.chatbot-bubble--loading span:nth-child(3) { animation-delay: 0.4s; }
+.bubble.loading span:nth-child(2) { animation-delay: 0.2s; }
+.bubble.loading span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes chatbot-dot {
+@keyframes dot {
     0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
     40% { transform: scale(1); opacity: 1; }
 }
 
-.chatbot-suggestions {
-    display: flex;
-    flex-direction: column;
+.suggestions {
     gap: 0.35rem;
     padding: 0.5rem 0.75rem;
-    border-top: 1px solid var(--bs-border-color);
 }
 
-.chatbot-suggestions-row {
-    display: flex;
+.line {
     gap: 0.4rem;
-    justify-content: flex-start;
 }
 
-.chatbot-suggestions-row--duo .chatbot-suggestion-btn {
+.line.duo .suggestion {
     flex: 1;
 }
 
-.chatbot-tip-wrap::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.4rem;
-    white-space: normal;
-    max-width: 150px;
-    text-align: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.chatbot-tip-wrap:hover::after {
-    opacity: 1;
-}
-
-
-.chatbot-suggestion-btn {
-    background: var(--bs-secondary-bg);
-    border: 1px solid var(--bs-border-color);
-    border-radius: 999px;
+.suggestion {
     padding: 0.3rem 0.85rem;
     font-size: 0.78rem;
-    font-weight: 500;
     cursor: pointer;
-    color: var(--bs-body-color);
-    white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.chatbot-suggestion-btn:hover {
+.suggestion:hover {
     background: var(--bs-tertiary-bg, #e9ecef);
     border-color: var(--bs-secondary-color);
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-.chatbot-input {
+.bar {
     padding: 0.65rem 0.75rem;
 }
 
-.chatbot-input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.chatbot-textarea {
-    width: 100%;
+.textarea {
     resize: none;
-    border: 1px solid var(--bs-border-color);
-    border-radius: 999px;
     padding: 0.55rem 2.8rem 0.55rem 1.1rem;
     font-size: 0.88rem;
     line-height: 1.4;
-    background: var(--bs-body-bg);
-    color: var(--bs-body-color);
     outline: none;
     transition: border-color 0.15s;
-    overflow: hidden;
 }
 
-.chatbot-textarea:focus {
+.textarea:focus {
     border-color: var(--bs-emphasis-color);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
 }
 
-.chatbot-send-btn {
-    position: absolute;
+.send {
     right: 0.45rem;
-    background: none;
-    border: none;
     cursor: pointer;
-    color: var(--bs-emphasis-color);
-    font-size: 1rem;
     padding: 0.3rem 0.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
     transition: color 0.15s, background 0.15s;
-    line-height: 1;
 }
 
-.chatbot-send-btn:hover:not(:disabled) {
+.send:hover:not(:disabled) {
     background: var(--bs-secondary-bg);
 }
 
-.chatbot-send-btn:disabled {
+.send:disabled {
     color: var(--bs-secondary-color);
     cursor: default;
     opacity: 0.45;
 }
 
-.chatbot-slide-enter-active,
-.chatbot-slide-leave-active {
+.slide-enter-active,
+.slide-leave-active {
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.chatbot-slide-enter-from,
-.chatbot-slide-leave-to {
+.slide-enter-from,
+.slide-leave-to {
     opacity: 0;
     transform: translateY(10px) scale(0.97);
 }

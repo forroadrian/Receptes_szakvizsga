@@ -249,7 +249,6 @@ ${languageDirective}`
             console.error('[chat] Groq rate limit', err.status, err.message)
             throw createError({ statusCode: 429, statusMessage: 'AI is busy, please retry shortly' })
         }
-
         if (err instanceof Groq.APIError) {
             console.error('[chat] Groq API error', err.status, err.message)
             throw createError({ statusCode: err.status ?? 502, statusMessage: err.message })
