@@ -125,6 +125,12 @@ async function send() {
             time: now()
         });
         if (!isOpen.value) unreadCount.value++;
+
+        if (response.closeChat) {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+            isExpired.value = true;
+        }
     } catch {
         messages.value.push({
             role: 'assistant',
@@ -254,7 +260,7 @@ function onKeydown(e: KeyboardEvent) {
                     </div>
                 </div>
 
-                <div v-if="!isExpired" class="chatbot-input card-footer">
+                <div class="chatbot-input card-footer">
                     <div class="chatbot-input-wrap">
                         <textarea
                             v-model="input"
