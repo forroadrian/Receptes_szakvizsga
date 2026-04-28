@@ -124,6 +124,15 @@
     box-shadow: var(--shadow-md);
 }
 
+
+.bi-toggle-on { font-size: 26px; }
+.bi-toggle-off { font-size: 26px; color: var(--bs-secondary-color); }
+
+.recipe-modal, .recipe-panel, .ingredient-item, .instruction-item {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
 .recipe-instruction-text,
 .form-label {
     color: var(--bs-emphasis-color);
