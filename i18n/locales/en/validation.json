@@ -1,0 +1,32 @@
+{
+    "validation": {
+        "loginRequired": "You must be logged in to save a recipe.",
+        "name": {
+            "required": "Enter the recipe name.",
+            "invalidChars": "Name can only contain letters, commas, and spaces.",
+            "tooLong": "Name must be at most {max} characters."
+        },
+        "desc": {
+            "required": "Enter the recipe description.",
+            "invalidChars": "Description can only contain letters, numbers, and basic punctuation.",
+            "tooLong": "Description must be at most {max} characters."
+        },
+        "time": {
+            "invalid": "Prep time must be between {min}–{max} minutes."
+        },
+        "servings": {
+            "invalid": "Servings must be between {min}–{max}."
+        },
+        "ingredients": {
+            "tooFew": "At least {min} ingredients required."
+        },
+        "steps": {
+            "tooFew": "At least {min} steps required."
+        },
+        "step": {
+            "tooShort": "Minimum {min} characters required.",
+            "tooLong": "Maximum {max} characters allowed.",
+            "needsLetter": "Step must contain at least one letter."
+        }
+    }
+}
