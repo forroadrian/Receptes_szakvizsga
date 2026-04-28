@@ -147,7 +147,7 @@
 
 .hero-image {
     position: relative;
-    min-height: 560px;
+    min-height: 700px;
     background-image: url('../images/hero-img.png');
     background-position: center bottom;
     background-repeat: no-repeat;
