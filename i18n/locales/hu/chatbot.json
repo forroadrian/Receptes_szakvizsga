@@ -22,7 +22,10 @@
             "pantryEmpty": "üres kamra",
             "expiring": "{count} hamarosan lejár",
             "allergies": "Allergiák",
-            "noAllergies": "nincs allergia"
-        }
+            "noAllergies": "nincs allergia",
+            "guestMode": "Vendég mód",
+            "guestRemaining": "{count} kérdés maradt"
+        },
+        "guestLockedPlaceholder": "Regisztrálj a folytatáshoz..."
     }
 }

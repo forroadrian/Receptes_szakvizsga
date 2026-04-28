@@ -22,7 +22,10 @@
             "pantryEmpty": "empty pantry",
             "expiring": "{count} expiring soon",
             "allergies": "Allergens",
-            "noAllergies": "no allergens"
-        }
+            "noAllergies": "no allergens",
+            "guestMode": "Guest mode",
+            "guestRemaining": "{count} questions left"
+        },
+        "guestLockedPlaceholder": "Sign up to keep chatting..."
     }
 }

@@ -38,8 +38,13 @@ const ALLOWED_NAV_PATHS = new Set([
     '/profile/password',
     '/profile/email',
     '/profile/allergen',
-    '/profile/dislikedIngredient'
+    '/profile/dislikedIngredient',
+    '/login',
+    '/register'
 ]);
+
+const GUEST_QUESTION_LIMIT = 2;
+const GUEST_COUNT_KEY = 'chatbot:guest:askedCount';
 
 function sanitizeMessage(raw: string): string {
     const escaped = raw
@@ -87,6 +92,7 @@ const showSuggestions = computed(() =>
 );
 
 async function loadContext() {
+    if (!user.value) return;
     await Promise.all([
         ingredientStore.loadIngredients(),
         preferencesStore.loadUserAllergies()
@@ -100,6 +106,39 @@ const expiringCount = computed(() =>
 const allergyNames = computed(() =>
     preferencesStore.userAllergies.map(a => a.name).join(', ')
 );
+
+const isGuest = computed(() => !user.value);
+const guestAskedCount = ref(0);
+
+function loadGuestCount() {
+    if (!import.meta.client) return;
+    const raw = localStorage.getItem(GUEST_COUNT_KEY);
+    const parsed = raw === null ? 0 : parseInt(raw, 10);
+    guestAskedCount.value = Number.isFinite(parsed) ? parsed : 0;
+}
+
+function persistGuestCount() {
+    if (!import.meta.client) return;
+    localStorage.setItem(GUEST_COUNT_KEY, String(guestAskedCount.value));
+}
+
+function clearGuestCount() {
+    if (!import.meta.client) return;
+    localStorage.removeItem(GUEST_COUNT_KEY);
+    guestAskedCount.value = 0;
+}
+
+const guestQuestionsRemaining = computed(() =>
+    Math.max(0, GUEST_QUESTION_LIMIT - guestAskedCount.value)
+);
+const guestLimitReached = computed(() =>
+    isGuest.value && guestAskedCount.value >= GUEST_QUESTION_LIMIT
+);
+
+watch(user, (newUser) => {
+    if (newUser) clearGuestCount();
+    else loadGuestCount();
+}, { immediate: true });
 
 function openChat() {
     if (!isOpen.value && messages.value.length === 0) {
@@ -172,21 +211,30 @@ async function scrollToBottom() {
 
 async function send() {
     const msg = input.value.trim();
-    if (!msg || isLoading.value) return;
+    if (!msg || isLoading.value || guestLimitReached.value) return;
 
     messages.value.push({ role: 'user', content: msg, time: now() });
+    if (isGuest.value) {
+        guestAskedCount.value++;
+        persistGuestCount();
+    }
     input.value = '';
     isLoading.value = true;
     await scrollToBottom();
 
     try {
-        await Promise.all([
-            ingredientStore.loadIngredients(),
+        const loaders: Promise<unknown>[] = [
             ingredientStore.loadAvailableIngredients(),
-            recipeStore.loadAvailableCategories(),
-            preferencesStore.loadUserAllergies(),
-            preferencesStore.loadUserDislikedIngredients()
-        ]);
+            recipeStore.loadAvailableCategories()
+        ];
+        if (user.value) {
+            loaders.push(
+                ingredientStore.loadIngredients(),
+                preferencesStore.loadUserAllergies(),
+                preferencesStore.loadUserDislikedIngredients()
+            );
+        }
+        await Promise.all(loaders);
 
         const history = messages.value
             .slice(-11, -1)
@@ -197,17 +245,21 @@ async function send() {
             body: {
                 message: msg,
                 language: locale.value,
-                pantry: ingredientStore.ingredients.map(i => ({
-                    name: i.name,
-                    quantity: i.quantity,
-                    unit: i.unit,
-                    expiry: i.expiry.toShort(),
-                    freshness: i.tag
-                })),
+                isGuest: isGuest.value,
+                guestRemaining: isGuest.value ? guestQuestionsRemaining.value : null,
+                pantry: user.value
+                    ? ingredientStore.ingredients.map(i => ({
+                        name: i.name,
+                        quantity: i.quantity,
+                        unit: i.unit,
+                        expiry: i.expiry.toShort(),
+                        freshness: i.tag
+                    }))
+                    : [],
                 availableCategories: recipeStore.getAvailableCategories(),
                 availableIngredients: ingredientStore.availableIngredients,
-                allergies: preferencesStore.userAllergies.map(a => a.name),
-                dislikedIngredients: preferencesStore.userDislikedIngredients.map(i => i.name),
+                allergies: user.value ? preferencesStore.userAllergies.map(a => a.name) : [],
+                dislikedIngredients: user.value ? preferencesStore.userDislikedIngredients.map(i => i.name) : [],
                 history
             }
         });
@@ -318,7 +370,18 @@ function onKeydown(e: KeyboardEvent) {
                     </div>
                 </div>
 
-                <div class="context d-flex flex-wrap align-items-center border-bottom bg-body-tertiary">
+                <div v-if="isGuest" class="context d-flex flex-wrap align-items-center border-bottom bg-body-tertiary">
+                    <span class="chip d-inline-flex align-items-center bg-body border rounded-pill text-body overflow-hidden text-nowrap">
+                        <i class="bi bi-person"></i>
+                        {{ $t('chatbot.context.guestMode') }}
+                    </span>
+                    <span class="chip warn d-inline-flex align-items-center border rounded-pill overflow-hidden text-nowrap">
+                        <i class="bi bi-question-circle"></i>
+                        {{ $t('chatbot.context.guestRemaining', { count: guestQuestionsRemaining }) }}
+                    </span>
+                </div>
+
+                <div v-else class="context d-flex flex-wrap align-items-center border-bottom bg-body-tertiary">
                     <span class="text-body-secondary fw-medium me-1">{{ $t('chatbot.context.intro') }}:</span>
                     <span class="chip d-inline-flex align-items-center bg-body border rounded-pill text-body overflow-hidden text-nowrap" :title="$t('common.pages.ingredients')">
                         <i class="bi bi-basket3"></i>
@@ -385,13 +448,13 @@ function onKeydown(e: KeyboardEvent) {
                             v-model="input"
                             class="textarea w-100 border rounded-pill bg-body text-body overflow-hidden"
                             rows="1"
-                            :placeholder="$t('chatbot.placeholder')"
-                            :disabled="isExpired"
+                            :placeholder="guestLimitReached ? $t('chatbot.guestLockedPlaceholder') : $t('chatbot.placeholder')"
+                            :disabled="isExpired || guestLimitReached"
                             @keydown="onKeydown"
                         />
                         <button
                             class="send position-absolute bg-transparent border-0 text-body-emphasis d-flex align-items-center justify-content-center rounded-circle lh-1"
-                            :disabled="isLoading || !input.trim() || isExpired"
+                            :disabled="isLoading || !input.trim() || isExpired || guestLimitReached"
                             @click="send"
                         >
                             <i class="bi bi-send-fill"></i>

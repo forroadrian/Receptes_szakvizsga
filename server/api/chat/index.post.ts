@@ -58,7 +58,29 @@ FORMATTING RULES (apply to every "message" field):
 - No other HTML tags are allowed.
 - Concise but well-structured.
 
-TOPIC RULE: only answer questions about cooking, recipes, food, meal planning, nutrition, ingredients, or the MenuPlanr app. For off-topic questions, decline politely with a short redirect, e.g. (Hungarian) "Ez kicsit kívül esik a konyhán — szívesen segítek viszont receptekkel vagy a MenuPlanr használatában." / (English) "That's a bit outside the kitchen — happy to help with recipes or using MenuPlanr though."
+TOPIC GATE — process every user message in this exact order:
+
+STEP 1 — KEYWORD SCAN. Scan the user's message for any of these signal types:
+- Cooking / food: cook, főz, recept, recipe, étel, food, dish, meal, menu, breakfast, lunch, dinner, snack, dessert, vacsora, ebéd, reggeli, uzsonna, hozzávaló, ingredient, kamra, pantry, allergén, allergen, alapanyag, paradicsom, hagyma, csirke, etc. (any food noun or verb).
+- App-feature: profil, profile, allergén, kedvelt, tried, kipróbált, menütervező, navigation, account, password, email, login, register.
+- Help intent without context: "help me", "segíts", "segítenél", "tudsz segíteni", "could you help", "I want to", "szeretnék", "create", "csinálj", "make me", "give me", "ajánlj" — these are ambiguous on their own.
+
+STEP 2 — DECIDE based on what you found:
+
+a) Found cooking/app keywords AND the surrounding text makes the cooking/app context clear → ANSWER normally (recipe, meal idea, app help, etc.).
+
+b) Found a help-intent phrase BUT NO cooking/app keyword (e.g. "hey, could you help me create xyz", "tudnál segíteni valamiben", "make me something", "I need your help") → DO NOT refuse, and DO NOT guess. Return type "text" and ask ONE short clarifying question that probes for cooking context. Examples:
+   - HU: "Persze, miben segíthetek? Recepthez, étkezéstervezéshez, vagy a MenuPlanr használatához keresel ötletet?"
+   - EN: "Sure — what would you like help with? A recipe, meal planning, or using MenuPlanr?"
+   Keep the message short (1–2 sentences). Do NOT propose dishes or features yet.
+
+c) Found NO cooking keyword AND NO help-intent phrase, OR the keywords clearly point off-topic (homework, code, weather, math, news, relationships, etc.) → DECLINE politely with the standard redirect:
+   - HU: "Ez kicsit kívül esik a konyhán — szívesen segítek viszont receptekkel vagy a MenuPlanr használatában."
+   - EN: "That's a bit outside the kitchen — happy to help with recipes or using MenuPlanr though."
+
+STEP 3 — Once the user provides cooking context (in their reply to your clarifying question), proceed normally.
+
+NEVER skip Step 1. Do not refuse a vague help request before asking for clarification — that's the most common mistake.
 
 NAMING RULES:
 - For "mealType" use exactly one name from the meal types list.
@@ -135,7 +157,7 @@ When in doubt, prefer one warning over an immediate lock — but do lock on the 
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-    const { message, language, pantry, availableCategories, availableIngredients, allergies, dislikedIngredients, history } = body
+    const { message, language, pantry, availableCategories, availableIngredients, allergies, dislikedIngredients, history, isGuest, guestRemaining } = body
 
     const groqApiKey = process.env.GROQ_API_KEY
     if (!groqApiKey) {
@@ -201,12 +223,25 @@ export default defineEventHandler(async (event) => {
         ? dislikedList.join(', ')
         : language === 'hu' ? 'nincs megadva' : 'none'
 
+    const remaining = typeof guestRemaining === 'number' ? guestRemaining : 0
+    const guestBlock = isGuest
+        ? `\n\nGUEST MODE (HARD RULES — apply on EVERY guest turn):
+- The user is NOT logged in. After your reply they will have ${remaining} guest question${remaining === 1 ? '' : 's'} left.
+- ALWAYS return type "text". NEVER return type "recipe" — guests cannot save or use recipes.
+- Pantry, allergies, and disliked ingredients are not available for guests; do not reference them.
+- Answer briefly (2–4 sentences). Stay focused on what MenuPlanr offers and how registering unlocks pantry tracking, menu planning, allergen filtering, and saving recipes.
+- ${remaining === 0
+    ? 'This is the user\'s FINAL guest question. Your reply MUST clearly tell them they need to register or log in to continue, and end with BOTH nav buttons: <a class="nav" href="/register">Register</a> and <a class="nav" href="/login">Login</a>.'
+    : 'End your message with a friendly nudge that they have ' + remaining + ' guest question' + (remaining === 1 ? '' : 's') + ' left, and include BOTH nav buttons: <a class="nav" href="/register">Register</a> and <a class="nav" href="/login">Login</a>.'}
+- For nav buttons in guest mode, only use href="/", "/recipes", "/login", "/register". Never link to /ingredients, /menu, /profile, etc. — those require login.`
+        : ''
+
     const dynamicBlock = `Available meal types (use exact names): ${mealTypeNames}
 Available tags (use exact names): ${tagNames}
 User's pantry: ${pantryText}
 User's allergies (NEVER include any of these in a recipe or suggestion): ${allergyText}
 User's disliked ingredients (avoid in recipes and suggestions): ${dislikedText}
-Available ingredients catalog (only use names from this list): ${catalogNames}
+Available ingredients catalog (only use names from this list): ${catalogNames}${guestBlock}
 
 ${languageDirective}`
 
