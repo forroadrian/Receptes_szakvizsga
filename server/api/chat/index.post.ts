@@ -42,6 +42,20 @@ FORMATTING RULES (apply to every "message" field):
 - Blank line between paragraphs.
 - Lists: each item on its own line. Numbered: "1. 2. 3.". Bulleted: "•".
 - Plain text only — no markdown (no **bold**, no # headers, no backticks).
+- You MAY render a clickable navigation button with <a class="nav" href="/path">label</a>. The user clicks and is navigated to that page inside the app. Always use double quotes around the class and href values (class="nav" href="/recipes", not class='nav'). Always close every <a> with </a>.
+- Allowed href values (anything else is silently stripped — never invent paths, never use absolute URLs):
+  • "/" — home / Kezdőlap
+  • "/recipes" — recipes list / Receptek
+  • "/ingredients" — pantry / Alapanyagok
+  • "/menu" — menu planner / Menütervező
+  • "/profile" — profile overview / Profil
+  • "/profile/username" — change username
+  • "/profile/password" — change password
+  • "/profile/email" — change email
+  • "/profile/allergen" — manage allergens
+  • "/profile/dislikedIngredient" — manage disliked ingredients
+- Use a nav button only when navigation is genuinely useful (e.g. the user asks "where do I add allergens?"). Use the language-appropriate label as the link text (Hungarian or English to match the conversation).
+- No other HTML tags are allowed.
 - Concise but well-structured.
 
 TOPIC RULE: only answer questions about cooking, recipes, food, meal planning, nutrition, ingredients, or the MenuPlanr app. For off-topic questions, decline politely with a short redirect, e.g. (Hungarian) "Ez kicsit kívül esik a konyhán — szívesen segítek viszont receptekkel vagy a MenuPlanr használatában." / (English) "That's a bit outside the kitchen — happy to help with recipes or using MenuPlanr though."
@@ -52,12 +66,38 @@ NAMING RULES:
 - For ingredient "name" use only entries from the catalog (exact spelling, byte-for-byte). Hungarian accents must be preserved exactly as written in the catalog — á, é, í, ó, ö, ő, ú, ü, ű — never strip or simplify them (write "paradicsom", "vöröshagyma", "főtt tojás", not "paradicsom" without accents or "vororshagyma"). If a needed ingredient is not in the catalog, substitute the closest catalog entry or omit it. Never invent a name. If no reasonable substitute exists, return type "text" and say what's missing.
 - For ingredient "unit" use only one of these exact values: g, dkg, kg, ml, dl, l, tsp, tbsp, c, pt, qt, gal, oz, lb, db, csipet, csomag, gerezd, tk. Never use any other unit string (no "darab", "evőkanál", "teáskanál", "kávéskanál" — use "db", "tbsp", "tsp", "tk" instead).
 
-OUTPUT SHAPE:
-- Always set "type" to either "text" or "recipe".
-- Always include "message" (a friendly intro for recipes, or the full answer for text).
-- For "text" responses, set "recipe" to null.
-- For "recipe" responses, fill the full recipe object.
-- Always set "closeChat" — set it to true ONLY when the user clearly signals they are done (e.g. "köszi, ennyi", "viszlát", "bezárhatod", "thanks bye", "close the chat", "I'm done") or when the ANSWER RULES below trigger an end-of-chat. When you set "closeChat" to true, keep "message" short and end with a one-line invitation to start a new chat using the ✏️ button in the chat header (Hungarian: "Ha mégis szeretnél tovább beszélgetni, indíts új csevegést a ✏️ gombbal a fejlécben." / English: "If you'd like to chat again, start a new conversation with the ✏️ button in the header."). Set "closeChat" to false in every other turn.
+OUTPUT FORMAT:
+You MUST respond with a single valid JSON object — nothing before or after, no markdown fences, no commentary. The object must match this exact shape:
+
+{
+  "type": "text" | "recipe",
+  "message": string,
+  "closeChat": boolean,
+  "recipe": null | {
+    "name": string,
+    "description": string,
+    "prepTime": integer (minutes),
+    "servings": integer,
+    "mealType": string (one exact name from the meal types list),
+    "tags": string[] (each an exact name from the tags list),
+    "ingredients": [
+      {
+        "name": string (exact catalog name with all Hungarian accents),
+        "quantity": number,
+        "unit": "g" | "dkg" | "kg" | "ml" | "dl" | "l" | "tsp" | "tbsp" | "c" | "pt" | "qt" | "gal" | "oz" | "lb" | "db" | "csipet" | "csomag" | "gerezd" | "tk"
+      }
+    ],
+    "instructions": string[] (each step is one array entry)
+  }
+}
+
+FIELD RULES:
+- All four top-level keys ("type", "message", "closeChat", "recipe") MUST be present on every response.
+- "message" is a friendly intro for recipes, or the full answer for text replies.
+- When "type" is "text", "recipe" MUST be null.
+- When "type" is "recipe", "recipe" MUST be the full object above with every property filled.
+- "unit" must be exactly one of the 19 allowed strings — no other value is valid.
+- Set "closeChat" to true ONLY when the user clearly signals they are done (e.g. "köszi, ennyi", "viszlát", "bezárhatod", "thanks bye", "close the chat", "I'm done") or when the ANSWER RULES below trigger an end-of-chat. When you set "closeChat" to true, keep "message" short and end with a one-line invitation to start a new chat using the ✏️ button in the chat header (Hungarian: "Ha mégis szeretnél tovább beszélgetni, indíts új csevegést a ✏️ gombbal a fejlécben." / English: "If you'd like to chat again, start a new conversation with the ✏️ button in the header."). Set "closeChat" to false in every other turn.
 
 QUICK MEAL IDEAS:
 - When the user asks for quick/easy ideas or a list of suggestions, return type "text" with exactly 10 ideas, numbered 1–10, each on its own line with a one-line description. Do NOT return a full recipe yet.
@@ -65,8 +105,18 @@ QUICK MEAL IDEAS:
 - If the user rejects the list ("more options", "more"), return a fresh list of 10 different ideas as type "text".
 
 PANTRY-AWARE SUGGESTIONS:
+- Each pantry item is listed as: name (quantity unit, expires YYYY-MM-DD, freshness). Freshness is one of "fresh", "soon" (expires within 3 days), or "expired".
 - If the pantry is empty and the user asks "what can I cook from what I have", return type "text" and tell them to add ingredients to their pantry first (with a pointer to /ingredients).
 - If the pantry is partial, prefer recipes that maximise pantry coverage.
+- Prioritise ingredients with freshness "soon" so they are used before they go bad — mention this naturally in the message when relevant.
+- Never suggest using ingredients with freshness "expired"; if the user asks about one, tell them clearly that it has expired and recommend replacing it.
+
+DIETARY RESTRICTIONS (HARD RULES — apply to every recipe and every suggestion):
+- The user's allergies and disliked ingredients are listed in the dynamic context. Treat the allergy list as ABSOLUTE — never include an allergen, never include any ingredient that contains it (e.g. if "tej" / "milk" is an allergy, also exclude butter, cheese, yogurt, cream, kefir, sour cream).
+- For disliked ingredients: avoid them. If a classic recipe normally requires one, substitute it; if no good substitute exists, pick a different recipe.
+- Quick-meal idea lists (the 10 ideas) must already exclude anything that violates these rules — do not list a dish and then say "skip the cheese".
+- When you give a recipe, briefly confirm in the message that it respects the user's allergies.
+- If the user explicitly asks for a recipe containing one of their allergens, refuse with a short warning and offer an allergen-free alternative instead.
 
 ANSWER RULES:
 - If the user asks the same question tell them again with a bit more detail.
@@ -83,65 +133,9 @@ Set "closeChat" to true with a short firm message in any of these cases. Give ex
 When in doubt, prefer one warning over an immediate lock — but do lock on the second clear offense. Keep the firm message brief; the standard new-chat invitation from the closeChat rule still applies.
 `
 
-const RESPONSE_SCHEMA = {
-    name: 'MenuPlanrResponse',
-    strict: true,
-    schema: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['type', 'closeChat', 'message', 'recipe'],
-        properties: {
-            type: { type: 'string', enum: ['text', 'recipe'] },
-            message: { type: 'string' },
-            closeChat: { type: 'boolean' },
-            recipe: {
-                anyOf: [
-                    { type: 'null' },
-                    {
-                        type: 'object',
-                        additionalProperties: false,
-                        required: ['name', 'description', 'prepTime', 'servings', 'mealType', 'tags', 'ingredients', 'instructions'],
-                        properties: {
-                            name: { type: 'string' },
-                            description: { type: 'string' },
-                            prepTime: { type: 'integer' },
-                            servings: { type: 'integer' },
-                            mealType: { type: 'string' },
-                            tags: { type: 'array', items: { type: 'string' } },
-                            ingredients: {
-                                type: 'array',
-                                items: {
-                                    type: 'object',
-                                    additionalProperties: false,
-                                    required: ['name', 'quantity', 'unit'],
-                                    properties: {
-                                        name: { type: 'string' },
-                                        quantity: { type: 'number' },
-                                        unit: {
-                                            type: 'string',
-                                            enum: [
-                                                'g', 'dkg', 'kg',
-                                                'ml', 'dl', 'l',
-                                                'tsp', 'tbsp', 'c', 'pt', 'qt', 'gal',
-                                                'oz', 'lb',
-                                                'db', 'csipet', 'csomag', 'gerezd', 'tk'
-                                            ]
-                                        }
-                                    }
-                                }
-                            },
-                            instructions: { type: 'array', items: { type: 'string' } }
-                        }
-                    }
-                ]
-            }
-        }
-    }
-}
-
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-    const { message, language, pantry, availableCategories, availableIngredients, history } = body
+    const { message, language, pantry, availableCategories, availableIngredients, allergies, dislikedIngredients, history } = body
 
     const groqApiKey = process.env.GROQ_API_KEY
     if (!groqApiKey) {
@@ -168,21 +162,55 @@ export default defineEventHandler(async (event) => {
         .join(', ')
 
     const pantryText = pantry.length > 0
-        ? pantry.map((i: any) => `${i.name} (${i.quantity} ${i.unit})`).join(', ')
+        ? pantry.map((i: any) => `${i.name} (${i.quantity} ${i.unit}, expires ${i.expiry}, ${i.freshness})`).join(', ')
         : language === 'hu'
             ? 'Üres – a felhasználónak nincs hozzáadva hozzávaló a kamrájához.'
             : 'Empty – the user has no ingredients in their pantry.'
 
-    const lang = language === 'hu' ? 'Hungarian' : 'English'
+    const languageDirective = language === 'hu'
+        ? `LANGUAGE: Hungarian.
+- Every "message" field, every recipe field, every navigation button label, every word you generate MUST be Hungarian.
+- Use these UI labels when referring to the app:
+  • Pages: Kezdőlap, Receptek, Alapanyagok, Menütervező, Profil
+  • Recipe tabs: Összes, Saját, Kedvelt, Kipróbált, AI ajánlás
+  • Recipe buttons: Új recept, Részletek, Kedvelem, Kipróbált, Létrehozás, Szerkesztés, Törlés
+  • Pantry buttons: Hozzáadás, Szerkesztés, Törlés; freshness words: friss, hamarosan, lejárt
+  • Profile sidebar: Profil beállítások, Allergének, Nem kedvelt alapanyagok
+- Off-topic decline phrase: "Ez kicsit kívül esik a konyhán — szívesen segítek viszont receptekkel vagy a MenuPlanr használatában."
+- closeChat invitation: "Ha mégis szeretnél tovább beszélgetni, indíts új csevegést a ✏️ gombbal a fejlécben."`
+        : `LANGUAGE: English.
+- Every "message" field, every recipe field, every navigation button label, every word you generate MUST be English. The user is in English mode — do NOT reply in Hungarian or mix Hungarian phrases into your prose.
+- Use these UI labels when referring to the app (these are what the user actually sees on screen in English mode):
+  • Pages: Home, Recipes, Pantry, Menu planner, Profile
+  • Recipe tabs: All, Mine, Liked, Tried, AI recommended
+  • Recipe buttons: New recipe, Details, Like, Tried, Create, Edit, Delete
+  • Pantry buttons: Add, Edit, Delete; freshness words: fresh, soon, expired
+  • Profile sidebar: Profile settings, Allergens, Disliked ingredients
+- Off-topic decline phrase: "That's a bit outside the kitchen — happy to help with recipes or using MenuPlanr though."
+- closeChat invitation: "If you'd like to chat again, start a new conversation with the ✏️ button in the header."
+- IMPORTANT: Even though the static prompt below contains Hungarian terms like "Kezdőlap", "Új recept", "Allergének", you MUST translate them to the English labels above when speaking to the user. Never quote a Hungarian label back to an English-mode user.`
 
-    const dynamicBlock = `Always respond in ${lang}.
+    const allergyList = (allergies ?? []) as string[]
+    const dislikedList = (dislikedIngredients ?? []) as string[]
 
-Available meal types (use exact names): ${mealTypeNames}
+    const allergyText = allergyList.length > 0
+        ? allergyList.join(', ')
+        : language === 'hu' ? 'nincs megadva' : 'none'
+
+    const dislikedText = dislikedList.length > 0
+        ? dislikedList.join(', ')
+        : language === 'hu' ? 'nincs megadva' : 'none'
+
+    const dynamicBlock = `Available meal types (use exact names): ${mealTypeNames}
 Available tags (use exact names): ${tagNames}
 User's pantry: ${pantryText}
-Available ingredients catalog (only use names from this list): ${catalogNames}`
+User's allergies (NEVER include any of these in a recipe or suggestion): ${allergyText}
+User's disliked ingredients (avoid in recipes and suggestions): ${dislikedText}
+Available ingredients catalog (only use names from this list): ${catalogNames}
 
-    const systemPrompt = `${STATIC_PROMPT}\n\n${dynamicBlock}`
+${languageDirective}`
+
+    const systemPrompt = `${languageDirective}\n\n${STATIC_PROMPT}\n\n${dynamicBlock}`
 
     const HISTORY_LIMIT = 6
     const chatHistory = (history ?? [])
@@ -201,7 +229,7 @@ Available ingredients catalog (only use names from this list): ${catalogNames}`
                 ...chatHistory,
                 { role: 'user', content: message }
             ],
-            response_format: { type: 'json_schema', json_schema: RESPONSE_SCHEMA },
+            response_format: { type: 'json_object' },
             temperature: 0.7,
             max_tokens: 2048
         })
@@ -222,14 +250,6 @@ Available ingredients catalog (only use names from this list): ${catalogNames}`
             throw createError({ statusCode: 429, statusMessage: 'AI is busy, please retry shortly' })
         }
 
-        if (err instanceof Groq.BadRequestError && err.error?.code === 'json_validate_failed') {
-            const repaired = repairResponse(err.error.failed_generation)
-            if (repaired) {
-                console.warn('[chat] repaired malformed AI response')
-                return canonicalize(repaired, availableIngredients)
-            }
-        }
-
         if (err instanceof Groq.APIError) {
             console.error('[chat] Groq API error', err.status, err.message)
             throw createError({ statusCode: err.status ?? 502, statusMessage: err.message })
@@ -237,24 +257,6 @@ Available ingredients catalog (only use names from this list): ${catalogNames}`
         throw err
     }
 })
-
-function repairResponse(raw: string | undefined): any | null {
-    if (!raw) return null
-    let parsed: any
-    try { parsed = JSON.parse(raw) } catch { return null }
-    if (typeof parsed.closeChat !== 'boolean') {
-        if (typeof parsed.recipe?.closeChat === 'boolean') {
-            parsed.closeChat = parsed.recipe.closeChat
-            delete parsed.recipe.closeChat
-        } else {
-            parsed.closeChat = false
-        }
-    }
-    if (parsed.type !== 'recipe' && parsed.type !== 'text') parsed.type = 'text'
-    if (typeof parsed.message !== 'string') parsed.message = ''
-    if (parsed.type === 'text') parsed.recipe = null
-    return parsed
-}
 
 function canonicalize(parsed: any, availableIngredients: any[]): any {
     if (!parsed?.recipe?.ingredients) return parsed
