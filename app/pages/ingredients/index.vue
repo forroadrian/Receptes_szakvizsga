@@ -2,10 +2,12 @@
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useIngredientStore } from "~/stores/ingredients";
 import type Ingredient from "~/models/Ingredient";
+import type SearchParams from "~/interfaces/SearchParams";
 
 definePageMeta({ middleware: "auth-only" });
 
 const store = useIngredientStore();
+const { formatIngredient } = useIngredientFormatter();
 
 const addModalRef = ref<any>(null);
 const missingModalRef = ref<any>(null);
@@ -23,14 +25,27 @@ const freshCount = computed(() => store.ingredients.filter((i) => i.tag === "fre
 const warningCount = computed(() => store.ingredients.filter((i) => i.tag === "soon").length);
 const expiredCount = computed(() => store.ingredients.filter((i) => i.tag === "expired").length);
 
-const filtered = computed(() => {
-    const q = search.value.trim().toLowerCase();
-    return store.ingredients.filter((i) => {
-        if (activeTab.value !== "all" && i.tag !== activeTab.value) return false;
-        if (q && !i.name.toLowerCase().includes(q)) return false;
-        return true;
-    });
+type LocalizedIngredient = { ingredient: Ingredient; localizedName: string };
+
+const tabFiltered = computed<LocalizedIngredient[]>(() => {
+    const list = activeTab.value === "all"
+        ? store.ingredients
+        : store.ingredients.filter((i) => i.tag === activeTab.value);
+    return list.map((i) => ({
+        ingredient: i as Ingredient,
+        localizedName: formatIngredient(i.id),
+    }));
 });
+
+const searchParams = computed<SearchParams<LocalizedIngredient>>(() => ({
+    haystack: tabFiltered.value,
+    searchFor: ["localizedName"],
+    query: search.value.trim(),
+    showAllByDefault: true,
+}));
+
+const searchResults = useSearch(searchParams);
+const filtered = computed(() => searchResults.value.map((r) => r.ingredient));
 
 const openAddModal = (prefillName?: string) => addModalRef.value?.open(prefillName);
 const openMissing = () => missingModalRef.value?.open();
