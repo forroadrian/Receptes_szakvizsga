@@ -379,7 +379,11 @@
     .hero {
         min-height: auto;
         padding-top: 4.5rem;
-        padding-bottom: 8.5rem;
+        padding-bottom: 3rem;
+    }
+
+    .custom-shape-divider-bottom-1776970496 svg {
+        height: 80px;
     }
 
     .hero-copy {
