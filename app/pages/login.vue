@@ -65,7 +65,7 @@ const onSubmit = async () => {
                             </label>
                         </div>
 
-                        <NuxtLink to="/forgot-password">{{ $t('login.forgotPassword') }}</NuxtLink>
+                        <NuxtLink to="/forgot-password" :class="{ 'link-disabled': authStore.loading }">{{ $t('login.forgotPassword') }}</NuxtLink>
                     </div>
 
                     <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
@@ -82,7 +82,7 @@ const onSubmit = async () => {
 
                     <div class="mt-3 d-flex justify-content-center pt-3">
                         <p class="pe-3">{{ $t('login.noAccount') }}</p>
-                        <NuxtLink to="/register">{{ $t('login.registerLink') }}</NuxtLink>
+                        <NuxtLink to="/register" :class="{ 'link-disabled': authStore.loading }">{{ $t('login.registerLink') }}</NuxtLink>
                     </div>
                 </form>
             </div>
