@@ -5,6 +5,7 @@ import AppSwitch from "~/components/Switch.vue";
 
 const recipeModal = useRecipeModal();
 const { t } = useI18n();
+const { formatUnit } = useUnitFormatter();
 const closeBtn = ref<HTMLButtonElement | null>(null);
 
 const steps = computed(() => [
@@ -235,7 +236,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="col-lg-6">
                                                 <label class="form-label">{{ $t('recipe.addRecipeModal.form.unit') }}</label>
                                                 <select v-model="recipeModal.selectedIngredientUnit" class="form-select">
-                                                    <option v-for="unit in recipeModal.availableUnits" :value="unit">{{ unit }}</option>
+                                                    <option v-for="unit in recipeModal.availableUnits" :value="unit">{{ formatUnit(unit) }}</option>
                                                 </select>
                                             </div>
                                             <div class="col-12">
@@ -267,7 +268,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 </div>
                                                 <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
                                                     class="ingredient-item d-flex align-items-center justify-content-between gap-3">
-                                                    <span>{{ $t('ingredient.' + ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                                                    <span>{{ $t('ingredient.' + ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</span>
                                                     <div class="d-flex gap-2">
                                                         <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
                                                             @click="recipeModal.editIngredient(index)"></Button>

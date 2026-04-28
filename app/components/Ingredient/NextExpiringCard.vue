@@ -9,6 +9,7 @@ const emit = defineEmits<{
 
 const store = useIngredientStore();
 const { t, locale } = useI18n();
+const { formatUnit } = useUnitFormatter();
 
 const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
@@ -54,7 +55,7 @@ const onJump = () => {
 
             <div class="meta">
                 <i class="bi bi-box2 me-1"></i>
-                {{ nextExpiring.quantity }} {{ nextExpiring.unit }}
+                {{ nextExpiring.quantity }} {{ formatUnit(nextExpiring.unit) }}
             </div>
         </template>
 

@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { formatUnit } = useUnitFormatter();
 const confirmingDelete = ref(false);
 
 const freshnessConfig = computed(() => {
@@ -65,7 +66,7 @@ const confirmDelete = () => {
                 <span class="tag" :class="freshnessConfig.class">{{ $t('common.tags.' + ingredient.tag) }}</span>
             </div>
             <div class="sub-line">
-                <span class="qty">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                <span class="qty">{{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</span>
                 <span class="sep">·</span>
                 <span class="date">
                     <i class="bi bi-calendar2-event me-1"></i>

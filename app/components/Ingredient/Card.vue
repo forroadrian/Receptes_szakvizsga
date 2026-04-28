@@ -5,6 +5,7 @@ import Ingredient from '~/models/Ingredient';
 import { useIngredientStore } from '~/stores/ingredients';
 
 const ingredientState = useIngredientStore();
+const { formatUnit } = useUnitFormatter();
 const card = useTemplateRef("card")
 const { width: cardWidth } = useElementBounding(card)
 const isTiny = computed(() => cardWidth.value <= 370)
@@ -138,7 +139,7 @@ const onEdit = async () => {
                     </div>
                     <span class="pantry-tag" :class="freshnessConfig.colorClass">{{ ingredient.tag }}</span>
                 </div>
-                <span v-if="!editing" class="pantry-qty">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                <span v-if="!editing" class="pantry-qty">{{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</span>
             </CardHeader>
         </template>
         <template #body>
@@ -169,7 +170,7 @@ const onEdit = async () => {
                     <div class="edit-field edit-field-unit">
                         <span class="edit-label">Egység</span>
                         <select class="edit-input" v-model="editUnit">
-                            <option :value="unit" v-for="unit in ingredientState.units">{{ unit }}</option>
+                            <option :value="unit" v-for="unit in ingredientState.units">{{ formatUnit(unit) }}</option>
                         </select>
                     </div>
                     <div class="edit-field">

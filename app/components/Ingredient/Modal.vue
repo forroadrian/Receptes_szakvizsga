@@ -4,6 +4,7 @@ import Ingredient from '~/models/Ingredient';
 import { useIngredientStore } from '~/stores/ingredients';
 
 const ingredientState = useIngredientStore();
+const { formatUnit } = useUnitFormatter();
 
 const {
     units,
@@ -156,7 +157,7 @@ onMounted(async () => {
 
                         <div class="unit-section">
                             <div class="section-trigger" @click="unitDropdownOpen = true">
-                                <span :class="inputUnit ? '' : 'placeholder-text'">{{ inputUnit || 'Egység' }}</span>
+                                <span :class="inputUnit ? '' : 'placeholder-text'">{{ inputUnit ? formatUnit(inputUnit) : 'Egység' }}</span>
                                 <i class="bi bi-chevron-down ms-auto"></i>
                             </div>
                         </div>
@@ -192,7 +193,7 @@ onMounted(async () => {
                     <div class="unit-pill-grid">
                         <button v-for="unit in units" :key="unit" class="unit-pill"
                             :class="{ active: inputUnit === unit }" @click="selectUnit(unit)">
-                            {{ unit }}
+                            {{ formatUnit(unit) }}
                         </button>
                     </div>
                 </div>
