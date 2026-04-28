@@ -12,6 +12,8 @@ import type Pill from "~/interfaces/Pill";
 const route = useRoute();
 const router = useRouter();
 const { locale, t } = useI18n();
+const { formatIngredient } = useIngredientFormatter();
+const { formatCategory } = useCategoryFormatter();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
@@ -36,7 +38,7 @@ const ingredientPills = computed(() => {
             ing.name.toLowerCase().includes(ingredientSearchText.value.toLowerCase())
             && !selected.includes(ing.id)).slice(0, 10);
     return filtered.map((ing: any) => ({
-        name: $t('ingredient.'+ ing.id),
+        name: formatIngredient(ing.id),
         identifier: ing.id
     }));
 });
@@ -47,7 +49,7 @@ const selectedIngredientPills = computed(() => {
         .map((id: number) => {
             const ing = all.find((i: any) => i.id === id);
             if (!ing) return null;
-            return { name: $t('ingredient.'+ ing.id), identifier: ing.id };
+            return { name: formatIngredient(ing.id), identifier: ing.id };
         })
         .filter(Boolean) as { name: string; identifier: number }[];
 });
@@ -151,7 +153,7 @@ const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 const getLocalizedPill = (recipe: any) => {
     const translatedCategories = recipe.categories.map((v: any) => {
         return {
-            name: $t('categories.' + v.id),
+            name: formatCategory(v.id),
             identifier: v.id
         }
     })

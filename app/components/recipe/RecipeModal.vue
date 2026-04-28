@@ -6,6 +6,8 @@ import AppSwitch from "~/components/Switch.vue";
 const recipeModal = useRecipeModal();
 const { t } = useI18n();
 const { formatUnit } = useUnitFormatter();
+const { formatIngredient } = useIngredientFormatter();
+const { formatCategory } = useCategoryFormatter();
 const closeBtn = ref<HTMLButtonElement | null>(null);
 
 const steps = computed(() => [
@@ -131,7 +133,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.meal') }}</span>
-                                            <strong>{{ recipeModal.selectedMealType ? $t('categories.' + recipeModal.selectedMealType.id) : $t('recipe.addRecipeModal.summary.empty') }}</strong>
+                                            <strong>{{ recipeModal.selectedMealType ? formatCategory(recipeModal.selectedMealType.id) : $t('recipe.addRecipeModal.summary.empty') }}</strong>
                                         </div>
 
                                         <div class="summary-row">
@@ -193,7 +195,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <Button v-for="meal in recipeModal.mealTypes" type="button" class="rounded-pill recipe-pill"
                                                     :color="recipeModal.recipe.mealType === meal.id ? 'yellow' : undefined"
                                                     @click="recipeModal.recipe.mealType = meal.id">
-                                                    {{ $t('categories.' + meal.id) }}
+                                                    {{ formatCategory(meal.id) }}
                                                 </Button>
                                             </div>
                                         </div>
@@ -203,7 +205,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <Button v-for="tag in recipeModal.tags" type="button" class="rounded-pill recipe-pill"
                                                     :color="recipeModal.recipe.tags.includes(tag.id) ? 'yellow' : undefined"
                                                     @click="recipeModal.toggleTag(tag.id)">
-                                                    {{ $t('categories.' + tag.id) }}
+                                                    {{ formatCategory(tag.id) }}
                                                 </Button>
                                             </div>
                                         </div>
@@ -243,8 +245,8 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <div v-if="recipeModal.showIngredientResults" class="ingredient-search-results d-flex flex-wrap gap-2 mt-2">
                                                     <Button v-for="ingredient in recipeModal.filteredIngredients" type="button"
                                                         class="rounded-pill recipe-pill ingredient-result-pill"
-                                                        @click="recipeModal.selectIngredient(ingredient.id, $t('ingredient.' + ingredient.id))">
-                                                        {{ $t('ingredient.' + ingredient.id) }}
+                                                        @click="recipeModal.selectIngredient(ingredient.id, formatIngredient(ingredient.id))">
+                                                        {{ formatIngredient(ingredient.id) }}
                                                     </Button>
                                                     <div v-if="recipeModal.filteredIngredients.length === 0" class="ingredient-search-empty">
                                                         {{ $t('recipe.addRecipeModal.form.noResults') }}
@@ -268,7 +270,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 </div>
                                                 <div v-for="(ingredient, index) in recipeModal.recipe.ingredients"
                                                     class="ingredient-item d-flex align-items-center justify-content-between gap-3">
-                                                    <span>{{ $t('ingredient.' + ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</span>
+                                                    <span>{{ formatIngredient(ingredient.ingredient_id) }} - {{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</span>
                                                     <div class="d-flex gap-2">
                                                         <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
                                                             @click="recipeModal.editIngredient(index)"></Button>

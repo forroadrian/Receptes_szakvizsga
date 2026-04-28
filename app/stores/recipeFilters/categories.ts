@@ -19,8 +19,7 @@ export const hasCategory = (categories: Category[], categoryId: number | null) =
 
 export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>, typeOptions: Ref<Category[]>) => {
     try {
-        const {$i18n} = useNuxtApp()
-        const t = $i18n.t
+        const { formatCategory } = useCategoryFormatter()
         const data = await $fetch("/api/category", {
             method: "GET"
         });
@@ -38,12 +37,12 @@ export const loadRecipeFilterCategories = async (mealOptions: Ref<Category[]>, t
             const groupType = normalizedCategory.group_type.toLowerCase();
 
             if (groupType === "meal") {
-                normalizedCategory.name = t('categories.' + category.id)
+                normalizedCategory.name = formatCategory(category.id)
                 mealOptions.value.push(normalizedCategory);
             }
 
             if (groupType === "type") {
-                normalizedCategory.name = t('categories.' + category.id)
+                normalizedCategory.name = formatCategory(category.id)
                 typeOptions.value.push(normalizedCategory);
             }
         }

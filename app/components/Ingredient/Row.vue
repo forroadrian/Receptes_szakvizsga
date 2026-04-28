@@ -16,6 +16,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { formatUnit } = useUnitFormatter();
+const { formatIngredient } = useIngredientFormatter();
 const confirmingDelete = ref(false);
 
 const freshnessConfig = computed(() => {
@@ -62,7 +63,7 @@ const confirmDelete = () => {
 
         <div class="main">
             <div class="top-line">
-                <span class="name">{{ $t('ingredient.' + ingredient.id.toString()) }}</span>
+                <span class="name">{{ formatIngredient(ingredient.id) }}</span>
                 <span class="tag" :class="freshnessConfig.class">{{ $t('common.tags.' + ingredient.tag) }}</span>
             </div>
             <div class="sub-line">

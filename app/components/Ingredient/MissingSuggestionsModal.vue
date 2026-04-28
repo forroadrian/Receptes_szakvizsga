@@ -83,7 +83,7 @@ defineExpose({ open });
 
                     <div v-else-if="!missing.length" class="empty">
                         <i class="bi bi-check2-circle fs-2 mb-2 d-block"></i>
-                        <p class="mb-0">{{$t('pantry.middingModal.empty')}}</p>
+                        <p class="mb-0">{{$t('pantry.missingModal.empty')}}</p>
                     </div>
 
                     <ul v-else class="missing-list list-unstyled m-0">

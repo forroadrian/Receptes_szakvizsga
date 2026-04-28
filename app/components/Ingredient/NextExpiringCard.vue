@@ -10,6 +10,7 @@ const emit = defineEmits<{
 const store = useIngredientStore();
 const { t, locale } = useI18n();
 const { formatUnit } = useUnitFormatter();
+const { formatIngredient } = useIngredientFormatter();
 
 const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
@@ -49,7 +50,7 @@ const onJump = () => {
 
         <template v-if="nextExpiring">
             <button type="button" class="title-btn text-start w-100" @click="onJump">
-                <span class="title">{{$t('ingredient.' + nextExpiring.id)}}</span>
+                <span class="title">{{ formatIngredient(nextExpiring.id) }}</span>
                 <span class="relative">{{ relativeLabel }}</span>
             </button>
 

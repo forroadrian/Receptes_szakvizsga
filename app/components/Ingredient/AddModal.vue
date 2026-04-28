@@ -6,6 +6,7 @@ import type Ingredient from "~/models/Ingredient";
 import { useIngredientStore } from "~/stores/ingredients";
 
 const store = useIngredientStore();
+const { formatIngredient } = useIngredientFormatter();
 
 const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
@@ -33,7 +34,7 @@ const filteredNames = computed(() => {
     if (!q) return store.availableIngredients.slice(0, 10);
     const results: { id: number; name: string }[] = [];
     for (const item of store.availableIngredients) {
-        const localized = $t('ingredient.' + item.id)
+        const localized = formatIngredient(item.id)
         if (localized.toLowerCase().includes(q)) results.push(item);
         if (results.length >= 10) break;
     }
@@ -51,7 +52,7 @@ const canSubmit = computed(
 
 const selectIngredient = (item: { id: number; name: string }) => {
     ingredientId.value = item.id;
-    name.value = $t('ingredient.' + item.id);
+    name.value = formatIngredient(item.id);
     dropdownOpen.value = false;
 };
 
@@ -261,7 +262,7 @@ defineExpose({ open, openForEdit });
                                         :key="item.id"
                                         @mousedown.prevent="selectIngredient(item)"
                                     >
-                                        {{ $t('ingredient.' + item.id) }}
+                                        {{ formatIngredient(item.id) }}
                                     </li>
                                 </ul>
                             </div>
@@ -320,7 +321,7 @@ defineExpose({ open, openForEdit });
                                     @click="selectById(item.ingredient_id)"
                                 > <!--Stale data, don't mind it, it runs correctly :)-->
                                     <i class="bi bi-plus-circle me-1"></i>
-                                    {{ $t('ingredient.' + item.ingredient_id) }}
+                                    {{ formatIngredient(item.ingredient_id) }}
                                 </button>
                             </div>
                         </section>
