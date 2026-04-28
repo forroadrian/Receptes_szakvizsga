@@ -13,7 +13,14 @@ export default defineEventHandler(async (event) => {
             *,
             menu_recipe (
                 recipe_id,
-                recipe (*)
+                recipe (
+                    id,
+                    name,
+                    description,
+                    time,
+                    servings,
+                    author_id
+                )
             )
         `)
         .eq("active", true)
