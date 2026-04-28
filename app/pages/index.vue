@@ -154,7 +154,7 @@ const thingsThatMakeUsStandOut = [
                         <img :src="thing.img" :alt="$t('home.features.'+thing.id+'.title')">
                     </div>
                     <h3>{{ $t('home.features.'+thing.id+'.title') }} </h3>
-                    <p><strong>{{ $t('home.features.easyRecipes.body', {strong: $t('home.features.easyRecipes.strong')}) }}</strong>
+                    <p><strong>{{ $t('home.features.'+thing.id+'.body', {strong: $t('home.features.'+thing.id+'.strong')}) }}</strong>
                     </p>
                 </div>
             </div>
