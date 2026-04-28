@@ -68,6 +68,21 @@
     font-weight: 700;
 }
 
+.summary-row strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+@media (max-width: 576px) {
+    .summary-row strong {
+        max-width: 120px;
+    }
+}
+
 
 
 .step-btn.active .step-index {
