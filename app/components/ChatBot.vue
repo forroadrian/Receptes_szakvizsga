@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useIngredientStore } from '~/stores/ingredients';
 import { useRecipeStore } from '~/stores/recipe';
+import { usePreferencesStore } from '~/stores/preferences';
 import { useRecipeModal } from '~/composables/useRecipeModal';
 
 const { t, locale } = useI18n();
 const router = useRouter();
 const ingredientStore = useIngredientStore();
 const recipeStore = useRecipeStore();
+const preferencesStore = usePreferencesStore();
 const recipeModal = useRecipeModal();
 
 const aiPendingOpen = useState<boolean>('aiPendingOpen', () => false);
@@ -23,6 +25,45 @@ function now(): string {
         hour: '2-digit',
         minute: '2-digit'
     });
+}
+
+const ALLOWED_NAV_PATHS = new Set([
+    '/',
+    '/recipes',
+    '/ingredients',
+    '/menu',
+    '/profile',
+    '/profile/username',
+    '/profile/password',
+    '/profile/email',
+    '/profile/allergen',
+    '/profile/dislikedIngredient'
+]);
+
+function sanitizeMessage(raw: string): string {
+    const escaped = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    const q = `(?:&quot;|')`;
+    return escaped.replace(
+        new RegExp(`&lt;a class=${q}nav${q} href=${q}([^&'"]+)${q}&gt;([\\s\\S]*?)&lt;/a&gt;`, 'g'),
+        (_, href, label) =>
+            ALLOWED_NAV_PATHS.has(href)
+                ? `<a class="chat-nav" data-nav-href="${href}">${label}</a>`
+                : label
+    );
+}
+
+function onBubbleClick(e: MouseEvent) {
+    const target = (e.target as HTMLElement).closest<HTMLElement>('.chat-nav');
+    if (!target) return;
+    e.preventDefault();
+    const href = target.dataset.navHref;
+    if (!href) return;
+    isOpen.value = false;
+    navigateTo(href);
 }
 
 const isOpen = ref(false);
@@ -98,6 +139,14 @@ async function send() {
     await scrollToBottom();
 
     try {
+        await Promise.all([
+            ingredientStore.loadIngredients(),
+            ingredientStore.loadAvailableIngredients(),
+            recipeStore.loadAvailableCategories(),
+            preferencesStore.loadUserAllergies(),
+            preferencesStore.loadUserDislikedIngredients()
+        ]);
+
         const history = messages.value
             .slice(-11, -1)
             .map(m => ({ role: m.role, content: m.content }));
@@ -110,10 +159,14 @@ async function send() {
                 pantry: ingredientStore.ingredients.map(i => ({
                     name: i.name,
                     quantity: i.quantity,
-                    unit: i.unit
+                    unit: i.unit,
+                    expiry: i.expiry.toShort(),
+                    freshness: i.tag
                 })),
                 availableCategories: recipeStore.getAvailableCategories(),
                 availableIngredients: ingredientStore.availableIngredients,
+                allergies: preferencesStore.userAllergies.map(a => a.name),
+                dislikedIngredients: preferencesStore.userDislikedIngredients.map(i => i.name),
                 history
             }
         });
@@ -229,7 +282,7 @@ function onKeydown(e: KeyboardEvent) {
                         class="chatbot-message"
                         :class="msg.role === 'user' ? 'chatbot-message--user' : 'chatbot-message--assistant'"
                     >
-                        <div class="chatbot-bubble">{{ msg.content }}</div>
+                        <div class="chatbot-bubble" v-html="sanitizeMessage(msg.content)" @click="onBubbleClick"></div>
                         <button
                             v-if="msg.recipe"
                             class="btn btn-sm btn-dark mt-2"
@@ -396,6 +449,36 @@ function onKeydown(e: KeyboardEvent) {
     font-size: 0.9rem;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.chatbot-bubble :deep(.chat-nav) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.25rem 0.15rem 0.05rem 0;
+    padding: 0.25rem 0.7rem;
+    background: var(--bs-tertiary-bg, #e9ecef);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.chatbot-bubble :deep(.chat-nav)::before {
+    content: "\F285";
+    font-family: "bootstrap-icons";
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.chatbot-bubble :deep(.chat-nav):hover {
+    background: var(--bs-secondary-bg);
+    border-color: var(--bs-secondary-color);
+    transform: translateY(-1px);
 }
 
 .chatbot-message--user .chatbot-bubble {
