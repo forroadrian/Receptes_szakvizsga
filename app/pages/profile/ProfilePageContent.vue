@@ -9,6 +9,7 @@ const preferences = usePreferencesStore();
 const route = useRoute();
 const { showAlert } = useAlert();
 const { t } = useI18n();
+const { formatIngredient } = useIngredientFormatter();
 const {
     validateUsernameChange,
     validateEmailChange,
@@ -703,7 +704,7 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ $t('ingredient.' + ingredient.id) }}
+                                                        {{ formatIngredient(ingredient.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"
@@ -845,7 +846,7 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ $t('ingredient.' + ingredient.id) }}
+                                                        {{ formatIngredient(ingredient.id) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"

@@ -34,18 +34,29 @@ export type Database = {
           group_type: Database["public"]["Enums"]["group_types"] | null
           id: number
           name: string | null
+          parent_id: number | null
         }
         Insert: {
           group_type?: Database["public"]["Enums"]["group_types"] | null
           id?: number
           name?: string | null
+          parent_id?: number | null
         }
         Update: {
           group_type?: Database["public"]["Enums"]["group_types"] | null
           id?: number
           name?: string | null
+          parent_id?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "category_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "category"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ingredient: {
         Row: {
@@ -207,10 +218,12 @@ export type Database = {
           deleted_at: string | null
           description: string
           id: number
+          image_url: string | null
           is_ai_generated: boolean
           last_edit: string
           likes: number
           name: string
+          public: boolean
           saves: number
           servings: number
           time: number
@@ -222,10 +235,12 @@ export type Database = {
           deleted_at?: string | null
           description: string
           id?: number
+          image_url?: string | null
           is_ai_generated?: boolean
           last_edit?: string
           likes?: number
           name: string
+          public?: boolean
           saves?: number
           servings: number
           time: number
@@ -237,10 +252,12 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           id?: number
+          image_url?: string | null
           is_ai_generated?: boolean
           last_edit?: string
           likes?: number
           name?: string
+          public?: boolean
           saves?: number
           servings?: number
           time?: number

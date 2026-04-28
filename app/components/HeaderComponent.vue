@@ -1,16 +1,44 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import GradSwitch from "~/components/Switch.vue";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore()
 const user = useSupabaseUser();
+const route = useRoute();
 
 const isLoggedIn = computed(() => !!user.value);
 const colorMode = useColorMode()
 
-
 const isReady = ref(false)
+const dropdownOpen = ref(false)
+
+const lockScroll = () => {
+    if (typeof document === 'undefined') return;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+};
+
+const unlockScroll = () => {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+};
+
+watch(dropdownOpen, (isOpen) => {
+    if (window.innerWidth >= 992) return;
+    isOpen ? lockScroll() : unlockScroll();
+});
+
+
+watch(route, () => {
+    dropdownOpen.value = false;
+    unlockScroll();
+});
+
+onUnmounted(() => unlockScroll());
+
 onMounted(async () => {
     isReady.value = true
     await authStore.initializeProfile()
@@ -55,6 +83,7 @@ const toggleTheme = () => {
 }
 
 const handleSignOut = async () => {
+    dropdownOpen.value = false
     const success = await authStore.signOut()
 
     if (success) {
@@ -64,8 +93,14 @@ const handleSignOut = async () => {
 </script>
 
 <template>
+    <Teleport to="body">
+        <Transition name="backdrop-fade">
+            <div v-if="dropdownOpen" class="dropdown-backdrop" @click="dropdownOpen = false" />
+        </Transition>
+    </Teleport>
+
     <header class="site-header">
-        <nav class="navbar navbar-expand-lg" :aria-label="$t('header.nav.aria.main')">
+        <nav class="navbar navbar-expand-xl" :aria-label="$t('header.nav.aria.main')">
             <div class="container d-flex align-items-center">
                 <NuxtLink class="navbar-brand m-0" to="/" :aria-label="$t('common.pages.index')">
                     <NuxtImg src="/logo.png" alt="Menu Planr logo" title="Brand logo" :width="180" :height="128"
@@ -97,14 +132,16 @@ const handleSignOut = async () => {
                         <LanguageSwitcher />
                         <GradSwitch :model-value="isReady && colorMode.value === 'dark'"
                             :icon="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill'"
-                             class="pe-lg-4 mx-auto" @update:model-value="toggleTheme" />
-                        <Button to="/register" color="orange" :outline="true" class="w-lg-auto me-1">
+                            class="pe-lg-4 d-flex justify-content-center" @update:model-value="toggleTheme" />
+                        <div class=" d-flex gap-3 auth-buttons">
+                           <Button to="/register" color="orange" :outline="true" class="register w-lg-auto">
                             {{ $t('header.nav.register') }}
                         </Button>
-
-                        <Button to="/login" color="orange" class="w-lg-auto">
+                        <Button to="/login" color="orange" class="login w-lg-auto">
                             {{ $t('header.nav.login') }}
-                        </Button>
+                        </Button>      
+                        </div>
+                           
                     </div>
 
                     <div v-else class="auth-area">
@@ -112,7 +149,8 @@ const handleSignOut = async () => {
 
                         <div class="dropdown w-lg-auto mx-auto" data-bs-auto-close="outside">
                             <button class="btn dropdown-toggle d-flex align-items-center gap-2" id="userDropdown"
-                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                @click="dropdownOpen = !dropdownOpen">
                                 <p>
                                     <img v-if="hasProfileImage" :src="displayProfileImage"
                                         :alt="$t('header.nav.profile.image.alt')"
@@ -125,21 +163,21 @@ const handleSignOut = async () => {
                                 </div>
                             </button>
 
-                            <ul class="dropdown-menu account-menu shadow" aria-labelledby="userDropdown">
+                            <ul class="dropdown-menu account-menu" aria-labelledby="userDropdown">
                                 <li class="p-2 text-center">
                                     <div class="account-avatar-wrap mb-3">
-                                        <img v-if="hasProfileImage" :src="displayProfileImage"
-                                            :alt="$t('header.nav.profile.image.alt')"
-                                            :title="$t('header.nav.profile.image.title')" />
-                                        <AvatarInitials v-else :name="displayUsername" size="55px" />
-                                        <span class="account-edit" aria-hidden="true">✎</span>
+                                        <NuxtLink to="/profile">
+                                            <img v-if="hasProfileImage" :src="displayProfileImage"
+                                                :alt="$t('header.nav.profile.image.alt')"
+                                                :title="$t('header.nav.profile.image.title')" />
+                                            <AvatarInitials v-else :name="displayUsername" size="55px" />
+                                            <span class="account-edit" aria-hidden="true">✎</span>
+                                        </NuxtLink>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="flex-grow-1">
                                             <p class="fw-bold text-truncate m-0">{{ displayUsername }}</p>
-                                            <p class="text-muted small">
-                                                {{ displayEmail }}
-                                            </p>
+                                            <p class="text-muted small">{{ displayEmail }}</p>
                                         </div>
                                     </div>
                                 </li>
@@ -155,16 +193,18 @@ const handleSignOut = async () => {
                                 </li>
 
                                 <li class="mt-2">
-                                    <NuxtLink to="/profile" class="dropdown-item d-flex align-items-center gap-2 py-2 ">
+                                    <NuxtLink to="/profile" class="dropdown-item d-flex align-items-center gap-2 py-2">
                                         <p><span class="badge">👤</span>{{ $t('header.nav.profile.settings') }}</p>
                                     </NuxtLink>
                                 </li>
 
                                 <li class="p-2">
-                                    <button class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 "
+                                    <button class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2"
                                         type="button" @click="handleSignOut">
-                                        <span class="fw-semibold text-orange"><i class="bi bi-box-arrow-right"></i>
-                                            {{ $t('header.nav.profile.logout') }}</span>
+                                        <span class="fw-semibold text-orange">
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            {{ $t('header.nav.profile.logout') }}
+                                        </span>
                                     </button>
                                 </li>
                             </ul>
@@ -178,9 +218,29 @@ const handleSignOut = async () => {
 </template>
 
 <style scoped>
-.dropdown-item:active ,.dropdown-menu li a:active {
+.dropdown-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1029;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+}
+
+.backdrop-fade-enter-active,
+.backdrop-fade-leave-active {
+    transition: opacity 0.25s ease;
+}
+
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+    opacity: 0;
+}
+
+.dropdown-item:active,
+.dropdown-menu li a:active {
     background-color: var(--yellow) !important;
 }
+
 .dropdown button,
 .dropdown-menu {
     border: none !important;
@@ -198,8 +258,7 @@ const handleSignOut = async () => {
     margin: 0 auto;
 }
 
-.nav-link,
-.baseMode span {
+.nav-link {
     font-size: var(--base-font-size);
     transition: 0.18s;
 }
@@ -215,8 +274,8 @@ const handleSignOut = async () => {
     transition: width 0.5s ease;
 }
 
-.nav-link:hover::after,
-.account-avatar-wrap img {
+.account-avatar-wrap img,
+.nav-link:hover::after {
     width: 100%;
 }
 
@@ -233,7 +292,6 @@ const handleSignOut = async () => {
     height: 100%;
     display: block;
     object-fit: cover;
-    border-radius: 50%;
 }
 
 .auth-area {
@@ -242,7 +300,11 @@ const handleSignOut = async () => {
 }
 
 .nav-avatar,
-.account-avatar {
+.account-avatar,
+.account-avatar-wrap img,
+.account-avatar-wrap,
+#userDropdown img,
+.account-edit {
     border-radius: var(--radius-rounded);
 }
 
@@ -259,7 +321,6 @@ const handleSignOut = async () => {
     width: 30px;
     height: 30px;
     object-fit: cover;
-    border-radius: 50%;
     display: block;
 }
 
@@ -286,9 +347,15 @@ const handleSignOut = async () => {
 }
 
 .account-menu {
+    top: 120% !important;
     right: 0;
     left: auto;
-    margin-left: 0;
+    min-width: 300px;
+    padding: 30px 10px;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.10) !important;
+    z-index: 1030;
 }
 
 .account-avatar-wrap {
@@ -296,11 +363,6 @@ const handleSignOut = async () => {
     height: 55px;
     margin: 0 auto;
     overflow: visible;
-    border-radius: 50%;
-}
-
-.account-avatar {
-    object-fit: cover;
 }
 
 .account-edit {
@@ -309,9 +371,7 @@ const handleSignOut = async () => {
     bottom: -6px;
     width: 26px;
     height: 26px;
-    border-radius: 50%;
-    font-size: 14px;
-    background: #fff;
+    background: var(--text-light);
     color: #6b6b6b;
     border: 1px solid #d9d9d9;
     display: flex;
@@ -326,8 +386,6 @@ const handleSignOut = async () => {
     text-align: center;
 }
 
-
-
 .lang-btn {
     border-radius: var(--radius-sm);
 }
@@ -337,18 +395,17 @@ const handleSignOut = async () => {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
-.baseMode {
-    font-size: var(--nav-icon-size);
-    cursor: pointer;
-}
-
 [data-bs-theme="dark"] .account-edit {
     background: var(--bs-body-bg);
-    color: #fff;
+    color: var(--text-light);
     border-color: var(--bs-border-color);
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
+    .dropdown-backdrop {
+        display: none;
+    }
+
     .auth-area {
         width: auto;
         margin-top: 0;
@@ -360,10 +417,6 @@ const handleSignOut = async () => {
     .nav-links {
         width: 100%;
         justify-content: space-evenly;
-    }
-
-    .baseMode span {
-        display: none;
     }
 
     .lang-btn,
@@ -378,11 +431,22 @@ const handleSignOut = async () => {
     }
 
     .account-menu {
-        min-width: 250px;
+        min-width: 280px;
     }
 }
 
-@media (max-width: 992px) {
+@media (min-width: 768px) {
+    .auth-area .register, .auth-area .login {
+        width: 60%;
+        margin: 0 auto !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .auth-buttons {
+    display: flex;
+    flex-direction: column;
+}
     .navbar-collapse {
         padding-top: 0.75rem;
     }
@@ -405,15 +469,26 @@ const handleSignOut = async () => {
     }
 
     .account-menu {
-        min-width: min(300px, calc(100vw - 2rem));
-        max-width: calc(100vw - 2rem);
-        right: 0;
-        left: auto;
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        width: min(400px, calc(100vw - 2rem));
+        max-height: 85vh;
+        overflow-y: auto;
+        transform: translate(-50%, -50%) scale(0.95) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .account-menu.show {
+        transform: translate(-50%, -50%) scale(1) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .navbar-brand img {
         width: var(--small-brand-logo-width);
     }
-
 }
 </style>

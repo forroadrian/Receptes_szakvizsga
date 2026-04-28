@@ -1,10 +1,15 @@
 {
   "recipe": {
     "title": "Receptek",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "subtitle": "Keress és szűrj ízlésed szerint, hogy megtaláld a számodra legmegfelelőbb ételeket!",
     "searchBar": {
-      "placeholder": "Keresés - pl: Brownie",
-      "active": "Allergének keresése..."
+      "placeholder": "Keresés... (Pl. Brownie)",
+      "active": "Allergének keresése...",
+      "byName": "Recept név alapján",
+      "byIngredient": "Hozzávaló alapján",
+      "ingredientPlaceholder": "Keresés... (Pl. Paradicsom)",
+      "availableIngredients": "Elérhető hozzávalók",
+      "selectedIngredients": "Kiválasztott hozzávaló"
     },
     "filter": {
       "title": "Szűrők",
@@ -15,6 +20,18 @@
       "ai": "AI ajánlás",
       "notFound": "Nincs a szűrésnek megfelelő recept!",
       "add": "Új, saját recept felvétele"
+    },
+    "aiRecommendations": {
+      "loading": "AI ajánlások betöltése...",
+      "loadingSubtitle": "Ez néhány másodpercet vehet igénybe",
+      "refresh": "Új ajánlások kérése",
+      "noResults": "Nem sikerült ajánlásokat betölteni. Próbáld újra!",
+      "rateLimit": "Túl sok kérés érkezett egyszerre. Várj egy percet, majd próbáld újra!",
+      "reasonLabel": "Miért ajánljuk?",
+      "badge": "AI ajánlás",
+      "saveAsRecipe": "Mentés receptként",
+      "filtersInfo": "Az ajánlások a beállított szűrőid alapján készülnek.",
+      "filtersInfoNoFilter": "Nincs aktív szűrő – az ajánlások általánosak."
     },
     "addRecipeModal": {
       "title": "Recept hozzáadása",
@@ -42,6 +59,8 @@
       "form": {
         "name": "Recept neve",
         "namePlaceholder": "Pl. Palacsinta",
+        "image": "Recept képe",
+        "imageDelete": "Receptkép törlése",
         "description": "Recept leírása",
         "descriptionPlaceholder": "Rövid leírás",
         "prepTime": "Elkészítési idő (perc)",
@@ -74,6 +93,37 @@
         "create": "Létrehozás",
         "edit": "Módosítás",
         "update": "Frissítés"
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Add meg a recept nevét.",
+        "invalidChars": "A név csak betűket, vesszőt és szóközt tartalmazhat.",
+        "tooLong": "A név maximum {nameMax} karakter lehet."
+      },
+      "desc": {
+        "required": "Add meg a recept leírását.",
+        "invalidChars": "A leírás csak betűket, számokat és alapvető írásjeleket tartalmazhat.",
+        "tooLong": "A leírás maximum {descMax} karakter lehet."
+      },
+      "time": {
+        "notNumber": "Csak egész számot adj meg.",
+        "range": "Az elkészítési idő {timeMin}–{timeMax} perc között legyen."
+      },
+      "servings": {
+        "notNumber": "Csak egész számot adj meg.",
+        "range": "Az adagok száma {servingsMin}–{servingsMax} fő között legyen."
+      },
+      "ingredients": {
+        "tooFew": "Legalább {ingredientsMin} alapanyag szükséges."
+      },
+      "steps": {
+        "tooFew": "Legalább {stepsMin} lépés szükséges."
+      },
+      "step": {
+        "tooShort": "Minimum {stepMinChars} karakter szükséges.",
+        "tooLong": "Maximum {stepMaxChars} karakter lehet.",
+        "needsLetter": "A lépésnek tartalmaznia kell betűt."
       }
     },
     "card": {

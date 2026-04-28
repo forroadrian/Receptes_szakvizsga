@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
+import GradSwitch from "~/components/Switch.vue";
 
 const colorMode = useColorMode();
 const isReady = ref(false);
@@ -34,15 +35,15 @@ const toggleTheme = () => {
             <div class="auth-topbar-actions">
                 <LanguageSwitcher />
 
-                <button type="button" class="auth-theme-button" @click="toggleTheme"
+                <Button type="button" class="auth-theme-button" @click="toggleTheme"
                     :aria-label="isReady && colorMode.value === 'dark' ? $t('auth.theme.toggleToLight') : $t('auth.theme.toggleToDark')">
                     <span class="auth-theme-icon">
-                        {{ isReady && colorMode.value === 'dark' ? '🌙' : '☀️' }}
+                        <i class="fs-5 pe-2" :class="isReady && colorMode.value === 'dark' ? 'bi bi-moon-stars-fill ' : 'bi bi-sun-fill '"></i>
                     </span>
                     <span>
                         {{ isReady && colorMode.value === 'dark' ? $t('auth.theme.dark') : $t('auth.theme.light') }}
                     </span>
-                </button>
+                </Button>
 
                 <NuxtLink to="/" class="grad orange auth-home-link">
                     {{ $t('auth.home') }}
@@ -148,10 +149,12 @@ const toggleTheme = () => {
 .auth-home-link:hover {
     transform: translateY(-1px);
 }
+ .auth-theme-icon  {
+    color: var(--yellow);
+}
 
-.auth-theme-icon {
-    font-size: 1rem;
-    line-height: 1;
+[data-bs-theme="dark"]  .auth-theme-icon  {
+    color: var(--orange);
 }
 
 [data-bs-theme="dark"] .auth-topbar-inner {

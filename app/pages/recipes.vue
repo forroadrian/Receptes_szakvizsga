@@ -4,19 +4,90 @@ import Button from "~/components/Button.vue";
 import FormInput from "~/components/FormInput.vue";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeFilterStore } from "~/stores/recipeFilters";
+import { useRecipeModal } from "~/composables/useRecipeModal";
+import { useIngredientStore } from "~/stores/ingredients";
 import Pills from "~/components/Pills.vue";
+import type Pill from "~/interfaces/Pill";
 
 const route = useRoute();
 const router = useRouter();
+const { locale, t } = useI18n();
+const { formatIngredient } = useIngredientFormatter();
+const { formatCategory } = useCategoryFormatter();
 
 const recipeStore = useRecipeStore();
 const filterStore = useRecipeFilterStore();
+const recipeModal = useRecipeModal();
+const ingredientStore = useIngredientStore();
 const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const { getRecipeImage } = useRecipeImage();
 const isHydrated = ref(false);
 const INITIAL_RECIPE_COUNT = 10;
 const visibleRecipeCount = ref(INITIAL_RECIPE_COUNT);
+
+const searchMode = ref<'name' | 'ingredient'>('name');
+const selectedIngredientIds = ref<number[]>([]);
+const ingredientSearchText = ref('');
+
+const ingredientPills = computed(() => {
+    if (!ingredientSearchText.value) return [];
+    const all = ingredientStore.availableIngredients ?? [];
+    const selected = selectedIngredientIds.value;
+    const filtered = all.filter((ing: any) =>
+            ing.name.toLowerCase().includes(ingredientSearchText.value.toLowerCase())
+            && !selected.includes(ing.id)).slice(0, 10);
+    return filtered.map((ing: any) => ({
+        name: formatIngredient(ing.id),
+        identifier: ing.id
+    }));
+});
+
+const selectedIngredientPills = computed(() => {
+    const all = ingredientStore.availableIngredients ?? [];
+    return selectedIngredientIds.value
+        .map((id: number) => {
+            const ing = all.find((i: any) => i.id === id);
+            if (!ing) return null;
+            return { name: formatIngredient(ing.id), identifier: ing.id };
+        })
+        .filter(Boolean) as { name: string; identifier: number }[];
+});
+
+const recipesFilteredByIngredients = computed(() => {
+    const base = filterStore.filteredRecipes;
+    if (searchMode.value !== 'ingredient' || selectedIngredientIds.value.length === 0) {
+        return base;
+    }
+
+    const selectedNames = selectedIngredientIds.value.map((id: number) => {
+        const ing = (ingredientStore.availableIngredients ?? []).find((i: any) => i.id === id);
+        return ing ? ing.name.toLowerCase() : '';
+    }).filter(Boolean);
+
+    return base.filter((recipe: any) => {
+        const recipeIngredientNames = (recipe.ingredients ?? []).map((i: any) =>
+            (i.name ?? i._name ?? '').toLowerCase()
+        );
+        return selectedNames.some((name: string) =>
+            recipeIngredientNames.some((rName: string) => rName.includes(name))
+        );
+    });
+});
+
+const removeSelectedIngredient = (id: number) => {
+    selectedIngredientIds.value = selectedIngredientIds.value.filter((i: number) => i !== id);
+};
+
+watch(searchMode, (newMode) => {
+    if (newMode === 'name') {
+        selectedIngredientIds.value = [];
+        ingredientSearchText.value = '';
+    } else {
+        filterStore.search = '';
+    }
+    visibleRecipeCount.value = INITIAL_RECIPE_COUNT;
+});
 
 onMounted(async() => {
     isHydrated.value = true;
@@ -82,7 +153,7 @@ const activeFilterCount = computed(() => filterStore.getActiveFilterCount());
 const getLocalizedPill = (recipe: any) => {
     const translatedCategories = recipe.categories.map((v: any) => {
         return {
-            name: $t('categories.' + v.id),
+            name: formatCategory(v.id),
             identifier: v.id
         }
     })
@@ -94,24 +165,137 @@ const needsLoginForTab = computed(() => {
 });
 
 const visibleRecipes = computed(() => {
-    return filterStore.filteredRecipes.slice(0, visibleRecipeCount.value);
+    return recipesFilteredByIngredients.value.slice(0, visibleRecipeCount.value);
 });
 
 const hasMoreRecipes = computed(() => {
-    return filterStore.filteredRecipes.length > visibleRecipeCount.value;
+    return recipesFilteredByIngredients.value.length > visibleRecipeCount.value;
 });
 
 const loadMoreRecipes = () => {
     visibleRecipeCount.value += INITIAL_RECIPE_COUNT;
 };
 
-watch(() => filterStore.filteredRecipes, () => {
+watch(() => recipesFilteredByIngredients.value, () => {
     visibleRecipeCount.value = INITIAL_RECIPE_COUNT;
 });
 
 const handleTabClick = (tab: any) => {
     filterStore.activeTab = tab;
 };
+
+const handleAddRecipeClick = () => {
+    recipeModal.resetForm();
+};
+
+const triggerAiRecommendations = (force = false) => {
+    filterStore.loadAiRecommendations({
+        language: locale.value,
+        userAllergyIds: allergyWarnings.userAllergyIds.value,
+        force
+    });
+};
+
+const getAiPill = (recipe: any) => {
+    if (!recipe.categories?.length) return [];
+    return dataToPillTag(
+        recipe.categories.map((v: any) => ({ name: v.name, identifier: v.id })),
+        BASIC_CONVERSION
+    );
+};
+
+const openAiRecipeForm = async (recipe: any) => {
+    if (!user.value) {
+        navigateTo('/login');
+        return;
+    }
+
+    await recipeModal.init();
+    recipeModal.resetForm();
+
+    const categories = recipeStore.getAvailableCategories();
+    const mealTypes = categories.filter(c => c.group_type === 'meal');
+    const typeTags = categories.filter(c => c.group_type === 'type');
+
+    const mealMatch = mealTypes.find(
+        m => m.name.toLowerCase() === recipe.mealType?.toLowerCase()
+    );
+    const tagMatches = typeTags
+        .filter(t => recipe.tags?.some(
+            (tag: string) => tag.toLowerCase() === t.name.toLowerCase()
+        ))
+        .map(t => t.id);
+
+    const available = ingredientStore.availableIngredients;
+    const matchedIngredients = (recipe.ingredients ?? [])
+        .map((ing: any) => {
+            const match = available.find(
+                a => a.name.toLowerCase() === ing.name.toLowerCase()
+            );
+            if (!match) return null;
+            return {
+                ingredient_id: match.id,
+                name: match.name,
+                quantity: ing.quantity,
+                unit: ing.unit
+            };
+        })
+        .filter(Boolean);
+
+    recipeModal.recipe.name = recipe.name ?? '';
+    recipeModal.recipe.description = recipe.description ?? '';
+    recipeModal.recipe.prepTime = recipe.prepTime ?? 60;
+    recipeModal.recipe.servings = recipe.servings ?? 4;
+    recipeModal.recipe.mealType = mealMatch?.id ?? null;
+    recipeModal.recipe.tags = tagMatches;
+    recipeModal.recipe.ingredients = matchedIngredients;
+    recipeModal.recipe.instructions = recipe.instructions ?? [];
+
+    if (import.meta.client) {
+        const modalEl = document.getElementById('openAddRecipeModal');
+        if (modalEl) (window as any).bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+};
+
+watch(() => filterStore.activeTab, async (tab) => {
+    if (tab !== 'ai') return;
+    if (!recipeStore.getAllRecipes().length) {
+        await recipeStore.loadRecipes();
+    }
+    triggerAiRecommendations();
+});
+
+// If filters change while on the AI tab, refresh the recommendations
+watch(() => [
+    filterStore.selectedMealId,
+    filterStore.selectedTypeId,
+    filterStore.selectedDurationId,
+    filterStore.selectedAllergyIds,
+    filterStore.search
+], () => {
+    if (filterStore.activeTab === 'ai') {
+        triggerAiRecommendations(true);
+    }
+});
+
+// If language changes while on the AI tab, translate existing recipes instead of regenerating
+watch(locale, () => {
+    if (filterStore.activeTab === 'ai' && filterStore.aiRecommendedRecipes.length) {
+        filterStore.translateAiRecipes(locale.value);
+    }
+});
+
+const tabCounts = computed(() => {
+    const all = recipeStore.getAllRecipes();
+    const userId = user.value?.id ?? user.value?.sub;
+    return {
+        default: all.filter(r => r.author_id === null || r.public === true).length,
+        own: all.filter(r => r.author_id === userId).length,
+        saved: filterStore.savedRecipeIds.length,
+        tried: filterStore.triedRecipeIds.length
+    };
+});
+
 </script>
 <template>
     <RecipeModal />
@@ -123,14 +307,27 @@ const handleTabClick = (tab: any) => {
                 {{ $t('recipe.subtitle') }}
             </p>
 
-            <div class="row align-items-center justify-content-between">
+            <div class="row align-items-end justify-content-between">
                 <div class="col-lg-9 col-md-8 search-wrap my-3">
-                    <SearchBar v-model="filterStore.search" :placeholder="$t('recipe.searchBar.placeholder')"
-                        class="recipes-search w-100" />
+                    <div class="search-mode-toggle d-flex gap-2 mb-3">
+                        <div class="search-mode-btn" :class="{ active: searchMode === 'name' }" @click="searchMode = 'name'">
+                            <i class="bi bi-fonts me-1"></i>
+                            {{ $t('recipe.searchBar.byName') }}
+                        </div>
+                        <div class="search-mode-btn" :class="{ active: searchMode === 'ingredient' }" @click="searchMode = 'ingredient'">
+                            <i class="bi bi-egg me-1"></i>
+                            {{ $t('recipe.searchBar.byIngredient') }}
+                        </div>
+                    </div>
+                        <SearchBar  v-if="searchMode === 'name'" v-model="filterStore.search"
+                        :placeholder="$t('recipe.searchBar.placeholder')"  class="recipes-search w-100" />
+                    
+                    <div v-if="searchMode === 'ingredient'">
+                        <SearchBar v-model="ingredientSearchText" :placeholder="$t('recipe.searchBar.ingredientPlaceholder')"  class="recipes-search w-100"/>
+                    </div>
                 </div>
-
-                <div class="filter-button col-lg-2 col-md-3 col-sm-6 mx-sm-auto">
-                    <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap" data-bs-toggle="offcanvas"
+                <div class="filter-button col-lg-3 col-md-4 col-sm-6 mx-sm-auto">
+                    <Button outline icon="bi bi-funnel" class="w-100 px-5 text-nowrap mb-3" data-bs-toggle="offcanvas"
                         data-bs-target="#recipeFiltersOffcanvas" aria-controls="recipeFiltersOffcanvas">
                         {{ $t('recipe.filter.title') }}
                         <span v-if="isHydrated && activeFilterCount" class="filter-count d-inline-flex me-3">
@@ -138,39 +335,53 @@ const handleTabClick = (tab: any) => {
                         </span>
                     </Button>
                 </div>
-            </div>
+                <div v-if="searchMode === 'ingredient'">
+                          <div v-if="selectedIngredientPills.length" class="mt-3">
+                            <p class="small text-muted mb-1">{{ $t('recipe.searchBar.selectedIngredients') }}</p>
+                            <Pills :pills="selectedIngredientPills" all-active removable icon="bi-x-circle" @remove="removeSelectedIngredient"/>
+                        </div>
+
+                        <div v-if="ingredientPills.length" class="mt-2 ingredient-pills-container">
+                            <p class="small text-muted mb-1">{{ $t('recipe.searchBar.availableIngredients')  }}</p>
+                            <Pills :pills="ingredientPills" interactive multi v-model="selectedIngredientIds" icon="bi-plus-circle"/>
+                        </div>
+                    </div>
+                </div>
 
             <nav class="recipes-tabs mt-3">
-                <ul class="d-flex flex-wrap list-unstyled gap-4">
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'default' }"
+                <ul class="row list-unstyled g-3 g-md-0 justify-content-lg-evenly pt-3">
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-three-dots" :class="{ active: filterStore.activeTab === 'default' }"
                             @click="handleTabClick('default')">
-                            {{ $t('recipe.filter.default') }}
-                        </button>
+                            {{ $t('recipe.filter.default') }} {{ tabCounts.default ? `(${tabCounts.default})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'own' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-person" :class="{ active: filterStore.activeTab === 'own' }"
                             @click="handleTabClick('own')">
-                            {{ $t('recipe.filter.own') }}
-                        </button>
+                            {{ $t('recipe.filter.own') }} {{ tabCounts.own ? `(${tabCounts.own})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'saved' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-star" :class="{ active: filterStore.activeTab === 'saved' }"
                             @click="handleTabClick('saved')">
-                            {{ $t('recipe.filter.liked') }}
-                        </button>
+                            {{ $t('recipe.filter.liked') }} {{ tabCounts.saved ? `(${tabCounts.saved})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'tried' }"
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3">
+                        <Button type="button" class="tab-btn" icon="bi bi-check-circle" :class="{ active: filterStore.activeTab === 'tried' }"
                             @click="handleTabClick('tried')">
-                            {{ $t('recipe.filter.tried') }}
-                        </button>
+                            {{ $t('recipe.filter.tried') }} {{ tabCounts.tried ? `(${tabCounts.tried})` : '' }}
+                        </Button>
                     </li>
-                    <li>
-                        <button type="button" class="tab-btn" :class="{ active: filterStore.activeTab === 'ai' }"
-                            @click="handleTabClick('ai')">
-                            {{ $t('recipe.filter.ai') }}
-                        </button>
+
+                    <li class="col-12 col-sm-6 col-md-4 col-lg-auto pb-md-3" >
+                        <Button type="button" class="tab-btn" icon="bi bi-stars" :class="{ active: filterStore.activeTab === 'ai' }" 
+                            @click="handleTabClick('ai')"> {{ $t('recipe.filter.ai') }}
+                        </Button>
                     </li>
                 </ul>
             </nav>
@@ -183,27 +394,53 @@ const handleTabClick = (tab: any) => {
                 </Button>
             </div>
 
-            <div v-if="!needsLoginForTab && !filterStore.filteredRecipes.length" class="text-center py-5">
-                <p class="mb-0 fw-bold py-3">
-                    {{ $t('recipe.filter.notFound') }}
-                </p>
-                <Button v-if="user" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
-                :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                {{ $t('recipe.filter.add') }}
-                </Button>
+            <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai' && filterStore.aiLoading" class="ai-loading-state text-center py-5">
+                <div class="ai-loading-spinner mb-3">
+                    <i class="bi bi-stars ai-loading-icon"></i>
+                </div>
+                <p class="fw-semibold mb-1">{{ $t('recipe.aiRecommendations.loading') }}</p>
+                <p class="text-muted small">{{ $t('recipe.aiRecommendations.loadingSubtitle') }}</p>
             </div>
 
-            <div v-if="!needsLoginForTab && filterStore.filteredRecipes.length" class="row">
-                <div v-if="user" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-4 d-flex justify-content-center align-items-center"
-                    :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null">
-                    <div class="row text-center py-4">
+            <div v-if="!needsLoginForTab && filterStore.activeTab === 'ai' && filterStore.aiLoaded && !filterStore.aiLoading" class="d-flex justify-content-end mb-3">
+                <button class="ai-refresh-btn" @click="triggerAiRecommendations(true)">
+                    <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('recipe.aiRecommendations.refresh') }}
+                </button>
+            </div>
+
+            <div v-if="!needsLoginForTab && !recipesFilteredByIngredients.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)" class="text-center py-5">
+                <p class="mb-0 fw-bold py-3">
+                    <template v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded">
+                        <i v-if="filterStore.aiError === 'rate_limit'" class="bi bi-clock me-1"></i>
+                        <i v-else class="bi bi-exclamation-circle me-1"></i>
+                        {{ filterStore.aiError === 'rate_limit'
+                            ? $t('recipe.aiRecommendations.rateLimit')
+                            : $t('recipe.aiRecommendations.noResults') }}
+                    </template>
+                    <template v-else>{{ $t('recipe.filter.notFound') }}</template>
+                </p>
+                <Button v-if="user && filterStore.activeTab !== 'ai'" icon="bi bi-plus-lg" color="orange" class="mx-auto my-3"
+                :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
+                @click="handleAddRecipeClick">
+                {{ $t('recipe.filter.add') }}
+                </Button>
+                <button v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded" class="ai-refresh-btn mt-2" @click="triggerAiRecommendations(true)">
+                    <i class="bi bi-arrow-clockwise me-1"></i>{{ $t('recipe.aiRecommendations.refresh') }}
+                </button>
+            </div>
+
+            <div v-if="!needsLoginForTab && recipesFilteredByIngredients.length" class="row">
+                <div v-if="user && filterStore.activeTab !== 'ai'" class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
+                    :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
+                    @click="handleAddRecipeClick">
+                    <div class="row text-center py-3">
                         <span class="plus-icon">+</span>
                         <p>{{ $t('recipe.addRecipeModal.title') }}</p>
                     </div>
                 </div>
                 <div v-for="recipe in visibleRecipes"
-                    class="recipe-cards col-12 col-md-6 col-lg-4 my-sm-4 ">
-                    <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
+                    class="recipe-cards col-12 col-md-6 col-lg-4 my-3">
+                    <NuxtLink v-if="!recipe.isAi" :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
                             metadata-class="w-100" footer-class="w-100" class="h-100">
                             <template #media>
@@ -227,9 +464,7 @@ const handleTabClick = (tab: any) => {
                             <template #body>
                                 <div class="row justify-content-center">
                                     <div class="col-10 col-lg-8">
-                                        <p class="text-center mb-3 small">
-                                            {{ recipe.description }}
-                                        </p>
+                                        <p class="text-center mb-3 small">{{ recipe.description }}</p>
                                     </div>
                                 </div>
                             </template>
@@ -245,11 +480,9 @@ const handleTabClick = (tab: any) => {
                                         {{ recipe.servings }} {{ $t('recipe.card.metadata.people', recipe.servings) }}
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <div v-if="recipe.categories?.length">
-                                          <Pills :pills="getLocalizedPill(recipe)"
-                                            class="d-flex justify-content-center" />
+                                        <Pills :pills="getLocalizedPill(recipe)" class="d-flex justify-content-center" />
                                     </div>
                                 </div>
                             </template>
@@ -257,8 +490,7 @@ const handleTabClick = (tab: any) => {
                             <template #footer>
                                 <div class="row pt-2">
                                     <div class="col-12 text-center small my-auto text-danger">
-                                        <template
-                                            v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
+                                        <template v-if="isHydrated && user && allergyWarnings.hasAllergyWarning(recipe)">
                                             <strong>
                                                 <i class="bi bi-exclamation-triangle-fill p-2"></i> {{ $t('recipe.card.footer.warning') }}
                                             </strong>{{ allergyWarnings.getMatchingAllergyNames(recipe) }}
@@ -268,6 +500,68 @@ const handleTabClick = (tab: any) => {
                             </template>
                         </CardBase>
                     </NuxtLink>
+
+                    <div v-else class="ai-recipe-wrapper text-decoration-none text-reset h-100 d-block">
+                        <CardBase orientation="vertical" variant="outline" media-position="top" body-class="w-100"
+                            metadata-class="w-100" footer-class="w-100" class="h-100">
+                            <template #media>
+                                <div class="row pt-4">
+                                    <div class="d-flex justify-content-center card-media">
+                                        <img :src="getRecipeImage(recipe)" :alt="recipe.name" />
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #header>
+                                <CardHeader class="w-100 card-header my-4 pt-5">
+                                    <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
+                                    <template #actions>
+                                        <span title="AI" class="top-0 start-50 translate-middle ai-badge-icon"><i class="bi bi-stars"></i></span>
+                                    </template>
+                                </CardHeader>
+                            </template>
+
+                            <template #body>
+                                <div class="row justify-content-center">
+                                    <div class="col-10 col-lg-8">
+                                        <p class="text-center mb-3 small">{{ recipe.description }}</p>
+                                        <div v-if="recipe.reason" class="ai-reason-badge">
+                                            <i class="bi bi-stars me-1"></i>
+                                            <span>{{ recipe.reason }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #metadata>
+                                <div class="row justify-content-center mb-3 py-2">
+                                    <div class="col-auto">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ recipe.time }} {{ $t('recipe.card.metadata.time', recipe.time) }}
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-people me-1"></i>
+                                        {{ recipe.servings }} {{ $t('recipe.card.metadata.people', recipe.servings) }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div v-if="recipe.categories?.length">
+                                        <Pills :pills="getAiPill(recipe)" class="d-flex justify-content-center" />
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template #footer>
+                                <div class="row pt-2">
+                                    <div class="col-12 text-center">
+                                        <Button color="orange" icon="bi bi-bookmark-plus" class="mx-auto" @click="openAiRecipeForm(recipe)">
+                                            {{ $t('recipe.aiRecommendations.saveAsRecipe') }}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </template>
+                        </CardBase>
+                    </div>
                 </div>
             </div>
 
@@ -358,16 +652,35 @@ const handleTabClick = (tab: any) => {
     height: 50px;
 }
 
+.search-mode-toggle {
+    border: 1.5px solid var(--bs-border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    width: fit-content;
+}
+
+.search-mode-btn {
+    background: var(--bs-body-bg);
+    color: var(--bs-secondary-color);
+    padding: 10px ;
+    font-size: var(--small-text);
+}
+
+.search-mode-btn.active, .search-mode-btn.active {
+    background: var(--bs-emphasis-color);
+    color: var(--bs-body-bg);
+}
+
 .card-media {
     height: 180px;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-media img {
-    max-width: 80%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
@@ -428,12 +741,14 @@ const handleTabClick = (tab: any) => {
 .tab-btn {
     background: none;
     border: none;
+    margin: auto;
+    padding: 0px;
 }
 
 .addRecipe,
 .tab-btn,
 .offcanvas-filters .form-check-label,
-.offcanvas-filters .form-check-input[type="radio"] {
+.offcanvas-filters .form-check-input[type="radio"], .search-mode-btn  {
     cursor: pointer;
 }
 
@@ -442,8 +757,13 @@ const handleTabClick = (tab: any) => {
     color: var(--dark);
 }
 
+.tab-btn::after{
+    animation: none!important;
+}
+
 .tab-btn.active {
     border-bottom: 2px solid var(--bs-emphasis-color);
+    border-radius: 0;
     font-weight: 500;
 }
 
@@ -452,7 +772,7 @@ const handleTabClick = (tab: any) => {
 }
 
 .filter-title,
-.filter-count {
+.filter-count, .search-mode-btn.active {
     font-weight: 700;
 }
 .filter-count, .card-header{
@@ -486,5 +806,119 @@ const handleTabClick = (tab: any) => {
         max-height: 150px;
         margin: 30px 0px;
     }
+}
+
+/* AI Recommendations */
+.ai-loading-state {
+    padding: 3rem 0;
+}
+
+.ai-loading-icon {
+    font-size: 2.5rem;
+    color: var(--bs-emphasis-color);
+    animation: ai-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.ai-refresh-btn {
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--bs-body-color);
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.ai-refresh-btn:hover {
+    background: var(--bs-tertiary-bg, #e9ecef);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.ai-reason-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color);
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.ai-reason-badge i {
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.ai-recipe-wrapper {
+    cursor: default;
+}
+
+.ai-badge-icon {
+    color: var(--orange);
+    font-size: 1.1rem;
+}
+
+/* AI Filters Info Banner */
+.ai-filters-banner {
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-left: 3px solid var(--orange);
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+}
+
+.ai-filters-banner-icon {
+    color: var(--orange);
+    font-size: 1rem;
+}
+
+.ai-filters-banner-text {
+    color: var(--bs-body-color);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.ai-filters-no-filter {
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+}
+
+.ai-active-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bs-tertiary-bg, #f1f3f5);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--bs-body-color);
+}
+
+
+
+/* Banner transition */
+.ai-banner-enter-active,
+.ai-banner-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ai-banner-enter-from,
+.ai-banner-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
 }
 </style>

@@ -13,6 +13,7 @@ const emit = defineEmits<{
 const menuStore = useMenuStore();
 const missing = useMissingIngredients();
 const { t, locale } = useI18n();
+const { formatUnit } = useUnitFormatter();
 
 const modalElRef = ref<HTMLElement | null>(null);
 let modalInstance: any = null;
@@ -237,7 +238,7 @@ defineExpose({ open });
                                 >
                                     <span class="missing-name">{{ item.ingredient_name }}</span>
                                     <span class="missing-qty">
-                                        {{ item.required_quantity }} {{ item.required_unit }}
+                                        {{ item.required_quantity }} {{ formatUnit(item.required_unit) }}
                                     </span>
                                     <span
                                         v-if="item.has_expired_stock"

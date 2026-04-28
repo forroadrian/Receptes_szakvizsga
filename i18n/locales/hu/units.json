@@ -1,0 +1,23 @@
+{
+  "units": {
+    "g": "g",
+    "dkg": "dkg",
+    "kg": "kg",
+    "ml": "ml",
+    "dl": "dl",
+    "l": "l",
+    "tsp": "tk",
+    "tbsp": "ek",
+    "c": "csésze",
+    "pt": "pint",
+    "qt": "qt",
+    "gal": "gal",
+    "oz": "uncia",
+    "lb": "font",
+    "db": "db",
+    "csipet": "csipet",
+    "csomag": "csomag",
+    "gerezd": "gerezd",
+    "tk": "tk"
+  }
+}

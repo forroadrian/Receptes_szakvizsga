@@ -9,6 +9,7 @@ const emit = defineEmits<{
 
 const store = useIngredientStore();
 const { locale } = useI18n();
+const { formatIngredient } = useIngredientFormatter();
 
 const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
@@ -85,7 +86,7 @@ const onItemClick = (id: number) => emit("jump", id);
                             class="item-link text-truncate"
                             @click="onItemClick(item.id)"
                         >
-                            {{ $t('ingredient.' + item.id) }}
+                            {{ formatIngredient(item.id) }}
                         </button>
                     </template>
                     <span v-else class="empty-label">{{ $t('pantry.upcoming.empty') }}</span>

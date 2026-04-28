@@ -1,0 +1,31 @@
+{
+    "chatbot": {
+        "title": "Recipe Assistant",
+        "placeholder": "Ask a question...",
+        "send": "Send",
+        "openRecipe": "Open recipe",
+        "loading": "Thinking...",
+        "error": "Something went wrong. Please try again.",
+        "openBtn": "Open assistant",
+        "newChat": "New conversation",
+        "expired": "Looks like you disappeared! 👋 The chat has ended due to 5 minutes of inactivity. Click the pencil icon to start a new chat.",
+        "welcome": "Welcome to MenuPlanr! How can I help you?",
+        "suggestions": {
+            "whatCanIDo": "ℹ️ What is MenuPlanr for?",
+            "suggestRecipe": "🍽️ Suggest me a recipe!",
+            "fromPantry": "🛒 What can I cook from my ingredients?",
+            "quickMeal": "⚡ Quick and easy meal ideas"
+        },
+        "context": {
+            "intro": "What I know about you",
+            "pantry": "{count} items",
+            "pantryEmpty": "empty pantry",
+            "expiring": "{count} expiring soon",
+            "allergies": "Allergens",
+            "noAllergies": "no allergens",
+            "guestMode": "Guest mode",
+            "guestRemaining": "{count} questions left"
+        },
+        "guestLockedPlaceholder": "Sign up to keep chatting..."
+    }
+}

@@ -8,6 +8,7 @@ import RecipeModal from "~/components/recipe/RecipeModal.vue";
 import ConfirmModal from "~/components/recipe/ConfirmModal.vue";
 
 const { t } = useI18n();
+const { formatUnit } = useUnitFormatter();
 const filterStore = useRecipeFilterStore();
 const recipeStore = useRecipeStore();
 const recipeModal = useRecipeModal();
@@ -149,7 +150,7 @@ onMounted(async () => {
                     <ul class="p-0">
                         <li v-for="ingredient in currentRecipe?.ingredients" class="border-bottom d-flex">
                             <p>{{ ingredient.name }}</p>
-                            <p>{{ ingredient.quantity }} {{ ingredient.unit }}</p>
+                            <p>{{ ingredient.quantity }} {{ formatUnit(ingredient.unit) }}</p>
                         </li>
                     </ul>
                 </div>

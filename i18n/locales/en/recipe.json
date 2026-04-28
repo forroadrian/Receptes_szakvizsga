@@ -1,12 +1,15 @@
 {
   "recipe": {
     "title": "Recipes",
-    "subtitle": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sed ut perspiciatis, unde omnis iste natus",
+    "subtitle": "Search and filter by your taste to find the meals that suit you best!",
     "searchBar": {
-      "placeholder": "E.g Brownie",
+      "placeholder": "Search... (E.G Brownie)",
       "active": "Searching for allergen...",
-      "byName": "Recipe name",
-      "byIngredient": "Ingredient"
+      "byName": " By recipe name",
+      "byIngredient": "By ingredient",
+      "ingredientPlaceholder": "Search (E.G Tomato)...",
+      "availableIngredients": "Available ingredients",
+      "selectedIngredients": "Selected ingredients"
     },
     "filter": {
       "title": "Filter",
@@ -17,6 +20,18 @@
       "ai": "AI suggestion",
       "notFound": "Theres no recipe that matches this criteria!",
       "add": "Create new recipe."
+    },
+    "aiRecommendations": {
+      "loading": "Loading AI recommendations...",
+      "loadingSubtitle": "This may take a few seconds",
+      "refresh": "Get new recommendations",
+      "noResults": "Could not load recommendations. Please try again!",
+      "rateLimit": "Too many requests at once. Please wait a minute and try again!",
+      "reasonLabel": "Why we recommend it?",
+      "badge": "AI pick",
+      "saveAsRecipe": "Save as my recipe",
+      "filtersInfo": "Recommendations are based on your active filters.",
+      "filtersInfoNoFilter": "No active filters – recommendations are general."
     },
     "addRecipeModal": {
       "title": "Create new recipe",
@@ -44,6 +59,8 @@
       "form": {
         "name": "Recipe name",
         "namePlaceholder": "E.g. Pancake",
+        "image": "Recipe image",
+        "imageDelete": "Delete recipe image",
         "description": "Recipe description",
         "descriptionPlaceholder": "Short description",
         "prepTime": "Preparation time (minutes)",
@@ -76,6 +93,37 @@
         "create": "Create",
         "edit": "Save changes",
         "update": "Update"
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Enter the recipe name.",
+        "invalidChars": "Name can only contain letters, commas, and spaces.",
+        "tooLong": "Name must be at most {nameMax} characters."
+      },
+      "desc": {
+        "required": "Enter the recipe description.",
+        "invalidChars": "Description can only contain letters, numbers, and basic punctuation.",
+        "tooLong": "Description must be at most {descMax} characters."
+      },
+      "time": {
+        "notNumber": "Please enter a whole number.",
+        "range": "Prep time must be between {timeMin}–{timeMax} minutes."
+      },
+      "servings": {
+        "notNumber": "Please enter a whole number.",
+        "range": "Servings must be between {servingsMin}–{servingsMax}."
+      },
+      "ingredients": {
+        "tooFew": "At least {ingredientsMin} ingredients required."
+      },
+      "steps": {
+        "tooFew": "At least {stepsMin} steps required."
+      },
+      "step": {
+        "tooShort": "Minimum {stepMinChars} characters required.",
+        "tooLong": "Maximum {stepMaxChars} characters allowed.",
+        "needsLetter": "Step must contain at least one letter."
       }
     },
     "card": {

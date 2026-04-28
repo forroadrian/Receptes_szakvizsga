@@ -245,7 +245,7 @@ const closeConfirmationModal = () => {
 
                     <div class="mt-3 d-flex justify-content-center">
                         <p class="pe-3">{{ $t('register.alreadyRegistered') }}</p>
-                        <NuxtLink to="/login">{{ $t('register.loginLink') }}</NuxtLink>
+                        <NuxtLink to="/login" :class="{ 'link-disabled': signupLoading }">{{ $t('register.loginLink') }}</NuxtLink>
                     </div>
                 </form>
             </div>

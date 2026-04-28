@@ -150,7 +150,7 @@ onMounted(async () => {
                         </button>
 
                         <p v-if="loading" class="loading-note text-muted small mb-0 py-2 text-center">
-                            {{$t('common.actions.loading')}}
+                            {{$t('common.loading')}}
                         </p>
 
                         <div v-else-if="!filtered.length" class="empty-list">

@@ -1,0 +1,31 @@
+{
+    "chatbot": {
+        "title": "Recept Asszisztens",
+        "placeholder": "Írj egy kérdést...",
+        "send": "Küldés",
+        "openRecipe": "Recept megnyitása",
+        "loading": "Gondolkodik...",
+        "error": "Hiba történt. Kérlek próbáld újra.",
+        "openBtn": "Asszisztens megnyitása",
+        "newChat": "Új beszélgetés",
+        "expired": "Úgy tűnik eltűntél! 👋 A beszélgetés 5 perc inaktivitás miatt lezárult. Új chat indításához kattints a ceruza ikonra.",
+        "welcome": "Üdvözöljük a MenuPlanr-en! Miben segíthetek?",
+        "suggestions": {
+            "whatCanIDo": "ℹ️ Mire való a MenuPlanr?",
+            "suggestRecipe": "🍽️ Ajánlj egy receptet!",
+            "fromPantry": "🛒 Mit főzzek a hozzávalóimból?",
+            "quickMeal": "⚡ Gyors és egyszerű ételötletek"
+        },
+        "context": {
+            "intro": "Ezt látom rólad",
+            "pantry": "{count} alapanyag",
+            "pantryEmpty": "üres kamra",
+            "expiring": "{count} hamarosan lejár",
+            "allergies": "Allergiák",
+            "noAllergies": "nincs allergia",
+            "guestMode": "Vendég mód",
+            "guestRemaining": "{count} kérdés maradt"
+        },
+        "guestLockedPlaceholder": "Regisztrálj a folytatáshoz..."
+    }
+}

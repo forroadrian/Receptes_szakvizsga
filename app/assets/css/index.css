@@ -147,7 +147,7 @@
 
 .hero-image {
     position: relative;
-    min-height: 560px;
+    min-height: 700px;
     background-image: url('../images/hero-img.png');
     background-position: center bottom;
     background-repeat: no-repeat;
@@ -379,7 +379,11 @@
     .hero {
         min-height: auto;
         padding-top: 4.5rem;
-        padding-bottom: 8.5rem;
+        padding-bottom: 3rem;
+    }
+
+    .custom-shape-divider-bottom-1776970496 svg {
+        height: 80px;
     }
 
     .hero-copy {

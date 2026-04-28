@@ -60,7 +60,7 @@ const ownRecipes = computed(() =>
 
 const publicRecipes = computed(() =>
     allRecipes.value.filter(
-        (r) => r.active && r.author_id !== currentUserId.value
+        (r) => r.active && r.public && r.author_id !== currentUserId.value
     )
 );
 
@@ -176,7 +176,7 @@ defineExpose({ openFor });
         >
             <div class="modal-dialog modal-dialog-centered modal-lg recipe-add-dialog">
                 <div class="modal-content recipe-add-modal">
-                    <div class="modal-header">
+                    <div class="modal-header d-flex justify-content-between align-items-start">
                         <div class="d-flex flex-column">
                             <h2 id="recipeAddModalLabel" class="modal-title fs-4 mb-1">
                                 {{ $t('menu.addModal.title') }}
@@ -185,7 +185,7 @@ defineExpose({ openFor });
                         </div>
                         <button
                             type="button"
-                            class="btn-close ms-3"
+                            class="btn-close ms-auto"
                             data-bs-dismiss="modal"
                             :aria-label="$t('common.actions.close')"
                         ></button>

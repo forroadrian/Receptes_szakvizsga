@@ -68,15 +68,26 @@
     font-weight: 700;
 }
 
-.step-index {
-    border: 1px solid var(--bs-border-color);
-    background: var(--bs-tertiary-bg);
+.summary-row strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
+@media (max-width: 576px) {
+    .summary-row strong {
+        max-width: 120px;
+    }
+}
+
+
+
 .step-btn.active .step-index {
-    background: var(--accent-grad);
-    border-color: transparent;
-    box-shadow: 0 10px 20px rgba(193, 154, 107, 0.28);
+    background: var(--grad-orange);
+    color: var(--text-light);
 }
 
 .step-text {
@@ -126,6 +137,15 @@
     background: var(--grad-dark);
     color: #fff;
     box-shadow: var(--shadow-md);
+}
+
+
+.bi-toggle-on { font-size: 26px; }
+.bi-toggle-off { font-size: 26px; color: var(--bs-secondary-color); }
+
+.recipe-modal, .recipe-panel, .ingredient-item, .instruction-item {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .recipe-instruction-text,
