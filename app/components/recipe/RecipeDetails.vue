@@ -78,6 +78,13 @@ const handleToggleTried = async () => {
     await filterStore.toggleTried(currentRecipe.value.id);
 };
 
+useHead({
+  titleTemplate: (title?: string) => {
+    const siteName = t('common.siteName')
+    return title ? `${title} · ${siteName} - ${currentRecipe.value}` : siteName
+  },
+})
+
 onMounted(async () => {
     await filterStore.loadUserRecipeIds();
 });

@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from "vue";
 import { defineStore } from "pinia";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
 import { useIngredientStore } from "~/stores/ingredients";
+import { useIngredientTaxonomyStore } from "~/stores/ingredientTaxonomy";
 import { useRecipeImageUpload } from "#imports";
 import { useRecipeValidation, LIMITS } from "~/composables/useRecipeValidation";
 
@@ -27,8 +28,10 @@ const createInitialRecipeState = () => ({
 export const useRecipeModal = defineStore("recipeModal", () => {
     const recipeStore = useRecipeStore();
     const ingredientStore = useIngredientStore();
+    const taxonomyStore = useIngredientTaxonomyStore();
     const user = useSupabaseUser();
     const { showAlert } = useAlert();
+    const { formatIngredient } = useIngredientFormatter();
 
     const recipe = ref(createInitialRecipeState());
     const editingRecipeId = ref<number | null>(null);
@@ -40,6 +43,9 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const selectedIngredientUnit = ref("");
     const editingIngredientIndex = ref<number | null>(null);
     const editingInstructionIndex = ref<number | null>(null);
+    const pickerMode = ref<"single" | "bulk">("bulk");
+    const bulkRows = ref<RecipeIngredientFormItem[]>([]);
+    const treeQuery = ref("");
     const isSaving = ref(false);
     const errorMessage = ref("");
     const needsReload = ref(false);
@@ -64,6 +70,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const categories = computed(() => recipeStore.getAvailableCategories());
     const availableIngredients = computed(() => ingredientStore.availableIngredients);
     const availableUnits = computed(() => ingredientStore.units);
+    const taxonomyTree = computed(() => taxonomyStore.tree);
     const mealTypes = computed(() => categories.value.filter(c => c.group_type === "meal"));
     const tags = computed(() => categories.value.filter(c => c.group_type === "type"));
     const selectedMealType = computed(() => mealTypes.value.find(c => c.id === recipe.value.mealType) ?? null);
@@ -74,12 +81,26 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         return availableIngredients.value.filter(i => i.name.toLowerCase().includes(q)).slice(0, 12);
     });
 
-    const hasSelectedIngredient = computed(() =>
-        availableIngredients.value.some(i => i.id === selectedIngredientId.value)
-    );
+    const hasSelectedIngredient = computed(() => selectedIngredientId.value !== null);
 
     const isEditingIngredient = computed(() => editingIngredientIndex.value !== null);
     const isEditingInstruction = computed(() => editingInstructionIndex.value !== null);
+
+    const singleSelectedSet = computed(() =>
+        selectedIngredientId.value !== null ? new Set([selectedIngredientId.value]) : new Set<number>()
+    );
+
+    const bulkSelectedSet = computed(() => new Set(bulkRows.value.map((r) => r.ingredient_id)));
+
+    const effectivePickerMode = computed<"single" | "bulk">(() =>
+        isEditingIngredient.value ? "single" : pickerMode.value
+    );
+
+    const hasBulkRows = computed(() => bulkRows.value.length > 0);
+
+    const bulkInvalidRowCount = computed(
+        () => bulkRows.value.filter((r) => !Number.isFinite(r.quantity) || r.quantity <= 0 || !r.unit).length
+    );
 
     const {
         validateStepText, isStepValid,
@@ -98,7 +119,8 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     async function init() {
         await Promise.all([
             recipeStore.loadAvailableCategories(),
-            ingredientStore.loadAvailableIngredients()
+            ingredientStore.loadAvailableIngredients(),
+            taxonomyStore.load()
         ]);
         if (!selectedIngredientUnit.value && ingredientStore.units.length > 0) {
             selectedIngredientUnit.value = ingredientStore.units[0];
@@ -152,14 +174,88 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         if (existing) selectedIngredientUnit.value = existing.unit;
     }
 
+    function ingredientNameFor(id: number): string {
+        const item = availableIngredients.value.find((a) => a.id === id);
+        return item?.name ?? formatIngredient(id) ?? String(id);
+    }
+
+    function onSinglePickerUpdate(next: Set<number>) {
+        const it = next.values().next();
+        const id = it.done ? null : (it.value as number);
+        if (id === null) {
+            selectedIngredientId.value = null;
+            ingredientSearch.value = "";
+            showIngredientResults.value = false;
+            return;
+        }
+        selectIngredient(id, ingredientNameFor(id));
+    }
+
+    function onBulkPickerUpdate(next: Set<number>) {
+        const oldIds = new Set(bulkRows.value.map((r) => r.ingredient_id));
+        for (const id of next) {
+            if (oldIds.has(id)) continue;
+            const existing = recipe.value.ingredients.find((i) => i.ingredient_id === id);
+            bulkRows.value.push({
+                ingredient_id: id,
+                name: ingredientNameFor(id),
+                quantity: existing?.quantity ?? 1,
+                unit: existing?.unit ?? availableUnits.value[0] ?? "",
+            });
+        }
+        bulkRows.value = bulkRows.value.filter((r) => next.has(r.ingredient_id));
+    }
+
+    function removeBulkRow(index: number) {
+        bulkRows.value.splice(index, 1);
+    }
+
+    function clearBulkSelection() {
+        bulkRows.value = [];
+    }
+
+    function commitBulkIngredients() {
+        if (bulkRows.value.length === 0) return;
+        for (const row of bulkRows.value) {
+            if (!Number.isFinite(row.quantity) || row.quantity <= 0 || !row.unit) continue;
+
+            const existing = recipe.value.ingredients.find(
+                (i) => i.ingredient_id === row.ingredient_id && i.unit === row.unit
+            );
+            const wouldAddNew = !existing;
+            if (wouldAddNew && tooManyIngredients.value) continue;
+
+            if (existing) {
+                existing.quantity = Math.round((existing.quantity + row.quantity) * 1000) / 1000;
+            } else {
+                recipe.value.ingredients.push({
+                    ingredient_id: row.ingredient_id,
+                    name: row.name,
+                    quantity: row.quantity,
+                    unit: row.unit,
+                });
+            }
+        }
+        bulkRows.value = [];
+    }
+
+    function switchPickerMode(m: "single" | "bulk") {
+        if (pickerMode.value === m) return;
+        if (m === "single") {
+            bulkRows.value = [];
+        } else {
+            cancelIngredientEdit();
+        }
+        pickerMode.value = m;
+    }
+
     function addOrUpdateIngredient() {
-        const selected = availableIngredients.value.find(i => i.id === selectedIngredientId.value);
-        if (!selected) return;
+        if (selectedIngredientId.value === null) return;
         if (editingIngredientIndex.value === null && tooManyIngredients.value) return;
 
         const item: RecipeIngredientFormItem = {
-            ingredient_id: selected.id,
-            name: selected.name,
+            ingredient_id: selectedIngredientId.value,
+            name: ingredientNameFor(selectedIngredientId.value),
             quantity: Number(selectedIngredientQuantity.value),
             unit: selectedIngredientUnit.value
         };
@@ -280,6 +376,9 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         instructionInput.value = "";
         editingInstructionIndex.value = null;
         resetIngredientFields();
+        bulkRows.value = [];
+        pickerMode.value = "bulk";
+        treeQuery.value = "";
         errorMessage.value = "";
         resetImage();
     }
@@ -368,6 +467,9 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         selectedIngredientId, selectedIngredientQuantity, selectedIngredientUnit,
         editingIngredientIndex, isEditingIngredient,
         editingInstructionIndex, isEditingInstruction,
+        pickerMode, bulkRows, hasBulkRows, bulkInvalidRowCount,
+        singleSelectedSet, bulkSelectedSet, effectivePickerMode,
+        treeQuery, taxonomyTree,
         isSaving, errorMessage, closeButton,
         mealTypes, tags, selectedMealType,
         availableUnits, filteredIngredients, hasSelectedIngredient,
@@ -381,6 +483,8 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         canSubmit, canAddStep, stepInputErr, LIMITS,
         init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
+        onSinglePickerUpdate, onBulkPickerUpdate, removeBulkRow,
+        commitBulkIngredients, clearBulkSelection, switchPickerMode,
         addOrUpdateIngredient, editIngredient, cancelIngredientEdit, removeIngredient,
         addOrUpdateInstruction, editInstruction, cancelInstructionEdit, removeInstruction,
         moveInstructionUp, moveInstructionDown, toggleTag,

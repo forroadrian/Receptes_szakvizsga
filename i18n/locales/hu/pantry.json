@@ -64,6 +64,13 @@
         "unitPlaceholder": "Egység",
         "expiry": "Lejárati dátum"
       },
+      "spread": {
+        "pickEyebrow": "Alapanyagok",
+        "pickTitle": "Válassz egyet",
+        "searchPlaceholder": "Keress vagy tallózz...",
+        "fillEyebrow": "Hozzávaló",
+        "namePlaceholder": "válassz egy alapanyagot →"
+      },
       "suggestions": {
         "title": "Népszerű receptalapanyagok",
         "hint": "Kattints a gyors kitöltéshez"

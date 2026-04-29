@@ -64,6 +64,13 @@
         "unitPlaceholder": "Unit",
         "expiry": "Expiry date"
       },
+      "spread": {
+        "pickEyebrow": "Ingredients",
+        "pickTitle": "Pick one",
+        "searchPlaceholder": "Search or browse...",
+        "fillEyebrow": "Ingredient",
+        "namePlaceholder": "pick an ingredient →"
+      },
       "suggestions": {
         "title": "Popular recipe ingredients",
         "hint": "Click to quick-fill"

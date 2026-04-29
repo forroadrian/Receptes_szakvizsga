@@ -93,6 +93,22 @@
         "create": "Létrehozás",
         "edit": "Módosítás",
         "update": "Frissítés"
+      },
+      "picker": {
+        "modeLabel": "Hozzávaló kiválasztási mód",
+        "bulkMode": "Tömegesen",
+        "singleMode": "Egyenként",
+        "searchPlaceholder": "Keress alapanyagot...",
+        "bulkFillTitle": "Mennyiségek megadása",
+        "bulkSelectedCount": "{n} kiválasztva",
+        "bulkEmpty": "Válassz fent hozzávalókat — itt jelennek meg a mennyiségmezőkkel.",
+        "bulkClear": "Ürítés",
+        "bulkCommit": "Hozzáadás ({n})",
+        "singleEyebrow": "Hozzávaló",
+        "editingEyebrow": "Szerkesztés",
+        "singleEmpty": "válassz egy alapanyagot →",
+        "addedTitle": "A receptben",
+        "addedCount": "{n} tétel"
       }
     },
     "validation": {

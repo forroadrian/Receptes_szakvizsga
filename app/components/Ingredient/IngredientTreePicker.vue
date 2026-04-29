@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { useMediaQuery } from "@vueuse/core";
-import type { TaxonomyTreeNode } from "~/stores/ingredientTaxonomy";
+import type { TaxonomyTreeNode, TaxonomyIngredientNode } from "~/stores/ingredientTaxonomy";
 import IngredientTreeNode from "./IngredientTreeNode.vue";
 
 const props = withDefaults(defineProps<{
     nodes: TaxonomyTreeNode[];
     selected?: Set<number>;
     multiple?: boolean;
+    query?: string;
 }>(), {
     selected: () => new Set<number>(),
     multiple: true,
+    query: "",
 });
 
 const emit = defineEmits<{
     "update:selected": [value: Set<number>];
+    "update:visibleCount": [n: number];
 }>();
 
 const { t } = useI18n();
+const { formatIngredient } = useIngredientFormatter();
 const mobile = useMediaQuery("(max-width: 768px)");
 const opened = reactive(new Set<number>());
 const root = ref<HTMLUListElement | null>(null);
@@ -27,10 +31,66 @@ const txt = (n: TaxonomyTreeNode) => {
     return out === k ? n.slug : out;
 };
 
+const leafLabel = (ing: TaxonomyIngredientNode) => {
+    const localized = formatIngredient(ing.id);
+    return localized || ing.name;
+};
+
 const kids = (n: TaxonomyTreeNode) =>
     [...n.children].sort((a, b) => txt(a).localeCompare(txt(b), "hu"));
 
-const tops = computed(() => [...props.nodes].sort((a, b) => txt(a).localeCompare(txt(b), "hu")));
+const q = computed(() => (props.query ?? "").trim().toLowerCase());
+const isSearching = computed(() => q.value.length > 0);
+
+const filterResult = computed(() => {
+    const matched = new Set<number>();
+    const autoOpen = new Set<number>();
+    let leafCount = 0;
+
+    if (!isSearching.value) {
+        return { nodes: props.nodes, matched, autoOpen, leafCount };
+    }
+
+    const filterNode = (n: TaxonomyTreeNode): TaxonomyTreeNode | null => {
+        const branchSelfMatch = txt(n).toLowerCase().includes(q.value);
+
+        const ingMatches = n.ingredients.filter((ing) =>
+            leafLabel(ing).toLowerCase().includes(q.value)
+            || ing.name.toLowerCase().includes(q.value)
+        );
+        ingMatches.forEach((ing) => matched.add(ing.id));
+
+        const kidResults = n.children
+            .map(filterNode)
+            .filter((c): c is TaxonomyTreeNode => c !== null);
+
+        const visibleIngredients = branchSelfMatch ? n.ingredients : ingMatches;
+        if (visibleIngredients.length === 0 && kidResults.length === 0) return null;
+
+        autoOpen.add(n.id);
+        leafCount += visibleIngredients.length;
+
+        return { ...n, children: kidResults, ingredients: visibleIngredients };
+    };
+
+    const filtered = props.nodes
+        .map(filterNode)
+        .filter((n): n is TaxonomyTreeNode => n !== null);
+
+    return { nodes: filtered, matched, autoOpen, leafCount };
+});
+
+watch(filterResult, (r) => {
+    emit("update:visibleCount", isSearching.value ? r.leafCount : -1);
+}, { immediate: true });
+
+const tops = computed(() =>
+    [...filterResult.value.nodes].sort((a, b) => txt(a).localeCompare(txt(b), "hu"))
+);
+
+const effectiveOpened = computed<Set<number>>(() =>
+    isSearching.value ? filterResult.value.autoOpen : opened
+);
 
 const closeAll = (n: TaxonomyTreeNode) => {
     opened.delete(n.id);
@@ -65,6 +125,7 @@ const getSiblings = (id: number): TaxonomyTreeNode[] => {
 };
 
 const clickBranch = (n: TaxonomyTreeNode) => {
+    if (isSearching.value) return;
     if (opened.has(n.id)) {
         closeAll(n);
         return;
@@ -110,8 +171,13 @@ const onKey = (e: KeyboardEvent) => {
 
 <template>
     <ul ref="root" class="tree" role="tree" :aria-multiselectable="multiple" @keydown="onKey">
-        <IngredientTreeNode v-for="n in tops" :key="n.id" :node="n" :depth="0" :opened="opened"
-            :selected="selected" :txt="txt" :kids="kids" @click-branch="clickBranch"
+        <IngredientTreeNode v-for="n in tops" :key="n.id"
+            :node="n" :depth="0"
+            :opened="effectiveOpened" :selected="selected"
+            :txt="txt" :kids="kids" :leaf-label="leafLabel"
+            :match-set="filterResult.matched"
+            :searching="isSearching"
+            @click-branch="clickBranch"
             @pick-it="pickIt" />
     </ul>
 </template>

@@ -1,0 +1,13 @@
+{
+  "ingredientPicker": {
+    "searchPlaceholder": "Search categories...",
+    "clearSearch": "Clear search",
+    "selectedCount": "{n} selected",
+    "removeIngredient": "Remove {name}",
+    "empty": "No ingredients available.",
+    "noResults": {
+      "title": "No matches",
+      "hint": "Nothing called \"{q}\" — try a shorter term."
+    }
+  }
+}

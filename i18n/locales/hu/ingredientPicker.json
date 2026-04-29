@@ -1,0 +1,13 @@
+{
+  "ingredientPicker": {
+    "searchPlaceholder": "Keresés a kategóriákban...",
+    "clearSearch": "Keresés törlése",
+    "selectedCount": "{n} kiválasztva",
+    "removeIngredient": "{name} eltávolítása",
+    "empty": "Nincsenek elérhető alapanyagok.",
+    "noResults": {
+      "title": "Nincs találat",
+      "hint": "A „{q}\" nincs a listában — próbálj rövidebb kifejezést."
+    }
+  }
+}
