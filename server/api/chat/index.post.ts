@@ -281,7 +281,7 @@ ${languageDirective}`
 
     try {
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
             service_tier: 'on_demand',
             messages: [
                 { role: 'system', content: systemPrompt },
