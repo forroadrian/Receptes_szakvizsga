@@ -195,7 +195,7 @@
 .select-checkbox-indicator {
     position: absolute;
     top: 22px;
-    left: 10px;
+    left: 18px;
     z-index: 11;
     font-size: 1.35rem;
     color: var(--bs-secondary-color);
