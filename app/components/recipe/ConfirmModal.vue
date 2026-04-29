@@ -25,7 +25,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 
 <template>
     <Teleport to="body">
-        <Transition name="modal-fade">
+        <div name="modal-fade">
             <div v-if="show" class="confirm-backdrop" @click.self="emit('cancel')">
                 <div class="recipe-card confirm-card" @click.stop>
                     <div class="d-flex align-items-center gap-3 mb-3">
@@ -58,7 +58,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
                     </div>
                 </div>
             </div>
-        </Transition>
+        </div>
     </Teleport>
 </template>
 
@@ -75,9 +75,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 }
 
 .confirm-card {
-    width: 80%;
+    width: 50%;
     background: var(--bs-body-bg);
     padding: 30px;
     border-radius: var(--radius-sm);
 }
+
+@media (max-width: 768px) { 
+    .confirm-card  {
+        min-width: 80%;
+    }
+ }
 </style>
