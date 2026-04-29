@@ -82,6 +82,11 @@ STEP 3 — Once the user provides cooking context (in their reply to your clarif
 
 NEVER skip Step 1. Do not refuse a vague help request before asking for clarification — that's the most common mistake.
 
+DESCRIPTION RULES:
+- The "description" should not be longer than 200 characters.
+- Never truncate the "description" - if it goes over 200 characters remove the last sentence, whilst it still makes sense.
+- If the user asks a long "description" give it to them through "message".
+
 NAMING RULES:
 - For "mealType" use exactly one name from the meal types list.
 - For "tags" use only names from the tags list (exact spelling).
@@ -119,6 +124,7 @@ FIELD RULES:
 - When "type" is "text", "recipe" MUST be null.
 - When "type" is "recipe", "recipe" MUST be the full object above with every property filled.
 - "unit" must be exactly one of the 19 allowed strings — no other value is valid.
+- "unit" can only be "g" | "dkg" | "kg" | "ml" | "dl" | "l" | "tsp" | "tbsp" | "c" | "pt" | "qt" | "gal" | "oz" | "lb" | "db" | "csipet" | "csomag" | "gerezd" | "tk" - nothing if something you want to use is not set here, convert that unit to one we have (e.g head -> kg, fej -> kg)
 - Set "closeChat" to true ONLY when the user clearly signals they are done (e.g. "köszi, ennyi", "viszlát", "bezárhatod", "thanks bye", "close the chat", "I'm done") or when the ANSWER RULES below trigger an end-of-chat. When you set "closeChat" to true, keep "message" short and end with a one-line invitation to start a new chat using the ✏️ button in the chat header (Hungarian: "Ha mégis szeretnél tovább beszélgetni, indíts új csevegést a ✏️ gombbal a fejlécben." / English: "If you'd like to chat again, start a new conversation with the ✏️ button in the header."). Set "closeChat" to false in every other turn.
 
 QUICK MEAL IDEAS:
@@ -174,7 +180,7 @@ export default defineEventHandler(async (event) => {
         .map((c: any) => c.name)
         .join(', ')
 
-    const CATALOG_LIMIT = 150
+    const CATALOG_LIMIT = 300
     const pantryNameSet = new Set(pantry.map((p: any) => p.name))
     const pantryFirst = availableIngredients.filter((i: any) => pantryNameSet.has(i.name))
     const rest = availableIngredients.filter((i: any) => !pantryNameSet.has(i.name))
@@ -237,11 +243,11 @@ export default defineEventHandler(async (event) => {
         : ''
 
     const dynamicBlock = `Available meal types (use exact names): ${mealTypeNames}
-Available tags (use exact names): ${tagNames}
+Available tags, only use these (use exact names): ${tagNames}
 User's pantry: ${pantryText}
 User's allergies (NEVER include any of these in a recipe or suggestion): ${allergyText}
 User's disliked ingredients (avoid in recipes and suggestions): ${dislikedText}
-Available ingredients catalog (only use names from this list): ${catalogNames}${guestBlock}
+Available ingredients catalog (use these as much as you can): ${catalogNames}${guestBlock}
 
 ${languageDirective}`
 
