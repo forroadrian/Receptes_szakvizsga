@@ -2,7 +2,15 @@
   "pantry": {
     "page": {
       "title": "Kamrám",
-      "subtitle": "Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van."
+      "subtitle": "Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van.",
+      "actions": {
+        "missingShort": "Hiányzók",
+        "addShort": "Új alapanyag"
+      }
+    },
+    "overview": {
+      "title": "Áttekintés",
+      "next": "Következő:"
     },
     "list": {
       "searchPlaceholder": "Keress alapanyag nevére...",

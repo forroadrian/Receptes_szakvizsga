@@ -51,14 +51,39 @@ export const useIngredientTaxonomyStore = defineStore("ingredientTaxonomy", () =
 
     const tree = computed<TaxonomyTreeNode[]>(() => {
         const byParent = new Map<number | null, TaxonomyCategory[]>();
+        const depthByCategory = new Map<number, number>();
         for (const cat of categories.value) {
             const list = byParent.get(cat.parent_id) ?? [];
             list.push(cat);
             byParent.set(cat.parent_id, list);
         }
 
-        const ingredientsByCategory = new Map<number, TaxonomyIngredientNode[]>();
+        const computeDepth = (catId: number): number => {
+            const cached = depthByCategory.get(catId);
+            if (cached !== undefined) return cached;
+            const cat = categories.value.find((c) => c.id === catId);
+            if (!cat) return 0;
+            const d = cat.parent_id === null ? 0 : computeDepth(cat.parent_id) + 1;
+            depthByCategory.set(catId, d);
+            return d;
+        };
+
+        const bestLinkByIngredient = new Map<number, TaxonomyLink>();
         for (const link of links.value) {
+            const current = bestLinkByIngredient.get(link.ingredient_id);
+            if (!current) {
+                bestLinkByIngredient.set(link.ingredient_id, link);
+                continue;
+            }
+            const dNew = computeDepth(link.category_id);
+            const dCur = computeDepth(current.category_id);
+            if (dNew > dCur || (dNew === dCur && link.category_id < current.category_id)) {
+                bestLinkByIngredient.set(link.ingredient_id, link);
+            }
+        }
+
+        const ingredientsByCategory = new Map<number, TaxonomyIngredientNode[]>();
+        for (const link of bestLinkByIngredient.values()) {
             const list = ingredientsByCategory.get(link.category_id) ?? [];
             list.push({ kind: "ingredient", id: link.ingredient_id, name: link.ingredient_name });
             ingredientsByCategory.set(link.category_id, list);

@@ -2,7 +2,15 @@
   "pantry": {
     "page": {
       "title": "My Pantry",
-      "subtitle": "Keep track of what's in your pantry, watch expiry dates, and find what you need."
+      "subtitle": "Keep track of what's in your pantry, watch expiry dates, and find what you need.",
+      "actions": {
+        "missingShort": "Missing",
+        "addShort": "New ingredient"
+      }
+    },
+    "overview": {
+      "title": "Overview",
+      "next": "Next:"
     },
     "list": {
       "searchPlaceholder": "Search ingredients by name...",
