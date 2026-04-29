@@ -83,15 +83,29 @@ STEP 3 — Once the user provides cooking context (in their reply to your clarif
 NEVER skip Step 1. Do not refuse a vague help request before asking for clarification — that's the most common mistake.
 
 DESCRIPTION RULES:
-- The "description" should not be longer than 200 characters.
-- Never truncate the "description" - if it goes over 200 characters remove the last sentence, whilst it still makes sense.
-- If the user asks a long "description" give it to them through "message".
+- The "description" MUST be STRICTLY under 200 characters. This is a HARD TECHNICAL LIMIT — going over WILL be cut by the server, so plan for it.
+- Count your characters before emitting. If a draft is over 200, rewrite it shorter (drop full sentences from the end, never mid-sentence) until it fits.
+- If the user explicitly asks for a longer description ("write a longer description", "more detailed description", "expand the description", "ennél hosszabb leírás", "részletesebb leírás", etc.), you MUST REFUSE inside "message" and explain that the "description" field is technically capped under 200 characters and cannot be made longer because of system limitations. Then place any longer prose in "message" instead — NEVER stretch "description" past 200 chars to please the user.
 
 NAMING RULES:
 - For "mealType" use exactly one name from the meal types list.
 - For "tags" use only names from the tags list (exact spelling).
 - For ingredient "name" use only entries from the catalog (exact spelling, byte-for-byte). Hungarian accents must be preserved exactly as written in the catalog — á, é, í, ó, ö, ő, ú, ü, ű — never strip or simplify them (write "paradicsom", "vöröshagyma", "főtt tojás", not "paradicsom" without accents or "vororshagyma"). If a needed ingredient is not in the catalog, substitute the closest catalog entry or omit it. Never invent a name. If no reasonable substitute exists, return type "text" and say what's missing.
-- For ingredient "unit" use only one of these exact values: g, dkg, kg, ml, dl, l, tsp, tbsp, c, pt, qt, gal, oz, lb, db, csipet, csomag, gerezd, tk. Never use any other unit string (no "darab", "evőkanál", "teáskanál", "kávéskanál" — use "db", "tbsp", "tsp", "tk" instead).
+- For ingredient "unit" use ONLY one of these 19 EXACT strings, byte-for-byte: g, dkg, kg, ml, dl, l, tsp, tbsp, c, pt, qt, gal, oz, lb, db, csipet, csomag, gerezd, tk.
+- This list is COMPLETE and CLOSED. Anything outside it is INVALID and the server WILL drop the ingredient. Do not invent units, do not localise them, do not use synonyms, do not pluralise.
+- BEFORE emitting, mentally check every "unit" against the 19-value list. If it isn't there, convert it using this table:
+  • "darab", "drb", "piece", "pieces" → "db"
+  • "fej" (fej saláta, fej hagyma, fej fokhagyma), "head" → "db"
+  • "szelet", "slice", "slices" → "db"
+  • "evőkanál", "ek", "ek.", "tablespoon", "tablespoons" → "tbsp"
+  • "teáskanál", "tk.", "teaspoon", "teaspoons", "kávéskanál", "kk", "kk." → "tsp"
+  • "kiskanál" → "tk"
+  • "csésze", "cup", "cups" → "c"
+  • "marék", "handful", "csipetnyi" → "csipet"
+  • "üveg", "jar", "doboz", "tin", "can", "tubus", "zacskó", "tasak" → "csomag"
+  • "liter", "litre", "litres" → "l"; "milliliter", "millilitre" → "ml"; "deciliter" → "dl"
+  • "gramm" → "g"; "kilogramm", "kilo" → "kg"; "dekagramm", "deka" → "dkg"
+- If you cannot map a unit to one of the 19 allowed values, default to "db" for whole/countable items or "g" for measurable items. There are NO exceptions — emitting any string outside the 19-value list is FORBIDDEN.
 
 OUTPUT FORMAT:
 You MUST respond with a single valid JSON object — nothing before or after, no markdown fences, no commentary. The object must match this exact shape:
@@ -124,7 +138,7 @@ FIELD RULES:
 - When "type" is "text", "recipe" MUST be null.
 - When "type" is "recipe", "recipe" MUST be the full object above with every property filled.
 - "unit" must be exactly one of the 19 allowed strings — no other value is valid.
-- "unit" can only be "g" | "dkg" | "kg" | "ml" | "dl" | "l" | "tsp" | "tbsp" | "c" | "pt" | "qt" | "gal" | "oz" | "lb" | "db" | "csipet" | "csomag" | "gerezd" | "tk" - nothing if something you want to use is not set here, convert that unit to one we have (e.g head -> kg, fej -> kg)
+- "unit" can ONLY be one of: "g" | "dkg" | "kg" | "ml" | "dl" | "l" | "tsp" | "tbsp" | "c" | "pt" | "qt" | "gal" | "oz" | "lb" | "db" | "csipet" | "csomag" | "gerezd" | "tk". Anything else is invalid. If a unit you want to use isn't in this list, you MUST convert it using the conversion table in NAMING RULES (e.g. fej → db, head → db, evőkanál → tbsp, csésze → c). Never invent a unit string and never leave a non-listed unit in the output — the server drops any ingredient whose unit isn't in the list.
 - Set "closeChat" to true ONLY when the user clearly signals they are done (e.g. "köszi, ennyi", "viszlát", "bezárhatod", "thanks bye", "close the chat", "I'm done") or when the ANSWER RULES below trigger an end-of-chat. When you set "closeChat" to true, keep "message" short and end with a one-line invitation to start a new chat using the ✏️ button in the chat header (Hungarian: "Ha mégis szeretnél tovább beszélgetni, indíts új csevegést a ✏️ gombbal a fejlécben." / English: "If you'd like to chat again, start a new conversation with the ✏️ button in the header."). Set "closeChat" to false in every other turn.
 
 QUICK MEAL IDEAS:
@@ -298,7 +312,61 @@ ${languageDirective}`
     }
 })
 
+const ALLOWED_UNITS = new Set(['g', 'dkg', 'kg', 'ml', 'dl', 'l', 'tsp', 'tbsp', 'c', 'pt', 'qt', 'gal', 'oz', 'lb', 'db', 'csipet', 'csomag', 'gerezd', 'tk'])
+
+const UNIT_ALIASES: Record<string, string> = {
+    'darab': 'db', 'drb': 'db', 'piece': 'db', 'pieces': 'db',
+    'fej': 'db', 'head': 'db', 'heads': 'db',
+    'szelet': 'db', 'slice': 'db', 'slices': 'db',
+    'evőkanál': 'tbsp', 'evokanal': 'tbsp', 'ek': 'tbsp', 'ek.': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp',
+    'teáskanál': 'tsp', 'teaskanal': 'tsp', 'tk.': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+    'kávéskanál': 'tsp', 'kaveskanal': 'tsp', 'kk': 'tsp', 'kk.': 'tsp',
+    'kiskanál': 'tk', 'kiskanal': 'tk',
+    'csésze': 'c', 'csesze': 'c', 'cup': 'c', 'cups': 'c',
+    'marék': 'csipet', 'marek': 'csipet', 'handful': 'csipet', 'csipetnyi': 'csipet',
+    'üveg': 'csomag', 'uveg': 'csomag', 'jar': 'csomag', 'doboz': 'csomag', 'tin': 'csomag', 'can': 'csomag',
+    'tubus': 'csomag', 'zacskó': 'csomag', 'zacsko': 'csomag', 'tasak': 'csomag', 'pack': 'csomag', 'package': 'csomag',
+    'liter': 'l', 'litre': 'l', 'litres': 'l', 'liters': 'l',
+    'milliliter': 'ml', 'millilitre': 'ml', 'millilitres': 'ml', 'milliliters': 'ml',
+    'deciliter': 'dl', 'decilitre': 'dl',
+    'gramm': 'g', 'gram': 'g', 'grams': 'g',
+    'kilogramm': 'kg', 'kilogram': 'kg', 'kilograms': 'kg', 'kilo': 'kg',
+    'dekagramm': 'dkg', 'deka': 'dkg', 'dkg.': 'dkg'
+}
+
+function normaliseUnit(unit: any): string | null {
+    if (typeof unit !== 'string') return null
+    const u = unit.trim().toLowerCase()
+    if (ALLOWED_UNITS.has(u)) return u
+    return UNIT_ALIASES[u] ?? null
+}
+
+function clampDescription(desc: any): string {
+    if (typeof desc !== 'string') return ''
+    if (desc.length < 200) return desc
+    const window = desc.slice(0, 199)
+    const lastBoundary = Math.max(
+        window.lastIndexOf('. '),
+        window.lastIndexOf('! '),
+        window.lastIndexOf('? '),
+        window.lastIndexOf('.'),
+        window.lastIndexOf('!'),
+        window.lastIndexOf('?')
+    )
+    if (lastBoundary > 50) {
+        const cut = window.slice(0, lastBoundary + 1).trimEnd()
+        if (cut.length < 200) return cut
+    }
+    const lastSpace = window.lastIndexOf(' ')
+    if (lastSpace > 50) return window.slice(0, lastSpace).trimEnd()
+    return window.trimEnd()
+}
+
 function canonicalize(parsed: any, availableIngredients: any[]): any {
+    if (parsed?.recipe?.description !== undefined) {
+        parsed.recipe.description = clampDescription(parsed.recipe.description)
+    }
+
     if (!parsed?.recipe?.ingredients) return parsed
     const stripDiacritics = (s: string) =>
         s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
@@ -308,7 +376,10 @@ function canonicalize(parsed: any, availableIngredients: any[]): any {
     parsed.recipe.ingredients = parsed.recipe.ingredients
         .map((ing: any) => {
             const canonical = canonByKey.get(stripDiacritics(ing.name ?? ''))
-            return canonical ? { ...ing, name: canonical } : null
+            if (!canonical) return null
+            const unit = normaliseUnit(ing.unit)
+            if (!unit) return null
+            return { ...ing, name: canonical, unit }
         })
         .filter(Boolean)
     return parsed
