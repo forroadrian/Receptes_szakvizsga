@@ -47,7 +47,10 @@ const GUEST_QUESTION_LIMIT = 2;
 const GUEST_COUNT_KEY = 'chatbot:guest:askedCount';
 
 function sanitizeMessage(raw: string): string {
-    const escaped = raw
+    // Some models double-escape quotes inside HTML attributes (sending \" instead of ").
+    // Normalise those before HTML-escaping so the nav-anchor regex can match.
+    const normalized = raw.replace(/\\"/g, '"');
+    const escaped = normalized
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -72,6 +75,8 @@ function onBubbleClick(e: MouseEvent) {
     navigateTo(href);
 }
 
+const INACTIVITY_MS = 5 * 60 * 1000;
+
 const isOpen = ref(false);
 const isLoading = ref(false);
 const isExpired = ref(false);
@@ -79,6 +84,40 @@ const unreadCount = ref(0);
 const input = ref('');
 const messages = ref<Message[]>([]);
 const messagesEl = ref<HTMLElement | null>(null);
+const lastUserMessageAt = ref<number | null>(null);
+let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearInactivityTimer() {
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = null;
+    }
+}
+
+function expireChat() {
+    if (isExpired.value) return;
+    clearInactivityTimer();
+    isExpired.value = true;
+    lastUserMessageAt.value = null;
+    messages.value.push({
+        role: 'assistant',
+        content: t('chatbot.expired'),
+        time: now()
+    });
+    if (!isOpen.value) unreadCount.value++;
+}
+
+function startInactivityTimer(remainingMs?: number) {
+    clearInactivityTimer();
+    const ms = remainingMs ?? INACTIVITY_MS;
+    if (ms <= 0) {
+        expireChat();
+        return;
+    }
+    inactivityTimer = setTimeout(expireChat, ms);
+}
+
+onBeforeUnmount(clearInactivityTimer);
 
 const suggestions = computed(() => [
     t('chatbot.suggestions.whatCanIDo'),
@@ -153,6 +192,8 @@ function openChat() {
 }
 
 function newChat() {
+    clearInactivityTimer();
+    lastUserMessageAt.value = null;
     isExpired.value = false;
     messages.value = [];
     input.value = '';
@@ -165,11 +206,13 @@ const storageKey = computed(() =>
 
 function loadFromStorage() {
     if (!import.meta.client || !storageKey.value) return;
+    clearInactivityTimer();
     const raw = localStorage.getItem(storageKey.value);
     if (!raw) {
         messages.value = [];
         isExpired.value = false;
         unreadCount.value = 0;
+        lastUserMessageAt.value = null;
         return;
     }
     try {
@@ -177,10 +220,21 @@ function loadFromStorage() {
         messages.value = data.messages ?? [];
         isExpired.value = data.isExpired ?? false;
         unreadCount.value = data.unreadCount ?? 0;
+        lastUserMessageAt.value = data.lastUserMessageAt ?? null;
+
+        if (!isExpired.value && lastUserMessageAt.value) {
+            const elapsed = Date.now() - lastUserMessageAt.value;
+            if (elapsed >= INACTIVITY_MS) {
+                expireChat();
+            } else {
+                startInactivityTimer(INACTIVITY_MS - elapsed);
+            }
+        }
     } catch {
         messages.value = [];
         isExpired.value = false;
         unreadCount.value = 0;
+        lastUserMessageAt.value = null;
     }
 }
 
@@ -190,13 +244,14 @@ function saveToStorage() {
         localStorage.setItem(storageKey.value, JSON.stringify({
             messages: messages.value,
             isExpired: isExpired.value,
-            unreadCount: unreadCount.value
+            unreadCount: unreadCount.value,
+            lastUserMessageAt: lastUserMessageAt.value
         }));
     } catch {}
 }
 
 watch(storageKey, loadFromStorage, { immediate: true });
-watch([messages, isExpired, unreadCount], saveToStorage, { deep: true });
+watch([messages, isExpired, unreadCount, lastUserMessageAt], saveToStorage, { deep: true });
 
 async function sendSuggestion(text: string) {
     input.value = text;
@@ -215,6 +270,8 @@ async function send() {
     if (!msg || isLoading.value || guestLimitReached.value) return;
 
     messages.value.push({ role: 'user', content: msg, time: now() });
+    lastUserMessageAt.value = Date.now();
+    startInactivityTimer();
     if (isGuest.value) {
         guestAskedCount.value++;
         persistGuestCount();
@@ -266,6 +323,8 @@ async function send() {
         if (!isOpen.value) unreadCount.value++;
 
         if (response.closeChat) {
+            clearInactivityTimer();
+            lastUserMessageAt.value = null;
             isExpired.value = true;
         }
     } catch {
@@ -435,19 +494,19 @@ function onKeydown(e: KeyboardEvent) {
                     </div>
                 </div>
 
-                <div class="bar card-footer">
+                <div v-if="!isExpired" class="bar card-footer">
                     <div class="position-relative d-flex align-items-center">
                         <textarea
                             v-model="input"
                             class="textarea w-100 border rounded-pill bg-body text-body overflow-hidden"
                             rows="1"
                             :placeholder="guestLimitReached ? $t('chatbot.guestLockedPlaceholder') : $t('chatbot.placeholder')"
-                            :disabled="isExpired || guestLimitReached"
+                            :disabled="guestLimitReached"
                             @keydown="onKeydown"
                         />
                         <button
                             class="send position-absolute bg-transparent border-0 text-body-emphasis d-flex align-items-center justify-content-center rounded-circle lh-1"
-                            :disabled="isLoading || !input.trim() || isExpired || guestLimitReached"
+                            :disabled="isLoading || !input.trim() || guestLimitReached"
                             @click="send"
                         >
                             <i class="bi bi-send-fill"></i>

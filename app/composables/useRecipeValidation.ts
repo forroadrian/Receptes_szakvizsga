@@ -2,20 +2,20 @@ import { computed, type Ref } from "vue"
 
 export const LIMITS = {
     nameMax: 60,
-    descMax: 200,
+    descMax: 300,
     timeMin: 2,
     timeMax: 360,
     servingsMin: 1,
     servingsMax: 20,
     ingredientsMin: 2,
-    ingredientsMax: 30,
+    ingredientsMax: 50,
     stepsMin: 2,
     stepsMax: 30,
     stepMinChars: 10,
     stepMaxChars: 200
 } as const
 
-const NAME_CHARS = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s,]+$/
+const NAME_CHARS = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s,-]+$/
 const DESC_CHARS = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ0-9\s.,!?\-:;()'"/]+$/
 const HAS_LETTER = /[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]/
 
