@@ -2,7 +2,15 @@
   "pantry": {
     "page": {
       "title": "My Pantry",
-      "subtitle": "Keep track of what's in your pantry, watch expiry dates, and find what you need."
+      "subtitle": "Keep track of what's in your pantry, watch expiry dates, and find what you need.",
+      "actions": {
+        "missingShort": "Missing",
+        "addShort": "New ingredient"
+      }
+    },
+    "overview": {
+      "title": "Overview",
+      "next": "Next:"
     },
     "list": {
       "searchPlaceholder": "Search ingredients by name...",
@@ -63,6 +71,13 @@
         "quantityUnit": "Quantity / Unit",
         "unitPlaceholder": "Unit",
         "expiry": "Expiry date"
+      },
+      "spread": {
+        "pickEyebrow": "Ingredients",
+        "pickTitle": "Pick one",
+        "searchPlaceholder": "Search or browse...",
+        "fillEyebrow": "Ingredient",
+        "namePlaceholder": "pick an ingredient →"
       },
       "suggestions": {
         "title": "Popular recipe ingredients",

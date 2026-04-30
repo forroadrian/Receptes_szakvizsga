@@ -93,6 +93,22 @@
         "create": "Create",
         "edit": "Save changes",
         "update": "Update"
+      },
+      "picker": {
+        "modeLabel": "Ingredient picking mode",
+        "bulkMode": "Bulk",
+        "singleMode": "One at a time",
+        "searchPlaceholder": "Search ingredients...",
+        "bulkFillTitle": "Set quantities",
+        "bulkSelectedCount": "{n} selected",
+        "bulkEmpty": "Pick ingredients above — they appear here with quantity fields.",
+        "bulkClear": "Clear",
+        "bulkCommit": "Add ({n})",
+        "singleEyebrow": "Ingredient",
+        "editingEyebrow": "Editing",
+        "singleEmpty": "pick an ingredient →",
+        "addedTitle": "In the recipe",
+        "addedCount": "{n} items"
       }
     },
     "validation": {

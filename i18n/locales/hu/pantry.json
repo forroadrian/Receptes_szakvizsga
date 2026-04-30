@@ -2,7 +2,15 @@
   "pantry": {
     "page": {
       "title": "Kamrám",
-      "subtitle": "Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van."
+      "subtitle": "Tartsd nyilván a kamrád tartalmát, kövesd a lejáratokat és találd meg azt, amire szükséged van.",
+      "actions": {
+        "missingShort": "Hiányzók",
+        "addShort": "Új alapanyag"
+      }
+    },
+    "overview": {
+      "title": "Áttekintés",
+      "next": "Következő:"
     },
     "list": {
       "searchPlaceholder": "Keress alapanyag nevére...",
@@ -63,6 +71,13 @@
         "quantityUnit": "Mennyiség / Egység",
         "unitPlaceholder": "Egység",
         "expiry": "Lejárati dátum"
+      },
+      "spread": {
+        "pickEyebrow": "Alapanyagok",
+        "pickTitle": "Válassz egyet",
+        "searchPlaceholder": "Keress vagy tallózz...",
+        "fillEyebrow": "Hozzávaló",
+        "namePlaceholder": "válassz egy alapanyagot →"
       },
       "suggestions": {
         "title": "Népszerű receptalapanyagok",
