@@ -6,9 +6,11 @@ definePageMeta({
 
 import { ref, computed, watch } from 'vue';
 import EmailConfirmationModal from '~/components/auth/EmailConfirmationModal.vue';
+import { useRegisterValidation } from '~/composables/useRegisterValidation';
 
 const supabase = useSupabaseClient();
 const { t } = useI18n();
+const { isUsernameOk, isPasswordOk, doPasswordsMatch } = useRegisterValidation();
 
 const email = ref("");
 const username = ref("");
@@ -28,9 +30,9 @@ const resendLoading = ref(false);
 const resendMessage = ref("");
 const resendError = ref("");
 
-const usernameOk = computed(() => username.value.trim().length >= 4);
-const passwordOk = computed(() => password.value.trim().length >= 6);
-const passwordsMatch = computed(() => password.value === repassword.value);
+const usernameOk = computed(() => isUsernameOk(username.value));
+const passwordOk = computed(() => isPasswordOk(password.value));
+const passwordsMatch = computed(() => doPasswordsMatch(password.value, repassword.value));
 
 const setCustomInputValidity = () => {
     if (!formRef.value) {

@@ -3,6 +3,7 @@ import { useIngredientStore } from '~/stores/ingredients';
 import { useRecipeStore } from '~/stores/recipe';
 import { usePreferencesStore } from '~/stores/preferences';
 import { useRecipeModal } from '~/composables/useRecipeModal';
+import { sanitizeMessage, ALLOWED_NAV_PATHS } from '~/utils/sanitizeMessage';
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -28,42 +29,8 @@ function now(): string {
     });
 }
 
-const ALLOWED_NAV_PATHS = new Set([
-    '/',
-    '/recipes',
-    '/ingredients',
-    '/menu',
-    '/profile',
-    '/profile/username',
-    '/profile/password',
-    '/profile/email',
-    '/profile/allergen',
-    '/profile/dislikedIngredient',
-    '/login',
-    '/register'
-]);
-
 const GUEST_QUESTION_LIMIT = 2;
 const GUEST_COUNT_KEY = 'chatbot:guest:askedCount';
-
-function sanitizeMessage(raw: string): string {
-    // Some models double-escape quotes inside HTML attributes (sending \" instead of ").
-    // Normalise those before HTML-escaping so the nav-anchor regex can match.
-    const normalized = raw.replace(/\\"/g, '"');
-    const escaped = normalized
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    const q = `(?:&quot;|')`;
-    return escaped.replace(
-        new RegExp(`&lt;a class=${q}nav${q} href=${q}([^&'"]+)${q}&gt;([\\s\\S]*?)&lt;/a&gt;`, 'g'),
-        (_, href, label) =>
-            ALLOWED_NAV_PATHS.has(href)
-                ? `<a class="chat-nav" data-nav-href="${href}">${label}</a>`
-                : label
-    );
-}
 
 function onBubbleClick(e: MouseEvent) {
     const target = (e.target as HTMLElement).closest<HTMLElement>('.chat-nav');
