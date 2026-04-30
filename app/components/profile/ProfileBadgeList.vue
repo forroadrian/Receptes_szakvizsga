@@ -9,7 +9,7 @@ import {
     watch,
 } from 'vue';
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 
 const emit = defineEmits(['remove']);
 
@@ -58,7 +58,8 @@ const shouldCollapseOnWrap = computed(() => Boolean(props.title));
 
 const getItemLabel = (item) => {
     if (props.translationPrefix && item && item.id != null) {
-        return t(`${props.translationPrefix}${item.id}`);
+        const key = `${props.translationPrefix}${item.id}`;
+        if (te(key)) return t(key);
     }
 
     return typeof item === 'string' ? item : item?.[props.displayKey] || '';

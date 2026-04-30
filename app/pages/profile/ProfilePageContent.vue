@@ -704,7 +704,7 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ formatIngredient(ingredient.id) }}
+                                                        {{ formatIngredient(ingredient) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"
@@ -846,7 +846,7 @@ const handleSave = async () => {
                                                         :key="ingredient.id" type="button"
                                                         class="list-group-item list-group-item-action allergy-suggestion-btn"
                                                         @click="selectDislikedIngredient(ingredient)">
-                                                        {{ formatIngredient(ingredient.id) }}
+                                                        {{ formatIngredient(ingredient) }}
                                                     </button>
 
                                                     <div v-if="!filteredDislikedIngredients.length"
