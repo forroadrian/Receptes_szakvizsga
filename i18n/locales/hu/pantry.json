@@ -96,7 +96,12 @@
       "namePlaceholder": "Pl. Tej",
       "unitPlaceholder": "Egység",
       "expiryDate": "Lejárati dátum",
-      "unitPicker": "Egység kiválasztása"
+      "unitPicker": "Egység kiválasztása",
+      "errors": {
+        "validation": "Tölts ki minden mezőt érvényes adattal.",
+        "saveFailed": "Nem sikerült menteni az alapanyagot.",
+        "loadFailed": "Nem sikerült betölteni az alapanyaglistát."
+      }
     },
     "missingModal": {
       "title": "Hiányzó alapanyagok",

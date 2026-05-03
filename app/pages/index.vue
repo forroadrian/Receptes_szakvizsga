@@ -108,7 +108,7 @@ const thingsThatMakeUsStandOut = [
                     </div>
                 </div>
                 <div class="col-12 col-lg-5 hero-visual">
-                    <div class="hero-image d-flex"></div>
+                    <div class="hero-image d-flex" role="img" :aria-label="$t('home.hero.imageAlt')"></div>
                 </div>
             </div>
         </div>

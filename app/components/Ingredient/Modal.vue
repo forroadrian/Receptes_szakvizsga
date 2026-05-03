@@ -17,7 +17,9 @@ const {
     availableIngredients
 } = ingredientState
 
-const reportError = () => showAlert('error', t('common.errors.invalidData'));
+const reportValidationError = () => showAlert('error', t('pantry.modal.errors.validation'));
+const reportSaveError = () => showAlert('error', t('pantry.modal.errors.saveFailed'));
+const reportLoadError = () => showAlert('error', t('pantry.modal.errors.loadFailed'));
 
 const inputName = ref("")
 const inputIngredientId = ref<number | null>(null)
@@ -79,7 +81,7 @@ function resetForm() {
 
 async function saveIngredient() {
     if (!nameIsValid.value || inputUnit.value == "" || inputExpiry.value == "" || inputQuantity.value == null || inputQuantity.value <= 0) {
-        reportError()
+        reportValidationError()
         return
     }
     try {
@@ -100,7 +102,7 @@ async function saveIngredient() {
         resetForm()
         closeIngredientModal()
     } catch (error: any) {
-        reportError()
+        reportSaveError()
     }
 }
 
@@ -108,7 +110,7 @@ onMounted(async () => {
     try {
         await loadAvailableIngredients()
     } catch {
-        reportError()
+        reportLoadError()
     }
 })
 </script>

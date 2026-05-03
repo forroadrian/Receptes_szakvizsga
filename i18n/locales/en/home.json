@@ -5,7 +5,8 @@
       "title": "Plan your meals!",
       "lead": "With MenuPlanR, you no longer have to keep track of when to cook, what to make, or which ingredients you need.",
       "browseRecipes": "Browse recipes",
-      "myPantry": "My pantry"
+      "myPantry": "My pantry",
+      "imageAlt": "Food and ingredients illustration"
     },
     "meals": {
       "title": "Meals",

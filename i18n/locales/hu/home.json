@@ -5,7 +5,8 @@
       "title": "Tervezd meg az étrendedet!",
       "lead": "A MenuPlanR segítségével nem kell többé észben tartanod, hogy mikor mit főzzél, vagy milyen hozzávalók szükségesek hozzá.",
       "browseRecipes": "Receptek megtekintése",
-      "myPantry": "Alapanyagaim"
+      "myPantry": "Alapanyagaim",
+      "imageAlt": "Étel és hozzávalók illusztráció"
     },
     "meals": {
       "title": "Étkezések",

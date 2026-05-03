@@ -96,7 +96,12 @@
       "namePlaceholder": "e.g. Milk",
       "unitPlaceholder": "Unit",
       "expiryDate": "Expiry date",
-      "unitPicker": "Choose a unit"
+      "unitPicker": "Choose a unit",
+      "errors": {
+        "validation": "Fill in every field with valid data.",
+        "saveFailed": "Could not save the ingredient.",
+        "loadFailed": "Could not load the ingredient list."
+      }
     },
     "missingModal": {
       "title": "Missing ingredients",
