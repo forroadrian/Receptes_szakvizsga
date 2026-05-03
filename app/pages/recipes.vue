@@ -310,7 +310,7 @@ watch(() => filterStore.activeTab, async (tab) => {
     triggerAiRecommendations();
 });
 
-// If filters change while on the AI tab, refresh the recommendations
+
 watch(() => [
     filterStore.selectedMealId,
     filterStore.selectedTypeId,
@@ -323,7 +323,7 @@ watch(() => [
     }
 });
 
-// If language changes while on the AI tab, translate existing recipes instead of regenerating
+
 watch(locale, () => {
     if (filterStore.activeTab === 'ai' && filterStore.aiRecommendedRecipes.length) {
         filterStore.translateAiRecipes(locale.value);
