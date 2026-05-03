@@ -24,6 +24,7 @@ const user = useSupabaseUser();
 const allergyWarnings = useRecipeAllergyWarnings();
 const { getRecipeImage } = useRecipeImage();
 const isHydrated = ref(false);
+const recipesLoading = ref(true);
 const INITIAL_RECIPE_COUNT = 10;
 const visibleRecipeCount = ref(INITIAL_RECIPE_COUNT);
 
@@ -92,22 +93,26 @@ watch(searchMode, (newMode) => {
 
 onMounted(async () => {
     isHydrated.value = true;
-    if (!recipeStore.getAllRecipes().length) {
-        await recipeStore.loadRecipes();
-    }
+    try {
+        if (!recipeStore.getAllRecipes().length) {
+            await recipeStore.loadRecipes();
+        }
 
-    if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
-        await filterStore.loadCategories();
-    }
+        if (!filterStore.mealOptions.length && !filterStore.typeOptions.length) {
+            await filterStore.loadCategories();
+        }
 
-    if (!filterStore.allAllergies.length) {
-        await filterStore.loadAllergies();
-    }
+        if (!filterStore.allAllergies.length) {
+            await filterStore.loadAllergies();
+        }
 
-    if (user.value) {
-        await allergyWarnings.loadUserAllergies();
-        await filterStore.loadUserDislikedIngredientIds();
-        await filterStore.loadUserRecipeIds();
+        if (user.value) {
+            await allergyWarnings.loadUserAllergies();
+            await filterStore.loadUserDislikedIngredientIds();
+            await filterStore.loadUserRecipeIds();
+        }
+    } finally {
+        recipesLoading.value = false;
     }
 
     const mealName = String(route.query.meal ?? "").toLowerCase();
@@ -456,7 +461,7 @@ const tabCounts = computed(() => {
                 </button>
             </div>
 
-            <div v-if="!needsLoginForTab && !recipesFilteredByIngredients.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)"
+            <div v-if="!recipesLoading && !needsLoginForTab && !recipesFilteredByIngredients.length && !(filterStore.activeTab === 'ai' && filterStore.aiLoading)"
                 class="text-center py-5">
                 <p class="mb-0 fw-bold py-3">
                     <template v-if="filterStore.activeTab === 'ai' && filterStore.aiLoaded">
@@ -494,7 +499,22 @@ const tabCounts = computed(() => {
                 </button>
             </div>
 
-            <div v-if="!needsLoginForTab && recipesFilteredByIngredients.length" class="row">
+            <div v-if="recipesLoading" class="row">
+                <div v-for="skeleton in 6" class="col-12 col-md-6 col-lg-4 my-3">
+                    <div class="skeleton-card">
+                        <div class="skeleton-bar image"></div>
+                        <div class="skeleton-bar title"></div>
+                        <div class="skeleton-bar text"></div>
+                        <div class="skeleton-bar text-short"></div>
+                        <div class="d-flex justify-content-center gap-2">
+                            <div class="skeleton-bar badge"></div>
+                            <div class="skeleton-bar badge"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="!recipesLoading && !needsLoginForTab && recipesFilteredByIngredients.length" class="row">
                 <div v-if="user && filterStore.activeTab !== 'ai'"
                     class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"

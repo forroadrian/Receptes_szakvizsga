@@ -1,3 +1,6 @@
+.recipes-page {
+    min-height: 90vh;
+}
 .search-wrap input {
     height: 50px;
 }
@@ -335,6 +338,52 @@
     transform: translateY(-6px);
 }
 
+.skeleton-card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    height: 500px;
+}
+
+.skeleton-bar {
+    background: var(--bs-secondary-bg);
+    border-radius: 6px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-bar.image {
+    height: 160px;
+}
+
+.skeleton-bar.title {
+    height: 16px;
+    width: 60%;
+    margin: 8px auto 0;
+}
+
+.skeleton-bar.text {
+    height: 12px;
+    width: 80%;
+}
+
+.skeleton-bar.text, .skeleton-bar.text-short{
+    margin: 0 auto;
+}
+
+.skeleton-bar.text-short {
+    height: 12px;
+    width: 50%;
+}
+
+.skeleton-bar.badge {
+    height: 26px;
+    width: 70px;
+    border-radius: 20px;
+    display: block;
+}
+
 @media (max-width: 992px) {
     .recipes-tabs ul {
         justify-content: center;
@@ -345,5 +394,15 @@
     .addRecipe {
         max-height: 150px;
         margin: 30px 0;
+    }
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
     }
 }
