@@ -13,7 +13,7 @@
     },
     "filter": {
       "title": "Filter",
-      "default": "All",
+      "default": "All public",
       "own": "Own",
       "liked": "Liked",
       "tried": "Tried",
@@ -24,7 +24,9 @@
     "loadMore": "More recipes",
     "multiselect": {
       "toggle": "Select",
-      "selectedCount": "{count} selected"
+      "selectedCount": "{count} selected",
+      "deleteTitle": "Delete recipes",
+      "deleteMessage": "Are you sure you want to delete the selected {count} recipe(s)? This action cannot be undone."
     },
     "aiRecommendations": {
       "loading": "Loading AI recommendations...",

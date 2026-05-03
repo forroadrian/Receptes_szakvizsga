@@ -13,7 +13,7 @@
     },
     "filter": {
       "title": "Szűrők",
-      "default": "Összes",
+      "default": "Összes publikus",
       "own": "Saját",
       "liked": "Kedvelt",
       "tried": "Kipróbált",
@@ -24,7 +24,9 @@
     "loadMore": "További receptek",
     "multiselect": {
       "toggle": "Kijelölés",
-      "selectedCount": "{count} kijelölve"
+      "selectedCount": "{count} kijelölve",
+      "deleteTitle": "Receptek törlése",
+      "deleteMessage": "Biztosan törölni szeretnéd a kijelölt {count} receptet? Ez a művelet nem visszavonható."
     },
     "aiRecommendations": {
       "loading": "AI ajánlások betöltése...",

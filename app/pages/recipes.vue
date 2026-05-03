@@ -7,6 +7,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 import { useIngredientStore } from "~/stores/ingredients";
 import Pills from "~/components/Pills.vue";
+import ConfirmModal from "~/components/recipe/ConfirmModal.vue";
 import type Pill from "~/interfaces/Pill";
 
 const route = useRoute();
@@ -204,15 +205,20 @@ const toggleSelection = (id: number) => {
     }
 };
 
+const showMultiDeleteModal = ref(false);
+
 const deleteSelected = async () => {
     if (!selectedIds.value.length) return;
-    const count = selectedIds.value.length;
-    if (!confirm(`Biztosan törlöd a kijelölt ${count} receptet?`)) return;
+    showMultiDeleteModal.value = true;
+};
+
+const confirmMultiDelete = async () => {
     for (const id of [...selectedIds.value]) {
         await recipeStore.deleteRecipe(id);
     }
     selectMode.value = false;
     selectedIds.value = [];
+    showMultiDeleteModal.value = false;
 };
 
 watch(() => filterStore.activeTab, (tab) => {
@@ -734,6 +740,13 @@ const tabCounts = computed(() => {
             </div>
         </div>
     </section>
+
+    <ConfirmModal :show="showMultiDeleteModal"
+        :confirm-label="$t('common.actions.delete')" :cancel-label="$t('common.actions.cancel')"
+        @confirm="confirmMultiDelete" @cancel="showMultiDeleteModal = false">
+        <template #title>{{ $t('recipe.multiselect.deleteTitle') }}</template>
+        <template #message>{{ $t('recipe.multiselect.deleteMessage', { count: selectedIds.length }) }}</template>
+    </ConfirmModal>
 </template>
 
 <style scoped src="~/assets/css/recipe.css"></style>

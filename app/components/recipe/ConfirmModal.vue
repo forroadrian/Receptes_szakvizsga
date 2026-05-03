@@ -66,7 +66,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
 .confirm-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 3;
+    z-index: 1060;
     display: flex;
     align-items: center;
     justify-content: center;
