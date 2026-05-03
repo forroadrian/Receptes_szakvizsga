@@ -53,7 +53,7 @@
 }
 
 .addRecipe {
-    height: 700px;
+    min-height: 700px;
     border: 2px dashed var(--bs-emphasis-color);
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -200,7 +200,11 @@
     top: 20px;
     left: 30px;
     font-size: 1.35rem;
-    color: var(--bs-secondary-color);
+    z-index: 10;
+    background-color: var(--bs-body-bg);
+    padding: 0px 6px;
+    border-radius: var(--radius-rounded);
+    color: var(--bs-emphasis-color);
     pointer-events: none;
     transition: color 0.15s, -webkit-text-fill-color 0.15s;
 }
@@ -368,7 +372,7 @@
     width: 80%;
 }
 
-.skeleton-bar.text, .skeleton-bar.text-short{
+.skeleton-bar.text, .skeleton-bar.text-short {
     margin: 0 auto;
 }
 

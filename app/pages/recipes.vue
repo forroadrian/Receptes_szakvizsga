@@ -679,6 +679,7 @@ const tabCounts = computed(() => {
             </div>
 
             <div id="recipeFiltersOffcanvas" class="offcanvas offcanvas-end" tabindex="-1"
+                data-bs-scroll="false"
                 aria-labelledby="recipeFiltersOffcanvasLabel">
                 <div class="offcanvas-header">
                     <p id="recipeFiltersOffcanvasLabel" class="offcanvas-title fw-bold fs-5">
