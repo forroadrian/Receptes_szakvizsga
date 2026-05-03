@@ -52,17 +52,17 @@ const onSubmit = async () => {
         <div class="auth-form-shell">
             <div class="auth-form-side d-flex flex-column justify-content-center">
                 <div class="text-center mb-4">
-                    <h1 class="fs-1">Elfelejtett jelszó</h1>
+                    <h1 class="fs-1">{{ $t('auth.forgot.title') }}</h1>
                 </div>
 
                 <p class="text-center mb-4">
-                    Add meg az email címed, és küldünk egy linket az új jelszó beállításához.
+                    {{ $t('auth.forgot.lead') }}
                 </p>
 
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                     @submit.prevent="onSubmit">
-                    <FormInput v-model="email" label="Email cím" type="email" placeholder="Add meg az email címed"
-                        required />
+                    <FormInput v-model="email" :label="$t('auth.forgot.emailLabel')" type="email"
+                        :placeholder="$t('auth.forgot.emailPlaceholder')" required />
 
                     <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
                         {{ authStore.errorMessage }}
@@ -73,11 +73,11 @@ const onSubmit = async () => {
                     </div>
 
                     <Button type="submit" color="green" class="w-100 py-2 mt-4" :disabled="authStore.loading">
-                        {{ authStore.loading ? 'Küldés...' : 'Jelszó-visszaállító email küldése' }}
+                        {{ authStore.loading ? $t('auth.forgot.submitting') : $t('auth.forgot.submit') }}
                     </Button>
 
                     <div class="mt-3 d-flex justify-content-center pt-3">
-                        <NuxtLink to="/login">Vissza a bejelentkezéshez</NuxtLink>
+                        <NuxtLink to="/login">{{ $t('auth.forgot.backToLogin') }}</NuxtLink>
                     </div>
                 </form>
             </div>

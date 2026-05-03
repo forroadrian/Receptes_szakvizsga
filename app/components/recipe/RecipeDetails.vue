@@ -14,6 +14,7 @@ const recipeStore = useRecipeStore();
 const recipeModal = useRecipeModal();
 const user = useSupabaseUser();
 const { getRecipeImage } = useRecipeImage();
+const { showAlert } = useAlert();
 
 const route = useRoute();
 const recipeId = computed(() => Number(route.params.id));
@@ -78,10 +79,40 @@ const handleToggleTried = async () => {
     await filterStore.toggleTried(currentRecipe.value.id);
 };
 
+const handleShareRecipe = async () => {
+    if (!currentRecipe.value || typeof window === 'undefined') return;
+
+    const shareUrl = window.location.href;
+    const shareData = {
+        title: currentRecipe.value.name,
+        text: currentRecipe.value.description ?? currentRecipe.value.name,
+        url: shareUrl
+    };
+
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        try {
+            await navigator.share(shareData);
+            return;
+        } catch (err: any) {
+            if (err?.name === 'AbortError') return;
+        }
+    }
+
+    try {
+        await navigator.clipboard.writeText(shareUrl);
+        showAlert('success', t('recipe.details.shareCopied'));
+    } catch {
+        showAlert('error', t('recipe.details.shareFailed'));
+    }
+};
+
 useHead({
   titleTemplate: (title?: string) => {
     const siteName = t('common.siteName')
-    return title ? `${title} · ${siteName} - ${currentRecipe.value}` : siteName
+    const recipeName = currentRecipe.value?.name
+    return title
+        ? `${title} · ${siteName}${recipeName ? ` — ${recipeName}` : ''}`
+        : siteName
   },
 })
 
@@ -101,7 +132,8 @@ onMounted(async () => {
                 <div>
                     <div class="recipe-image">
                         <div class="icons d-flex w-100">
-                            <Button icon="bi bi-share" color="yellow" iconOnly class="icon-btn"></Button>
+                            <Button icon="bi bi-share" color="yellow" iconOnly class="icon-btn"
+                                :aria-label="$t('recipe.details.share')" @click="handleShareRecipe"></Button>
                             <div class="d-flex gap-3">
                                 <Button v-if="isOwnRecipe" color="yellow" icon="bi bi-pencil-square" iconOnly
                                     class="icon-btn" data-bs-toggle="modal" data-bs-target="#openAddRecipeModal" @click="handleEditRecipe"> 

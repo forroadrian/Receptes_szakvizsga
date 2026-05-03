@@ -126,8 +126,8 @@ onMounted(async () => {
                             <i class="bi bi-basket2"></i>
                         </div>
                         <div>
-                            <p class="modal-label mb-0">Alapanyagok</p>
-                            <h3 class="mb-0">Új Alapanyag</h3>
+                            <p class="modal-label mb-0">{{ $t('pantry.modal.label') }}</p>
+                            <h3 class="mb-0">{{ $t('pantry.modal.title') }}</h3>
                         </div>
                     </div>
                     <button class="close-btn" @click="closeIngredientModal">
@@ -136,16 +136,16 @@ onMounted(async () => {
                 </div>
 
                 <div class="position-relative mb-3">
-                    <label class="field-label">Alapanyag neve, mennyisége, egysége</label>
+                    <label class="field-label">{{ $t('pantry.modal.fieldCombined') }}</label>
                     <div class="combined-input">
 
                         <div class="name-section">
                             <div v-if="!nameInputOpen" class="section-trigger" @click="openNameInput">
-                                <span :class="inputName ? '' : 'placeholder-text'">{{ inputName || 'Pl. Tej' }}</span>
+                                <span :class="inputName ? '' : 'placeholder-text'">{{ inputName || $t('pantry.modal.namePlaceholder') }}</span>
                                 <i class="bi bi-chevron-down ms-auto"></i>
                             </div>
                             <input v-else id="ingredient-name-input" v-model="inputName" type="text"
-                                class="name-text-input" placeholder="Pl. Tej" autocomplete="off" @blur="onNameBlur" />
+                                class="name-text-input" :placeholder="$t('pantry.modal.namePlaceholder')" autocomplete="off" @blur="onNameBlur" />
                         </div>
 
                         <div class="section-divider"></div>
@@ -157,7 +157,7 @@ onMounted(async () => {
 
                         <div class="unit-section">
                             <div class="section-trigger" @click="unitDropdownOpen = true">
-                                <span :class="inputUnit ? '' : 'placeholder-text'">{{ inputUnit ? formatUnit(inputUnit) : 'Egység' }}</span>
+                                <span :class="inputUnit ? '' : 'placeholder-text'">{{ inputUnit ? formatUnit(inputUnit) : $t('pantry.modal.unitPlaceholder') }}</span>
                                 <i class="bi bi-chevron-down ms-auto"></i>
                             </div>
                         </div>
@@ -173,19 +173,19 @@ onMounted(async () => {
 
                 <template v-if="!unitDropdownOpen">
                     <div class="mb-4">
-                        <label class="field-label">Lejárati dátum</label>
+                        <label class="field-label">{{ $t('pantry.modal.expiryDate') }}</label>
                         <input v-model="inputExpiry" type="date" class="date-input form-control" />
                     </div>
 
                     <Button color="orange" icon="bi bi-check2" iconPosition="left" type="button" @click="saveIngredient"
                         class="w-100">
-                        Mentés
+                        {{ $t('common.actions.save') }}
                     </Button>
                 </template>
 
                 <div v-else class="unit-drawer">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="field-label mb-0">Egység kiválasztása</span>
+                        <span class="field-label mb-0">{{ $t('pantry.modal.unitPicker') }}</span>
                         <button class="unit-drawer-close" @click="unitDropdownOpen = false">
                             <i class="bi bi-x"></i>
                         </button>
@@ -201,7 +201,7 @@ onMounted(async () => {
         </div>
     </div>
 
-    <Alert message="Helytelen adat." :show="isAlert" type="error" @close="isAlert = false" />
+    <Alert :message="$t('common.errors.invalidData')" :show="isAlert" type="error" @close="isAlert = false" />
 </template>
 <style scoped>
 .modal-backdrop {

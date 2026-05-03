@@ -21,6 +21,11 @@
       "notFound": "Theres no recipe that matches this criteria!",
       "add": "Create new recipe."
     },
+    "loadMore": "More recipes",
+    "multiselect": {
+      "toggle": "Select",
+      "selectedCount": "{count} selected"
+    },
     "aiRecommendations": {
       "loading": "Loading AI recommendations...",
       "loadingSubtitle": "This may take a few seconds",
@@ -166,7 +171,10 @@
       "imageAlt": "Recipe image",
       "deleteTitle": "Delete own recipe",
       "deleteConfirmBtn": "Delete",
-      "deleteCancel": "Cancel"
+      "deleteCancel": "Cancel",
+      "share": "Share recipe",
+      "shareCopied": "Recipe link copied to clipboard.",
+      "shareFailed": "Could not share recipe."
     },
     "similar": {
       "details": "Details",

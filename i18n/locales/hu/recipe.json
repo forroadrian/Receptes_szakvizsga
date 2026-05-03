@@ -21,6 +21,11 @@
       "notFound": "Nincs a szűrésnek megfelelő recept!",
       "add": "Új, saját recept felvétele"
     },
+    "loadMore": "További receptek",
+    "multiselect": {
+      "toggle": "Kijelölés",
+      "selectedCount": "{count} kijelölve"
+    },
     "aiRecommendations": {
       "loading": "AI ajánlások betöltése...",
       "loadingSubtitle": "Ez néhány másodpercet vehet igénybe",
@@ -166,7 +171,10 @@
       "imageAlt": "Recept képe",
       "deleteTitle": "Saját recept törlése",
       "deleteConfirmBtn": "Törlés",
-      "deleteCancel": "Mégsem"
+      "deleteCancel": "Mégsem",
+      "share": "Recept megosztása",
+      "shareCopied": "A recept linkje vágólapra másolva.",
+      "shareFailed": "Nem sikerült megosztani a receptet."
     },
     "similar": {
       "details": "Részletek",

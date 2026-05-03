@@ -476,15 +476,15 @@ const tabCounts = computed(() => {
             <div v-if="!needsLoginForTab && filterStore.activeTab === 'own' && user && recipesFilteredByIngredients.length"
                 class="d-flex justify-content-end align-items-center gap-2 mb-2 mt-3">
                 <template v-if="selectMode">
-                    <span class="select-count text-muted small">{{ selectedIds.length }} kijelölve</span>
+                    <span class="select-count text-muted small" aria-live="polite">{{ $t('recipe.multiselect.selectedCount', { count: selectedIds.length }) }}</span>
                     <button class="select-action-btn select-delete-btn" :disabled="!selectedIds.length"
                         @click="deleteSelected">
-                        <i class="bi bi-trash me-1"></i>Törlés
+                        <i class="bi bi-trash me-1"></i>{{ $t('common.actions.delete') }}
                     </button>
-                    <button class="select-action-btn select-cancel-btn" @click="toggleSelectMode">Mégse</button>
+                    <button class="select-action-btn select-cancel-btn" @click="toggleSelectMode">{{ $t('common.actions.cancel') }}</button>
                 </template>
                 <button v-else class="select-action-btn select-toggle-btn" @click="toggleSelectMode">
-                    <i class="bi bi-check2-square me-1"></i>Kijelölés
+                    <i class="bi bi-check2-square me-1"></i>{{ $t('recipe.multiselect.toggle') }}
                 </button>
             </div>
 
@@ -648,7 +648,7 @@ const tabCounts = computed(() => {
 
             <div v-if="!needsLoginForTab && hasMoreRecipes" class="d-flex justify-content-center mt-2 mb-4">
                 <Button color="orange" @click="loadMoreRecipes">
-                    További receptek
+                    {{ $t('recipe.loadMore') }}
                 </Button>
             </div>
 
