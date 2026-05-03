@@ -5,6 +5,8 @@ import { useIngredientStore } from '~/stores/ingredients';
 
 const ingredientState = useIngredientStore();
 const { formatUnit } = useUnitFormatter();
+const { t } = useI18n();
+const { showAlert } = useAlert();
 
 const {
     units,
@@ -15,11 +17,7 @@ const {
     availableIngredients
 } = ingredientState
 
-const isAlert = ref<boolean>(false);
-
-function showAlert() {
-    isAlert.value = true;
-}
+const reportError = () => showAlert('error', t('common.errors.invalidData'));
 
 const inputName = ref("")
 const inputIngredientId = ref<number | null>(null)
@@ -81,7 +79,7 @@ function resetForm() {
 
 async function saveIngredient() {
     if (!nameIsValid.value || inputUnit.value == "" || inputExpiry.value == "" || inputQuantity.value == null || inputQuantity.value <= 0) {
-        showAlert()
+        reportError()
         return
     }
     try {
@@ -102,7 +100,7 @@ async function saveIngredient() {
         resetForm()
         closeIngredientModal()
     } catch (error: any) {
-        showAlert()
+        reportError()
     }
 }
 
@@ -110,7 +108,7 @@ onMounted(async () => {
     try {
         await loadAvailableIngredients()
     } catch {
-        showAlert()
+        reportError()
     }
 })
 </script>
@@ -201,7 +199,6 @@ onMounted(async () => {
         </div>
     </div>
 
-    <Alert :message="$t('common.errors.invalidData')" :show="isAlert" type="error" @close="isAlert = false" />
 </template>
 <style scoped>
 .modal-backdrop {

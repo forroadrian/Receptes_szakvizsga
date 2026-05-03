@@ -8,6 +8,8 @@ definePageMeta({ middleware: "auth-only" });
 
 const store = useIngredientStore();
 const { formatIngredient } = useIngredientFormatter();
+const { t } = useI18n();
+const { showAlert } = useAlert();
 
 const addModalRef = ref<any>(null);
 const missingModalRef = ref<any>(null);
@@ -19,7 +21,6 @@ const highlightedId = ref<number | null>(null);
 const rowContainers = ref<Record<number, HTMLElement | null>>({});
 
 const loading = ref(false);
-const errorAlert = ref(false);
 
 const freshCount = computed(() => store.ingredients.filter((i) => i.tag === "fresh").length);
 const warningCount = computed(() => store.ingredients.filter((i) => i.tag === "soon").length);
@@ -70,7 +71,7 @@ const handleDelete = async (ingredient: Ingredient) => {
     try {
         await store.removeIngredient(ingredient.id);
     } catch {
-        errorAlert.value = true;
+        showAlert('error', t('common.errors.invalidData'));
     }
 };
 
@@ -198,8 +199,6 @@ onMounted(async () => {
 
         <IngredientAddModal ref="addModalRef" />
         <IngredientMissingSuggestionsModal ref="missingModalRef" @pick="handleMissingPick" />
-
-        <Alert :message="$t('common.errors.invalidData')" :show="errorAlert" type="error" @close="errorAlert = false" />
     </section>
 </template>
 

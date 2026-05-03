@@ -14,7 +14,7 @@ type FeaturedRecipe = {
 };
 
 const user = useSupabaseUser();
-const {t, locale, locales, setLocale} = useI18n({
+const { t } = useI18n({
     useScope: 'global',
 })
 const { getRecipeImage } = useRecipeImage()
@@ -29,12 +29,9 @@ const { data: featuredRecipes } = await useAsyncData<FeaturedRecipe[]>(
     { default: () => [] }
 )
 
-const goToRecipes = async (mealName: string) => {
-    const prev = locale.value
-    await setLocale('hu')
-    const route: string = '/recipes?meal=' + $t('home.meals.categories.'+mealName+".name")
-    navigateTo(route);
-    await setLocale(prev)
+const goToRecipes = (mealName: string) => {
+    const huName = t(`home.meals.categories.${mealName}.name`, {}, { locale: 'hu' })
+    navigateTo(`/recipes?meal=${huName}`)
 };
 
 const categories = [
