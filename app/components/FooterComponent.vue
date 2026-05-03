@@ -6,230 +6,295 @@ const scrollTop = () => {
 </script>
 
 <template>
-    <footer class="footer position-relative">
-        <div class="container pt-5">
-            <div class="row g-4 align-items-start text-center text-lg-start">
-                <div class="col-lg-5 col-md-12 col-sm-12">
-                    <NuxtImg src="/logo.png" alt="Menu Planr" :width="180" :height="128" format="webp" loading="lazy" densities="x1 x2" class="footer-logo mb-3" />
-                    <p class="footer-desc mx-auto mx-lg-0">
-                        {{ $t('footer.title')}}
-                    </p>
+    <footer class="footer">
+        <div class="footer-bg"></div>
+        <div class="container footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <NuxtImg src="/logo.png" alt="Menu Planr" format="webp" loading="lazy" densities="x1 x2"
+                        class="footer-logo" />
 
-                    <div class="footer-social d-flex justify-content-center justify-content-lg-start gap-2 mt-3">
-                        <a class="social-btn" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <a class="social-btn" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <p class="footer-desc">{{ $t('footer.title') }}</p>
+
+                    <div class="footer-social">
+                        <a class="social-btn" href="#" aria-label="Facebook"> <i class="bi bi-facebook"></i></a>
+                        <a class="social-btn" href="#" aria-label="Instagram"> <i class="bi bi-instagram"></i></a>
                         <a class="social-btn" href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-12 col-sm-12">
-                    <h5 class="footer-title mt-3">{{ $t('footer.links.title') }}</h5>
-                    <ul
-                        class="footer-links list-unstyled m-0 d-grid gap-2 justify-content-center justify-content-lg-start">
+                <nav class="footer-col" aria-label="Footer navigation">
+                    <h5 class="footer-title">{{ $t('footer.links.title') }}</h5>
+
+                    <ul class="footer-list">
                         <li>
-                            <NuxtLink to="/" class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-house-door"></i> {{ $t('common.pages.index') }}
+                            <NuxtLink to="/" class="footer-link">{{ $t('common.pages.index') }}</NuxtLink>
+                        </li>
+                        <li>
+                            <NuxtLink to="/recipes" class="footer-link">{{ $t('common.pages.recipes') }}</NuxtLink>
+                        </li>
+                        <li>
+                            <NuxtLink to="/ingredients" class="footer-link">{{ $t('common.pages.ingredients') }}
                             </NuxtLink>
                         </li>
                         <li>
-                            <NuxtLink to="/recipes" class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-journal-text"></i> {{ $t('common.pages.recipes') }}
-                            </NuxtLink>
-                        </li>
-                        <li>
-                            <NuxtLink to="/ingredients"
-                                class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-basket"></i> {{ $t('common.pages.ingredients') }}
-                            </NuxtLink>
-                        </li>
-                        <li>
-                            <NuxtLink to="/menu"
-                                class="footer-link justify-content-center justify-content-lg-start">
-                                <i class="bi bi-calendar2-week"></i> {{ $t('common.pages.menuPlanner') }}
-                            </NuxtLink>
+                            <NuxtLink to="/menu" class="footer-link">{{ $t('common.pages.menuPlanner') }} </NuxtLink>
                         </li>
                     </ul>
-                </div>
+                </nav>
 
-                <div class="col-lg-4  col-md-12 col-sm-12">
-                    <div class="contact-panel">
-                        <h5 class="footer-title mb-3">{{ $t('footer.contact.title') }}</h5>
+                <div class="footer-col">
+                    <h5 class="footer-title">{{ $t('footer.contact.title') }}</h5>
+                    <ul class="footer-list footer-contact">
+                        <li>
+                            <i class="bi bi-geo-alt"></i>
+                            <span>{{ $t('footer.contact.address') }}</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone"></i>
+                            <span>{{ $t('footer.contact.phone') }}</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-globe"></i>
+                            <span>{{ $t('footer.contact.website') }}</span>
+                        </li>
+                    </ul>
 
-                        <ul class="footer-contact list-unstyled m-0 p-0 d-grid gap-2">
-                            <li class="footer-contact-item justify-content-center justify-content-lg-start">
-                                <i class="bi bi-geo-alt me-2"></i>
-                                <span>{{ $t('footer.contact.address') }}</span>
-                            </li>
-                            <li class="footer-contact-item justify-content-center justify-content-lg-start">
-                                <i class="bi bi-telephone me-2"></i>
-                                <span>{{ $t('footer.contact.phone') }}</span>
-                            </li>
-                            <li class="footer-contact-item justify-content-center justify-content-lg-start">
-                                <i class="bi bi-globe me-2"></i>
-                                <span>{{ $t('footer.contact.website') }}</span>
-                            </li>
-                        </ul>
-
-                        <div class="mini-badge mt-3 mx-auto mx-lg-0">
-                            <i class="bi bi-clock"></i>
-                            <span>{{ $t('footer.contact.time') }}: 08:00–16:00</span>
-                        </div>
+                    <div class="mini-badge">
+                        <i class="bi bi-clock"></i>
+                        <span>{{ $t('footer.contact.time') }}: 08:00–16:00</span>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center border-top mt-4 pt-3">
-                <p> &copy; 2026 Bánki Tatabánya | {{ $t('footer.rights') }}</p>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Bánki Tatabánya | {{ $t('footer.rights') }}</p>
+                <button class="scroll-top" @click="scrollTop" :aria-label="$t('footer.anchor.aria.label')">
+                    <i class="bi bi-arrow-up"></i>
+                </button>
             </div>
         </div>
-        <button class="scroll-top" @click="scrollTop" :aria-label="$t('footer.anchor.aria.label')">↑</button>
     </footer>
 </template>
 
 <style scoped>
-html[data-bs-theme="dark"] .footer {
+.footer {
+    position: relative;
+    padding: 60px;
     background:
-        var(--radial-orange-top-left-strong),
-        var(--radial-yellow-bottom-right-soft)
+        radial-gradient(900px 400px at 50% 30%, rgba(255, 114, 49, 0.14), transparent 70%),
+        radial-gradient(700px 350px at 50% 100%, rgba(250, 180, 100, 0.18), transparent 70%),
+        var(--bs-body-bg);
+    border-top: 1px solid rgba(173, 173, 173, 0.22);
 }
 
-html[data-bs-theme="light"] .footer {
-    background:
-        var(--radial-orange-top-left-soft),
-        var(--radial-yellow-bottom-right-strong),
-        var(--grad-light);
+.footer-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.025));
+    pointer-events: none;
+}
+
+.footer-container {
+    position: relative;
+    z-index: 1;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+}
+
+.footer-brand {
+    max-width: 360px;
 }
 
 .footer-logo {
-    width: var(--brand-logo-width);
+    width: var(--small-brand-logo-width);
+    height: auto;
+    margin-bottom: 10px;
 }
 
 .footer-desc {
-    line-height: 1.7;
-    font-size: 14px;
+    max-width: 320px;
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--bs-secondary-color);
 }
 
 .footer-title {
-    font-family: "Caveat", cursive;
-    font-weight: 700;
-    font-size: 28px;
-    letter-spacing: 0.9px;
+    margin-bottom: 30px;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bs-body-color);
 }
 
-.footer-title::after {
-    content: "";
-    display: block;
-    width: 60%;
-    height: 2px;
-    margin: 10px auto 0;
-    background: var(--grad-yellow);
+.footer-list {
+    display: grid;
+    gap: 1.6rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
 .footer-link {
     display: inline-flex;
-    align-items: center;
-    padding: 10px 0;
-    font-weight: 500;
-    transition: transform 0.18s ease, color 0.18s ease;
-}
-
-.footer-link,
-.social-btn {
+    width: fit-content;
+    color: var(--bs-secondary-color);
     text-decoration: none;
+    transition: color 0.18s ease, transform 0.18s ease;
 }
 
 .footer-link:hover {
-    transform: translateX(10px);
-    font-weight: 700;
+    color: var(--orange);
+    transform: translateX(4px);
 }
 
-.contact-panel {
-    padding: 18px 16px;
-}
-
-.contact-panel,
-.mini-badge {
-    border-radius: 20px;
-}
-
-.mini-badge {
-    display: inline-flex;
+.footer-contact li {
+    display: flex;
     align-items: center;
-    padding: 10px 12px;
+    gap: 20px;
+    color: var(--bs-secondary-color);
 }
 
-.footer-social,
-.footer-link,
-.mini-badge {
-    gap: 10px;
+.footer-contact i {
+    color: var(--orange);
 }
 
-.mini-badge,
-.social-btn,
-.scroll-top,
-.contact-panel {
-    background: linear-gradient(0deg, rgba(255, 178, 78, 0.212), rgba(243, 243, 243, 0.03));
-    border: 1px solid var(--bs-border-color);
-    box-shadow: var(--bs-box-shadow-sm);
+.footer-social {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 1.4rem;
 }
 
 .social-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0px 8px
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(173, 173, 173, 0.25);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+    transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .social-btn:hover {
     transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.10);
+    color: var(--orange);
+    border-color: rgba(255, 114, 49, 0.35);
 }
 
-.scroll-top:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 10px var(--orange);
+.mini-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: fit-content;
+    margin-top: 1.1rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid rgba(255, 114, 49, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 114, 49, 0.07);
+    color: var(--bs-secondary-color);
+    font-size: 0.82rem;
+}
+
+.mini-badge i {
+    color: var(--orange);
+}
+
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(173, 173, 173, 0.22);
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: var(--bs-secondary-color);
+    font-size: 0.82rem;
 }
 
 .scroll-top {
-    font-size: var(--nav-icon-size);
-    width: var(--large-icon-size);
-    height: var(--large-icon-size);
-    position: absolute;
-    left: 40px;
-    bottom: 20px;
-    border-radius: var(--radius-rounded);
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a33e00, #f06922);
+    color: #fff;
     cursor: pointer;
-    background: var(--grad-orange);
-    color: var(--text-light);
+    box-shadow: 0 12px 24px rgba(240, 105, 34, 0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.scroll-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(240, 105, 34, 0.32);
+}
+
+[data-bs-theme="dark"] .footer {
+    background:
+        radial-gradient(900px 400px at 50% 30%, rgba(255, 114, 49, 0.10), transparent 70%),
+        radial-gradient(700px 350px at 50% 100%, rgba(250, 180, 100, 0.08), transparent 70%),
+        var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .social-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .mini-badge {
+    background: rgba(255, 114, 49, 0.08);
+    border-color: rgba(255, 114, 49, 0.18);
 }
 
 @media (max-width: 991px) {
+    .footer {
+        padding-top: 3.5rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer-brand {
+        max-width: none;
+    }
+
     .footer-desc {
         margin: 0 auto;
     }
 
-    .col-sm-12,
-    .col-md-12 {
-        margin-bottom: 30px;
+    .footer-social,
+    .footer-link,
+    .footer-contact li,
+    .mini-badge {
+        justify-content: center;
     }
 
-    .scroll-top {
-        bottom: 55px;
-        left: 45%;
-    }
-}
-
-@media (min-width: 992px) {
-    .footer-title::after {
-        margin: 10px 0;
+    .footer-link:hover {
+        transform: none;
     }
 
-    .navbar-brand img {
-        width: var(--small-brand-logo-width);
+    .footer-bottom {
+        flex-direction: column-reverse;
+        text-align: center;
     }
 }
 </style>
