@@ -7,6 +7,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
 const route = useRoute();
+const { t } = useI18n();
 const { validatePasswordReset } = useAuthValidation();
 
 const authStore = useAuthStore();
@@ -17,6 +18,7 @@ const repassword = ref('');
 const recoveryReady = ref(false);
 const verifyingRecovery = ref(true);
 const submitAttempted = ref(false);
+const passwordChanged = ref(false);
 const formRef = ref(null);
 
 const passwordOk = computed(() => password.value.trim().length >= 6);
@@ -51,13 +53,13 @@ const setCustomInputValidity = () => {
 
     if (passwordInput) {
         passwordInput.setCustomValidity(
-            passwordOk.value ? "" : "A jelszó legalább 6 karakter legyen."
+            passwordOk.value ? "" : t('auth.reset.passwordTooShort')
         );
     }
 
     if (repasswordInput) {
         repasswordInput.setCustomValidity(
-            passwordsMatch.value ? "" : "A két jelszó nem egyezik."
+            passwordsMatch.value ? "" : t('auth.reset.passwordMismatch')
         );
     }
 };
@@ -92,7 +94,7 @@ const prepareRecoverySession = async () => {
 
             if (error) {
                 clearRecoveryReady();
-                authStore.errorMessage = 'A jelszó-visszaállító link lejárt vagy érvénytelen. Kérj új emailt.';
+                authStore.errorMessage = t('auth.reset.errors.linkExpired');
                 return;
             }
 
@@ -111,7 +113,7 @@ const prepareRecoverySession = async () => {
 
             if (error) {
                 clearRecoveryReady();
-                authStore.errorMessage = 'A jelszó-visszaállító link lejárt vagy érvénytelen. Kérj új emailt.';
+                authStore.errorMessage = t('auth.reset.errors.linkExpired');
                 return;
             }
 
@@ -125,7 +127,7 @@ const prepareRecoverySession = async () => {
         }
 
         clearRecoveryReady();
-        authStore.errorMessage = 'A jelszó-visszaállító link hiányzik vagy már nem érvényes. Kérj új emailt.';
+        authStore.errorMessage = t('auth.reset.errors.linkMissing');
     } finally {
         verifyingRecovery.value = false;
     }
@@ -155,7 +157,7 @@ const onSubmit = async () => {
     setCustomInputValidity();
 
     if (!recoveryReady.value) {
-        authStore.errorMessage = 'A jelszó-visszaállító link nem aktív vagy lejárt. Kérj új emailt.';
+        authStore.errorMessage = t('auth.reset.errors.linkExpired');
         return;
     }
 
@@ -174,13 +176,14 @@ const onSubmit = async () => {
 
     if (!sessionData.session) {
         clearRecoveryReady();
-        authStore.errorMessage = 'A jelszó-visszaállító munkamenet megszűnt. Kérj új emailt.';
+        authStore.errorMessage = t('auth.reset.errors.sessionLost');
         return;
     }
 
     const success = await authStore.completePasswordReset(password.value);
 
     if (success) {
+        passwordChanged.value = true;
         clearRecoveryReady();
         password.value = '';
         repassword.value = '';
@@ -198,47 +201,54 @@ const onSubmit = async () => {
         <div class="auth-form-shell">
             <div class="auth-form-side d-flex flex-column justify-content-center">
                 <div class="text-center mb-4">
-                    <h1 class="fs-1">Új jelszó beállítása</h1>
+                    <h1 class="fs-1">{{ $t('auth.reset.title') }}</h1>
                 </div>
 
-                <div v-if="verifyingRecovery" class="alert alert-info">
-                    A jelszó-visszaállító link ellenőrzése folyamatban...
-                </div>
-
-                <div v-else-if="!recoveryReady" class="alert alert-warning">
-                    A jelszó-visszaállító link nem aktív vagy lejárt. Kérj új emailt.
-                </div>
-
-                <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
-                    @submit.prevent="onSubmit">
-                    <FormInput v-model="password" label="Új jelszó" type="password"
-                        placeholder="Add meg az új jelszavad" required />
-                    <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
-                        A jelszó legalább 6 karakter legyen.
-                    </div>
-
-                    <FormInput v-model="repassword" label="Új jelszó újra" type="password"
-                        placeholder="Add meg újra az új jelszavad" required />
-                    <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
-                        A két jelszó nem egyezik.
-                    </div>
-
-                    <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
-                        {{ authStore.errorMessage }}
-                    </div>
-
-                    <div v-if="authStore.successMessage" class="alert alert-success mt-3">
+                <template v-if="passwordChanged">
+                    <div class="alert alert-success">
                         {{ authStore.successMessage }}
                     </div>
-
-                    <Button type="submit" color="green" class="w-100 py-2 mt-4" :disabled="authStore.loading">
-                        {{ authStore.loading ? 'Mentés...' : 'Új jelszó mentése' }}
+                    <Button to="/login" color="green" class="w-100 py-2 mt-2">
+                        {{ $t('auth.reset.goToLogin') }}
                     </Button>
+                </template>
 
-                    <div class="mt-3 d-flex justify-content-center pt-3">
-                        <NuxtLink to="/login">Vissza a bejelentkezéshez</NuxtLink>
+                <template v-else>
+                    <div v-if="verifyingRecovery" class="alert alert-info">
+                        {{ $t('auth.reset.verifying') }}
                     </div>
-                </form>
+
+                    <div v-else-if="!recoveryReady" class="alert alert-warning">
+                        {{ $t('auth.reset.linkInvalid') }}
+                    </div>
+
+                    <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
+                        @submit.prevent="onSubmit">
+                        <FormInput v-model="password" :label="$t('auth.reset.passwordLabel')" type="password"
+                            :placeholder="$t('auth.reset.passwordPlaceholder')" required />
+                        <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
+                            {{ $t('auth.reset.passwordTooShort') }}
+                        </div>
+
+                        <FormInput v-model="repassword" :label="$t('auth.reset.repasswordLabel')" type="password"
+                            :placeholder="$t('auth.reset.repasswordPlaceholder')" required />
+                        <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
+                            {{ $t('auth.reset.passwordMismatch') }}
+                        </div>
+
+                        <div v-if="authStore.errorMessage" class="alert alert-danger mt-3">
+                            {{ authStore.errorMessage }}
+                        </div>
+
+                        <Button type="submit" color="green" class="w-100 py-2 mt-4" :disabled="authStore.loading">
+                            {{ authStore.loading ? $t('auth.reset.submitting') : $t('auth.reset.submit') }}
+                        </Button>
+
+                        <div class="mt-3 d-flex justify-content-center pt-3">
+                            <NuxtLink to="/login">{{ $t('auth.reset.backToLogin') }}</NuxtLink>
+                        </div>
+                    </form>
+                </template>
             </div>
         </div>
     </section>

@@ -16,12 +16,13 @@ export const useAccountSettings = ({
     user
 }: UseAccountSettingsOptions) => {
     const supabase = useSupabaseClient()
+    const { t } = useI18n()
 
     const refreshSessionSafely = async () => {
         try {
             await supabase.auth.refreshSession()
         } catch (e) {
-            console.warn('Session refresh hiba, de nem kritikus', e)
+            console.warn('Session refresh failed (non-critical)', e)
         }
     }
 
@@ -29,7 +30,7 @@ export const useAccountSettings = ({
         clearMessages()
 
         if (!user.value) {
-            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            errorMessage.value = t('auth.account.noUser')
             return false
         }
 
@@ -50,16 +51,16 @@ export const useAccountSettings = ({
             })
 
             if (authUpdateError) {
-                errorMessage.value = 'Az adatbázis frissült, de a bejelentkezési adatok nem.'
+                errorMessage.value = t('auth.account.username.partialFailure')
                 return false
             }
 
             await refreshSessionSafely()
 
-            successMessage.value = 'Sikeres felhasználónév módosítás.'
+            successMessage.value = t('auth.account.username.success')
             return true
         } catch (error: any) {
-            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt a felhasználónév módosításakor.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.account.username.failed'))
             return false
         } finally {
             loading.value = false
@@ -70,14 +71,14 @@ export const useAccountSettings = ({
         clearMessages()
 
         if (!user.value) {
-            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            errorMessage.value = t('auth.account.noUser')
             return false
         }
 
         const email = user.value.email
 
         if (!email) {
-            errorMessage.value = 'Nem található a felhasználó email címe.'
+            errorMessage.value = t('auth.account.noEmail')
             return false
         }
 
@@ -90,7 +91,7 @@ export const useAccountSettings = ({
             })
 
             if (signInError) {
-                errorMessage.value = 'A jelenlegi jelszó hibás.'
+                errorMessage.value = t('auth.account.password.currentWrong')
                 return false
             }
 
@@ -99,16 +100,16 @@ export const useAccountSettings = ({
             })
 
             if (updateError) {
-                errorMessage.value = 'Nem sikerült módosítani a jelszót.'
+                errorMessage.value = t('auth.account.password.updateFailed')
                 return false
             }
 
             await refreshSessionSafely()
 
-            successMessage.value = 'Sikeres jelszó módosítás.'
+            successMessage.value = t('auth.account.password.success')
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Hiba történt a jelszó módosításakor.'
+            errorMessage.value = error?.message || t('auth.account.password.failed')
             return false
         } finally {
             loading.value = false
@@ -125,14 +126,14 @@ export const useAccountSettings = ({
             const { data: authUserData, error: authUserError } = await supabase.auth.getUser()
 
             if (authUserError || !authUserData.user) {
-                errorMessage.value = 'Nem sikerült lekérni a bejelentkezett felhasználót.'
+                errorMessage.value = t('auth.account.email.fetchUserFailed')
                 return false
             }
 
             const authUser = authUserData.user
 
             if (authUser.new_email && authUser.new_email !== authUser.email) {
-                errorMessage.value = 'Már van folyamatban lévő email módosítás. Előbb azt fejezd be.'
+                errorMessage.value = t('auth.account.email.alreadyPending')
                 return false
             }
 
@@ -154,19 +155,19 @@ export const useAccountSettings = ({
             )
 
             if (error) {
-                errorMessage.value = 'Nem sikerült módosítani az email címet.'
+                errorMessage.value = t('auth.account.email.updateFailed')
                 return false
             }
 
             if (!data.user || data.user.new_email?.toLowerCase() !== trimmedNewEmail) {
-                errorMessage.value = 'Az email módosítási kérés nem indult el rendesen.'
+                errorMessage.value = t('auth.account.email.requestNotStarted')
                 return false
             }
 
-            successMessage.value = 'Megerősítő email elküldve. Nézd meg a régi és az új email címedet is.'
+            successMessage.value = t('auth.account.email.success')
             return true
         } catch (error: any) {
-            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt az email cím módosításakor.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.account.email.failed'))
             return false
         } finally {
             loading.value = false

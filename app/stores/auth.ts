@@ -4,6 +4,7 @@ import { getRequestErrorMessage } from '~/utils/auth'
 export const useAuthStore = defineStore('auth', () => {
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
+    const { t } = useI18n()
 
     const loading = ref(false)
     const errorMessage = ref('')
@@ -61,15 +62,15 @@ export const useAuthStore = defineStore('auth', () => {
 
             if (data.user) {
                 if (data.session) {
-                    successMessage.value = 'Sikeres regisztráció!'
+                    successMessage.value = t('auth.flow.signUp.success')
                 } else {
-                    successMessage.value = 'Sikeres regisztráció! Nézd meg az emailedet a megerősítéshez.'
+                    successMessage.value = t('auth.flow.signUp.successConfirmEmail')
                 }
             }
 
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Váratlan hiba történt a regisztráció során.'
+            errorMessage.value = error?.message || t('auth.flow.signUp.unexpected')
             return false
         } finally {
             loading.value = false
@@ -101,26 +102,26 @@ export const useAuthStore = defineStore('auth', () => {
 
             if (error) {
                 if (error.code === 'email_not_confirmed') {
-                    errorMessage.value = 'Még nem erősítetted meg az email címedet.'
+                    errorMessage.value = t('auth.flow.signIn.emailNotConfirmed')
                     return false
                 }
 
-                errorMessage.value = 'Hibás adatok.'
+                errorMessage.value = t('auth.flow.signIn.invalidCredentials')
                 return false
             }
 
             if (!data.user) {
-                errorMessage.value = 'A bejelentkezés nem sikerült.'
+                errorMessage.value = t('auth.flow.signIn.failed')
                 return false
             }
 
             saveRememberPreference(rememberMe)
             await loadProfileData(data.user.id)
 
-            successMessage.value = 'Sikeres bejelentkezés!'
+            successMessage.value = t('auth.flow.signIn.success')
             return true
         } catch (error: any) {
-            errorMessage.value = getRequestErrorMessage(error, 'Váratlan hiba történt a bejelentkezés során.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.flow.signIn.unexpected'))
             return false
         } finally {
             loading.value = false
@@ -136,11 +137,11 @@ export const useAuthStore = defineStore('auth', () => {
         clearProfileData()
 
         if (error) {
-            errorMessage.value = 'A kijelentkezés nem sikerült.'
+            errorMessage.value = t('auth.flow.signOut.failed')
             return false
         }
 
-        successMessage.value = 'Sikeres kijelentkezés!'
+        successMessage.value = t('auth.flow.signOut.success')
         return true
     }
 
@@ -172,10 +173,10 @@ export const useAuthStore = defineStore('auth', () => {
                 return false
             }
 
-            successMessage.value = 'A jelszó-visszaállító email elküldve.'
+            successMessage.value = t('auth.flow.requestReset.success')
             return true
         } catch (error: any) {
-            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült elküldeni a jelszó-visszaállító emailt.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.flow.requestReset.failed'))
             return false
         } finally {
             loading.value = false
@@ -200,10 +201,10 @@ export const useAuthStore = defineStore('auth', () => {
             await supabase.auth.signOut()
             clearProfileData()
 
-            successMessage.value = 'A jelszó sikeresen megváltozott. Most jelentkezz be az új jelszóval.'
+            successMessage.value = t('auth.flow.completeReset.success')
             return true
         } catch (error: any) {
-            errorMessage.value = error?.message || 'Nem sikerült megváltoztatni a jelszót.'
+            errorMessage.value = error?.message || t('auth.flow.completeReset.failed')
             return false
         } finally {
             loading.value = false

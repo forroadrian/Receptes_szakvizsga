@@ -26,6 +26,7 @@ export const useAuthProfile = ({
     user
 }: UseAuthProfileOptions) => {
     const supabase = useSupabaseClient()
+    const { t } = useI18n()
     const PROFILE_BUCKET = 'profile-images'
 
     const LEGACY_DEFAULT_AVATAR_PATHS = new Set(['/icons/profile.png'])
@@ -71,7 +72,7 @@ export const useAuthProfile = ({
 
             return data
         } catch (error: any) {
-            errorMessage.value = getRequestErrorMessage(error, 'Nem sikerült betölteni a profiladatokat.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.profile.loadFailed'))
             return null
         }
     }
@@ -88,7 +89,7 @@ export const useAuthProfile = ({
             return await loadProfileData(data.user.id)
         } catch (error: any) {
             clearProfileData()
-            errorMessage.value = error?.message || 'Nem sikerült betölteni a profiladatokat.'
+            errorMessage.value = error?.message || t('auth.profile.loadFailed')
             return null
         }
     }
@@ -97,7 +98,7 @@ export const useAuthProfile = ({
         clearMessages()
 
         if (!user.value) {
-            errorMessage.value = 'Nincs bejelentkezett felhasználó.'
+            errorMessage.value = t('auth.account.noUser')
             return false
         }
 
@@ -113,11 +114,11 @@ export const useAuthProfile = ({
             })
 
             profileUrl.value = `${uploadedUrl}?t=${Date.now()}`
-            successMessage.value = 'Sikeres profilkép módosítás.'
+            successMessage.value = t('auth.profile.image.success')
             return true
         } catch (error: any) {
             console.error('Unexpected profile image error:', error)
-            errorMessage.value = getRequestErrorMessage(error, 'Hiba történt a profilkép módosításakor.')
+            errorMessage.value = getRequestErrorMessage(error, t('auth.profile.image.failed'))
             return false
         } finally {
             loading.value = false

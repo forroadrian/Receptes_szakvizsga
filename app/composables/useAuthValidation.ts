@@ -1,4 +1,6 @@
 export const useAuthValidation = () => {
+    const { t } = useI18n()
+
     const isValidEmail = (email: string) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
     }
@@ -7,11 +9,11 @@ export const useAuthValidation = () => {
         const trimmedEmail = email.trim().toLowerCase()
 
         if (!trimmedEmail) {
-            return 'Add meg az email címed.'
+            return t('auth.validation.emailRequired')
         }
 
         if (!isValidEmail(trimmedEmail)) {
-            return 'Adj meg érvényes email címet.'
+            return t('auth.validation.emailInvalid')
         }
 
         return ''
@@ -21,15 +23,15 @@ export const useAuthValidation = () => {
         const trimmedPassword = password.trim()
 
         if (!trimmedPassword) {
-            return 'Add meg az új jelszót.'
+            return t('auth.validation.newPasswordRequired')
         }
 
         if (trimmedPassword.length < 6) {
-            return 'A jelszó legalább 6 karakter legyen.'
+            return t('auth.validation.passwordTooShort')
         }
 
         if (repassword && password !== repassword) {
-            return 'A két jelszó nem egyezik.'
+            return t('auth.validation.passwordMismatch')
         }
 
         return ''

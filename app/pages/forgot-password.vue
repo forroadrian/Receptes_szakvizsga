@@ -43,6 +43,8 @@ const onSubmit = async () => {
         if (formRef.value) {
             formRef.value.reset();
         }
+
+        setTimeout(() => navigateTo('/login'), 4000);
     }
 }
 </script>
