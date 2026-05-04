@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import ConfirmModal from '~/components/recipe/ConfirmModal.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 
 const Button = {
     template: '<button :disabled="$attrs.disabled" @click="$emit(\'click\')"><slot /></button>'
