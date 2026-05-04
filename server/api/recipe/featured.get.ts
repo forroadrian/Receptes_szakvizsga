@@ -108,7 +108,8 @@ export default defineEventHandler(async (event): Promise<FeaturedRecipe[]> => {
         .from("recipe")
         .select("id, name, likes, saves, author_id")
         .eq("active", true)
-        .is("deleted_at", null);
+        .is("deleted_at", null)
+        .eq("public", true);
 
     if (rankError) {
         throw createError({ statusCode: 500, message: rankError.message });
@@ -145,7 +146,8 @@ export default defineEventHandler(async (event): Promise<FeaturedRecipe[]> => {
     const { data, error } = await admin
         .from("recipe")
         .select(featuredSelect)
-        .in("id", topIds);
+        .in("id", topIds)
+        .eq("public", true);
 
     if (error) {
         throw createError({ statusCode: 500, message: error.message });
