@@ -91,7 +91,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 <template>
     <ClientOnly>
     <div id="openAddRecipeModal" class="modal fade" tabindex="-1" aria-labelledby="openAddRecipeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl recipe-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-xl-down recipe-dialog">
             <div class="modal-content recipe-modal">
                 <div class="modal-header recipe-modal-header">
                     <div class="w-100 d-flex align-items-start justify-content-between gap-3 flex-wrap">
@@ -147,7 +147,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.name') }}</span>
-                                            <strong class="summary-value":class="{ 'text-danger': recipeModal.nameBadChars || recipeModal.nameTooLong, 'text-warning': recipeModal.nameEmpty }"
+                                            <strong class="summary-value":class="{ 'recipe-error': recipeModal.nameBadChars || recipeModal.nameTooLong, 'recipe-warn': recipeModal.nameEmpty }"
                                                 :title="recipeModal.recipe.name">
                                                 <i v-if="recipeModal.nameEmpty || recipeModal.nameBadChars || recipeModal.nameTooLong" class="bi bi-exclamation-triangle-fill me-1"></i>
                                                 {{ recipeModal.recipe.name || $t('recipe.addRecipeModal.summary.empty') }}
@@ -156,7 +156,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.meal') }}</span>
-                                            <strong class="summary-value":class="{ 'text-warning': recipeModal.noMealType }">
+                                            <strong class="summary-value":class="{ 'recipe-warn': recipeModal.noMealType }">
                                                 <i v-if="recipeModal.noMealType"
                                                     class="bi bi-exclamation-triangle-fill me-1"></i>
                                                 {{ recipeModal.selectedMealType ?
@@ -167,7 +167,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.ingredient') }}</span>
-                                            <strong :class="{ 'text-danger': recipeModal.tooFewIngredients || recipeModal.tooManyIngredients }">
+                                            <strong :class="{ 'recipe-error': recipeModal.tooFewIngredients || recipeModal.tooManyIngredients }">
                                                 <i v-if="recipeModal.tooFewIngredients" class="bi bi-exclamation-triangle-fill me-1"></i>
                                                 <template v-if="recipeModal.tooManyIngredients">{{ recipeModal.ingredientCount }}/
                                                     {{recipeModal.LIMITS.ingredientsMax }}</template>
@@ -177,7 +177,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                         <div class="summary-row">
                                             <span>{{ $t('recipe.addRecipeModal.summary.step') }}</span>
-                                            <strong :class="{ 'text-danger': recipeModal.tooFewSteps || recipeModal.tooManySteps }">
+                                            <strong :class="{ 'recipe-error': recipeModal.tooFewSteps || recipeModal.tooManySteps }">
                                                 <i v-if="recipeModal.tooFewSteps" class="bi bi-exclamation-triangle-fill me-1"></i>
                                                 <template v-if="recipeModal.tooManySteps">
                                                     {{ recipeModal.stepCount}}/{{ recipeModal.LIMITS.stepsMax }}
@@ -202,7 +202,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 </Button>
                                             </div>
                                             <input v-else type="file"  accept="image/*" class="form-control" @change="recipeModal.onImageSelected">
-                                            <small v-if="recipeModal.errorMessage" class="text-danger">{{ recipeModal.errorMessage }}</small>
+                                            <small v-if="recipeModal.errorMessage" class="recipe-error">{{ recipeModal.errorMessage }}</small>
                                         </div>
                                         <div>
                                             <label class="form-label">{{ $t('recipe.addRecipeModal.form.name') }}</label>
@@ -212,9 +212,9 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 :placeholder="$t('recipe.addRecipeModal.form.namePlaceholder')">
 
                                             <div class="d-flex justify-content-between mt-1">
-                                                <small v-if="recipeModal.nameBadChars"  class="text-danger d-block">{{$t('recipe.validation.name.invalidChars') }}</small>
+                                                <small v-if="recipeModal.nameBadChars"  class="recipe-error d-block">{{$t('recipe.validation.name.invalidChars') }}</small>
                                                 <small v-else>&nbsp;</small>
-                                                <small :class="recipeModal.nameTooLong ? 'text-danger fw-semibold' : 'text-muted'">
+                                                <small :class="recipeModal.nameTooLong ? 'recipe-error fw-semibold' : 'text-muted'">
                                                     {{ recipeModal.nameLength }}/{{ recipeModal.LIMITS.nameMax }}
                                                 </small>
                                             </div>
@@ -229,9 +229,9 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                             <div class="d-flex justify-content-between mt-1">
                                                 <small v-if="recipeModal.descBadChars"
-                                                    class="text-danger d-block">{{$t('recipe.validation.desc.invalidChars') }}</small>
+                                                    class="recipe-error d-block">{{$t('recipe.validation.desc.invalidChars') }}</small>
                                                 <small v-else>&nbsp;</small>
-                                                <small :class="recipeModal.descTooLong ? 'text-danger fw-semibold' : 'text-muted'">
+                                                <small :class="recipeModal.descTooLong ? 'recipe-error fw-semibold' : 'text-muted'">
                                                     {{ recipeModal.descLength }}/{{ recipeModal.LIMITS.descMax }}
                                                 </small>
                                             </div>
@@ -243,7 +243,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <input v-model.number="recipeModal.recipe.prepTime" type="number"
                                                     :min="recipeModal.LIMITS.timeMin" :max="recipeModal.LIMITS.timeMax" step="1" class="form-control"
                                                     :class="{ 'is-invalid': recipeModal.timeBad && recipeModal.recipe.prepTime }">
-                                                <small v-if="recipeModal.timeBad && recipeModal.recipe.prepTime" class="text-danger d-block mt-1">
+                                                <small v-if="recipeModal.timeBad && recipeModal.recipe.prepTime" class="recipe-error d-block mt-1">
                                                     {{ $t('recipe.validation.time.range', recipeModal.LIMITS) }}
                                                 </small>
                                             </div>
@@ -251,7 +251,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 <label class="form-label">{{$t('recipe.addRecipeModal.form.servings') }}</label>
                                                 <input v-model.number="recipeModal.recipe.servings" type="number"  :min="recipeModal.LIMITS.servingsMin" :max="recipeModal.LIMITS.servingsMax" step="1"
                                                     class="form-control" :class="{ 'is-invalid': recipeModal.servingsBad && recipeModal.recipe.servings }">
-                                                <small v-if="recipeModal.servingsBad && recipeModal.recipe.servings" class="text-danger d-block mt-1">
+                                                <small v-if="recipeModal.servingsBad && recipeModal.recipe.servings" class="recipe-error d-block mt-1">
                                                     {{ $t('recipe.validation.servings.range', recipeModal.LIMITS) }}
                                                 </small>
                                             </div>
@@ -295,7 +295,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                         <header class="step-head">
                                             <div class="head-row">
                                                 <label class="form-label mb-0 step-label">{{ $t('recipe.addRecipeModal.form.ingredient') }}</label>
-                                                <small :class="recipeModal.tooManyIngredients ? 'text-danger fw-semibold' : 'text-muted'">
+                                                <small :class="recipeModal.tooManyIngredients ? 'recipe-error fw-semibold' : 'text-muted'">
                                                     <template v-if="recipeModal.tooManyIngredients">{{ recipeModal.ingredientCount }}/{{ recipeModal.LIMITS.ingredientsMax }}</template>
                                                     <template v-else>{{ recipeModal.ingredientCount }}</template>
                                                 </small>
@@ -464,7 +464,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                     <div v-else-if="currentStep === 4" class="recipe-card recipe-panel d-flex flex-column gap-4">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <label class="form-label mb-0">{{$t('recipe.addRecipeModal.steps.instructions') }}</label>
-                                            <small :class="recipeModal.tooManySteps ? 'text-danger fw-semibold' : 'text-muted'">
+                                            <small :class="recipeModal.tooManySteps ? 'recipe-error fw-semibold' : 'text-muted'">
                                                 <template v-if="recipeModal.tooManySteps">{{ recipeModal.stepCount
                                                     }}/{{ recipeModal.LIMITS.stepsMax }}</template>
                                                 <template v-else>{{ recipeModal.stepCount }}</template>
@@ -478,7 +478,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                     :placeholder="$t('recipe.addRecipeModal.form.instructionPlaceholder')">
 
                                                 <div class="d-flex justify-content-between mt-1">
-                                                    <small v-if="recipeModal.stepInputErr"class="text-danger d-block">
+                                                    <small v-if="recipeModal.stepInputErr"class="recipe-error d-block">
                                                         {{$t(recipeModal.stepInputErr, recipeModal.LIMITS) }}
                                                     </small>
                                                     <small v-else>&nbsp;</small>
@@ -507,8 +507,8 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                                 @dragover.prevent @drop="onInstructionDrop(index)" @dragend="onInstructionDragEnd">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle"><i class="bi bi-arrow-down-up"></i></span>
-                                                    <strong>{{ index + 1 }}.</strong>
-                                                    <span>{{ instruction }}</span>
+                                                    <strong class="instruction-number">{{ index + 1 }}.</strong>
+                                                    <span class="instruction-text">{{ instruction }}</span>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-3">
                                                     <Button type="button" color="yellow" icon="bi bi-pencil-square" icon-only
@@ -748,6 +748,23 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
     max-height: 28vh;
     overflow-y: auto;
     padding-right: 2px;
+}
+
+.instruction-number {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.instruction-text {
+    min-width: 0;
+    word-break: break-word;
+}
+
+.recipe-error, .step-warning-icon {
+    color: var(--orange);
+}
+
+.recipe-warn {
+    color: var(--yellow);
 }
 
 .bulk-row {

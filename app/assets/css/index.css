@@ -326,7 +326,6 @@
 
 .topRecipe {
     padding: 56px 0 80px;
-    background: #FAF8F5;
 }
 
 .topRecipe-shell {
@@ -334,7 +333,8 @@
 }
 
 .topRecipe-header {
-    margin-bottom: 36px;
+    margin-bottom: 50px;
+    text-align: center;
 }
 
 .topRecipe-eyebrow {

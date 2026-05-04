@@ -242,13 +242,15 @@ onMounted(async () => {
 
 .recipe-image {
     position: relative;
+    width: 100%;
+    height: clamp(260px, 38vw, 420px);
 }
 
 .recipe-image::before {
     content: "";
     inset: 0 0 auto 0;
     height: 200px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.295), transparent);
 }
 
 .recipe-image .icons {
@@ -277,11 +279,12 @@ li {
 
 .recipe-image img.hero-image {
     display: block;
-    margin: 0 auto;
-    width: auto;
-    max-width: 100%;
-    max-height: 360px;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
+    object-position: center;
 }
 
 @media (min-width: 992px) {
