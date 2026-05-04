@@ -9,6 +9,7 @@ type FeaturedRecipe = {
     saves: number;
     time: number;
     servings: number;
+    image_url: string | null;
     categories: Array<{ id: number; name: string; group_type: string }>;
     allergies: Array<{ id: number; name: string }>;
 };

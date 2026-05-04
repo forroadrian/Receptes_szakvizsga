@@ -2,7 +2,7 @@ import { serverSupabaseServiceRole } from "#supabase/server";
 import { Database } from "~/types/database.types";
 
 const featuredSelect = `
-    id, author_id, name, description, saves, likes, time, servings,
+    id, author_id, name, description, saves, likes, time, servings, image_url,
     recipe_ingredients (
         ingredient (
             ingredient_allergy (
@@ -31,6 +31,7 @@ type FeaturedRow = {
     likes: number;
     time: number;
     servings: number;
+    image_url: string | null;
     recipe_ingredients: Array<{
         ingredient: {
             ingredient_allergy: Array<{
@@ -51,6 +52,7 @@ type FeaturedRecipe = {
     saves: number;
     time: number;
     servings: number;
+    image_url: string | null;
     categories: Array<{ id: number; name: string; group_type: string }>;
     allergies: Array<{ id: number; name: string }>;
 };
@@ -88,6 +90,7 @@ const shape = (row: FeaturedRow): FeaturedRecipe => {
         saves: row.saves,
         time: row.time,
         servings: row.servings,
+        image_url: row.image_url ?? null,
         categories,
         allergies
     };
