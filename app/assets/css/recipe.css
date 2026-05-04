@@ -388,6 +388,22 @@
     display: block;
 }
 
+.recipe-cards > a {
+    transition: transform 240ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.recipe-cards > a:hover {
+    transform: translateY(-6px);
+}
+
+.recipe-cards > a:hover .card-media img {
+    transform: scale(1.06) rotate(-3deg);
+}
+
+.card-media img {
+    transition: transform 280ms cubic-bezier(.2, .8, .2, 1);
+}
+
 @media (max-width: 992px) {
     .recipes-tabs ul {
         justify-content: center;
