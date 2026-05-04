@@ -99,11 +99,12 @@ export const useRecipeModal = defineStore("recipeModal", () => {
     const hasBulkRows = computed(() => bulkRows.value.length > 0);
 
     const bulkInvalidRowCount = computed(
-        () => bulkRows.value.filter((r) => !Number.isFinite(r.quantity) || r.quantity <= 0 || !r.unit).length
+        () => bulkRows.value.filter((r) => !isIngredientValid(r.quantity, r.unit)).length
     );
 
     const {
         validateStepText, isStepValid,
+        validateQuantity, isIngredientValid,
         nameLength, descLength, ingredientCount, stepCount,
         nameEmpty, nameTooLong, nameBadChars, descEmpty, descTooLong, 
         descBadChars, timeBad, servingsBad,
@@ -481,6 +482,7 @@ export const useRecipeModal = defineStore("recipeModal", () => {
         tooFewIngredients, tooManyIngredients, tooFewSteps, tooManySteps,
         noMealType, firstError,
         canSubmit, canAddStep, stepInputErr, LIMITS,
+        validateQuantity, isIngredientValid,
         init, openEditRecipe, resetForm, saveRecipe, onModalHidden,
         onIngredientSearchFocus, onIngredientSearchInput, selectIngredient,
         onSinglePickerUpdate, onBulkPickerUpdate, removeBulkRow,

@@ -12,7 +12,9 @@ export const LIMITS = {
     stepsMin: 2,
     stepsMax: 30,
     stepMinChars: 10,
-    stepMaxChars: 200
+    stepMaxChars: 200,
+    quantityMin: 0.5,
+    quantityMax: 9000
 } as const
 
 const NAME_CHARS = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s,-]+$/
@@ -86,6 +88,18 @@ export const useRecipeValidation = (recipe: Ref<RecipeForm>) => {
             && HAS_LETTER.test(trimmed)
     }
 
+    const validateQuantity = (quantity: number) => {
+        const v = Number(quantity)
+        if (!Number.isFinite(v)) return 'recipe.validation.ingredients.quantityNotNumber'
+        if (v < LIMITS.quantityMin) return 'recipe.validation.ingredients.quantityTooLow'
+        if (v > LIMITS.quantityMax) return 'recipe.validation.ingredients.quantityTooHigh'
+        return null
+    }
+
+    const isIngredientValid = (quantity: number, unit: string) => {
+        return !validateQuantity(quantity) && !!unit
+    }
+
     const nameLength = computed(() => recipe.value.name.length)
     const descLength = computed(() => recipe.value.description.length)
     const ingredientCount = computed(() => recipe.value.ingredients.length)
@@ -121,6 +135,7 @@ export const useRecipeValidation = (recipe: Ref<RecipeForm>) => {
 
     return {validateName, validateDescription, validatePrepTime, validateServings, 
         validateIngredientCount, validateStepCount, validateStepText, isStepValid,
+        validateQuantity, isIngredientValid,
         nameLength, descLength, ingredientCount, stepCount, nameEmpty, nameTooLong, nameBadChars, nameOk,
         descEmpty, descTooLong, descBadChars, descOk, timeBad, servingsBad,
         tooFewIngredients, tooManyIngredients, tooFewSteps, tooManySteps, isFormValid, firstError

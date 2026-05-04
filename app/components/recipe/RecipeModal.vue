@@ -86,6 +86,12 @@ function onInstructionDrop(targetIndex: number) {
 }
 
 function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
+
+const singleQtyErr = computed(() =>
+    recipeModal.selectedIngredientQuantity
+        ? recipeModal.validateQuantity(recipeModal.selectedIngredientQuantity)
+        : null
+);
 </script>
 
 <template>
@@ -364,7 +370,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                             <div v-else class="bulk-rows">
                                                 <div v-for="(row, idx) in recipeModal.bulkRows" :key="`b-${row.ingredient_id}`" class="bulk-row"
-                                                    :class="{ invalid: !row.quantity || row.quantity <= 0 || !row.unit }">
+                                                    :class="{ invalid: !recipeModal.isIngredientValid(row.quantity, row.unit) }">
                                                     <span class="bulk-name" :title="formatIngredient(row.ingredient_id)">
                                                         {{ formatIngredient(row.ingredient_id) }}
                                                     </span>
@@ -411,7 +417,12 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
                                             <div class="row g-2 mt-1">
                                                 <div class="col-6">
                                                     <label class="form-label form-label-sm">{{ $t('recipe.addRecipeModal.form.quantity') }}</label>
-                                                    <input v-model.number="recipeModal.selectedIngredientQuantity" type="number" min="0" step="any" class="form-control form-control-sm" />
+                                                    <input v-model.number="recipeModal.selectedIngredientQuantity" type="number" min="0" step="any"
+                                                        class="form-control form-control-sm"
+                                                        :class="{ 'is-invalid': singleQtyErr }" />
+                                                    <small v-if="singleQtyErr" class="recipe-error d-block mt-1">
+                                                        {{ $t(singleQtyErr, recipeModal.LIMITS) }}
+                                                    </small>
                                                 </div>
                                                 <div class="col-6">
                                                     <label class="form-label form-label-sm">{{ $t('recipe.addRecipeModal.form.unit') }}</label>
@@ -423,7 +434,7 @@ function onInstructionDragEnd() { draggedInstructionIndex.value = null; }
 
                                             <div class="single-actions">
                                                 <Button v-if="recipeModal.hasSelectedIngredient" type="button" color="green" class="single-action-btn"
-                                                    :disabled="!recipeModal.isEditingIngredient && recipeModal.tooManyIngredients"
+                                                    :disabled="!!singleQtyErr || (!recipeModal.isEditingIngredient && recipeModal.tooManyIngredients)"
                                                     @click="recipeModal.addOrUpdateIngredient">
                                                     {{ recipeModal.isEditingIngredient ? $t('recipe.addRecipeModal.form.saveEdit') : $t('recipe.addRecipeModal.form.add') }}
                                                 </Button>

@@ -138,7 +138,10 @@
         "range": "Az adagok száma {servingsMin}–{servingsMax} fő között legyen."
       },
       "ingredients": {
-        "tooFew": "Legalább {ingredientsMin} alapanyag szükséges."
+        "tooFew": "Legalább {ingredientsMin} alapanyag szükséges.",
+        "quantityNotNumber": "Adj meg érvényes számot.",
+        "quantityTooLow": "A mennyiség nem lehet nulla vagy negatív.",
+        "quantityTooHigh": "A mennyiség túl nagy (max. {quantityMax})."
       },
       "steps": {
         "tooFew": "Legalább {stepsMin} lépés szükséges."
