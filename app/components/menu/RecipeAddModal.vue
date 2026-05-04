@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useMenuStore } from "~/stores/menu";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
+import { getTabRecipes } from "~/stores/recipeFilters/recipeTabs";
 import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 
 const menuStore = useMenuStore();
@@ -51,18 +52,16 @@ const existingMenusForDate = computed(() =>
 
 const hasExistingMenus = computed(() => existingMenusForDate.value.length > 0);
 
-const currentUserId = computed(() => user.value?.id ?? null);
+const currentUserId = computed(() => user.value?.id ?? user.value?.sub);
 
 const allRecipes = computed<RecipeItem[]>(() => recipeStore.getAllRecipes());
 
-const ownRecipes = computed(() =>
-    allRecipes.value.filter((r) => r.author_id === currentUserId.value)
+const ownRecipes = computed<RecipeItem[]>(() =>
+    getTabRecipes(allRecipes.value, "own", currentUserId.value)
 );
 
-const publicRecipes = computed(() =>
-    allRecipes.value.filter(
-        (r) => r.active && r.public && r.author_id !== currentUserId.value
-    )
+const publicRecipes = computed<RecipeItem[]>(() =>
+    getTabRecipes(allRecipes.value, "default", currentUserId.value)
 );
 
 const filteredRecipes = computed(() => {
