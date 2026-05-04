@@ -16,7 +16,6 @@ export default defineEventHandler(async (event) => {
 
     const lang = language === 'hu' ? 'Hungarian' : 'English'
 
-    // Randomly pick 5 distinct cuisine regions each request to force variety
     const allCuisines = [
         'Hungarian (e.g. töltött káposzta, halászlé, rakott krumpli, lángos, lecsó, pörkölt)',
         'Italian (e.g. risotto, osso buco, saltimbocca, ribollita, caponata, arancini)',

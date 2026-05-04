@@ -107,7 +107,6 @@ const prepareRecoverySession = async () => {
             return;
         }
 
-        // PKCE code fallback
         if (code) {
             const { error } = await supabase.auth.exchangeCodeForSession(code);
 

@@ -93,40 +93,72 @@ const shape = (row: FeaturedRow): FeaturedRecipe => {
     };
 };
 
+type RankingRow = {
+    id: number;
+    name: string;
+    likes: number;
+    saves: number;
+    author_id: string | null;
+};
+
 export default defineEventHandler(async (event): Promise<FeaturedRecipe[]> => {
     const admin = await serverSupabaseServiceRole<Database>(event);
+
+    const { data: ranking, error: rankError } = await admin
+        .from("recipe")
+        .select("id, name, likes, saves, author_id")
+        .eq("active", true)
+        .is("deleted_at", null);
+
+    if (rankError) {
+        throw createError({ statusCode: 500, message: rankError.message });
+    }
+
+    const allRecipes = (ranking ?? []) as RankingRow[];
+
+    const sortedByEngagement = [...allRecipes].sort((a, b) => {
+        const engagementA = a.likes + a.saves;
+        const engagementB = b.likes + b.saves;
+        if (engagementA !== engagementB) {
+            return engagementB - engagementA;
+        }
+        return a.name.localeCompare(b.name, "hu");
+    });
+
+    const topThreeByEngagement = sortedByEngagement.slice(0, 3);
+    const leader = topThreeByEngagement[0];
+    const leaderHasAnyEngagement = leader !== undefined && (leader.likes + leader.saves) > 0;
+
+    let topIds: number[];
+    if (leaderHasAnyEngagement) {
+        topIds = topThreeByEngagement.map(recipe => recipe.id);
+    } else {
+        const adminRecipes = allRecipes.filter(recipe => recipe.author_id === null);
+        const adminRecipesByName = [...adminRecipes].sort((a, b) =>
+            a.name.localeCompare(b.name, "hu")
+        );
+        topIds = adminRecipesByName.slice(0, 3).map(recipe => recipe.id);
+    }
+
+    if (topIds.length === 0) return [];
 
     const { data, error } = await admin
         .from("recipe")
         .select(featuredSelect)
-        .eq("active", true)
-        .is("deleted_at", null);
+        .in("id", topIds);
 
     if (error) {
         throw createError({ statusCode: 500, message: error.message });
     }
 
-    const rows = (data ?? []) as unknown as FeaturedRow[];
+    const fullRows = (data ?? []) as unknown as FeaturedRow[];
 
-    const sorted = [...rows].sort((a, b) => {
-        const engagementDiff = b.likes + b.saves - (a.likes + a.saves);
-        if (engagementDiff !== 0) return engagementDiff;
-        return a.name.localeCompare(b.name, "hu");
-    });
-
-    const topByEngagement = sorted.slice(0, 3);
-    const leadHasEngagement =
-        topByEngagement.length > 0 &&
-        topByEngagement[0]!.likes + topByEngagement[0]!.saves > 0;
-
-    if (leadHasEngagement) {
-        return topByEngagement.map(shape);
+    const fullRowById = new Map(fullRows.map(row => [row.id, row]));
+    const orderedRows: FeaturedRow[] = [];
+    for (const id of topIds) {
+        const row = fullRowById.get(id);
+        if (row) orderedRows.push(row);
     }
 
-    const adminFallback = rows
-        .filter(r => r.author_id === null)
-        .sort((a, b) => a.name.localeCompare(b.name, "hu"))
-        .slice(0, 3);
-
-    return adminFallback.map(shape);
+    return orderedRows.map(shape);
 });

@@ -45,7 +45,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
         tags: string[];
         ingredients: { name: string; quantity: number; unit: string }[];
         instructions: string[];
-        // compatibility fields for the recipe card template:
         time: number;
         categories: { id: string; name: string; group_type: string }[];
         allergies: { id: number; name: string }[];
@@ -180,7 +179,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
         const pantry = ingredientStore.ingredients.map(i => ({ name: i.name, quantity: i.quantity, unit: i.unit }));
 
-        // Map filter IDs to names for the AI
         const mealTypeName = selectedMealId.value
             ? mealOptions.value.find(m => m.id === selectedMealId.value)?.name
             : undefined;
@@ -209,7 +207,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
 
         const availableMealTypes = mealOptions.value.map(m => m.name);
         const availableTags = typeOptions.value.map(t => t.name);
-        // Send a limited catalog. Prefer pantry-matched first, then fill up with the rest.
         const pantryNames = new Set(pantry.map(p => p.name.toLowerCase()));
         const allIngredientNames = ingredientStore.availableIngredients.map(i => i.name);
         const pantryIngredientNames = allIngredientNames.filter(n => pantryNames.has(n.toLowerCase()));
@@ -248,7 +245,6 @@ export const useRecipeFilterStore = defineStore("recipeFilters", () => {
                 tags: r.tags,
                 ingredients: r.ingredients,
                 instructions: r.instructions,
-                // template compatibility:
                 time: r.prepTime,
                 categories: [
                     ...(r.mealType ? [{ id: `ai-meal-${r.mealType}`, name: r.mealType, group_type: 'meal' }] : []),

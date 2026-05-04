@@ -23,11 +23,21 @@ const ingredientsButtonTo = computed(() => {
     return user.value ? "/ingredients" : "/login"
 })
 
-const { data: featuredRecipes } = await useAsyncData<FeaturedRecipe[]>(
+const { data: featuredRecipes } = useAsyncData<FeaturedRecipe[]>(
     'featured-recipes',
     () => $fetch('/api/recipe/featured'),
-    { default: () => [] }
+    { default: () => [], lazy: true, server: false }
 )
+
+const orderedFeatured = computed<FeaturedRecipe[]>(() => {
+    const recipes = featuredRecipes.value ?? []
+    const mostLiked = recipes[0]
+    const runnerUp = recipes[1]
+    if (!mostLiked || !runnerUp) return recipes
+
+    const remaining = recipes.slice(2)
+    return [runnerUp, mostLiked, ...remaining]
+})
 
 const goToRecipes = (mealName: string) => {
     const huName = t(`home.meals.categories.${mealName}.name`, {}, { locale: 'hu' })
@@ -158,13 +168,13 @@ const thingsThatMakeUsStandOut = [
         </div>
     </section>
 
-    <section class="topRecipe" v-if="featuredRecipes && featuredRecipes.length">
+    <section class="topRecipe" v-if="orderedFeatured.length">
         <div class="container">
             <h4 class="text-center grad-text text-orange">{{ $t('home.topRecipes.subhead') }}</h4>
             <h2 class="text-center">{{ $t('home.topRecipes.title') }}</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto"
-                     v-for="(recipe, index) in featuredRecipes" :key="recipe.id">
+                     v-for="(recipe, index) in orderedFeatured" :key="recipe.id">
                     <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
                         <CardBase variant="subtle" media-position="top" tags-position="above"
                             :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100 featured-recipe-card">
@@ -174,7 +184,7 @@ const thingsThatMakeUsStandOut = [
                                 </div>
                             </template>
 
-                            <template v-if="index === 0" #badge>
+                            <template v-if="index === 1" #badge>
                                 <span class="badge dark rounded-pill px-4 py-2">
                                     {{ $t('home.topRecipes.mostPopular') }}
                                 </span>

@@ -20,7 +20,6 @@ export const getTabRecipes = (
         case "tried":
             return allRecipes.filter(recipe => triedRecipeIds.includes(recipe.id));
 
-        // "ai" tab is handled directly in the store (AI recipes are not from DB)
         case "ai":
             return [];
 

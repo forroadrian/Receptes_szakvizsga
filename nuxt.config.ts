@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 import { readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -20,7 +19,7 @@ export default defineNuxtConfig({
           include: [
             '@vue/devtools-core',
             '@vue/devtools-kit',
-            'bootstrap/dist/js/bootstrap.bundle.min.js', // CJS
+            'bootstrap/dist/js/bootstrap.bundle.min.js',
             'pinia',
           ]
         }
@@ -35,7 +34,6 @@ export default defineNuxtConfig({
     ],
     modules: ['@nuxtjs/color-mode', '@nuxt/image', '@nuxtjs/supabase', '@vueuse/nuxt', 'nuxt-vitalizer', '@nuxt/fonts', '@nuxtjs/i18n'],
     vitalizer: {
-        // disableStylesheets: 'entry'
     },
     fonts: {
         families: [
