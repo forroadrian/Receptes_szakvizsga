@@ -12,6 +12,7 @@ const route = useRoute();
 const recipeStore = useRecipeStore();
 const { t } = useI18n();
 const { getRecipeImage } = useRecipeImage();
+const user = useSupabaseUser();
 
 const currentRecipeId = computed(() => Number(route.params.id));
 
@@ -23,7 +24,7 @@ const items = computed(() => {
     const currentCategoryIds = currentRecipe.categories.map(c => c.id);
 
     for (const recipe of recipeStore.getAllRecipes()) {
-        if (recipe.id !== currentRecipeId.value) {
+        if (recipe.id !== currentRecipeId.value && (recipe.public || recipe.author_id === user.value?.id)) {
             let matchCount = 0;
 
             for (const category of recipe.categories) {
@@ -116,6 +117,10 @@ const items = computed(() => {
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+.similar-recipes-header a{
+    color: var(--orange);
 }
 
 .similar-recipes-meta-item {
