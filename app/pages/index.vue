@@ -39,6 +39,12 @@ const orderedFeatured = computed<FeaturedRecipe[]>(() => {
     return [runnerUp, mostLiked, ...remaining]
 })
 
+const getRank = (recipe: FeaturedRecipe): string => {
+    const original = featuredRecipes.value ?? []
+    const idx = original.findIndex(r => r.id === recipe.id)
+    return String(idx + 1).padStart(2, '0')
+}
+
 const goToRecipes = (mealName: string) => {
     const huName = t(`home.meals.categories.${mealName}.name`, {}, { locale: 'hu' })
     navigateTo(`/recipes?meal=${huName}`)
@@ -169,55 +175,48 @@ const thingsThatMakeUsStandOut = [
     </section>
 
     <section class="topRecipe" v-if="orderedFeatured.length">
-        <div class="container">
-            <h4 class="text-center grad-text text-orange">{{ $t('home.topRecipes.subhead') }}</h4>
-            <h2 class="text-center">{{ $t('home.topRecipes.title') }}</h2>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-12 px-3 my-5 mx-auto"
+        <div class="container topRecipe-shell">
+            <div class="topRecipe-header">
+                <p class="topRecipe-eyebrow">{{ $t('home.topRecipes.subhead') }}</p>
+                <h2 class="topRecipe-title">{{ $t('home.topRecipes.title') }}</h2>
+            </div>
+
+            <div class="row topRecipe-grid g-4">
+                <div class="col-12 col-md-6 col-lg-4"
+                     :class="{ 'mt-lg-5 pt-lg-3': index !== 1 }"
                      v-for="(recipe, index) in orderedFeatured" :key="recipe.id">
-                    <NuxtLink :to="`/recipe/${recipe.id}`" class="text-decoration-none text-reset h-100 d-block">
-                        <CardBase variant="subtle" media-position="top" tags-position="above"
-                            :class="{ 'mt-lg-5': index != 1 }" show-divider class="h-100 featured-recipe-card">
-                            <template #media>
-                                <div class="d-flex align-items-center justify-content-center featured-recipe-media">
-                                    <img :src="getRecipeImage(recipe)" :alt="recipe.name" />
-                                </div>
-                            </template>
-
-                            <template v-if="index === 1" #badge>
-                                <span class="badge dark rounded-pill px-4 py-2">
-                                    {{ $t('home.topRecipes.mostPopular') }}
+                    <NuxtLink :to="`/recipe/${recipe.id}`"
+                              class="text-decoration-none text-reset topRecipe-link">
+                        <article class="topRecipe-card" :class="{ 'is-top': index === 1 }">
+                            <div class="topRecipe-card-top">
+                                <span class="topRecipe-rank">{{ getRank(recipe) }}</span>
+                                <span v-if="index === 1" class="topRecipe-pill">
+                                    <span class="topRecipe-pill-star" aria-hidden="true">★</span>
+                                    <span>{{ $t('home.topRecipes.mostPopular') }}</span>
                                 </span>
-                            </template>
+                            </div>
 
-                            <template #header>
-                                <CardHeader>
-                                    <CardTitle :rank="3">{{ recipe.name }}</CardTitle>
-                                </CardHeader>
-                            </template>
+                            <div class="topRecipe-img">
+                                <img :src="getRecipeImage(recipe)" :alt="recipe.name" loading="lazy" />
+                            </div>
 
-                            <template #body>
-                                <p class="text-center featured-recipe-description">
-                                    {{ recipe.description }}
-                                </p>
-                            </template>
+                            <h3 class="topRecipe-name">{{ recipe.name }}</h3>
 
-                            <template v-if="recipe.allergies?.length" #footer>
-                                <p class="text-center mb-0">
-                                    <strong>
-                                        <i class="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
-                                        {{ $t('home.topRecipes.containsAllergen', { allergen: recipe.allergies.map(a => a.name).join(', ') }) }}
-                                    </strong>
-                                </p>
-                            </template>
-                        </CardBase>
+                            <div v-if="recipe.allergies?.length" class="topRecipe-allergens"
+                                 :title="$t('home.topRecipes.containsAllergen', { allergen: recipe.allergies.map(a => $t('allergies.' + a.id)).join(', ') })">
+                                <span class="topRecipe-allergen" v-for="a in recipe.allergies" :key="a.id">
+                                    {{ $t('allergies.' + a.id) }}
+                                </span>
+                            </div>
+                        </article>
                     </NuxtLink>
                 </div>
-                <div class=" col-lg-6 col-md-12 col-sm-12 moreRecipeBtn mt-lg-5 mx-auto">
-                    <ClientOnly>
-                        <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right" class="my-5">{{ $t('home.topRecipes.ctaMore') }}</Button>
-                    </ClientOnly>
-                </div>
+            </div>
+
+            <div class="topRecipe-cta">
+                <ClientOnly>
+                    <Button to="/recipes" icon="bi bi-arrow-right" iconPosition="right">{{ $t('home.topRecipes.ctaMore') }}</Button>
+                </ClientOnly>
             </div>
         </div>
     </section>
