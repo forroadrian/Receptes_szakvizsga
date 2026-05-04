@@ -515,7 +515,7 @@ const tabCounts = computed(() => {
             </div>
 
             <div v-if="!recipesLoading && !needsLoginForTab && recipesFilteredByIngredients.length" class="row">
-                <div v-if="user && filterStore.activeTab !== 'ai'"
+               <div v-if="user && (filterStore.activeTab == 'own' || filterStore.activeTab == 'default')"
                     class="addRecipe col-12 col-md-6 col-lg-4 my-sm-3 d-flex justify-content-center align-items-center"
                     :data-bs-toggle="user ? 'modal' : null" :data-bs-target="user ? '#openAddRecipeModal' : null"
                     @click="handleAddRecipeClick">
@@ -551,15 +551,7 @@ const tabCounts = computed(() => {
                             <template #header>
                                 <CardHeader class="w-100 card-header my-4"
                                     :class="{ 'pt-5': filterStore.activeTab !== 'default' }">
-                                    <CardTitle :rank="5">{{ recipe.name }}</CardTitle>
-                                    <template #actions>
-                                        <span title="User" class="top-0 start-50 translate-middle"
-                                            v-if="filterStore.activeTab === 'own'"><i
-                                                class="bi bi-file-earmark-person fs-4"></i></span>
-                                        <span title="User" class="top-0 start-50 translate-middle"
-                                            v-if="filterStore.activeTab === 'saved'"><i
-                                                class="bi bi-bookmark-check"></i></span>
-                                    </template>
+                                    <CardTitle :rank="5">{{ recipe.name }}</CardTitle>                           
                                 </CardHeader>
                             </template>
 
