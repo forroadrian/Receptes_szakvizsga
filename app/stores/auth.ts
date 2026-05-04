@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     const errorMessage = ref('')
     const successMessage = ref('')
     const profileUrl = ref('')
+    const username = ref('')
 
     const clearMessages = () => {
         errorMessage.value = ''
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const clearProfileData = () => {
         profileUrl.value = ''
+        username.value = ''
     }
 
     const { saveRememberPreference, clearRememberPreference } = useRememberMe()
@@ -29,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
         successMessage,
         loading,
         profileUrl,
+        username,
         user
     })
 
@@ -217,6 +220,7 @@ export const useAuthStore = defineStore('auth', () => {
         errorMessage,
         successMessage,
         profileUrl,
+        username,
         clearMessages,
         clearProfileData,
         loadProfileData,

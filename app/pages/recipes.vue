@@ -7,7 +7,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 import { useIngredientStore } from "~/stores/ingredients";
 import Pills from "~/components/Pills.vue";
-import ConfirmModal from "~/components/recipe/ConfirmModal.vue";
+import ConfirmModal from "~/components/ConfirmModal.vue";
 import type Pill from "~/interfaces/Pill";
 
 const route = useRoute();

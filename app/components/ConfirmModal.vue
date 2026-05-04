@@ -43,7 +43,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
                             <slot name="message">{{ $t('common.irreversible') }}</slot>
                         </p>
                     </div>
-           
+
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12 my-3 d-flex justify-content-center justify-content-md-end justify-content-xl-center">
                             <Button class="w-100" @click="emit('cancel')">
@@ -81,7 +81,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEsc));
     border-radius: var(--radius-sm);
 }
 
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
     .confirm-card  {
         min-width: 80%;
     }

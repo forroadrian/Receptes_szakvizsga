@@ -1,0 +1,13 @@
+{
+    "error": {
+        "home": "Vissza a kezdőlapra",
+        "notFound": {
+            "title": "Nem találjuk az oldalt",
+            "message": "Lehet, hogy elköltözött vagy soha nem is létezett. Térj vissza a kezdőlapra és folytasd a főzést."
+        },
+        "generic": {
+            "title": "Hiba történt",
+            "message": "Valami nem sikerült. Próbáld újra később, vagy térj vissza a kezdőlapra."
+        }
+    }
+}

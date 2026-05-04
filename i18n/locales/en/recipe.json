@@ -176,7 +176,8 @@
       "deleteCancel": "Cancel",
       "share": "Share recipe",
       "shareCopied": "Recipe link copied to clipboard.",
-      "shareFailed": "Could not share recipe."
+      "shareFailed": "Could not share recipe.",
+      "notFound": "The recipe you're looking for could not be found."
     },
     "similar": {
       "details": "Details",

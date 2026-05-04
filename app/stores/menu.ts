@@ -40,6 +40,14 @@ type MenuApiResponse = {
     }[];
 };
 
+type CreatedMenuResponse = {
+    id: number;
+    user_id: string;
+    name: string | null;
+    planned_date: string;
+    active: boolean;
+};
+
 export const useMenuStore = defineStore("menus", () => {
     const menus = ref<MenuItem[]>([]);
     const isLoaded = ref(false);
@@ -92,31 +100,27 @@ export const useMenuStore = defineStore("menus", () => {
     };
 
     const loadMenus = async () => {
-        try {
-            const raw = await $fetch<MenuApiResponse[]>("/api/menu", { method: "GET" });
-            menus.value = (raw ?? [])
-                .filter((m): m is MenuApiResponse & { planned_date: string } => !!m.planned_date)
-                .map<MenuItem>((m) => ({
-                    id: m.id,
-                    user_id: m.user_id,
-                    name: m.name,
-                    planned_date: m.planned_date,
-                    active: m.active,
-                    recipes: (m.menu_recipe ?? [])
-                        .filter((mr) => !!mr.recipe)
-                        .map<MenuRecipe>((mr) => ({
-                            recipe_id: mr.recipe_id,
-                            name: mr.recipe!.name,
-                            description: mr.recipe!.description,
-                            time: mr.recipe!.time,
-                            servings: mr.recipe!.servings,
-                            author_id: mr.recipe!.author_id,
-                        })),
-                }));
-            isLoaded.value = true;
-        } catch (error) {
-            throw error;
-        }
+        const raw = await $fetch<MenuApiResponse[]>("/api/menu", { method: "GET" });
+        menus.value = (raw ?? [])
+            .filter((m): m is MenuApiResponse & { planned_date: string } => !!m.planned_date)
+            .map<MenuItem>((m) => ({
+                id: m.id,
+                user_id: m.user_id,
+                name: m.name,
+                planned_date: m.planned_date,
+                active: m.active,
+                recipes: (m.menu_recipe ?? [])
+                    .filter((mr) => !!mr.recipe)
+                    .map<MenuRecipe>((mr) => ({
+                        recipe_id: mr.recipe_id,
+                        name: mr.recipe!.name,
+                        description: mr.recipe!.description,
+                        time: mr.recipe!.time,
+                        servings: mr.recipe!.servings,
+                        author_id: mr.recipe!.author_id,
+                    })),
+            }));
+        isLoaded.value = true;
     };
 
     const createMenu = async (
@@ -124,12 +128,12 @@ export const useMenuStore = defineStore("menus", () => {
         name: string,
         recipeIds: number[]
     ): Promise<MenuItem | null> => {
-        await $fetch("/api/menu", {
+        const created = await $fetch<CreatedMenuResponse>("/api/menu", {
             method: "POST",
             body: { name, date, recipe_ids: recipeIds },
         });
         await loadMenus();
-        return menus.value.find((m) => m.name === name && m.planned_date === date) ?? null;
+        return menus.value.find((m) => m.id === created.id) ?? null;
     };
 
     const updateMenu = async (id: number, updates: { name?: string; date?: string }) => {

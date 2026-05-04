@@ -20,6 +20,10 @@ const props = defineProps({
     required: {
         type: Boolean,
         default: false
+    },
+    autocomplete: {
+        type: String,
+        default: ''
     }
 });
 
@@ -42,7 +46,7 @@ const togglePassword = () => {
         <label v-if="label || placeholder" class="form-label floating-label">{{ label || placeholder }}</label>
 
         <div class="position-relative d-flex align-items-center">
-            <input class="form-control pe-5" v-model="model" :type="inputType" :placeholder="label || placeholder" :required="required"/>
+            <input class="form-control pe-5" v-model="model" :type="inputType" :placeholder="label || placeholder" :required="required" :autocomplete="autocomplete || undefined"/>
 
             <i v-if="type === 'password'"
                 :class="showPassword ? 'bi bi-eye password-icon' : 'bi bi-eye-slash password-icon'" @click="togglePassword"></i>

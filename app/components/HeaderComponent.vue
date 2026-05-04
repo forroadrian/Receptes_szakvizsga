@@ -61,9 +61,13 @@ const hasProfileImage = computed(() => !!authStore.profileUrl)
 const displayUsername = computed(() => {
     if (!user.value) return ""
 
-    const username = user.value.user_metadata?.username
-    if (username && username.trim() !== "") {
-        return username
+    if (authStore.username && authStore.username.trim() !== "") {
+        return authStore.username
+    }
+
+    const metaUsername = user.value.user_metadata?.username
+    if (metaUsername && metaUsername.trim() !== "") {
+        return metaUsername
     }
 
     if (user.value.email) {

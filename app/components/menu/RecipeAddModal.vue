@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useMenuStore } from "~/stores/menu";
 import { useRecipeStore, type RecipeItem } from "~/stores/recipe";
+import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 
 const menuStore = useMenuStore();
 const recipeStore = useRecipeStore();
@@ -11,7 +12,7 @@ const { t, locale } = useI18n();
 const intlLocale = computed(() => (locale.value === "hu" ? "hu-HU" : "en-US"));
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: any = null;
+let modalInstance: BootstrapModal | null = null;
 
 const targetDate = ref<string>("");
 const targetTime = ref<string>("12:00");
@@ -112,10 +113,7 @@ const resetState = (dateKey: string) => {
 
 const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
-    if (!modalElRef.value) return null;
-    const bs = (window as any).bootstrap;
-    if (!bs?.Modal) return null;
-    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
+    modalInstance = getBootstrapModal(modalElRef.value);
     return modalInstance;
 };
 
@@ -192,7 +190,12 @@ defineExpose({ openFor });
                     </div>
 
                     <div class="modal-body">
-                        <div v-if="pinnedRecipes.length" class="pinned-bar">
+                        <div
+                            v-if="pinnedRecipes.length"
+                            class="pinned-bar"
+                            role="group"
+                            :aria-label="$t('menu.addModal.pinned')"
+                        >
                             <span class="pinned-label">{{ $t('menu.addModal.pinned') }}</span>
                             <span
                                 v-for="recipe in pinnedRecipes"

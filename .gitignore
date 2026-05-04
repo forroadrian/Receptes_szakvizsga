@@ -31,5 +31,7 @@ logs
 .claude
 *.sql
 
+.playwright*
+
 # Vitest
 coverage/

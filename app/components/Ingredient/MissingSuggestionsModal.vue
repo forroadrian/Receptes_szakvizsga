@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useIngredientStore } from "~/stores/ingredients";
+import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 
 const emit = defineEmits<{
     (e: "pick", ingredientName: string): void;
 }>();
 
 const store = useIngredientStore();
+const { formatIngredient } = useIngredientFormatter();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: any = null;
+let modalInstance: BootstrapModal | null = null;
 
-const missing = ref<{ name: string; appears: number }[]>([]);
+const missing = ref<{ name: string; appears: number; ingredient_id: number }[]>([]);
 const isLoading = ref(false);
 
 const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
-    if (!modalElRef.value) return null;
-    const bs = (window as any).bootstrap;
-    if (!bs?.Modal) return null;
-    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
+    modalInstance = getBootstrapModal(modalElRef.value);
     return modalInstance;
 };
 
@@ -79,7 +78,7 @@ defineExpose({ open });
                 </div>
 
                 <div class="modal-body">
-                    <p v-if="isLoading" class="text-muted small mb-0">{{$t('common.actions.loading')}}</p>
+                    <p v-if="isLoading" class="text-muted small mb-0">{{$t('common.loading')}}</p>
 
                     <div v-else-if="!missing.length" class="empty">
                         <i class="bi bi-check2-circle fs-2 mb-2 d-block"></i>
@@ -89,19 +88,19 @@ defineExpose({ open });
                     <ul v-else class="missing-list list-unstyled m-0">
                         <li
                             v-for="item in missing"
-                            :key="item.name"
+                            :key="item.ingredient_id"
                         >
                             <button
                                 type="button"
                                 class="missing-row"
-                                @click="onPick(item.name)"
+                                @click="onPick(formatIngredient(item.ingredient_id) || item.name)"
                             >
                                 <span class="appears-chip">
                                     {{ item.appears }}&times;
                                 </span>
-                                <span class="item-name">{{item.name}}</span>
+                                <span class="item-name">{{ formatIngredient(item.ingredient_id) || item.name }}</span>
                                 <span class="add-hint">
-                                    <i class="bi bi-plus-lg me-1"></i>
+                                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
                                     {{$t('pantry.missingModal.actions.add')}}
                                 </span>
                             </button>

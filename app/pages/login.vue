@@ -52,10 +52,10 @@ const onSubmit = async () => {
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                     @submit.prevent="onSubmit">
                     <FormInput class="pt-3" v-model="loginValue" :label="$t('login.fields.identifier')" type="text"
-                        :placeholder="$t('login.fields.identifierPlaceholder')" required />
+                        :placeholder="$t('login.fields.identifierPlaceholder')" autocomplete="username" required />
 
                     <FormInput class="pt-3" v-model="password" :label="$t('login.fields.password')" type="password"
-                        :placeholder="$t('login.fields.passwordPlaceholder')" required />
+                        :placeholder="$t('login.fields.passwordPlaceholder')" autocomplete="current-password" required />
 
                     <div class="auth-login-options d-flex justify-content-between align-items-center flex-wrap gap-2 mt-2 mb-3">
                         <div class="form-check m-0">

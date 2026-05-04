@@ -13,6 +13,7 @@ type UseAuthProfileOptions = {
     successMessage: Ref<string>
     loading: Ref<boolean>
     profileUrl: Ref<string>
+    username: Ref<string>
     user: Ref<any>
 }
 
@@ -23,6 +24,7 @@ export const useAuthProfile = ({
     successMessage,
     loading,
     profileUrl,
+    username,
     user
 }: UseAuthProfileOptions) => {
     const supabase = useSupabaseClient()
@@ -69,6 +71,7 @@ export const useAuthProfile = ({
             const data = await $fetch<ProfileResponse>('/api/auth/profile', { method: 'GET' })
 
             profileUrl.value = resolveProfileImageUrl(data?.profile_url)
+            username.value = data?.username ?? ''
 
             return data
         } catch (error: any) {

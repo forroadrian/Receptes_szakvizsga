@@ -5,7 +5,7 @@ import { useRecipeFilterStore } from "~/stores/recipeFilters";
 import { useRecipeStore } from "~/stores/recipe";
 import { useRecipeModal } from "~/composables/useRecipeModal";
 import RecipeModal from "~/components/recipe/RecipeModal.vue";
-import ConfirmModal from "~/components/recipe/ConfirmModal.vue";
+import ConfirmModal from "~/components/ConfirmModal.vue";
 
 const { t } = useI18n();
 const { formatUnit } = useUnitFormatter();

@@ -88,6 +88,8 @@ onMounted(async () => {
     loading.value = true;
     try {
         await Promise.all(tasks);
+    } catch (err: any) {
+        showAlert("error", err?.data?.message ?? err?.message ?? t("pantry.modal.errors.loadFailed"));
     } finally {
         loading.value = false;
     }
@@ -165,9 +167,9 @@ onMounted(async () => {
                             <span>{{$t('pantry.list.addIngredient')}}</span>
                         </button>
 
-                        <p v-if="loading" class="loading-note text-muted small mb-0 py-2 text-center">
-                            {{$t('common.loading')}}
-                        </p>
+                        <div v-if="loading" class="skeleton-rows" aria-busy="true" :aria-label="$t('common.loading')">
+                            <div v-for="n in 4" :key="n" class="skeleton-row"></div>
+                        </div>
 
                         <div v-else-if="!filtered.length" class="empty-list">
                             <i class="bi bi-basket2 fs-2 mb-2 d-block"></i>
@@ -310,6 +312,34 @@ onMounted(async () => {
     text-align: center;
     padding: 2.5rem 1rem;
     color: var(--bs-secondary-color);
+}
+
+.skeleton-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.skeleton-row {
+    height: 56px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+        90deg,
+        var(--bs-tertiary-bg) 0%,
+        var(--bs-secondary-bg) 50%,
+        var(--bs-tertiary-bg) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-row { animation: none; }
 }
 
 @media (max-width: 991px) {

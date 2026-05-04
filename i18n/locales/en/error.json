@@ -1,0 +1,13 @@
+{
+    "error": {
+        "home": "Back to home",
+        "notFound": {
+            "title": "We can't find this page",
+            "message": "It may have moved or it never existed. Head back to the home page and keep cooking."
+        },
+        "generic": {
+            "title": "Something went wrong",
+            "message": "Something didn't go to plan. Try again later or head back to the home page."
+        }
+    }
+}

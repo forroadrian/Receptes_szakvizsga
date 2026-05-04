@@ -45,32 +45,20 @@ const getRank = (recipe: FeaturedRecipe): string => {
     return String(idx + 1).padStart(2, '0')
 }
 
-const goToRecipes = (mealName: string) => {
-    const huName = t(`home.meals.categories.${mealName}.name`, {}, { locale: 'hu' })
-    navigateTo(`/recipes?meal=${huName}`)
+const goToRecipes = (huMealName: string) => {
+    if (!huMealName) {
+        navigateTo("/recipes")
+        return
+    }
+    navigateTo({ path: "/recipes", query: { meal: huMealName } })
 };
 
-const categories = [
-    {
-        name: "all",
-        icon: "bi bi-three-dots",
-    },
-    {
-        name: "breakfast",
-        icon: "bi bi-sun",
-    },
-    {
-        name: "lunch",
-        icon: "bi bi-egg-fried",
-    },
-    {
-        name: "dinner",
-        icon: "bi bi-moon",
-    },
-    {
-        name: "snack",
-        icon: "bi bi-cookie",
-    },
+const categories: Array<{ name: string; icon: string; huName: string }> = [
+    { name: "all",       icon: "bi bi-three-dots", huName: "" },
+    { name: "breakfast", icon: "bi bi-sun",        huName: "Reggeli" },
+    { name: "lunch",     icon: "bi bi-egg-fried",  huName: "Ebéd" },
+    { name: "dinner",    icon: "bi bi-moon",       huName: "Vacsora" },
+    { name: "snack",     icon: "bi bi-cookie",     huName: "Snack" },
 ]
 
 const thingsThatMakeUsStandOut = [
@@ -145,13 +133,13 @@ const thingsThatMakeUsStandOut = [
                 <p class="meal-section-lead">{{ $t('home.meals.lead') }}</p>
                 <div class="row meal-grid justify-content-center g-0">
                     <div class="col-12 col-sm-6 col-lg" v-for="item in categories" :key="item.name">
-                        <div class="meal-card" @click="goToRecipes(item.name)">
+                        <button type="button" class="meal-card" @click="goToRecipes(item.huName)">
                             <div class="category-icon">
-                                <i :class="item.icon"></i>
+                                <i :class="item.icon" aria-hidden="true"></i>
                             </div>
                             <h3 class="meal-card-title">{{ $t('home.meals.categories.' + item.name + '.name') }}</h3>
                             <p class="meal-card-text">{{ $t('home.meals.categories.' + item.name + '.description') }}</p>
-                        </div>
+                        </button>
                     </div>
                 </div>
             </div>

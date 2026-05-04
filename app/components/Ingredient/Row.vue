@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { MatcherPatternQueryParam } from "vue-router/dist/experimental/index.mjs";
 import type Ingredient from "~/models/Ingredient";
 import { daysFromToday } from "~/utils/budapestDate";
 

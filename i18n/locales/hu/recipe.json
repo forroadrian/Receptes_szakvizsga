@@ -176,7 +176,8 @@
       "deleteCancel": "Mégsem",
       "share": "Recept megosztása",
       "shareCopied": "A recept linkje vágólapra másolva.",
-      "shareFailed": "Nem sikerült megosztani a receptet."
+      "shareFailed": "Nem sikerült megosztani a receptet.",
+      "notFound": "A keresett recept nem található."
     },
     "similar": {
       "details": "Részletek",

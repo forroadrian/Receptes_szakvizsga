@@ -224,13 +224,13 @@ const onSubmit = async () => {
                     <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                         @submit.prevent="onSubmit">
                         <FormInput v-model="password" :label="$t('auth.reset.passwordLabel')" type="password"
-                            :placeholder="$t('auth.reset.passwordPlaceholder')" required />
+                            :placeholder="$t('auth.reset.passwordPlaceholder')" autocomplete="new-password" required />
                         <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
                             {{ $t('auth.reset.passwordTooShort') }}
                         </div>
 
                         <FormInput v-model="repassword" :label="$t('auth.reset.repasswordLabel')" type="password"
-                            :placeholder="$t('auth.reset.repasswordPlaceholder')" required />
+                            :placeholder="$t('auth.reset.repasswordPlaceholder')" autocomplete="new-password" required />
                         <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
                             {{ $t('auth.reset.passwordMismatch') }}
                         </div>

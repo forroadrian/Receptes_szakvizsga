@@ -5,6 +5,7 @@ import {
     useMissingIngredients,
     type MissingIngredient,
 } from "~/composables/useMissingIngredients";
+import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 
 const emit = defineEmits<{
     (e: "add-recipe", dateKey: string): void;
@@ -14,9 +15,23 @@ const menuStore = useMenuStore();
 const missing = useMissingIngredients();
 const { t, locale } = useI18n();
 const { formatUnit } = useUnitFormatter();
+const { showAlert } = useAlert();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: any = null;
+let modalInstance: BootstrapModal | null = null;
+
+type PendingAction =
+    | { kind: "removeRecipe"; menuId: number; recipeId: number }
+    | { kind: "deleteMenu"; menuId: number };
+
+const pendingAction = ref<PendingAction | null>(null);
+const isActionRunning = ref(false);
+
+const confirmMessage = computed(() => {
+    if (pendingAction.value?.kind === "removeRecipe") return t("menu.dayDetail.confirmRemoveRecipe");
+    if (pendingAction.value?.kind === "deleteMenu") return t("menu.dayDetail.confirmDeleteMenu");
+    return "";
+});
 
 const dateKey = ref<string>("");
 const missingList = ref<MissingIngredient[]>([]);
@@ -51,10 +66,7 @@ const formatTime = (iso: string) =>
 
 const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
-    if (!modalElRef.value) return null;
-    const bs = (window as any).bootstrap;
-    if (!bs?.Modal) return null;
-    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
+    modalInstance = getBootstrapModal(modalElRef.value);
     return modalInstance;
 };
 
@@ -75,25 +87,44 @@ const open = async (targetDateKey: string) => {
 
 const close = () => modalInstance?.hide();
 
-const handleRemoveRecipe = async (menuId: number, recipeId: number) => {
-    if (!confirm(t("menu.dayDetail.confirmRemoveRecipe"))) return;
+const handleRemoveRecipe = (menuId: number, recipeId: number) => {
+    pendingAction.value = { kind: "removeRecipe", menuId, recipeId };
+};
+
+const handleDeleteMenu = (menuId: number) => {
+    pendingAction.value = { kind: "deleteMenu", menuId };
+};
+
+const confirmPendingAction = async () => {
+    const action = pendingAction.value;
+    if (!action || isActionRunning.value) return;
+    isActionRunning.value = true;
     try {
-        await menuStore.removeRecipeFromMenu(menuId, recipeId);
-        missing.invalidate();
+        if (action.kind === "removeRecipe") {
+            await menuStore.removeRecipeFromMenu(action.menuId, action.recipeId);
+            missing.invalidate();
+        } else {
+            await menuStore.deleteMenu(action.menuId);
+            missing.invalidate();
+            if (!menusForDay.value.length) close();
+        }
+        pendingAction.value = null;
     } catch {
-        alert(t("menu.dayDetail.removeRecipeError"));
+        showAlert(
+            "error",
+            action.kind === "removeRecipe"
+                ? t("menu.dayDetail.removeRecipeError")
+                : t("menu.dayDetail.deleteMenuError"),
+        );
+        pendingAction.value = null;
+    } finally {
+        isActionRunning.value = false;
     }
 };
 
-const handleDeleteMenu = async (menuId: number) => {
-    if (!confirm(t("menu.dayDetail.confirmDeleteMenu"))) return;
-    try {
-        await menuStore.deleteMenu(menuId);
-        missing.invalidate();
-        if (!menusForDay.value.length) close();
-    } catch {
-        alert(t("menu.dayDetail.deleteMenuError"));
-    }
+const cancelPendingAction = () => {
+    if (isActionRunning.value) return;
+    pendingAction.value = null;
 };
 
 const handleAdd = () => {
@@ -272,6 +303,18 @@ defineExpose({ open });
                 </div>
             </div>
         </div>
+
+    <ConfirmModal
+        :show="pendingAction !== null"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
+        :loading="isActionRunning"
+        @cancel="cancelPendingAction"
+        @confirm="confirmPendingAction"
+    >
+        <template #title>{{ t('menu.dayDetail.title') }}</template>
+        <template #message>{{ confirmMessage }}</template>
+    </ConfirmModal>
 </template>
 
 <style scoped>

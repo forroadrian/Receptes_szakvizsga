@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useMenuStore, type MenuItem } from "~/stores/menu";
 import { toBudapestDateKey } from "~/utils/budapestDate";
+import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 
 const emit = defineEmits<{
     (e: "jump", dateKey: string): void;
@@ -9,9 +10,13 @@ const emit = defineEmits<{
 
 const menuStore = useMenuStore();
 const { t, locale } = useI18n();
+const { showAlert } = useAlert();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: any = null;
+let modalInstance: BootstrapModal | null = null;
+
+const pendingDeleteId = ref<number | null>(null);
+const isDeleting = ref(false);
 
 const year = ref<number>(new Date().getFullYear());
 const month = ref<number>(new Date().getMonth());
@@ -100,21 +105,33 @@ const onJump = (dateKey: string) => {
     modalInstance?.hide();
 };
 
-const onDelete = async (menuId: number) => {
-    if (!confirm(t("menu.monthModal.confirmDelete"))) return;
+const onDelete = (menuId: number) => {
+    pendingDeleteId.value = menuId;
+};
+
+const confirmDelete = async () => {
+    const menuId = pendingDeleteId.value;
+    if (menuId === null || isDeleting.value) return;
+    isDeleting.value = true;
     try {
         await menuStore.deleteMenu(menuId);
-    } catch (err) {
-        alert(t("menu.monthModal.deleteError"));
+        pendingDeleteId.value = null;
+    } catch {
+        showAlert("error", t("menu.monthModal.deleteError"));
+        pendingDeleteId.value = null;
+    } finally {
+        isDeleting.value = false;
     }
+};
+
+const cancelDelete = () => {
+    if (isDeleting.value) return;
+    pendingDeleteId.value = null;
 };
 
 const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
-    if (!modalElRef.value) return null;
-    const bs = (window as any).bootstrap;
-    if (!bs?.Modal) return null;
-    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
+    modalInstance = getBootstrapModal(modalElRef.value);
     return modalInstance;
 };
 
@@ -250,6 +267,18 @@ defineExpose({ open });
                 </div>
             </div>
         </div>
+
+    <ConfirmModal
+        :show="pendingDeleteId !== null"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
+        :loading="isDeleting"
+        @cancel="cancelDelete"
+        @confirm="confirmDelete"
+    >
+        <template #title>{{ t('menu.monthModal.deleteTitle') }}</template>
+        <template #message>{{ t('menu.monthModal.confirmDelete') }}</template>
+    </ConfirmModal>
 </template>
 
 <style scoped>

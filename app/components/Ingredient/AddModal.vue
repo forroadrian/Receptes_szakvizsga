@@ -4,6 +4,7 @@ import ExpiryDate from "~/models/ExpiryDate";
 import IngredientModel from "~/models/Ingredient";
 import type Ingredient from "~/models/Ingredient";
 import { useIngredientStore } from "~/stores/ingredients";
+import { getBootstrapModal, type BootstrapModal } from "~/utils/bootstrapModal";
 import IngredientPicker from "./IngredientPicker.vue";
 
 const store = useIngredientStore();
@@ -11,7 +12,7 @@ const { formatIngredient } = useIngredientFormatter();
 const { t } = useI18n();
 
 const modalElRef = ref<HTMLElement | null>(null);
-let modalInstance: any = null;
+let modalInstance: BootstrapModal | null = null;
 
 const mode = ref<"create" | "edit">("create");
 const originalId = ref<number | null>(null);
@@ -24,6 +25,7 @@ const expiry = ref("");
 const saving = ref(false);
 const deleting = ref(false);
 const errorMessage = ref("");
+const showDeleteConfirm = ref(false);
 
 const missing = ref<{ name: string; appears: number; ingredient_id: number }[]>([]);
 
@@ -69,10 +71,7 @@ const reset = () => {
 
 const ensureModalInstance = () => {
     if (modalInstance) return modalInstance;
-    if (!modalElRef.value) return null;
-    const bs = (window as any).bootstrap;
-    if (!bs?.Modal) return null;
-    modalInstance = bs.Modal.getOrCreateInstance(modalElRef.value);
+    modalInstance = getBootstrapModal(modalElRef.value);
     return modalInstance;
 };
 
@@ -148,16 +147,23 @@ const handleSave = async () => {
     }
 };
 
-const handleDelete = async () => {
+const handleDelete = () => {
     if (!isEdit.value || originalId.value === null || deleting.value) return;
-    if (!confirm(t("pantry.addModal.deleteConfirm"))) return;
+    errorMessage.value = "";
+    showDeleteConfirm.value = true;
+};
+
+const confirmDelete = async () => {
+    if (!isEdit.value || originalId.value === null || deleting.value) return;
     deleting.value = true;
     errorMessage.value = "";
     try {
         await store.removeIngredient(originalId.value);
+        showDeleteConfirm.value = false;
         close();
         reset();
     } catch (err: any) {
+        showDeleteConfirm.value = false;
         errorMessage.value =
             err?.data?.message ?? err?.message ?? t("pantry.addModal.errors.deleteFailed");
     } finally {
@@ -244,8 +250,8 @@ defineExpose({ open, openForEdit });
                                                 type="number"
                                                 class="form-control"
                                                 placeholder="10"
-                                                min="0"
-                                                step="any"
+                                                min="0.01"
+                                                step="0.01"
                                             />
                                             <select v-model="unit" class="form-select unit-select" :aria-label="t('pantry.addModal.fields.unitPlaceholder')">
                                                 <option value="" disabled>{{ t('pantry.addModal.fields.unitPlaceholder') }}</option>
@@ -315,6 +321,18 @@ defineExpose({ open, openForEdit });
             </div>
         </div>
     </div>
+
+    <ConfirmModal
+        :show="showDeleteConfirm"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
+        :loading="deleting"
+        @cancel="showDeleteConfirm = false"
+        @confirm="confirmDelete"
+    >
+        <template #title>{{ t('pantry.addModal.title.edit') }}</template>
+        <template #message>{{ t('pantry.addModal.deleteConfirm') }}</template>
+    </ConfirmModal>
 </template>
 
 <style scoped>

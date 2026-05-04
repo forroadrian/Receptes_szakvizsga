@@ -614,17 +614,17 @@ const handleSave = async () => {
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
                                                 <FormInput v-model="currentPasswordInput" :label="$t('profile.fields.currentPassword')"
-                                                    type="password" />
+                                                    type="password" autocomplete="current-password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="newPasswordInput" :label="$t('profile.fields.newPassword')"
-                                                    type="password" />
+                                                    type="password" autocomplete="new-password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="confirmPasswordInput"
-                                                    :label="$t('profile.fields.confirmPassword')" type="password" />
+                                                    :label="$t('profile.fields.confirmPassword')" type="password" autocomplete="new-password" />
                                             </div>
 
                                             <div class="form-check mb-4">
@@ -755,17 +755,17 @@ const handleSave = async () => {
                                         <form class="d-flex flex-column flex-grow-1" @submit.prevent="handleSave">
                                             <div class="mb-3">
                                                 <FormInput v-model="currentPasswordInput" :label="$t('profile.fields.currentPassword')"
-                                                    type="password" />
+                                                    type="password" autocomplete="current-password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="newPasswordInput" :label="$t('profile.fields.newPassword')"
-                                                    type="password" />
+                                                    type="password" autocomplete="new-password" />
                                             </div>
 
                                             <div class="mb-3">
                                                 <FormInput v-model="confirmPasswordInput"
-                                                    :label="$t('profile.fields.confirmPassword')" type="password" />
+                                                    :label="$t('profile.fields.confirmPassword')" type="password" autocomplete="new-password" />
                                             </div>
 
                                             <div class="form-check mb-4">

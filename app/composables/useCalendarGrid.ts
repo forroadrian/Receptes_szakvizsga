@@ -10,38 +10,10 @@ export type CalendarCell = {
     isWeekend: boolean;
 };
 
-const HUNGARIAN_MONTHS = [
-    "Január",
-    "Február",
-    "Március",
-    "Április",
-    "Május",
-    "Június",
-    "Július",
-    "Augusztus",
-    "Szeptember",
-    "Október",
-    "November",
-    "December",
-];
-
-export const HUNGARIAN_WEEKDAYS_SHORT = ["H", "K", "Sze", "Cs", "P", "Szo", "V"];
-export const HUNGARIAN_WEEKDAYS_LONG = [
-    "Hétfő",
-    "Kedd",
-    "Szerda",
-    "Csütörtök",
-    "Péntek",
-    "Szombat",
-    "Vasárnap",
-];
-
 export function useCalendarGrid(initial?: { year: number; month: number }) {
     const today = new Date();
     const year: Ref<number> = ref(initial?.year ?? today.getFullYear());
     const month: Ref<number> = ref(initial?.month ?? today.getMonth());
-
-    const monthLabel = computed(() => `${year.value}. ${HUNGARIAN_MONTHS[month.value]}`);
 
     const cells = computed<CalendarCell[]>(() => {
         const firstOfMonth = new Date(year.value, month.value, 1);
@@ -100,7 +72,6 @@ export function useCalendarGrid(initial?: { year: number; month: number }) {
         year,
         month,
         cells,
-        monthLabel,
         prevMonth,
         nextMonth,
         goToToday,

@@ -203,22 +203,22 @@ const closeConfirmationModal = () => {
                 <form ref="formRef" class="needs-validation" :class="{ 'was-validated': submitAttempted }" novalidate
                     @submit.prevent="onSubmit">
                     <FormInput v-model="email" :label="$t('register.fields.email')" type="email"
-                        :placeholder="$t('register.fields.emailPlaceholder')" required />
+                        :placeholder="$t('register.fields.emailPlaceholder')" autocomplete="email" required />
 
                     <FormInput v-model="username" :label="$t('register.fields.username')" type="text"
-                        :placeholder="$t('register.fields.usernamePlaceholder')" required />
+                        :placeholder="$t('register.fields.usernamePlaceholder')" autocomplete="username" required />
                     <div v-if="submitAttempted && !usernameOk" class="invalid-feedback d-block mb-2">
                         {{ $t('register.validation.usernameTooShort') }}
                     </div>
 
                     <FormInput v-model="password" :label="$t('register.fields.password')" type="password"
-                        :placeholder="$t('register.fields.passwordPlaceholder')" required />
+                        :placeholder="$t('register.fields.passwordPlaceholder')" autocomplete="new-password" required />
                     <div v-if="submitAttempted && !passwordOk" class="invalid-feedback d-block mb-2">
                         {{ $t('register.validation.passwordTooShort') }}
                     </div>
 
                     <FormInput v-model="repassword" :label="$t('register.fields.repassword')" type="password"
-                        :placeholder="$t('register.fields.repasswordPlaceholder')" required />
+                        :placeholder="$t('register.fields.repasswordPlaceholder')" autocomplete="new-password" required />
                     <div v-if="submitAttempted && !passwordsMatch" class="invalid-feedback d-block mb-2">
                         {{ $t('register.validation.passwordMismatch') }}
                     </div>
